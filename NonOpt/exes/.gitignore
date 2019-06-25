@@ -1,0 +1,17 @@
+.DS_Store
+*.a
+*.d
+*.d.*
+*.dSYM
+*.m
+*.nl
+*.o
+*.opt
+*.out
+*.pbs
+*.py
+*.sh
+*.sol
+*.txt
+solveAMPLProblem
+solveNonsmoothProblem

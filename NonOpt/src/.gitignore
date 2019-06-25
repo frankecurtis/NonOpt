@@ -1,0 +1,6 @@
+.DS_Store
+*.a
+*.d
+*.d.*
+*.dSYM
+*.o

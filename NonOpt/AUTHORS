@@ -1,0 +1,9 @@
+The main author of NonOpt is:
+
+Frank E. Curtis <frank.e.curtis@gmail.com>
+
+Other authors of subroutines:
+
+- NonOptQPSolverActiveSet.hpp/.cpp:
+
+  Baoyu Zhou <baz216@lehigh.edu>
