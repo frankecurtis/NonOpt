@@ -38,7 +38,7 @@ $(LIB): $(objects)
 	$(AR) $@ $(objects)
 
 # Includes
-INCLUDES = -I $(NonOptDIR) -I $(AMPLDIR)
+INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(AMPLDIR)
 
 # Rule for .cpp.o
 .cpp.o:

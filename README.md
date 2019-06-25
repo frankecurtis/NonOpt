@@ -4,19 +4,20 @@ NonOpt
 Overview
 --------
 
-NonOpt (Non(-linear/-convex/-smooth) Optimizer) is a software package for solving minimization problems.  It is designed to locate a stationary point (ideally, a minimizer) of
+NonOpt (Nonlinear/nonconvex/nonsmooth Optimizer) is a software package for solving minimization problems.  It is designed to locate a stationary point (ideally, a minimizer) of
 
 ```
 min     f(x)
 x ∈ Rⁿ
 ```
-where ```f : Rⁿ --> R``` is locally Lipschitz and continuously differentiable over a full-measure subset of ```Rⁿ```.  The function ```f``` can be nonlinear, nonconvex, and/or nonsmooth.
+
+where ```f : Rⁿ -> R``` is locally Lipschitz and continuously differentiable over a full-measure subset of ```Rⁿ```.  The function ```f``` can be nonlinear, nonconvex, and/or nonsmooth.
 
 NonOpt is written in C++ and is released under the MIT License.  The main author is [Frank E. Curtis](http://coral.ise.lehigh.edu/frankecurtis/).  For a list of all contributors, please see the [AUTHORS file](NonOpt/AUTHORS).
 
-Compiling NonOpt requires BLAS and LAPACK routines.  The code for these is not provided in the distribution, which are available under different conditions and licenses than those for NonOpt.
+Compiling NonOpt requires BLAS and LAPACK.  The code for these packages is not provided in this repository, which are available under different conditions and licenses than those for NonOpt.
 
-Please visit [the NonOpt homepage](http://coral.ise.lehigh.edu/frankecurtis/nonopt/).
+Please visit the [NonOpt homepage](http://coral.ise.lehigh.edu/frankecurtis/nonopt/).
 
 Citing NonOpt
 -------------

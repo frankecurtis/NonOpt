@@ -20,12 +20,12 @@ dependlists = $(sources:.cpp=.d)
 dsyms       = $(sources:.cpp=.dSYM)
 
 # Libraries
-NonOptLIB         = $(NonOptDIR)/libNonOpt.a
-NonOptProblemsLIB = $(NonOptProblemsDIR)/libNonOptProblems.a
+NonOptLIB         = $(NONOPTDIR)/NonOpt/src/libNonOpt.a
+NonOptProblemsLIB = $(NONOPTDIR)/NonOpt/problems/libNonOptProblems.a
 AMPLLIB           = $(AMPLDIR)/amplsolver.a
 
 # Includes
-INCLUDES = -I $(NonOptDIR) -I $(NonOptProblemsDIR) -I $(AMPLDIR)
+INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(NONOPTDIR)/NonOpt/problems -I $(AMPLDIR)
 
 # Rule for all
 all: $(EXES)
