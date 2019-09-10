@@ -229,6 +229,7 @@ class QPSolverActiveSet : public QPSolver
    * Input parameters
    */
   bool fail_on_factorization_error_;
+  bool doEarlyTermination_;
   double cholesky_tolerance_;
   double kkt_tolerance_;
   double linear_independence_tolerance_;
@@ -246,6 +247,9 @@ class QPSolverActiveSet : public QPSolver
    */
   int iteration_count_;
   double kkt_error_;
+  double first_dual_;
+  double best_primal_;
+  double gamma_scalar_;
   /**
    * Algorithm quantities
    */
@@ -271,6 +275,7 @@ class QPSolverActiveSet : public QPSolver
   Vector omega_;
   //@}
 
+  bool earlyTermination();
   /** @name Private methods */
   //@{
   /**
@@ -295,6 +300,7 @@ class QPSolverActiveSet : public QPSolver
                       double solution2[]);
   void choleskyFromScratch(const Reporter* reporter);
   void evaluateDualVectors();
+  void evaluateScaledDualVectors();
   void evaluateDualMultiplier(double solution1[],
                               double solution2[]);
   void evaluateSystemVector(int set,

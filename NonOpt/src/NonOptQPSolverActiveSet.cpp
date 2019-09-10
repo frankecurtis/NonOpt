@@ -59,6 +59,13 @@ void QPSolverActiveSet::addOptions(Options* options,
                          "Indicator for whether to indicate failure on factorization error.\n"
                          "Default value: false.");
 
+
+
+  options->addBoolOption(reporter,
+                         "QP_terminate_early",
+                         true,
+                         "Indicator for whether to imply early termination.\n"
+                         "Default value: false.");
   // Add double options
   options->addDoubleOption(reporter,
                            "QPAS_kkt_tolerance",
@@ -116,6 +123,8 @@ void QPSolverActiveSet::setOptions(const Options* options,
 
   // Read bool options
   options->valueAsBool(reporter, "QPAS_fail_on_factorization_error", fail_on_factorization_error_);
+
+  options->valueAsBool(reporter, "QP_terminate_early", doEarlyTermination_);
 
   // Read double options
   options->valueAsDouble(reporter, "QPAS_kkt_tolerance", kkt_tolerance_);
@@ -332,19 +341,19 @@ double QPSolverActiveSet::KKTErrorFull()
   d0.addScaledVector(-1.0, Gomega);
   d0.addScaledVector(-1.0, gamma_);
   Vector d(gamma_length_);
-  matrix_->matrixVectorProduct(d0, d);
+  matrix_->matrixVectorProduct(d0, d); //M*(-G*omega-gamma)
 
   // Evaluate gradient inner products
   Vector Gtd;
   Gtd.setLength((int)vector_.size());
   for (int i = 0; i < (int)vector_list_.size(); i++) {
-    Gtd.values()[i] = vector_list_[i]->innerProduct(d);
+    Gtd.values()[i] = vector_list_[i]->innerProduct(d); //G^T*d
   }
 
   // Evaluate dual scalar
   double z = omega_.innerProduct(Gtd);
   for (int i = 0; i < (int)vector_list_.size(); i++) {
-    z = z + omega_.values()[i] * vector_[i];
+    z = z + omega_.values()[i] * vector_[i]; //vector_=f(xk)*n
   }
 
   // Initialize KKT error
@@ -424,6 +433,10 @@ void QPSolverActiveSet::setNullSolution()
   iteration_count_ = 0;
   kkt_error_ = -1.0;
 
+  gamma_scalar_=0.3;
+  first_dual_=0.0;
+  best_primal_=0.0;
+
   // Clear solution arrays
   omega_positive_.clear();
   omega_positive_best_.clear();
@@ -440,6 +453,9 @@ void QPSolverActiveSet::setNullSolution()
 
 }  // end setNullSolution
 
+
+
+
 // Add vectors
 void QPSolverActiveSet::addData(const std::vector<std::shared_ptr<Vector> > vector_list,
                                 const std::vector<double> vector)
@@ -452,6 +468,117 @@ void QPSolverActiveSet::addData(const std::vector<std::shared_ptr<Vector> > vect
   }
 
 }  // end addData
+
+bool QPSolverActiveSet::earlyTermination(){
+	finalizeSolution();
+
+
+
+//    Vector Gomega(gamma_length_);
+//    for (int i = 0; i < (int)vector_list_.size(); i++) {
+//      Gomega.addScaledVector(omega_.values()[i], *vector_list_[i].get());
+//    }
+//
+//    Vector d0(gamma_length_);
+//    d0.addScaledVector(-1.0, Gomega);
+//    d0.addScaledVector(-1.0, gamma_);
+//    Vector d(gamma_length_);
+//    matrix_->matrixVectorProduct(d0, d); //M*(-G*omega-gamma)
+//
+//    Vector Gtd;
+//    Gtd.setLength((int)vector_.size());
+//    for (int i = 0; i < (int)vector_list_.size(); i++) {
+//    Gtd.values()[i] = vector_list_[i]->innerProduct(d); //G^T*d
+//    }
+//
+//    double z = omega_.innerProduct(Gtd);
+//    for (int i = 0; i < (int)vector_list_.size(); i++) {
+//    z = z + omega_.values()[i] * vector_[i]; //vector_=f(xk)
+//    }
+    double quad_value=objectiveQuadraticValue();
+    double dual_obj=-0.5*quad_value;
+
+    int length = gamma_length_;
+    int length_2=(int)vector_list_.size();
+    int increment = 1;
+
+     Vector Gtd_f;
+     Gtd_f.setLength((int)vector_.size());
+
+     Vector newDual_Step;
+     newDual_Step.setLength((int) gamma_length_);
+     double scale_fac=scalar_/dual_step_.normInf();
+     if(scale_fac>1){
+    	 scale_fac=1.0;
+     }
+     newDual_Step.addScaledVector(scale_fac,dual_step_);
+
+     for (int i = 0; i < length_2; i++) {
+        Gtd_f.values()[i] = ddot_(&length, newDual_Step.values(), &increment, vector_list_[i]->values(), &increment)+vector_[i];
+     }
+
+//     double* constraints=new double[length_2];
+//     for (int i = 0; i < (int)vector_list_.size(); i++) {
+//    	 constraints[i]=Gtd.values()[i]+vector_[i];
+//     }
+
+
+     int i = idamax_(&length_2,Gtd_f.values() , &increment);
+     double z=Gtd_f.values()[i];
+
+     double vector_copy[vector_.size()];
+     std::copy(vector_.begin(),vector_.end(),vector_copy);
+     dual_obj+=ddot_(&length_2, omega_.values(), &increment, vector_copy, &increment);
+     dual_obj-=scalar_*(gamma_.norm1());
+
+     double primal_obj=z+0.5*quad_value*scale_fac*scale_fac;
+
+
+    if(iteration_count_==0){
+    	best_primal_=primal_obj;
+    	first_dual_=dual_obj;
+    }
+    best_primal_=fmin(best_primal_,primal_obj);
+
+
+
+    double xi=first_dual_/best_primal_;
+    double alpha_j=1-(gamma_scalar_*gamma_scalar_+2*gamma_scalar_)/(xi-1);
+    //alpha_j=0.5;
+
+//    if (iteration_count_%20==0){
+//    printf("====================================================================================================================================\n");
+//     printf("QP iter   dual obj      primal obj    first_dual      alpha     best_primal     ||d||      radi      LHS       RHS    kkt\n");
+//     printf("===================================================================================================================================\n");
+//    }
+//
+//    printf("%6d  %+.4e  %+.4e %+.4e %+.4e %.4e %+.4e %+.4e %+.4e %+.4e  %+.2e\n",
+//    		iteration_count_,
+//    		dual_obj,
+//			primal_obj,
+//			first_dual_,
+//			alpha_j,
+//			best_primal_,
+//			newDual_Step.normInf(),
+//			scalar_,
+//			dual_obj-first_dual_,
+//			fmax(alpha_j,0.9)*(best_primal_-first_dual_),
+//			kkt_error_
+//			);
+
+// && dual_step_.normInf()<=(1.0+1e-8)*scalar_                 fmax(alpha_j,0.9999)
+    if (dual_obj-first_dual_>=fmax(alpha_j,0.9)*(best_primal_-first_dual_)){
+    	dual_step_.copy(newDual_Step);
+        return true;
+    }
+
+
+
+
+
+    return false;
+}
+
 
 // Solve
 void QPSolverActiveSet::solveQP(const Options* options,
@@ -470,11 +597,13 @@ void QPSolverActiveSet::solveQP(const Options* options,
       THROW_EXCEPTION(QP_INPUT_ERROR_EXCEPTION, "QP solve unsuccessful. Input error.");
     }
 
+
+
     // Initialize minimum index and value
     int index = -1;
     double value = NONOPT_DOUBLE_INFINITY;
 
-    // Loop through vector list
+    // Loop through vector list  // what's in vector list?
     for (int i = 0; i < (int)vector_list_.size(); i++) {
 
       // Compute objective value
@@ -555,6 +684,7 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
     // Set iteration limit
     int iteration_limit = fmax(iteration_limit_minimum_, fmin(pow((int)vector_list_.size(), 2) + pow(gamma_length_, 3), iteration_limit_maximum_));
 
+
     // Iteration loop
     while (true) {
 
@@ -604,10 +734,17 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
       // Evaluate dual vectors
       evaluateDualVectors();
 
+//      if (doEarlyTermination_&&scalar_<=1.0){
+//    	  evaluateScaledDualVectors();
+//
+//      }
+
       // Check nan error
       if (!real_solution) {
         THROW_EXCEPTION(QP_NAN_ERROR_EXCEPTION, "QP solve unsuccessful.  NaN error.");
       }
+
+
 
       // Initialize solution and KKT vectors
       std::vector<double> kkt_residual_omega((int)vector_.size(), 0.0);
@@ -700,10 +837,31 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
                        kkt_residual_minimum_index,
                        kkt_error_);
 
-      // Check KKT error tolerance
-      if (kkt_error_ >= -kkt_tolerance_) {
-        THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
+//      if (doEarlyTermination_){
+//          if (earlyTermination()) {
+//        	  THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
+//          }
+//      }
+//      else {
+//           //Check KKT error tolerance
+//          if (kkt_error_ >= -kkt_tolerance_) {
+//            THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
+//          }
+//      }
+
+//      if (kkt_error_ >= -kkt_tolerance_) {
+//        THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
+//      }
+
+
+      if (earlyTermination()) {
+    	  THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
       }
+
+
+
+
+
 
       // Check for iteration limit
       if (iteration_count_ >= iteration_limit) {
@@ -1643,6 +1801,12 @@ void QPSolverActiveSet::evaluateDualVectors()
   dual_step_.scale(-1.0);
 
 }  // end evaluateDualVectors
+
+// Get
+void QPSolverActiveSet::evaluateScaledDualVectors(){
+	double newscale=scalar_/dual_step_.normInf();
+	dual_step_.scale(newscale);
+}
 
 // Evaluate dual multiplier
 void QPSolverActiveSet::evaluateDualMultiplier(double solution1[],
