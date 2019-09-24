@@ -91,15 +91,30 @@ class QPSolverActiveSet : public QPSolver
    */
   void dualStep(double vector[]);
   /**
+   * Get feasible dual step
+   * \param[out] vector is dual step given by "-W*(G*omega + gamma)" projected onto feasible region
+   */
+  void dualStepFeasible(double vector[]);
+  /**
    * Get dual step's infinity norm
    * \return "||W*(G*omega + gamma)||_inf"
    */
   double dualStepNormInf();
   /**
+   * Get feasible dual step's infinity norm
+   * \return "||d||_inf" where d is projection of -W*(G*omega + gamma) onto feasible region
+   */
+  double dualStepFeasibleNormInf();
+  /**
    * Get objective quadratic value
    * \return (G*omega + gamma)'*W*(G*omega + gamma)
    */
   double objectiveQuadraticValue();
+  /**
+   * Get objective quadratic value
+   * \return "d'*H*d" where d is projection of -W*(G*omega + gamma) onto feasible region
+   */
+  double objectiveQuadraticValueFeasible();
   /**
    * Get gamma
    * \param[out] vector is "gamma" solution value
@@ -137,7 +152,7 @@ class QPSolverActiveSet : public QPSolver
   /**
    * Set dual step to zero
    */
-  void setDualStepToZero() { dual_step_.scale(0.0); };
+  void setDualStepToZero() { dual_step_.scale(0.0); dual_step_feasible_.scale(0.0); dual_step_feasible_best_.scale(0.0); };
   /**
    * Set matrix
    * \param[in] matrix is pointer to SymmetricMatrix to be set as QP "W" data
@@ -229,9 +244,11 @@ class QPSolverActiveSet : public QPSolver
    * Input parameters
    */
   bool fail_on_factorization_error_;
-  bool doEarlyTermination_;
+  bool allow_inexact_termination_;
   double cholesky_tolerance_;
   double kkt_tolerance_;
+  double inexact_termination_factor_;
+  double inexact_termination_ratio_min_;
   double linear_independence_tolerance_;
   int iteration_limit_minimum_;
   int iteration_limit_maximum_;
@@ -247,9 +264,8 @@ class QPSolverActiveSet : public QPSolver
    */
   int iteration_count_;
   double kkt_error_;
-  double first_dual_;
-  double best_primal_;
-  double gamma_scalar_;
+  double dual_objective_best_;
+  double primal_objective_reference_;
   /**
    * Algorithm quantities
    */
@@ -270,12 +286,14 @@ class QPSolverActiveSet : public QPSolver
   Vector combination_;
   Vector combination_translated_;
   Vector dual_step_;
+  double dual_step_projection_scalar_;
+  Vector dual_step_feasible_;
+  Vector dual_step_feasible_best_;
   Vector gamma_;
   double multiplier_;
   Vector omega_;
   //@}
 
-  bool earlyTermination();
   /** @name Private methods */
   //@{
   /**
@@ -286,6 +304,10 @@ class QPSolverActiveSet : public QPSolver
    * Update best solution
    */
   bool updateBestSolution();
+  /**
+   * Termination condition for inexact solution
+   */
+  bool inexactTerminationCondition();
   /**
    * Internal solve methods
    */
@@ -300,7 +322,6 @@ class QPSolverActiveSet : public QPSolver
                       double solution2[]);
   void choleskyFromScratch(const Reporter* reporter);
   void evaluateDualVectors();
-  void evaluateScaledDualVectors();
   void evaluateDualMultiplier(double solution1[],
                               double solution2[]);
   void evaluateSystemVector(int set,

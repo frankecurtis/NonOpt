@@ -13,25 +13,17 @@ CXXFLAGS = -g -Wall -std=c++11
 # Library utility command
 AR = ar rv
 
-# Sources, objects, etc.
-sources = \
-ActiveFaces.cpp \
-AMPLProblem.cpp \
-BrownFunction_2.cpp \
-ChainedCB3_1.cpp \
-ChainedCB3_2.cpp \
-ChainedCrescent_1.cpp \
-ChainedCrescent_2.cpp \
-ChainedLQ.cpp \
-ChainedMifflin_2.cpp \
-MaxQ.cpp \
-MxHilb.cpp \
-QuadPoly.cpp
+# Set sources, etc.
+headers = $(wildcard *.hpp)
+sources = $(wildcard *.cpp)
 objects = $(sources:.cpp=.o)
-dependlists = $(sources:.cpp=.d)
+depends = $(sources:.cpp=.d)
 
 # Library
 LIB = libNonOptProblems.a
+
+# Rule for all
+all: $(LIB)
 
 # Create library
 $(LIB): $(objects)
@@ -40,13 +32,17 @@ $(LIB): $(objects)
 # Includes
 INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(AMPLDIR)
 
-# Rule for .cpp.o
+# Rule for objects
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
+# Objects depend on headers and sources
+$(objects): $(headers)
+$(objects): $(sources)
+
 # Clean
 clean:
-	rm -f $(objects) $(dependlists)
+	rm -f $(objects) $(depends)
 
 # Very clean
 veryclean: clean

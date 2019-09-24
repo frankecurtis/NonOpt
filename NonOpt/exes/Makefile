@@ -10,14 +10,17 @@ CXX = g++
 # C++ compiler flags
 CXXFLAGS = -g -Wall -std=c++11
 
-# Executable(s)
-EXES = solveAMPLProblem solveNonsmoothProblem
+# Set sources, etc.
+headers = $(wildcard *.hpp)
+sources = $(wildcard *.cpp)
+objects = $(sources:.cpp=.o)
+depends = $(sources:.cpp=.d)
 
-# Sources, objects, etc.
-sources     = $(EXES:=.cpp)
-objects     = $(sources:.cpp=.o)
-dependlists = $(sources:.cpp=.d)
-dsyms       = $(sources:.cpp=.dSYM)
+# Executable(s)
+EXES = $(sources:.cpp=)
+
+# Directories
+LAPACKDIR = /Users/frankecurtis/Dropbox/software/lapack-3.8.0
 
 # Libraries
 NonOptLIB         = $(NONOPTDIR)/NonOpt/src/libNonOpt.a
@@ -25,23 +28,39 @@ NonOptProblemsLIB = $(NONOPTDIR)/NonOpt/problems/libNonOptProblems.a
 AMPLLIB           = $(AMPLDIR)/amplsolver.a
 
 # Includes
-INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(NONOPTDIR)/NonOpt/problems -I $(AMPLDIR)
+INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(NONOPTDIR)/NonOpt/problems -I $(AMPLDIR) -I /usr/local/include
 
 # Rule for all
 all: $(EXES)
 
 # Dependence for executable
 $(EXES): % : %.o
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(NonOptProblemsLIB) $(AMPLLIB) -L/Users/frankecurtis/Dropbox/software/lapack-3.8.0 -ldl -lblas -llapack
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(NonOptProblemsLIB) $(AMPLLIB) -L $(LAPACKDIR) -ldl -lblas -llapack
+
+# Dependencies for executable
+$(EXES): $(NonOptLIB) $(NonOptProblemsLIB)
+
+# Rules for libraries
+$(NonOptLIB):
+	$(MAKE) --directory=$(NONOPTDIR)/NonOpt/src
+$(NonOptProblemsLIB):
+	$(MAKE) --directory=$(NONOPTDIR)/NonOpt/problems
+
+# Dependencies for libraries
+$(NonOptLIB): $(wildcard $(NONOPTDIR)/NonOpt/src/*.hpp) $(wildcard $(NONOPTDIR)/NonOpt/src/*.cpp)
+$(NonOptProblemsLIB): $(wildcard $(NONOPTDIR)/NonOpt/problems/*.hpp) $(wildcard $(NONOPTDIR)/NonOpt/problems/*.cpp)
 
 # Rule for .cpp.o
 .cpp.o:
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@ -I/usr/local/include
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+# Objects depend on headers and sources
+$(objects): $(headers)
+$(objects): $(sources)
 
 # Clean
 clean:
-	rm -f $(objects) $(dependlists)
-	rm -rf $(dsyms)
+	rm -f $(objects) $(depends)
 
 # Very clean
 veryclean: clean

@@ -13,42 +13,33 @@ CXXFLAGS = -g -Wall -std=c++11
 # Library utility command
 AR = ar rv
 
-# Set sources and objects
-sources = \
-NonOptDirectionComputationCuttingPlane.cpp \
-NonOptDirectionComputationGradient.cpp \
-NonOptDirectionComputationGradientCombination.cpp \
-NonOptInverseHessianUpdateBFGS.cpp \
-NonOptLineSearchBacktracking.cpp \
-NonOptLineSearchWeakWolfe.cpp \
-NonOptOptions.cpp \
-NonOptPoint.cpp \
-NonOptPointSetUpdateProximity.cpp \
-NonOptQuantities.cpp \
-NonOptQPSolverActiveSet.cpp \
-NonOptReporter.cpp \
-NonOptStrategies.cpp \
-NonOptSymmetricMatrixDense.cpp \
-NonOptSymmetricMatrixLimitedMemory.cpp \
-NonOptVector.cpp \
-NonOptSolver.cpp
+# Set sources, etc.
+headers = $(wildcard *.hpp)
+sources = $(wildcard *.cpp)
 objects = $(sources:.cpp=.o)
-dependlists = $(sources:.cpp=.d)
+depends = $(sources:.cpp=.d)
 
 # Library
 LIB = libNonOpt.a
+
+# Rule for all
+all: $(LIB)
 
 # Create library
 $(LIB): $(objects)
 	$(AR) $@ $(objects)
 
-# Rule for .cpp.o
+# Rule for objects
 .cpp.o:
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+# Objects depend on headers and sources
+$(objects): $(headers)
+$(objects): $(sources)
+
 # Clean
 clean:
-	rm -f $(objects) $(dependlists)
+	rm -f $(objects) $(depends)
 
 # Very clean
 veryclean: clean

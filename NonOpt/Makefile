@@ -10,7 +10,11 @@ $(SUBDIRS):
 clean:
 	for d in $(SUBDIRS); \
 	do \
-	$(MAKE) --directory=$$d veryclean; \
+	$(MAKE) --directory=$$d clean; \
 	done
 
-veryclean: clean
+veryclean:
+	for d in $(SUBDIRS); \
+	do \
+	$(MAKE) --directory=$$d veryclean; \
+	done

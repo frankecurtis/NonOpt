@@ -162,6 +162,14 @@ class Vector
    */
   double innerProduct(const Vector &vector) const;
   /**
+   * maximum value
+   */
+  double min() const;
+  /**
+   * minimum value
+   */
+  double max() const;
+  /**
    * 1-norm
    */
   double norm1() const;

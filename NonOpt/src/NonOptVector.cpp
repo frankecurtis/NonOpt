@@ -280,6 +280,40 @@ double Vector::innerProduct(const Vector &other_vector) const
 
 }  // end innerProduct
 
+// Maximum element
+double Vector::max() const
+{
+
+  // Initialize maximum
+  double maximum = values_[0];
+
+  // Determine maximum
+  for (int i = 1; i < length_; i++) {
+    maximum = fmax(maximum, values_[i]);
+  }
+
+  // Return maximum
+  return maximum;
+
+}  // end max
+
+// Minimum element
+double Vector::min() const
+{
+
+  // Initialize minimum
+  double minimum = values_[0];
+
+  // Determine minimum
+  for (int i = 1; i < length_; i++) {
+    minimum = fmax(minimum, values_[i]);
+  }
+
+  // Return minimum
+  return minimum;
+
+}  // end max
+
 // 1-norm
 double Vector::norm1() const
 {
