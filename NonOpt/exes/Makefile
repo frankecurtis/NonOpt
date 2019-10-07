@@ -12,7 +12,7 @@ CXXFLAGS = -g -Wall -std=c++11
 
 # Set sources, etc.
 headers = $(wildcard *.hpp)
-sources = $(wildcard *.cpp)
+sources = $(filter-out solveAMPLProblem.cpp,$(wildcard *.cpp))
 objects = $(sources:.cpp=.o)
 depends = $(sources:.cpp=.d)
 
@@ -20,22 +20,22 @@ depends = $(sources:.cpp=.d)
 EXES = $(sources:.cpp=)
 
 # Directories
-LAPACKDIR = /Users/frankecurtis/Dropbox/software/lapack-3.8.0
+LAPACKDIR = /Users/messi/Documents/Gradient_Sampling/C_code/lapack-3.8.0
 
 # Libraries
 NonOptLIB         = $(NONOPTDIR)/NonOpt/src/libNonOpt.a
 NonOptProblemsLIB = $(NONOPTDIR)/NonOpt/problems/libNonOptProblems.a
-AMPLLIB           = $(AMPLDIR)/amplsolver.a
+#AMPLLIB           = $(AMPLDIR)/amplsolver.a
 
 # Includes
-INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(NONOPTDIR)/NonOpt/problems -I $(AMPLDIR) -I /usr/local/include
+INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(NONOPTDIR)/NonOpt/problems# -I $(AMPLDIR) -I /usr/local/include
 
 # Rule for all
 all: $(EXES)
 
 # Dependence for executable
 $(EXES): % : %.o
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(NonOptProblemsLIB) $(AMPLLIB) -L $(LAPACKDIR) -ldl -lblas -llapack
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(NonOptProblemsLIB) -L $(LAPACKDIR) -ldl -lblas -llapack
 
 # Dependencies for executable
 $(EXES): $(NonOptLIB) $(NonOptProblemsLIB)

@@ -20,7 +20,7 @@ depends = $(sources:.cpp=.d)
 EXES = $(sources:.cpp=)
 
 # Directories
-LAPACKDIR = /Users/frankecurtis/Dropbox/software/lapack-3.8.0
+LAPACKDIR = /Users/messi/Documents/Gradient_Sampling/C_code/lapack-3.8.0
 
 # Libraries
 NonOptLIB         = $(NONOPTDIR)/NonOpt/src/libNonOpt.a

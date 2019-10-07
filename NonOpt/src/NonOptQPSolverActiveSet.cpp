@@ -86,9 +86,9 @@ void QPSolverActiveSet::addOptions(Options* options,
                            "Default value: 1e-12.");
   options->addDoubleOption(reporter,
                            "QPAS_inexact_termination_factor",
-                           sqrt(2.0)-1.0-1e-2,
+						   1.5,//sqrt(2.0)-1.0-1e-2,
                            0.0,
-                           sqrt(2.0)-1.0,
+                           2.0,//sqrt(2.0)-1.0,
                            "Factor for inexact termination, if allowed.  Factor by which\n"
                            "norm of inexact solution needs to be within true norm of true\n"
                            "(unknown) projection of origin onto convex hull of gradients.\n"
@@ -538,7 +538,8 @@ void QPSolverActiveSet::addData(const std::vector<std::shared_ptr<Vector> > vect
   // Loop through new elements
   for (int i = 0; i < (int)vector.size(); i++) {
     vector_list_.push_back(vector_list[i]);
-    vector_.push_back(vector[i]);
+    //vector_.push_back(vector[i]);
+    vector_.push_back(0.0);
   }
 
 }  // end addData
@@ -593,19 +594,23 @@ bool QPSolverActiveSet::inexactTerminationCondition()
   // Set inexact termination ratio value
   double inexact_termination_ratio = 1 - (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)/(objective_ratio - 1.0);
 
-/*
-  printf("%+.4e  %+.4e  %+.4e  %+.4e  %+.4e  %+.4e  %+.4e  %+.4e  %+.4e  %+.4e\n",
-         b.max() - primal_objective_reference_,
-         b.max() - primal_objective,
-         b.max() - dual_objective,
-         b.max() - dual_objective_best_,
-         objective_ratio,
-         inexact_termination_ratio,
-         primal_objective - primal_objective_reference_,
-         fmax(inexact_termination_ratio,inexact_termination_ratio_min_)*(dual_objective_best_ - primal_objective_reference_),
-         (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)*(b.max() - dual_objective_best_),
-         dual_objective_best_ - primal_objective);
-*/
+//  if(iteration_count_ %20==0){
+//  printf("============================================================================================================\n");
+//  printf("b-q0    	 b-qk      b-pk   	  b-pkb   	   xi            alpha             LHS        	   RHS     	    LHS1        RHS1\n");
+//  printf("============================================================================================================\n");}
+//  printf("%+.4e  %+.4e  %+.4e  %+.4e  %+.4e  %+.8e  %+.10e  %+.10e  %+.4e  %+.4e %+.4e\n",
+//         b.max() - primal_objective_reference_,
+//         b.max() - primal_objective,
+//         b.max() - dual_objective,
+//         b.max() - dual_objective_best_,
+//         objective_ratio,
+//         inexact_termination_ratio,
+//         primal_objective - primal_objective_reference_,
+//         fmax(inexact_termination_ratio,inexact_termination_ratio_min_)*(dual_objective_best_ - primal_objective_reference_),
+//         (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)*(b.max() - dual_objective_best_),
+//         dual_objective_best_ - primal_objective,
+//		 inexact_termination_factor_);
+
 
   // Initialize return value
   bool condition_bool = false;
@@ -648,7 +653,7 @@ void QPSolverActiveSet::solveQP(const Options* options,
     // Loop through vector list
     for (int i = 0; i < (int)vector_list_.size(); i++) {
 
-      // Compute objective value
+      // Compute objective value 0.5*g_i^T*W*g_i-b_i
       double t = 0.5 * matrix_->innerProduct(*vector_list_[i]) - vector_[i];
 
       // Check for minimum
@@ -673,7 +678,7 @@ void QPSolverActiveSet::solveQP(const Options* options,
     // Set factor
     factor_[0] = sqrt(1.0 + matrix_->innerProduct(*vector_list_[index]));
 
-    // Set dual multiplier
+    // Set dual multiplier b_i-g_i^T*W*g_i
     multiplier_ = 1.0 + vector_[index] - pow(factor_[0], 2);
 
     // Set system solution
@@ -789,7 +794,7 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
       int kkt_residual_minimum_set;
       int kkt_residual_minimum_index;
 
-      // Evaluate omega's KKT error components
+      // Evaluate omega's KKT error components  -g_i^T*W*g_i-g_i^Td
       for (int i = 0; i < (int)vector_.size(); i++) {
         kkt_residual_omega[i] = multiplier_ - vector_[i] - vector_list_[i]->innerProduct(dual_step_);
       }
@@ -872,7 +877,7 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
                        kkt_error_);
 
       // Check for successful solve
-      if (kkt_error_ >= -kkt_tolerance_ ||
+      if ( kkt_error_ >= -kkt_tolerance_ ||
           (allow_inexact_termination_ && inexactTerminationCondition())) {
         THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
       }

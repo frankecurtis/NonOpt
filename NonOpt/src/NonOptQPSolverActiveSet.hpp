@@ -171,12 +171,12 @@ class QPSolverActiveSet : public QPSolver
    * Set vector
    * \param[in] vector is vector of double values to be set as QP "b" data
    */
-  void setVector(const std::vector<double> vector) { vector_ = vector; };
+  void setVector(const std::vector<double> vector) { std::vector<double> vector2(vector.size(), 0.0); vector_ =vector2 ;}//vector; };
   /**
    * Set scalar
    * \param[in] scalar is double value to be set as QP "r" data
    */
-  void setScalar(double scalar) { scalar_ = scalar; };
+  void setScalar(double scalar) { scalar_ = std::numeric_limits<double>::max(); };
   //@}
 
   /** @name Add data methods */

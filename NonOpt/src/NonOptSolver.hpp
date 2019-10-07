@@ -74,6 +74,11 @@ class NonOptSolver
    */
   inline int const totalInnerIterations() const { return quantities_.totalInnerIterationCounter(); };
   /**
+   * Get inner iteration counter
+   * \return total inner iterations performed so far
+   */
+  inline int const totalQPIterations() const { return quantities_.totalQPIterationCounter(); };
+  /**
    * Get objective value
    * \return objective value of current iterate
    */

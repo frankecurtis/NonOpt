@@ -14,11 +14,12 @@ CXXFLAGS = -g -Wall -std=c++11
 AR = ar rv
 
 # Set sources, etc.
-headers = $(wildcard *.hpp)
-sources = $(wildcard *.cpp)
+headers = $(filter-out AMPLProblem.hpp, $(wildcard *.hpp))
+sources = $(filter-out AMPLProblem.cpp, $(wildcard *.cpp))
 objects = $(sources:.cpp=.o)
 depends = $(sources:.cpp=.d)
 
+#SRC_FILES = $(filter-out src/bar.cpp, $(wildcard src/*.cpp))
 # Library
 LIB = libNonOptProblems.a
 
@@ -30,7 +31,7 @@ $(LIB): $(objects)
 	$(AR) $@ $(objects)
 
 # Includes
-INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(AMPLDIR)
+INCLUDES = -I $(NONOPTDIR)/NonOpt/src #-I $(AMPLDIR)
 
 # Rule for objects
 .cpp.o:
