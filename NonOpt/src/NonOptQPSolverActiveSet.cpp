@@ -88,7 +88,7 @@ void QPSolverActiveSet::addOptions(Options* options,
                            "QPAS_inexact_termination_factor",
 						   1.5,//sqrt(2.0)-1.0-1e-2,
                            0.0,
-                           2.0,//sqrt(2.0)-1.0,
+                           4.0,//sqrt(2.0)-1.0,
                            "Factor for inexact termination, if allowed.  Factor by which\n"
                            "norm of inexact solution needs to be within true norm of true\n"
                            "(unknown) projection of origin onto convex hull of gradients.\n"
@@ -389,6 +389,9 @@ double QPSolverActiveSet::objectiveQuadraticValueFeasible()
 
 }  // end objectiveQuadraticValueFeasible
 
+
+
+
 // Get solution, gamma
 void QPSolverActiveSet::gamma(double vector[])
 {
@@ -417,7 +420,7 @@ double QPSolverActiveSet::KKTErrorFull()
   d0.addScaledVector(-1.0, Gomega);
   d0.addScaledVector(-1.0, gamma_);
   Vector d(gamma_length_);
-  matrix_->matrixVectorProduct(d0, d);
+  matrix_->matrixVectorProduct_HessianInverse(d0, d);
 
   // Evaluate gradient inner products
   Vector Gtd;
@@ -545,8 +548,9 @@ void QPSolverActiveSet::addData(const std::vector<std::shared_ptr<Vector> > vect
 }  // end addData
 
 // Inexact termination condition
-bool QPSolverActiveSet::inexactTerminationCondition()
+bool QPSolverActiveSet::inexactTerminationCondition(const Reporter* reporter)
 {
+
 
   // Finalize solution (to set omega_ and gamma_)
   finalizeSolution();
@@ -593,33 +597,100 @@ bool QPSolverActiveSet::inexactTerminationCondition()
 
   // Set inexact termination ratio value
   double inexact_termination_ratio = 1 - (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)/(objective_ratio - 1.0);
+//R_NL, R_PER_ITERATION,
+  if(iteration_count_ ==0){
+	  reporter->printf(R_QP, R_PER_INNER_ITERATION_IN,"==========================================================================================================================================================\n");
+	  reporter->printf(R_QP, R_PER_INNER_ITERATION_IN,"b              b-p0          b-pk        b-qk    b-qkb   	  xi          alpha             LHS        	   RHS     	    LHS1        RHS1         kkt\n");
+	  reporter->printf(R_QP, R_PER_INNER_ITERATION_IN,"==========================================================================================================================================================\n");}
+  reporter->printf(R_QP, R_PER_INNER_ITERATION_IN,"%+.4e  %+.4e %+.4e %+.4e  %+.4e  %+.4e  %+.8e  %+.10e  %+.10e  %+.4e  %+.4e  %+.4e\n",
+		  b.max(),
+         b.max() - primal_objective_reference_,
+         b.max() - primal_objective,
+         b.max() - dual_objective,
+         b.max() - dual_objective_best_,
+         objective_ratio,
+         inexact_termination_ratio,
+         primal_objective - primal_objective_reference_,
+         fmax(inexact_termination_ratio,inexact_termination_ratio_min_)*(dual_objective_best_ - primal_objective_reference_),
+         (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)*(b.max() - dual_objective_best_),
+         dual_objective_best_ - primal_objective,
+		 kkt_error_
+		 );
 
-//  if(iteration_count_ %20==0){
-//  printf("============================================================================================================\n");
-//  printf("b-q0    	 b-qk      b-pk   	  b-pkb   	   xi            alpha             LHS        	   RHS     	    LHS1        RHS1\n");
-//  printf("============================================================================================================\n");}
-//  printf("%+.4e  %+.4e  %+.4e  %+.4e  %+.4e  %+.8e  %+.10e  %+.10e  %+.4e  %+.4e %+.4e\n",
-//         b.max() - primal_objective_reference_,
-//         b.max() - primal_objective,
-//         b.max() - dual_objective,
-//         b.max() - dual_objective_best_,
-//         objective_ratio,
-//         inexact_termination_ratio,
-//         primal_objective - primal_objective_reference_,
-//         fmax(inexact_termination_ratio,inexact_termination_ratio_min_)*(dual_objective_best_ - primal_objective_reference_),
-//         (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)*(b.max() - dual_objective_best_),
-//         dual_objective_best_ - primal_objective,
-//		 inexact_termination_factor_);
+
+    // Initialize return value
+    bool condition_bool = false;
+
+	Vector d_bar(gamma_length_);
+	  for (int i = 0; i < (int)vector_list_.size(); i++) {
+	    d_bar.addScaledVector(1.0/(int)vector_list_.size(),*vector_list_[i].get());
+	  }
+
+	  Vector gTd_bar((int)vector_.size());
+	  for (int i = 0; i < (int)vector_.size(); i++) {
+		  gTd_bar.values()[i] = -1.0*(vector_list_[i]->innerProduct(d_bar));
+	  }
+
+	  int length = (int)vector_.size();
+	  int increment = 1;
+	  int i_ind = idamax_(&length, gTd_bar.values(), &increment);
+	  int gTd_bar_opt=-1.0*gTd_bar.values()[i_ind];
+//	  int alpha_step=alpha_step1;
 
 
-  // Initialize return value
-  bool condition_bool = false;
 
-  // Check condition
-  if (dual_objective_best_ < b.max() &&
+	  double alpha_step=0;
+	  Vector dual_step_simple_(gamma_length_);
+	  if(gTd_bar_opt>0){
+
+//		  int length1 = gamma_length_;
+
+//		  Vector combination_bar_(length1);
+//		  combination_bar_.copyArray(combination_.values());
+		  // Set quadratic value dHd
+		  double quadratic_value_bar = matrix_->innerProduct_Hessian(d_bar);
+
+		  // Set maximum
+		  if (isnan(quadratic_value_bar) || quadratic_value_bar > NONOPT_DOUBLE_INFINITY) {
+			  quadratic_value_bar = NONOPT_DOUBLE_INFINITY;
+		  }
+
+		  alpha_step=gTd_bar_opt/quadratic_value_bar;
+
+		  dual_step_simple_.addScaledVector(-1.0*alpha_step,d_bar);
+
+		  dual_objective_simple_=alpha_step*gTd_bar.values()[i_ind]+ 0.5*alpha_step*alpha_step*quadratic_value_bar;
+
+//		  Vector bPlusGd_simple((int)vector_.size());
+//		  bPlusGd_simple.copy(b);
+//
+//		  for (int i = 0; i < (int)vector_.size(); i++) {
+//		    bPlusGd_simple.values()[i] += vector_list_[i]->innerProduct(dual_step_simple_);
+//		  }
+//		  dual_objective_simple_ = bPlusGd_simple.max() + 0.5*quadratic_value_bar;
+		  //printf("condition met\n");
+	  }
+
+
+
+
+  // dual_objective_best_ < b.max() &&     alpha_step1>0&&
+  //dual_objective_best_ - primal_objective <= (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)*(b.max() - dual_objective_best_)
+  if (alpha_step>0&&
       (primal_objective - primal_objective_reference_ >=
-      fmax(inexact_termination_ratio,inexact_termination_ratio_min_)*(dual_objective_best_ - primal_objective_reference_) ||
-       dual_objective_best_ - primal_objective <= (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)*(b.max() - dual_objective_best_))) {
+      fmax(inexact_termination_ratio,inexact_termination_ratio_min_)*(dual_objective_simple_ - primal_objective_reference_)||
+      dual_objective_best_ - primal_objective <= (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)*(b.max() - dual_objective_best_) )) {
+	  //printf("dual step length is %4d\n",(int)dual_step_.length());
+	  //printf("dual step simple length is %4d\n",(int)dual_step_simple_.length());
+	  dual_step_.copy(dual_step_simple_);
+    condition_bool = true;
+  }
+
+//dual_objective_best_ < b.max() &&
+  // Check condition
+  else if (
+      (primal_objective - primal_objective_reference_ >=
+      fmax(inexact_termination_ratio,inexact_termination_ratio_min_)*(dual_objective_best_ - primal_objective_reference_) )) {
     dual_step_feasible_.copy(dual_step_feasible_best_);
     condition_bool = true;
   }
@@ -654,7 +725,7 @@ void QPSolverActiveSet::solveQP(const Options* options,
     for (int i = 0; i < (int)vector_list_.size(); i++) {
 
       // Compute objective value 0.5*g_i^T*W*g_i-b_i
-      double t = 0.5 * matrix_->innerProduct(*vector_list_[i]) - vector_[i];
+      double t = 0.5 * matrix_->innerProduct_HessianInverse(*vector_list_[i]) - vector_[i];
 
       // Check for minimum
       if (t < value) {
@@ -676,7 +747,7 @@ void QPSolverActiveSet::solveQP(const Options* options,
     omega_positive_.push_back(index);
 
     // Set factor
-    factor_[0] = sqrt(1.0 + matrix_->innerProduct(*vector_list_[index]));
+    factor_[0] = sqrt(1.0 + matrix_->innerProduct_HessianInverse(*vector_list_[index]));
 
     // Set dual multiplier b_i-g_i^T*W*g_i
     multiplier_ = 1.0 + vector_[index] - pow(factor_[0], 2);
@@ -877,8 +948,16 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
                        kkt_error_);
 
       // Check for successful solve
+
+
+
+
+
+
       if ( kkt_error_ >= -kkt_tolerance_ ||
-          (allow_inexact_termination_ && inexactTerminationCondition())) {
+          (allow_inexact_termination_ && inexactTerminationCondition(reporter))) {
+    	  if (kkt_error_ >= -kkt_tolerance_&&allow_inexact_termination_ ) {inexactTerminationCondition(reporter);};
+    	  if (!allow_inexact_termination_){reporter->printf(R_QP, R_PER_INNER_ITERATION_IN,"%+.4e\n",kkt_error_); };
         THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
       }
 
@@ -911,7 +990,7 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
 
       // Check which set is being updated
       if (kkt_residual_minimum_set == 1) {
-        new_diagonal_squared = 1.0 + matrix_->innerProduct(*vector_list_[kkt_residual_minimum_index]);
+        new_diagonal_squared = 1.0 + matrix_->innerProduct_HessianInverse(*vector_list_[kkt_residual_minimum_index]);
       }
       else {
         new_diagonal_squared = matrix_->element(kkt_residual_minimum_index, kkt_residual_minimum_index);
@@ -1683,7 +1762,7 @@ void QPSolverActiveSet::choleskyFromScratch(const Reporter* reporter)
   // Compute WG matrix
   for (int i = 0; i < (int)omega_positive_.size(); i++) {
     std::shared_ptr<Vector> product(new Vector(gamma_length_));
-    matrix_->matrixVectorProduct(*vector_list_[omega_positive_[i]], *product);
+    matrix_->matrixVectorProduct_HessianInverse(*vector_list_[omega_positive_[i]], *product);
     WG.push_back(product);
   }  // end for
 
@@ -1800,10 +1879,14 @@ void QPSolverActiveSet::evaluateDualVectors()
   dual_step_.scale(0.0);
   dual_step_feasible_.scale(0.0);
 
+  //printf("Iteration %d\n",iteration_count_);
   // Loop to compute gradient combination
   for (int i = 0; i < (int)omega_positive_best_.size(); i++) {
     combination_.addScaledVector(system_solution_best_[i], *vector_list_[omega_positive_best_[i]]);
+    //printf("omega is %+.4e with index %4d and the norm is %+.4e,",system_solution_best_[i],omega_positive_best_[i],vector_list_[omega_positive_best_[i]]->normInf());
+    //if(combination_.normInf()<1e-10){printf("combination is %+.4e at iteration %4d\n",combination_.normInf(),iteration_count_);};
   }
+  //printf("\n");
 
   // Initialize gradient combination shifted
   combination_translated_.copy(combination_);
@@ -1817,7 +1900,7 @@ void QPSolverActiveSet::evaluateDualVectors()
   }
 
   // Compute matrix-vector product
-  matrix_->matrixVectorProduct(combination_translated_, dual_step_);
+  matrix_->matrixVectorProduct_HessianInverse(combination_translated_, dual_step_);
   dual_step_.scale(-1.0);
 
   // Compute feasible dual step by projection

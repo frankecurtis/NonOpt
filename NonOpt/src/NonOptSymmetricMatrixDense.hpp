@@ -26,7 +26,9 @@ class SymmetricMatrixDense : public SymmetricMatrix
     */
   SymmetricMatrixDense()
       : size_(-1),
-        values_(nullptr){};
+		hessian_inverse_values_(nullptr),
+		hessian_values_(nullptr){};
+
   //@}
 
   /** @name Destructor */
@@ -78,6 +80,13 @@ class SymmetricMatrixDense : public SymmetricMatrix
   void const column(int column_index,
                     Vector& column);
   /**
+   * Get column
+   * \param[in] index is index of column to return
+   * \param[out] column is Vector to store column values
+   */
+  void const column_Hessian(int column_index,
+                    Vector& column);
+  /**
    * Get element (const)
    * \param[in] row_index is row index number
    * \param[in] column_index is column index number
@@ -86,17 +95,38 @@ class SymmetricMatrixDense : public SymmetricMatrix
   double const element(int row_index,
                        int column_index);
   /**
-   * Get inner product with vector
+   * Get element (const)
+   * \param[in] row_index is row index number
+   * \param[in] column_index is column index number
+   * \return (row_index,column_index) element of matrix
+   */
+  double const element_Hessian(int row_index,
+                       int column_index);
+  /**
+   * Get inner product with vector for Inverse Hessian approximation
    * \param[in] vector is reference to a Vector
    * \return inner product of vector with this vector
    */
-  double innerProduct(const Vector& vector);
+  double innerProduct_HessianInverse(const Vector& vector);
   /**
-   * Get product with vector
+   * Get inner product with vector for Hessian approximation
+   * \param[in] vector is reference to a Vector
+   * \return inner product of vector with this vector
+   */
+  double innerProduct_Hessian(const Vector& vector);
+  /**
+   * Get product with vector for Inverse Hessian approximation
    * \param[in] vector is reference to a Vector
    * \param[out] product is Vector to store product values
    */
-  void matrixVectorProduct(const Vector& vector,
+  void matrixVectorProduct_HessianInverse(const Vector& vector,
+                           Vector& product);
+  /**
+   * Get product with vector for Hessian approximation
+   * \param[in] vector is reference to a Vector
+   * \param[out] product is Vector to store product values
+   */
+  void matrixVectorProduct_Hessian(const Vector& vector,
                            Vector& product);
   /**
    * Get name of strategy
@@ -112,12 +142,12 @@ class SymmetricMatrixDense : public SymmetricMatrix
    * Get values (const)
    * \return is pointer to array of SymmetricMatrixDense values
    */
-  inline double* const values() const { return values_; };
+  inline double* const values() const { return hessian_inverse_values_; };
   /**
    * Get values (modifiable)
    * \return is pointer to array of SymmetricMatrixDense values (to allow modification of array)
    */
-  inline double* valuesModifiable() { return values_; };
+  inline double* valuesModifiable() { return hessian_inverse_values_; };
   //@}
 
   /** @name Modify methods */
@@ -168,7 +198,10 @@ class SymmetricMatrixDense : public SymmetricMatrix
   //@{
   int size_;       /**< Number of rows and number of columns */
   int length_;     /**< Number of rows *   number of columns */
-  double* values_; /**< Double array                         */
+  double* hessian_inverse_values_; /**< Double array   */
+  double* hessian_values_; /**< Double array
+                      */
+
   //@}
 
   /** @name Indexing methods */

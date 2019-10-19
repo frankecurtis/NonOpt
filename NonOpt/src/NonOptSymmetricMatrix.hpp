@@ -85,14 +85,21 @@ class SymmetricMatrix : public Strategy
   /** @name Get methods */
   //@{
   /**
-   * Get column
+   * Get column for Inverse Hessian
    * \param[in] index is index of column to return
    * \param[out] column is Vector to store column values
    */
   virtual void const column(int column_index,
                             Vector& column) = 0;
   /**
-    * Get element (const)
+   * Get column for Hessian
+   * \param[in] index is index of column to return
+   * \param[out] column is Vector to store column values
+   */
+  virtual void const column_Hessian(int column_index,
+                            Vector& column) = 0;
+  /**
+    * Get element (const) for Inverse Hessian
     * \param[in] row_index is row index number
     * \param[in] column_index is column index number
     * \return (row_index,column_index) element of matrix
@@ -100,18 +107,52 @@ class SymmetricMatrix : public Strategy
   virtual double const element(int row_index,
                                int column_index) = 0;
   /**
-   * Get inner product with vector
+    * Get element (const) for Hessian
+    * \param[in] row_index is row index number
+    * \param[in] column_index is column index number
+    * \return (row_index,column_index) element of matrix
+    */
+  virtual double const element_Hessian(int row_index,
+                               int column_index) = 0;
+
+
+  /**
+   * Get inner product with vector for Inverse Hessian approximation
    * \param[in] vector is reference to a Vector
    * \return inner product of vector with this vector
    */
-  virtual double innerProduct(const Vector& vector) = 0;
+  virtual double innerProduct_HessianInverse(const Vector& vector)= 0;
   /**
-    * Get product with vector
-    * \param[in] vector is reference to a Vector
-    * \param[out] product is Vector to store product values
-    */
-  virtual void matrixVectorProduct(const Vector& vector,
-                                   Vector& product) = 0;
+   * Get inner product with vector for Hessian approximation
+   * \param[in] vector is reference to a Vector
+   * \return inner product of vector with this vector
+   */
+  virtual double innerProduct_Hessian(const Vector& vector)= 0;
+
+
+//  /**
+//    * Get product with vector
+//    * \param[in] vector is reference to a Vector
+//    * \param[out] product is Vector to store product values
+//    */
+//  virtual void matrixVectorProduct(const Vector& vector,
+//                                   Vector& product) = 0;
+
+  /**
+   * Get product with vector for Inverse Hessian approximation
+   * \param[in] vector is reference to a Vector
+   * \param[out] product is Vector to store product values
+   */
+  virtual void matrixVectorProduct_HessianInverse(const Vector& vector,
+                           Vector& product)= 0;
+  /**
+   * Get product with vector for Hessian approximation
+   * \param[in] vector is reference to a Vector
+   * \param[out] product is Vector to store product values
+   */
+  virtual void matrixVectorProduct_Hessian(const Vector& vector,
+                           Vector& product)= 0;
+
   /**
    * Get name of strategy
    * \return string with name of strategy

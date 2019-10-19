@@ -244,6 +244,8 @@ void Quantities::updateRadii(double stationarity_tolerance)
   stationarity_radius_ = fmax(stationarity_tolerance, stationarity_radius_update_factor_ * stationarity_radius_);
   trust_region_radius_ = trust_region_radius_update_factor_ * trust_region_radius_;
 
+  // reset step size
+  stepsize_=1.0;
 }  // end updateRadii
 
 // Print header

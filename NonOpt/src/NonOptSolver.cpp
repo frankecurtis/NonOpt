@@ -91,7 +91,7 @@ void NonOptSolver::addOptions()
   // Add integer options (name, default value, lower bound, upper bound, description)
   options_.addIntegerOption(&reporter_,
                             "iteration_limit",
-                            1e+04,
+							1e+04,
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of iterations that will be performed.\n"
@@ -212,6 +212,7 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
 
       // Compute direction
       strategies_.directionComputation()->computeDirection(&options_, &quantities_, &reporter_, &strategies_);
+      //printf("%4d\n",strategies_.directionComputation()->status());
 
       // Check status
       if (strategies_.directionComputation()->status() != DC_SUCCESS) {

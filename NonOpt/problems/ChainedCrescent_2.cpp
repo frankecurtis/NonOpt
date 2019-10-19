@@ -6,6 +6,7 @@
 
 #include <cmath>
 
+#include "setDim.hpp"
 #include "ChainedCrescent_2.hpp"
 
 // Constructor
@@ -19,7 +20,8 @@ bool ChainedCrescent_2::numberOfVariables(int& n)
 {
 
   // Set number of variables
-  n = 50;
+	setDim di;
+  n = di.getDim();
 
   // Return
   return true;

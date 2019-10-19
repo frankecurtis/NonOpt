@@ -2,20 +2,20 @@
 //
 // This code is published under the MIT License.
 //
-// Author(s) : Frank E. Curtis
+// Author(s) : Minhan Li
 
 #include <cmath>
 #include "setDim.hpp"
-#include "ActiveFaces.hpp"
+#include "Test29_2.hpp"
 
 // Constructor
-ActiveFaces::ActiveFaces() {}
+Test29_2::Test29_2() {}
 
 // Destructor
-ActiveFaces::~ActiveFaces() {}
+Test29_2::~Test29_2() {}
 
 // Number of variables
-bool ActiveFaces::numberOfVariables(int& n)
+bool Test29_2::numberOfVariables(int& n)
 {
 
   // Set number of variables
@@ -29,7 +29,7 @@ bool ActiveFaces::numberOfVariables(int& n)
 }  // end numberOfVariables
 
 // Initial point
-bool ActiveFaces::initialPoint(int n,
+bool Test29_2::initialPoint(int n,
                                double* x)
 {
 
@@ -44,19 +44,18 @@ bool ActiveFaces::initialPoint(int n,
 }  // end initialPoint
 
 // Objective value
-bool ActiveFaces::evaluateObjective(int n,
+bool Test29_2::evaluateObjective(int n,
                                     const double* x,
                                     double& f)
 {
 
   // Evaluate maximum value
   f = 0.0;
-  double sum = 0.0;
   for (int i = 0; i < n; i++) {
-    f = fmax(f, log(fabs(x[i]) + 1.0));
-    sum = sum + x[i];
+	  if(fabs(x[i])>f){
+		  f=fabs(x[i]);
+	  }
   }  // end for
-  f = fmax(f, log(fabs(sum) + 1.0));
 
   // Return
   return true;
@@ -64,52 +63,31 @@ bool ActiveFaces::evaluateObjective(int n,
 }  // end evaluateObjective
 
 // Gradient value
-bool ActiveFaces::evaluateGradient(int n,
+bool Test29_2::evaluateGradient(int n,
                                    const double* x,
                                    double* g)
 {
 
   // Initialize gradient and evaluate maximum value
-  double max_val = 0.0;
   int max_ind = 0;
-  double sum = 0.0;
-  double temp = 0.0;
+  double max_val=0.0;
   for (int i = 0; i < n; i++) {
-    g[i] = 0.0;
-    temp = log(fabs(x[i]) + 1.0);
-    if (temp > max_val) {
-      max_val = temp;
-      max_ind = i;
-    }  // end if
-    sum = sum + x[i];
-  }  // end for
-  temp = log(fabs(sum) + 1.0);
-  if (temp > max_val) {
-    max_val = temp;
-    max_ind = -1;
-  }  // end if
+	  if(fabs(x[i])>max_val){
+		  max_ind=i;
+	  }
+	  g[i] = 0.0;
+  }
+  if(x[max_ind]>=0){
+	  g[max_ind]=1.0;
+  }
+  else{
+	  g[max_ind]=-1.0;
+  }
 
-  // Evaluate gradient
-  if (max_ind >= 0) {
-    if (x[max_ind] >= 0) {
-      g[max_ind] = 1 / (x[max_ind] + 1);
-    }
-    else {
-      g[max_ind] = -1 / (-x[max_ind] + 1);
-    }
-  }  // end if
-  else {
-    if (-sum >= 0) {
-      for (int i = 0; i < n; i++) {
-        g[i] = -1 / (-sum + 1);
-      }
-    }
-    else {
-      for (int i = 0; i < n; i++) {
-        g[i] = 1 / (sum + 1);
-      }
-    }
-  }  // end else
+
+
+
+
 
   // Return
   return true;
@@ -117,7 +95,7 @@ bool ActiveFaces::evaluateGradient(int n,
 }  // end evaluateGradient
 
 // Finalize solution
-bool ActiveFaces::finalizeSolution(int n,
+bool Test29_2::finalizeSolution(int n,
                                    const double* x,
                                    double f,
                                    const double* g)

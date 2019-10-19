@@ -25,6 +25,27 @@
 #include "MxHilb.hpp"
 #include "QuadPoly.hpp"
 
+#include "Test29_2.hpp"
+#include "Test29_2.hpp"
+#include "Test29_5.hpp"
+#include "Test29_5.hpp"
+#include "Test29_6.hpp"
+#include "Test29_6.hpp"
+#include "Test29_11.hpp"
+#include "Test29_11.hpp"
+#include "Test29_13.hpp"
+#include "Test29_13.hpp"
+#include "Test29_17.hpp"
+#include "Test29_17.hpp"
+#include "Test29_19.hpp"
+#include "Test29_19.hpp"
+#include "Test29_20.hpp"
+#include "Test29_20.hpp"
+#include "Test29_22.hpp"
+#include "Test29_22.hpp"
+#include "Test29_24.hpp"
+#include "Test29_24.hpp"
+
 using namespace NonOpt;
 
 // Implementation of test
@@ -115,6 +136,7 @@ int runExperiments()
 
                 // Declare file report
                 std::shared_ptr<FileReport> r(new FileReport("f", R_NL, R_PER_INNER_ITERATION));
+                std::shared_ptr<FileReport> r_QP(new FileReport("f", R_QP, R_PER_INNER_ITERATION_IN));
 
                 // Declare output file name
                 char out_file[100];
@@ -187,16 +209,81 @@ int runExperiments()
                     strcpy(out_file, (char*)"output/QuadPoly");
                     optimal_value = 0.0;
                     break;
+                  case 11:
+                    problem = std::make_shared<Test29_2>();
+                    printf("Test29_2           ");
+                    strcpy(out_file, (char*)"output/Test29_2");
+                    optimal_value = 0.0;
+                    break;
+                  case 12:
+                    problem = std::make_shared<Test29_5>();
+                    printf("Test29_5           ");
+                    strcpy(out_file, (char*)"output/Test29_5");
+                    optimal_value = 0.0;
+                    break;
+                  case 13:
+                    problem = std::make_shared<Test29_6>();
+                    printf("Test29_6           ");
+                    strcpy(out_file, (char*)"output/Test29_6");
+                    optimal_value = 0.0;
+                    break;
+                  case 14:
+                    problem = std::make_shared<Test29_11>();
+                    printf("Test29_11           ");
+                    strcpy(out_file, (char*)"output/Test29_11");
+                    optimal_value = 0.0;
+                    break;
+                  case 15:
+                    problem = std::make_shared<Test29_13>();
+                    printf("Test29_13           ");
+                    strcpy(out_file, (char*)"output/Test29_13");
+                    optimal_value = 0.0;
+                    break;
+                  case 16:
+                    problem = std::make_shared<Test29_17>();
+                    printf("Test29_17           ");
+                    strcpy(out_file, (char*)"output/Test29_17");
+                    optimal_value = 0.0;
+                    break;
+                  case 17:
+                    problem = std::make_shared<Test29_19>();
+                    printf("Test29_19           ");
+                    strcpy(out_file, (char*)"output/Test29_19");
+                    optimal_value = 0.0;
+                    break;
+                  case 18:
+                    problem = std::make_shared<Test29_20>();
+                    printf("Test29_20           ");
+                    strcpy(out_file, (char*)"output/Test29_20");
+                    optimal_value = 0.0;
+                    break;
+                  case 19:
+                    problem = std::make_shared<Test29_22>();
+                    printf("Test29_22           ");
+                    strcpy(out_file, (char*)"output/Test29_22");
+                    optimal_value = 0.0;
+                    break;
+                  case 20:
+                    problem = std::make_shared<Test29_24>();
+                    printf("Test29_24           ");
+                    strcpy(out_file, (char*)"output/Test29_24");
+                    optimal_value = 0.0;
+                    break;
                 }  // end switch
 
                 // Set rest of output file name
                 //sprintf(out_file, "%s_%d_%d_%d_%d_%d_%d.out", out_file, direction_computation_number, inverse_hessian_update_number, line_search_number, point_set_update_number, qp_solver_number, symmetric_matrix_number);
                 sprintf(out_file, "%s_%s.out", out_file, settings_name.c_str());
+                char out_file_QP[100];
+                std::copy(out_file, out_file+100, out_file_QP);
+                sprintf(out_file_QP, "%s_%s_qp.out", out_file_QP, settings_name.c_str());
                 // Open output file
                 r->open(out_file);
+                r_QP->open(out_file_QP);
 
                 // Add to reporter
                 nonopt.reporter()->addReport(r);
+                nonopt.reporter()->addReport(r_QP);
 
                 // Optimize
                 nonopt.optimize(problem);

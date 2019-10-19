@@ -94,7 +94,6 @@ class Quantities
    */
   inline clock_t const startTime() const { return start_time_; };
   /**
-   * End time
    * \return end time that was set
    */
   inline clock_t const endTime() const { return end_time_; };

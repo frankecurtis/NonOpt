@@ -167,62 +167,62 @@ double const SymmetricMatrixLimitedMemory::element(int row_index,
 
 }  // end element
 
-// Inner product
-double SymmetricMatrixLimitedMemory::innerProduct(const Vector& vector)
-{
-
-  // Assert
-  ASSERT_EXCEPTION(size_ == vector.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Vector has incorrect length.");
-
-  // Create new vector
-  Vector product(size_);
-
-  // Compute matrix-vector product
-  matrixVectorProduct(vector, product);
-
-  // Return inner product
-  return vector.innerProduct(product);
-
-}  // end innerProduct
-
-// Matrix-vector product
-void SymmetricMatrixLimitedMemory::matrixVectorProduct(const Vector& vector,
-                                                       Vector& product)
-{
-
-  // Asserts
-  ASSERT_EXCEPTION(size_ == vector.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Vector has incorrect length.");
-  ASSERT_EXCEPTION(size_ == product.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Product has incorrect length.");
-
-  // Create intermediate value vectors
-  double* a = new double[(int)s_.size()];
-  double* b = new double[(int)s_.size()];
-
-  // Initialize product
-  product.copy(vector);
-
-  // Set parameters for daxpy
-  double value = 0.0;
-  int increment = 1;
-
-  // Two-loop
-  for (int i = (int)s_.size() - 1; i >= 0; i--) {
-    a[i] = rho_[i] * s_[i]->innerProduct(product);
-    value = -a[i];
-    daxpy_(&size_, &value, y_[i]->values(), &increment, product.valuesModifiable(), &increment);
-  }  // end for
-  product.scale(initial_diagonal_value_);
-  for (int i = 0; i < (int)s_.size(); i++) {
-    b[i] = rho_[i] * y_[i]->innerProduct(product);
-    value = a[i] - b[i];
-    daxpy_(&size_, &value, s_[i]->values(), &increment, product.valuesModifiable(), &increment);
-  }  // end for
-
-  // Delete intermediate value vectors
-  delete[] a;
-  delete[] b;
-
-}  // end matrixVectorProduct
+//// Inner product
+//double SymmetricMatrixLimitedMemory::innerProduct(const Vector& vector)
+//{
+//
+//  // Assert
+//  ASSERT_EXCEPTION(size_ == vector.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Vector has incorrect length.");
+//
+//  // Create new vector
+//  Vector product(size_);
+//
+//  // Compute matrix-vector product
+//  matrixVectorProduct(vector, product);
+//
+//  // Return inner product
+//  return vector.innerProduct(product);
+//
+//}  // end innerProduct
+//
+//// Matrix-vector product
+//void SymmetricMatrixLimitedMemory::matrixVectorProduct(const Vector& vector,
+//                                                       Vector& product)
+//{
+//
+//  // Asserts
+//  ASSERT_EXCEPTION(size_ == vector.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Vector has incorrect length.");
+//  ASSERT_EXCEPTION(size_ == product.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Product has incorrect length.");
+//
+//  // Create intermediate value vectors
+//  double* a = new double[(int)s_.size()];
+//  double* b = new double[(int)s_.size()];
+//
+//  // Initialize product
+//  product.copy(vector);
+//
+//  // Set parameters for daxpy
+//  double value = 0.0;
+//  int increment = 1;
+//
+//  // Two-loop
+//  for (int i = (int)s_.size() - 1; i >= 0; i--) {
+//    a[i] = rho_[i] * s_[i]->innerProduct(product);
+//    value = -a[i];
+//    daxpy_(&size_, &value, y_[i]->values(), &increment, product.valuesModifiable(), &increment);
+//  }  // end for
+//  product.scale(initial_diagonal_value_);
+//  for (int i = 0; i < (int)s_.size(); i++) {
+//    b[i] = rho_[i] * y_[i]->innerProduct(product);
+//    value = a[i] - b[i];
+//    daxpy_(&size_, &value, s_[i]->values(), &increment, product.valuesModifiable(), &increment);
+//  }  // end for
+//
+//  // Delete intermediate value vectors
+//  delete[] a;
+//  delete[] b;
+//
+//}  // end matrixVectorProduct
 
 // Set as diagonal matrix
 void SymmetricMatrixLimitedMemory::setAsDiagonal(int size,

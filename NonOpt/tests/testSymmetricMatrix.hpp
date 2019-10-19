@@ -8,6 +8,7 @@
 #define __TESTSYMMETRICMATRIX_HPP__
 
 #include <iostream>
+#include <iterator>
 
 #include "NonOptOptions.hpp"
 #include "NonOptReporter.hpp"
@@ -52,7 +53,7 @@ int testSymmetricMatrixImplementation(int option)
   symmetric_matrix->addOptions(&options, &reporter);
 
   // Loop over strategies
-  for (int symmetric_matrix_number = 0; symmetric_matrix_number < 2; symmetric_matrix_number++) {
+  for (int symmetric_matrix_number = 0; symmetric_matrix_number < 1; symmetric_matrix_number++) {
 
     // Set symmetric matrix
     if (symmetric_matrix_number == 0) {
@@ -73,16 +74,16 @@ int testSymmetricMatrixImplementation(int option)
     // Use I as name
     std::shared_ptr<SymmetricMatrix> I = symmetric_matrix;
 
-    // Check elements
+    // Check element_Hessians
     for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 5; j++) {
         if (i == j) {
-          if (I->element(i, j) < 1.0 - 1e-12 || I->element(i, j) > 1.0 + 1e-12) {
+          if (I->element_Hessian(i, j) < 1.0 - 1e-12 || I->element_Hessian(i, j) > 1.0 + 1e-12) {
             result = 1;
           }
         }
         else {
-          if (I->element(i, j) < 0.0 - 1e-12 || I->element(i, j) > 0.0 + 1e-12) {
+          if (I->element_Hessian(i, j) < 0.0 - 1e-12 || I->element_Hessian(i, j) > 0.0 + 1e-12) {
             result = 1;
           }
         }
@@ -90,13 +91,14 @@ int testSymmetricMatrixImplementation(int option)
     }    // end for
 
     // Print identity matrix
-    I->print(&reporter, "Testing constructor with default value... should be identity matrix:");
+
+    //I->print(&reporter, "Testing constructor with default value... should be identity matrix:");
 
     // Declare ones vector
     Vector s(5, 1.0);
 
     // Print creation message
-    s.print(&reporter, "Creating vector... should be ones vector:");
+    //s.print(&reporter, "Creating vector... should be ones vector:");
 
     // Declare [1,2,3,4,5] vector and set values
     Vector y(5, 1.0);
@@ -106,141 +108,152 @@ int testSymmetricMatrixImplementation(int option)
     y.set(4, 5.0);
 
     // Print creation message
-    y.print(&reporter, "Creating vector... should be [1,2,3,4,5]:");
+    //y.print(&reporter, "Creating vector... should be [1,2,3,4,5]:");
 
     // Perform BFGS Update
     I->updateBFGS(s, y);
 
     // Print matrix
-    I->print(&reporter, "Testing Symmetric update... result with I, s=ones, y=1..5:");
+    //I->print(&reporter, "Testing Symmetric update... result with I, s=ones, y=1..5:");
 
-    // Print element-by-element while checking values
+
+
     reporter.printf(R_NL, R_BASIC, "Testing element access... printing same matrix again:\n");
     for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 5; j++) {
         reporter.printf(R_NL, R_BASIC, " %23.16e", I->element(i, j));
+      }
+      reporter.printf(R_NL, R_BASIC, "\n");
+    }
+
+
+    // Print element_Hessian-by-element_Hessian while checking values
+    reporter.printf(R_NL, R_BASIC, "Testing element_Hessian access... printing same matrix again:\n");
+    for (int i = 0; i < 5; i++) {
+      for (int j = 0; j < 5; j++) {
+        reporter.printf(R_NL, R_BASIC, " %23.16e", I->element_Hessian(i, j));
         if (i == 0 && j == 0) {
-          if (I->element(i, j) < 1.177777777777 - 1e-12 || I->element(i, j) > 1.177777777777 + 1e-12) {
+          if (I->element_Hessian(i, j) < 1.177777777777 - 1e-12 || I->element_Hessian(i, j) > 1.177777777777 + 1e-12) {
             result = 1;
           }
         }
         if (i == 0 && j == 1) {
-          if (I->element(i, j) < 0.111111111111 - 1e-12 || I->element(i, j) > 0.111111111111 + 1e-12) {
+          if (I->element_Hessian(i, j) < 0.111111111111 - 1e-12 || I->element_Hessian(i, j) > 0.111111111111 + 1e-12) {
             result = 1;
           }
         }
         if (i == 0 && j == 2) {
-          if (I->element(i, j) < 0.044444444444 - 1e-12 || I->element(i, j) > 0.044444444444 + 1e-12) {
+          if (I->element_Hessian(i, j) < 0.044444444444 - 1e-12 || I->element_Hessian(i, j) > 0.044444444444 + 1e-12) {
             result = 1;
           }
         }
         if (i == 0 && j == 3) {
-          if (I->element(i, j) < -0.022222222222 - 1e-12 || I->element(i, j) > -0.022222222222 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.022222222222 - 1e-12 || I->element_Hessian(i, j) > -0.022222222222 + 1e-12) {
             result = 1;
           }
         }
         if (i == 0 && j == 4) {
-          if (I->element(i, j) < -0.088888888888 - 1e-12 || I->element(i, j) > -0.088888888888 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.088888888888 - 1e-12 || I->element_Hessian(i, j) > -0.088888888888 + 1e-12) {
             result = 1;
           }
         }
         if (i == 1 && j == 0) {
-          if (I->element(i, j) < 0.111111111111 - 1e-12 || I->element(i, j) > 0.111111111111 + 1e-12) {
+          if (I->element_Hessian(i, j) < 0.111111111111 - 1e-12 || I->element_Hessian(i, j) > 0.111111111111 + 1e-12) {
             result = 1;
           }
         }
         if (i == 1 && j == 1) {
-          if (I->element(i, j) < 1.044444444444 - 1e-12 || I->element(i, j) > 1.044444444444 + 1e-12) {
+          if (I->element_Hessian(i, j) < 1.044444444444 - 1e-12 || I->element_Hessian(i, j) > 1.044444444444 + 1e-12) {
             result = 1;
           }
         }
         if (i == 1 && j == 2) {
-          if (I->element(i, j) < -0.022222222222 - 1e-12 || I->element(i, j) > -0.022222222222 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.022222222222 - 1e-12 || I->element_Hessian(i, j) > -0.022222222222 + 1e-12) {
             result = 1;
           }
         }
         if (i == 1 && j == 3) {
-          if (I->element(i, j) < -0.088888888888 - 1e-12 || I->element(i, j) > -0.088888888888 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.088888888888 - 1e-12 || I->element_Hessian(i, j) > -0.088888888888 + 1e-12) {
             result = 1;
           }
         }
         if (i == 1 && j == 4) {
-          if (I->element(i, j) < -0.155555555555 - 1e-12 || I->element(i, j) > -0.155555555555 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.155555555555 - 1e-12 || I->element_Hessian(i, j) > -0.155555555555 + 1e-12) {
             result = 1;
           }
         }
         if (i == 2 && j == 0) {
-          if (I->element(i, j) < 0.044444444444 - 1e-12 || I->element(i, j) > 0.044444444444 + 1e-12) {
+          if (I->element_Hessian(i, j) < 0.044444444444 - 1e-12 || I->element_Hessian(i, j) > 0.044444444444 + 1e-12) {
             result = 1;
           }
         }
         if (i == 2 && j == 1) {
-          if (I->element(i, j) < -0.022222222222 - 1e-12 || I->element(i, j) > -0.022222222222 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.022222222222 - 1e-12 || I->element_Hessian(i, j) > -0.022222222222 + 1e-12) {
             result = 1;
           }
         }
         if (i == 2 && j == 2) {
-          if (I->element(i, j) < 0.911111111111 - 1e-12 || I->element(i, j) > 0.911111111111 + 1e-12) {
+          if (I->element_Hessian(i, j) < 0.911111111111 - 1e-12 || I->element_Hessian(i, j) > 0.911111111111 + 1e-12) {
             result = 1;
           }
         }
         if (i == 2 && j == 3) {
-          if (I->element(i, j) < -0.155555555555 - 1e-12 || I->element(i, j) > -0.155555555555 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.155555555555 - 1e-12 || I->element_Hessian(i, j) > -0.155555555555 + 1e-12) {
             result = 1;
           }
         }
         if (i == 2 && j == 4) {
-          if (I->element(i, j) < -0.222222222222 - 1e-12 || I->element(i, j) > -0.222222222222 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.222222222222 - 1e-12 || I->element_Hessian(i, j) > -0.222222222222 + 1e-12) {
             result = 1;
           }
         }
         if (i == 3 && j == 0) {
-          if (I->element(i, j) < -0.022222222222 - 1e-12 || I->element(i, j) > -0.022222222222 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.022222222222 - 1e-12 || I->element_Hessian(i, j) > -0.022222222222 + 1e-12) {
             result = 1;
           }
         }
         if (i == 3 && j == 1) {
-          if (I->element(i, j) < -0.088888888888 - 1e-12 || I->element(i, j) > -0.088888888888 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.088888888888 - 1e-12 || I->element_Hessian(i, j) > -0.088888888888 + 1e-12) {
             result = 1;
           }
         }
         if (i == 3 && j == 2) {
-          if (I->element(i, j) < -0.155555555555 - 1e-12 || I->element(i, j) > -0.155555555555 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.155555555555 - 1e-12 || I->element_Hessian(i, j) > -0.155555555555 + 1e-12) {
             result = 1;
           }
         }
         if (i == 3 && j == 3) {
-          if (I->element(i, j) < 0.777777777777 - 1e-12 || I->element(i, j) > 0.777777777777 + 1e-12) {
+          if (I->element_Hessian(i, j) < 0.777777777777 - 1e-12 || I->element_Hessian(i, j) > 0.777777777777 + 1e-12) {
             result = 1;
           }
         }
         if (i == 3 && j == 4) {
-          if (I->element(i, j) < -0.288888888888 - 1e-12 || I->element(i, j) > -0.288888888888 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.288888888888 - 1e-12 || I->element_Hessian(i, j) > -0.288888888888 + 1e-12) {
             result = 1;
           }
         }
         if (i == 4 && j == 0) {
-          if (I->element(i, j) < -0.088888888888 - 1e-12 || I->element(i, j) > -0.088888888888 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.088888888888 - 1e-12 || I->element_Hessian(i, j) > -0.088888888888 + 1e-12) {
             result = 1;
           }
         }
         if (i == 4 && j == 1) {
-          if (I->element(i, j) < -0.155555555555 - 1e-12 || I->element(i, j) > -0.155555555555 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.155555555555 - 1e-12 || I->element_Hessian(i, j) > -0.155555555555 + 1e-12) {
             result = 1;
           }
         }
         if (i == 4 && j == 2) {
-          if (I->element(i, j) < -0.222222222222 - 1e-12 || I->element(i, j) > -0.222222222222 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.222222222222 - 1e-12 || I->element_Hessian(i, j) > -0.222222222222 + 1e-12) {
             result = 1;
           }
         }
         if (i == 4 && j == 3) {
-          if (I->element(i, j) < -0.288888888888 - 1e-12 || I->element(i, j) > -0.288888888888 + 1e-12) {
+          if (I->element_Hessian(i, j) < -0.288888888888 - 1e-12 || I->element_Hessian(i, j) > -0.288888888888 + 1e-12) {
             result = 1;
           }
         }
         if (i == 4 && j == 4) {
-          if (I->element(i, j) < 0.644444444444 - 1e-12 || I->element(i, j) > 0.644444444444 + 1e-12) {
+          if (I->element_Hessian(i, j) < 0.644444444444 - 1e-12 || I->element_Hessian(i, j) > 0.644444444444 + 1e-12) {
             result = 1;
           }
         }
@@ -248,13 +261,52 @@ int testSymmetricMatrixImplementation(int option)
       reporter.printf(R_NL, R_BASIC, "\n");
     }  // end for
 
+
+    // Test Hessian multiply Inverse Hessian
+    std::vector<double> res;
+    for(int i=0;i<5;i++){
+      Vector col(5, 0.0);
+      I->column_Hessian(i, col);
+      Vector prod(5, 0.0);
+      I->matrixVectorProduct_HessianInverse(col,prod);
+
+    for(int j=0;j<5;j++){
+//      printf("%.4e",prod.values()[j]);
+      res.push_back(prod.values()[j]);
+    }
+    }
+
+    reporter.printf(R_NL, R_BASIC, "Testing Matrix Matrix multiplication... printing the product:\n");
+    for (int i = 0; i < 5; i++) {
+      for (int j = 0; j < 5; j++) {
+        reporter.printf(R_NL, R_BASIC, " %23.16e", res[i+5*j]);
+        if (i == j) {
+          if (res[i+5*j] < 1.0 - 1e-12 || res[i+5*j] > 1.0 + 1e-12) {
+            result = 1;
+          }
+        }
+        else {
+          if (res[i+5*j] < 0.0 - 1e-12 || res[i+5*j] > 0.0 + 1e-12) {
+            result = 1;
+          }
+        }
+      }  // end for
+      reporter.printf(R_NL, R_BASIC, "\n");
+    }    // end for
+
+
+
+
+
+
+
     // Declare vector for column access
     Vector c(5, 0.0);
 
     // Get column
     I->column(3, c);
 
-    // Check elements of column
+    // Check element_Hessians of column
     for (int i = 0; i < 5; i++) {
       if (i == 0) {
         if (c.values()[i] < -0.022222222222 - 1e-12 || c.values()[i] > -0.022222222222 + 1e-12) {
@@ -284,15 +336,15 @@ int testSymmetricMatrixImplementation(int option)
     }  // end for
 
     // Print column
-    c.print(&reporter, "Column... should be vector of elements of column 3 of I:");
+    c.print(&reporter, "Column... should be vector of element_Hessians of column 3 of I:");
 
     // Declare vector for matrix-vector product
     Vector p(5, 0.0);
 
     // Compute matrix-vector product
-    I->matrixVectorProduct(s, p);
+    I->matrixVectorProduct_HessianInverse(s, p);
 
-    // Check elements of matrix-vector product
+    // Check element_Hessians of matrix-vector product
     for (int i = 0; i < 5; i++) {
       if (i == 0) {
         if (p.values()[i] < 1.222222222222 - 1e-12 || p.values()[i] > 1.222222222222 + 1e-12) {
@@ -325,7 +377,7 @@ int testSymmetricMatrixImplementation(int option)
     p.print(&reporter, "Matrix-vector product... should be vector of sums of rows of I:");
 
     // Declare inner product
-    double inner_product = I->innerProduct(s);
+    double inner_product = I->innerProduct_HessianInverse(s);
 
     // Check inner product
     if (inner_product < 2.777777777777 - 1e-12 || inner_product > 2.777777777777 + 1e-12) {
@@ -338,16 +390,16 @@ int testSymmetricMatrixImplementation(int option)
     // Reset as diagonal matrix
     I->setAsDiagonal(5, 7.0);
 
-    // Check elements
+    // Check element_Hessians
     for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 5; j++) {
         if (i == j) {
-          if (I->element(i, j) < 7.0 - 1e-12 || I->element(i, j) > 7.0 + 1e-12) {
+          if (I->element_Hessian(i, j) < 7.0 - 1e-12 || I->element_Hessian(i, j) > 7.0 + 1e-12) {
             result = 1;
           }
         }
         else {
-          if (I->element(i, j) < 0.0 - 1e-12 || I->element(i, j) > 0.0 + 1e-12) {
+          if (I->element_Hessian(i, j) < 0.0 - 1e-12 || I->element_Hessian(i, j) > 0.0 + 1e-12) {
             result = 1;
           }
         }
@@ -360,16 +412,16 @@ int testSymmetricMatrixImplementation(int option)
     // Set as 2x2
     I->setAsDiagonal(2, 1.0);
 
-    // Check elements
+    // Check element_Hessians
     for (int i = 0; i < 2; i++) {
       for (int j = 0; j < 2; j++) {
         if (i == j) {
-          if (I->element(i, j) < 1.0 - 1e-12 || I->element(i, j) > 1.0 + 1e-12) {
+          if (I->element_Hessian(i, j) < 1.0 - 1e-12 || I->element_Hessian(i, j) > 1.0 + 1e-12) {
             result = 1;
           }
         }
         else {
-          if (I->element(i, j) < 0.0 - 1e-12 || I->element(i, j) > 0.0 + 1e-12) {
+          if (I->element_Hessian(i, j) < 0.0 - 1e-12 || I->element_Hessian(i, j) > 0.0 + 1e-12) {
             result = 1;
           }
         }

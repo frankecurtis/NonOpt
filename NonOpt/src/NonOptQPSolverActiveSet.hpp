@@ -171,11 +171,13 @@ class QPSolverActiveSet : public QPSolver
    * Set vector
    * \param[in] vector is vector of double values to be set as QP "b" data
    */
-  void setVector(const std::vector<double> vector) { std::vector<double> vector2(vector.size(), 0.0); vector_ =vector2 ;}//vector; };
+  //void setVector(const std::vector<double> vector){vector_=vector; };
+  void setVector(const std::vector<double> vector){ std::vector<double> vector2(vector.size(), 0.0); vector_ =vector2 ;};
   /**
    * Set scalar
    * \param[in] scalar is double value to be set as QP "r" data
    */
+  //void setScalar(double scalar) { scalar_ =scalar; };//
   void setScalar(double scalar) { scalar_ = std::numeric_limits<double>::max(); };
   //@}
 
@@ -266,6 +268,7 @@ class QPSolverActiveSet : public QPSolver
   double kkt_error_;
   double dual_objective_best_;
   double primal_objective_reference_;
+  double dual_objective_simple_;
   /**
    * Algorithm quantities
    */
@@ -289,6 +292,7 @@ class QPSolverActiveSet : public QPSolver
   double dual_step_projection_scalar_;
   Vector dual_step_feasible_;
   Vector dual_step_feasible_best_;
+  Vector dual_step_simple_;
   Vector gamma_;
   double multiplier_;
   Vector omega_;
@@ -307,7 +311,7 @@ class QPSolverActiveSet : public QPSolver
   /**
    * Termination condition for inexact solution
    */
-  bool inexactTerminationCondition();
+  bool inexactTerminationCondition(const Reporter* reporter);
   /**
    * Internal solve methods
    */
