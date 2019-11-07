@@ -37,7 +37,7 @@ bool Test29_17::initialPoint(int n,
 
   // Set initial point
   for (int i = 0; i < n; i++) {
-    x[i] = 1.0;
+    x[i] = 1.0/n;
   }
 
   // Return
@@ -73,7 +73,7 @@ bool Test29_17::evaluateGradient(int n,
 
   // Initialize gradient and evaluate maximum value
   int max_ind = 0;
-  double max_val=0.0;
+  double max_val=-1.0;
   for (int i = 0; i < n; i++) {
 	  g[i] = 0.0;
   }
@@ -82,7 +82,9 @@ bool Test29_17::evaluateGradient(int n,
 	  int j=i/5;
 	  term[i]=5-(j+1)*(1-cos(x[i]))-sin(x[i])-cos(x[5*j])-cos(x[5*j+1])-cos(x[5*j+2])-cos(x[5*j+3])-cos(x[5*j+4]);
 	  if(fabs(term[i])>max_val){
+		  max_val=fabs(term[i]);
 		  max_ind=i;
+
 	  }
   }  // end for
   int j=max_ind/5;

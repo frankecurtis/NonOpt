@@ -84,7 +84,7 @@ int runExperiments()
 
 
     std::vector<std::string> settings_names;
-    settings_names.push_back("original");
+    //settings_names.push_back("original");
 	settings_names.push_back("only_inexact");
 
 	for (int settings_number = 0; settings_number < settings_names.size(); settings_number++) {
@@ -231,13 +231,13 @@ int runExperiments()
                     problem = std::make_shared<Test29_11>();
                     printf("Test29_11           ");
                     strcpy(out_file, (char*)"output/Test29_11");
-                    optimal_value = 0.0;
+                    optimal_value = 20.0;
                     break;
                   case 15:
                     problem = std::make_shared<Test29_13>();
                     printf("Test29_13           ");
                     strcpy(out_file, (char*)"output/Test29_13");
-                    optimal_value = 0.0;
+                    optimal_value = 0.94;
                     break;
                   case 16:
                     problem = std::make_shared<Test29_17>();
@@ -267,7 +267,7 @@ int runExperiments()
                     problem = std::make_shared<Test29_24>();
                     printf("Test29_24           ");
                     strcpy(out_file, (char*)"output/Test29_24");
-                    optimal_value = 0.0;
+                    optimal_value = 0.4;
                     break;
                 }  // end switch
 

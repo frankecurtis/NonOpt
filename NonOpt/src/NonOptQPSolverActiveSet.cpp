@@ -553,10 +553,13 @@ bool QPSolverActiveSet::inexactTerminationCondition(const Reporter* reporter)
 
 
   // Finalize solution (to set omega_ and gamma_)
-  finalizeSolution();
+//	if (iteration_count_ == 0){
+//		finalizeSolution();
+//	};
+
 
   // Evaluate dual vectors
-  evaluateDualVectors();
+  //evaluateDualVectors();
 
   // Set "b"
   Vector b((int)vector_.size());
@@ -565,7 +568,8 @@ bool QPSolverActiveSet::inexactTerminationCondition(const Reporter* reporter)
   }
 
   // Evaluate primal objective value
-  double primal_objective = -0.5*objectiveQuadraticValue() + omega_.innerProduct(b) - scalar_*gamma_.norm1();
+  double primal_objective = -0.5*objectiveQuadraticValue();// + omega_.innerProduct(b) - scalar_*gamma_.norm1();
+  //printf("second term is= %.4e and third term =%.4e\n",omega_.innerProduct(b),scalar_*gamma_.norm1());
 
   // Evaluate dual objective value
   Vector bPlusGd((int)vector_.size());
@@ -597,7 +601,7 @@ bool QPSolverActiveSet::inexactTerminationCondition(const Reporter* reporter)
 
   // Set inexact termination ratio value
   double inexact_termination_ratio = 1 - (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)/(objective_ratio - 1.0);
-//R_NL, R_PER_ITERATION,
+
   if(iteration_count_ ==0){
 	  reporter->printf(R_QP, R_PER_INNER_ITERATION_IN,"==========================================================================================================================================================\n");
 	  reporter->printf(R_QP, R_PER_INNER_ITERATION_IN,"b              b-p0          b-pk        b-qk    b-qkb   	  xi          alpha             LHS        	   RHS     	    LHS1        RHS1         kkt\n");
@@ -678,8 +682,7 @@ bool QPSolverActiveSet::inexactTerminationCondition(const Reporter* reporter)
   //dual_objective_best_ - primal_objective <= (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)*(b.max() - dual_objective_best_)
   if (alpha_step>0&&
       (primal_objective - primal_objective_reference_ >=
-      fmax(inexact_termination_ratio,inexact_termination_ratio_min_)*(dual_objective_simple_ - primal_objective_reference_)||
-      dual_objective_best_ - primal_objective <= (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)*(b.max() - dual_objective_best_) )) {
+      fmax(inexact_termination_ratio,inexact_termination_ratio_min_)*(dual_objective_simple_ - primal_objective_reference_) )) {
 	  //printf("dual step length is %4d\n",(int)dual_step_.length());
 	  //printf("dual step simple length is %4d\n",(int)dual_step_simple_.length());
 	  dual_step_.copy(dual_step_simple_);
@@ -690,7 +693,8 @@ bool QPSolverActiveSet::inexactTerminationCondition(const Reporter* reporter)
   // Check condition
   else if (
       (primal_objective - primal_objective_reference_ >=
-      fmax(inexact_termination_ratio,inexact_termination_ratio_min_)*(dual_objective_best_ - primal_objective_reference_) )) {
+      fmax(inexact_termination_ratio,inexact_termination_ratio_min_)*(dual_objective_best_ - primal_objective_reference_)||
+      dual_objective_best_ - primal_objective <= (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)*(b.max() - dual_objective_best_) )) {
     dual_step_feasible_.copy(dual_step_feasible_best_);
     condition_bool = true;
   }

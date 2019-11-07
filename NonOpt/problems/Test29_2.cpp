@@ -34,8 +34,11 @@ bool Test29_2::initialPoint(int n,
 {
 
   // Set initial point
-  for (int i = 0; i < n; i++) {
-    x[i] = 1.0;
+  for (int i = 1; i <=n/2; i++) {
+    x[i-1] = i/(double)n;
+  }
+  for (int i = n/2+1; i <=n; i++) {
+    x[i-1] = -i/(double)n;
   }
 
   // Return
@@ -50,7 +53,7 @@ bool Test29_2::evaluateObjective(int n,
 {
 
   // Evaluate maximum value
-  f = 0.0;
+  f = -1.0;
   for (int i = 0; i < n; i++) {
 	  if(fabs(x[i])>f){
 		  f=fabs(x[i]);
@@ -70,9 +73,10 @@ bool Test29_2::evaluateGradient(int n,
 
   // Initialize gradient and evaluate maximum value
   int max_ind = 0;
-  double max_val=0.0;
+  double max_val=-1.0;
   for (int i = 0; i < n; i++) {
 	  if(fabs(x[i])>max_val){
+		  max_val=fabs(x[i]);
 		  max_ind=i;
 	  }
 	  g[i] = 0.0;

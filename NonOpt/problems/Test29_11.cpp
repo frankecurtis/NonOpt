@@ -35,9 +35,14 @@ bool Test29_11::initialPoint(int n,
 {
 
   // Set initial point
-  for (int i = 0; i < n; i++) {
-    x[i] = 1.0;
+  for (int i = 0; i < n-1; i++) {
+    x[i] = 0.5;
   }
+  x[n-1]=-2.0;
+
+//  for (int i = 0; i < n; i++) {
+//	  x[i]=1.0;
+//  }
 
   // Return
   return true;
@@ -53,7 +58,7 @@ bool Test29_11::evaluateObjective(int n,
   // Evaluate maximum value
   f = 0.0;
   std::vector<double> term(2*n-2,0.0);
-  for (int k = 1; k < 2*n-1; k++) {
+  for (int k = 1; k <= 2*n-2; k++) {
 	  int i=(int) (k+1)/2;
 	  if(k%2==1){
 		  term[k-1]=x[i-1]+x[i]*((5-x[i])*x[i]-2)-13;
@@ -76,9 +81,12 @@ bool Test29_11::evaluateGradient(int n,
 {
 
   // Initialize gradient and evaluate maximum value
-  std::vector<double> term(2*n-2,0.0);
 
-  for (int k = 1; k < 2*n-1; k++) {
+  for (int i = 0; i < n; i++) {
+    g[i] = 0.0;
+  }
+  std::vector<double> term(2*n-2,0.0);
+  for (int k = 1; k <= 2*n-2; k++) {
 	  int i=(int) (k+1)/2;
 	  if(k%2==1){
 		  term[k-1]=x[i-1]+x[i]*((5-x[i])*x[i]-2)-13;
@@ -86,6 +94,10 @@ bool Test29_11::evaluateGradient(int n,
 	  else{
 		  term[k-1]=x[i-1]+x[i]*((1+x[i])*x[i]-14)-29;
 	  }
+  }  // end for
+
+  for (int k = 1; k < 2*n-1; k++) {
+	  int i=(int) (k+1)/2;
 
 	  if(term[k-1]>=0){
 		  if(k%2==0){
