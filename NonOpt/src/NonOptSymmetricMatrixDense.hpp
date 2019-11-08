@@ -26,8 +26,8 @@ class SymmetricMatrixDense : public SymmetricMatrix
     */
   SymmetricMatrixDense()
       : size_(-1),
-		hessian_inverse_values_(nullptr),
-		hessian_values_(nullptr){};
+		    hessian_inverse_values_(nullptr),
+		    hessian_values_(nullptr) {};
 
   //@}
 
@@ -73,61 +73,61 @@ class SymmetricMatrixDense : public SymmetricMatrix
   /** @name Get methods */
   //@{
   /**
-   * Get column
+   * Get column of Hessian
    * \param[in] index is index of column to return
    * \param[out] column is Vector to store column values
    */
-  void const column(int column_index,
-                    Vector& column);
+  void const columnHessian(int column_index,
+                           Vector& column);
   /**
-   * Get column
+   * Get column of inverse Hessian
    * \param[in] index is index of column to return
    * \param[out] column is Vector to store column values
    */
-  void const column_Hessian(int column_index,
-                    Vector& column);
+  void const columnHessianInverse(int column_index,
+                                  Vector& column);
   /**
-   * Get element (const)
-   * \param[in] row_index is row index number
-   * \param[in] column_index is column index number
-   * \return (row_index,column_index) element of matrix
-   */
-  double const element(int row_index,
-                       int column_index);
+    * Get element of Hessian
+    * \param[in] row_index is row index number
+    * \param[in] column_index is column index number
+    * \return (row_index,column_index) element of matrix
+    */
+  double const elementHessian(int row_index,
+                              int column_index);
   /**
-   * Get element (const)
-   * \param[in] row_index is row index number
-   * \param[in] column_index is column index number
-   * \return (row_index,column_index) element of matrix
-   */
-  double const element_Hessian(int row_index,
-                       int column_index);
+    * Get element of inverse Hessian
+    * \param[in] row_index is row index number
+    * \param[in] column_index is column index number
+    * \return (row_index,column_index) element of matrix
+    */
+  double const elementHessianInverse(int row_index,
+                                     int column_index);
   /**
-   * Get inner product with vector for Inverse Hessian approximation
+   * Get inner product of Hessian with vector
    * \param[in] vector is reference to a Vector
    * \return inner product of vector with this vector
    */
-  double innerProduct_HessianInverse(const Vector& vector);
+  double innerProductHessian(const Vector& vector);
   /**
-   * Get inner product with vector for Hessian approximation
+   * Get inner product of inverse Hessian with vector
    * \param[in] vector is reference to a Vector
    * \return inner product of vector with this vector
    */
-  double innerProduct_Hessian(const Vector& vector);
+  double innerProductHessianInverse(const Vector& vector);
   /**
-   * Get product with vector for Inverse Hessian approximation
+   * Get product of Hessian with vector
    * \param[in] vector is reference to a Vector
    * \param[out] product is Vector to store product values
    */
-  void matrixVectorProduct_HessianInverse(const Vector& vector,
-                           Vector& product);
+  void matrixVectorProductHessian(const Vector& vector,
+                                  Vector& product);
   /**
-   * Get product with vector for Hessian approximation
+   * Get product of inverse Hessian with vector
    * \param[in] vector is reference to a Vector
    * \param[out] product is Vector to store product values
    */
-  void matrixVectorProduct_Hessian(const Vector& vector,
-                           Vector& product);
+  void matrixVectorProductHessianInverse(const Vector& vector,
+                                         Vector& product);
   /**
    * Get name of strategy
    * \return string with name of strategy
@@ -139,15 +139,25 @@ class SymmetricMatrixDense : public SymmetricMatrix
     */
   inline int const size() const { return size_; };
   /**
-   * Get values (const)
+   * Get values (const) of Hessian
    * \return is pointer to array of SymmetricMatrixDense values
    */
-  inline double* const values() const { return hessian_inverse_values_; };
+  inline double* const valuesHessian() const { return hessian_values_; };
   /**
-   * Get values (modifiable)
+   * Get values (const) of inverse Hessian
+   * \return is pointer to array of SymmetricMatrixDense values
+   */
+  inline double* const valuesHessianInverse() const { return hessian_inverse_values_; };
+  /**
+   * Get values (modifiable) of Hessian
    * \return is pointer to array of SymmetricMatrixDense values (to allow modification of array)
    */
-  inline double* valuesModifiable() { return hessian_inverse_values_; };
+  inline double* valuesModifiableHessian() { return hessian_values_; };
+  /**
+   * Get values (modifiable) of inverse Hessian
+   * \return is pointer to array of SymmetricMatrixDense values (to allow modification of array)
+   */
+  inline double* valuesModifiableHessianInverse() { return hessian_inverse_values_; };
   //@}
 
   /** @name Modify methods */
@@ -196,12 +206,10 @@ class SymmetricMatrixDense : public SymmetricMatrix
 
   /** @name Private members */
   //@{
-  int size_;       /**< Number of rows and number of columns */
-  int length_;     /**< Number of rows *   number of columns */
-  double* hessian_inverse_values_; /**< Double array   */
-  double* hessian_values_; /**< Double array
-                      */
-
+  int size_;                       /**< Number of rows and number of columns */
+  int length_;                     /**< Number of rows *   number of columns */
+  double* hessian_inverse_values_; /**< Double array */
+  double* hessian_values_;         /**< Double array */
   //@}
 
   /** @name Indexing methods */

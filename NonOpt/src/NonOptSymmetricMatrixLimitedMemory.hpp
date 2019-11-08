@@ -78,76 +78,61 @@ class SymmetricMatrixLimitedMemory : public SymmetricMatrix
   /** @name Get methods */
   //@{
   /**
-   * Get column for Inverse Hessian
+   * Get column of Hessian
    * \param[in] index is index of column to return
    * \param[out] column is Vector to store column values
    */
-  void const column(int column_index,
-                    Vector& column);
+  void const columnHessian(int column_index,
+                           Vector& column);
   /**
-   * Get column for Hessian
+   * Get column of inverse Hessian
    * \param[in] index is index of column to return
    * \param[out] column is Vector to store column values
    */
-  void const column_Hessian(int column_index,
-                    Vector& column){};
+  void const columnHessianInverse(int column_index,
+                                  Vector& column);
   /**
-   * Get element (const) for Inverse Hessian
-   * \param[in] row_index is row index number
-   * \param[in] column_index is column index number
-   * \return (row_index,column_index) element of matrix
-   */
-  double const element(int row_index,
-                       int column_index);
+    * Get element of Hessian
+    * \param[in] row_index is row index number
+    * \param[in] column_index is column index number
+    * \return (row_index,column_index) element of matrix
+    */
+  double const elementHessian(int row_index,
+                              int column_index);
   /**
-   * Get element (const) for Hessian
-   * \param[in] row_index is row index number
-   * \param[in] column_index is column index number
-   * \return (row_index,column_index) element of matrix
-   */
-  double const element_Hessian(int row_index,
-                       int column_index){return 0.0;};
-//  /**
-//   * Get inner product with vector
-//   * \param[in] vector is reference to a Vector
-//   * \return inner product of vector with this vector
-//   */
-//  double innerProduct(const Vector& vector);
-//  /**
-//    * Get product with vector
-//    * \param[in] vector is reference to a Vector
-//    * \param[out] product is Vector to store product values
-//    */
-//  void matrixVectorProduct(const Vector& vector,
-//                           Vector& product);
-
-
+    * Get element of inverse Hessian
+    * \param[in] row_index is row index number
+    * \param[in] column_index is column index number
+    * \return (row_index,column_index) element of matrix
+    */
+  double const elementHessianInverse(int row_index,
+                                     int column_index);
   /**
-   * Get inner product with vector for Inverse Hessian approximation
+   * Get inner product of Hessian with vector
    * \param[in] vector is reference to a Vector
    * \return inner product of vector with this vector
    */
-  double innerProduct_HessianInverse(const Vector& vector){return 0.0;};
+  double innerProductHessian(const Vector& vector);
   /**
-   * Get inner product with vector for Hessian approximation
+   * Get inner product of inverse Hessian with vector
    * \param[in] vector is reference to a Vector
    * \return inner product of vector with this vector
    */
-  double innerProduct_Hessian(const Vector& vector){return 0.0;};
+  double innerProductHessianInverse(const Vector& vector);
   /**
-   * Get product with vector for Inverse Hessian approximation
+   * Get product of Hessian with vector
    * \param[in] vector is reference to a Vector
    * \param[out] product is Vector to store product values
    */
-  void matrixVectorProduct_HessianInverse(const Vector& vector,
-                           Vector& product){};
+  void matrixVectorProductHessian(const Vector& vector,
+                                  Vector& product);
   /**
-   * Get product with vector for Hessian approximation
+   * Get product of inverse Hessian with vector
    * \param[in] vector is reference to a Vector
    * \param[out] product is Vector to store product values
    */
-  void matrixVectorProduct_Hessian(const Vector& vector,
-                           Vector& product){};
+  void matrixVectorProductHessianInverse(const Vector& vector,
+                                         Vector& product);
   /**
    * Get name of strategy
    * \return string with name of strategy

@@ -85,74 +85,61 @@ class SymmetricMatrix : public Strategy
   /** @name Get methods */
   //@{
   /**
-   * Get column for Inverse Hessian
+   * Get column of Hessian
    * \param[in] index is index of column to return
    * \param[out] column is Vector to store column values
    */
-  virtual void const column(int column_index,
-                            Vector& column) = 0;
+  virtual void const columnHessian(int column_index,
+                                   Vector& column) = 0;
   /**
-   * Get column for Hessian
+   * Get column of inverse Hessian
    * \param[in] index is index of column to return
    * \param[out] column is Vector to store column values
    */
-  virtual void const column_Hessian(int column_index,
-                            Vector& column) = 0;
+  virtual void const columnHessianInverse(int column_index,
+                                          Vector& column) = 0;
   /**
-    * Get element (const) for Inverse Hessian
+    * Get element of Hessian
     * \param[in] row_index is row index number
     * \param[in] column_index is column index number
     * \return (row_index,column_index) element of matrix
     */
-  virtual double const element(int row_index,
-                               int column_index) = 0;
+  virtual double const elementHessian(int row_index,
+                                      int column_index) = 0;
   /**
-    * Get element (const) for Hessian
+    * Get element of inverse Hessian
     * \param[in] row_index is row index number
     * \param[in] column_index is column index number
     * \return (row_index,column_index) element of matrix
     */
-  virtual double const element_Hessian(int row_index,
-                               int column_index) = 0;
-
-
+  virtual double const elementHessianInverse(int row_index,
+                                             int column_index) = 0;
   /**
-   * Get inner product with vector for Inverse Hessian approximation
+   * Get inner product of Hessian with vector
    * \param[in] vector is reference to a Vector
    * \return inner product of vector with this vector
    */
-  virtual double innerProduct_HessianInverse(const Vector& vector)= 0;
+  virtual double innerProductHessian(const Vector& vector) = 0;
   /**
-   * Get inner product with vector for Hessian approximation
+   * Get inner product of inverse Hessian with vector
    * \param[in] vector is reference to a Vector
    * \return inner product of vector with this vector
    */
-  virtual double innerProduct_Hessian(const Vector& vector)= 0;
-
-
-//  /**
-//    * Get product with vector
-//    * \param[in] vector is reference to a Vector
-//    * \param[out] product is Vector to store product values
-//    */
-//  virtual void matrixVectorProduct(const Vector& vector,
-//                                   Vector& product) = 0;
-
+  virtual double innerProductHessianInverse(const Vector& vector) = 0;
   /**
-   * Get product with vector for Inverse Hessian approximation
+   * Get product of Hessian with vector
    * \param[in] vector is reference to a Vector
    * \param[out] product is Vector to store product values
    */
-  virtual void matrixVectorProduct_HessianInverse(const Vector& vector,
-                           Vector& product)= 0;
+  virtual void matrixVectorProductHessian(const Vector& vector,
+                                          Vector& product) = 0;
   /**
-   * Get product with vector for Hessian approximation
+   * Get product of inverse Hessian with vector
    * \param[in] vector is reference to a Vector
    * \param[out] product is Vector to store product values
    */
-  virtual void matrixVectorProduct_Hessian(const Vector& vector,
-                           Vector& product)= 0;
-
+  virtual void matrixVectorProductHessianInverse(const Vector& vector,
+                                                 Vector& product) = 0;
   /**
    * Get name of strategy
    * \return string with name of strategy
@@ -165,7 +152,7 @@ class SymmetricMatrix : public Strategy
   virtual int const size() const = 0;
   /**
    * Get status
-   * \return current status of direction computation
+   * \return current status of symmetric matrix
    */
   inline SM_Status status() { return status_; };
   //@}

@@ -258,13 +258,13 @@ int testQPSolverImplementation(int option)
     for (int i = 0; i < numberVariables; i++) {
       for (int j = 0; j < numberVariables; j++) {
         for (int k = 0; k < numberVariables; k++) {
-          matrix->valuesModifiable()[i * numberVariables + j] = matrix->values()[i * numberVariables + j] + hessianInverse_init[i * numberVariables + k] * hessianInverse_init[j * numberVariables + k];
+          matrix->valuesModifiableHessianInverse()[i * numberVariables + j] = matrix->valuesHessianInverse()[i * numberVariables + j] + hessianInverse_init[i * numberVariables + k] * hessianInverse_init[j * numberVariables + k];
         }
       }  // end for
     }    // end for
     for (int i = 0; i < numberVariables; i++) {
       for (int j = 0; j < numberVariables; j++) {
-        matrix->valuesModifiable()[i * numberVariables + j] = hess_scaling * matrix->values()[i * numberVariables + j];
+        matrix->valuesModifiableHessianInverse()[i * numberVariables + j] = hess_scaling * matrix->valuesHessianInverse()[i * numberVariables + j];
       }
     }  // end for
 

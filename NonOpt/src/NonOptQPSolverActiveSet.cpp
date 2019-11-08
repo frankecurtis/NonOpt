@@ -420,7 +420,7 @@ double QPSolverActiveSet::KKTErrorFull()
   d0.addScaledVector(-1.0, Gomega);
   d0.addScaledVector(-1.0, gamma_);
   Vector d(gamma_length_);
-  matrix_->matrixVectorProduct_HessianInverse(d0, d);
+  matrix_->matrixVectorProductHessianInverse(d0, d);
 
   // Evaluate gradient inner products
   Vector Gtd;
@@ -652,7 +652,7 @@ bool QPSolverActiveSet::inexactTerminationCondition(const Reporter* reporter)
 //		  Vector combination_bar_(length1);
 //		  combination_bar_.copyArray(combination_.values());
 		  // Set quadratic value dHd
-		  double quadratic_value_bar = matrix_->innerProduct_Hessian(d_bar);
+		  double quadratic_value_bar = matrix_->innerProductHessian(d_bar);
 
 		  // Set maximum
 		  if (isnan(quadratic_value_bar) || quadratic_value_bar > NONOPT_DOUBLE_INFINITY) {
@@ -729,7 +729,7 @@ void QPSolverActiveSet::solveQP(const Options* options,
     for (int i = 0; i < (int)vector_list_.size(); i++) {
 
       // Compute objective value 0.5*g_i^T*W*g_i-b_i
-      double t = 0.5 * matrix_->innerProduct_HessianInverse(*vector_list_[i]) - vector_[i];
+      double t = 0.5 * matrix_->innerProductHessianInverse(*vector_list_[i]) - vector_[i];
 
       // Check for minimum
       if (t < value) {
@@ -751,7 +751,7 @@ void QPSolverActiveSet::solveQP(const Options* options,
     omega_positive_.push_back(index);
 
     // Set factor
-    factor_[0] = sqrt(1.0 + matrix_->innerProduct_HessianInverse(*vector_list_[index]));
+    factor_[0] = sqrt(1.0 + matrix_->innerProductHessianInverse(*vector_list_[index]));
 
     // Set dual multiplier b_i-g_i^T*W*g_i
     multiplier_ = 1.0 + vector_[index] - pow(factor_[0], 2);
@@ -994,10 +994,10 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
 
       // Check which set is being updated
       if (kkt_residual_minimum_set == 1) {
-        new_diagonal_squared = 1.0 + matrix_->innerProduct_HessianInverse(*vector_list_[kkt_residual_minimum_index]);
+        new_diagonal_squared = 1.0 + matrix_->innerProductHessianInverse(*vector_list_[kkt_residual_minimum_index]);
       }
       else {
-        new_diagonal_squared = matrix_->element(kkt_residual_minimum_index, kkt_residual_minimum_index);
+        new_diagonal_squared = matrix_->elementHessianInverse(kkt_residual_minimum_index, kkt_residual_minimum_index);
       }
 
       // Set inputs for blas
@@ -1443,7 +1443,7 @@ void QPSolverActiveSet::printData(const Reporter* reporter)
   reporter->printf(R_QP, R_BASIC, "\nMATRIX:\n");
   for (int i = 0; i < gamma_length_; i++) {
     for (int j = 0; j < gamma_length_; j++) {
-      reporter->printf(R_QP, R_BASIC, " %+23.16e", matrix_->element(i, j));
+      reporter->printf(R_QP, R_BASIC, " %+23.16e", matrix_->elementHessianInverse(i, j));
     }
     reporter->printf(R_QP, R_BASIC, "\n");
   }  // end for
@@ -1766,7 +1766,7 @@ void QPSolverActiveSet::choleskyFromScratch(const Reporter* reporter)
   // Compute WG matrix
   for (int i = 0; i < (int)omega_positive_.size(); i++) {
     std::shared_ptr<Vector> product(new Vector(gamma_length_));
-    matrix_->matrixVectorProduct_HessianInverse(*vector_list_[omega_positive_[i]], *product);
+    matrix_->matrixVectorProductHessianInverse(*vector_list_[omega_positive_[i]], *product);
     WG.push_back(product);
   }  // end for
 
@@ -1794,21 +1794,21 @@ void QPSolverActiveSet::choleskyFromScratch(const Reporter* reporter)
   // Compute (2,2)-block (upper triangle)
   for (int i = 0; i < (int)gamma_positive_.size(); i++) {
     for (int j = i; j < (int)gamma_positive_.size(); j++) {
-      matrix[((int)omega_positive_.size() + i) * size + ((int)omega_positive_.size() + j)] = matrix_->element(gamma_positive_[i], gamma_positive_[j]);
+      matrix[((int)omega_positive_.size() + i) * size + ((int)omega_positive_.size() + j)] = matrix_->elementHessianInverse(gamma_positive_[i], gamma_positive_[j]);
     }
   }  // end for
 
   // Compute (2,3)-block (upper triangle)
   for (int i = 0; i < (int)gamma_positive_.size(); i++) {
     for (int j = 0; j < (int)gamma_negative_.size(); j++) {
-      matrix[((int)omega_positive_.size() + i) * size + ((int)omega_positive_.size() + (int)gamma_positive_.size() + j)] = matrix_->element(gamma_positive_[i], gamma_negative_[j]);
+      matrix[((int)omega_positive_.size() + i) * size + ((int)omega_positive_.size() + (int)gamma_positive_.size() + j)] = matrix_->elementHessianInverse(gamma_positive_[i], gamma_negative_[j]);
     }
   }  // end for
 
   // Compute (3,3)-block (upper triangle)
   for (int i = 0; i < (int)gamma_negative_.size(); i++) {
     for (int j = i; j < (int)gamma_negative_.size(); j++) {
-      matrix[((int)omega_positive_.size() + (int)gamma_positive_.size() + i) * size + ((int)omega_positive_.size() + (int)gamma_positive_.size() + j)] = matrix_->element(gamma_negative_[i], gamma_negative_[j]);
+      matrix[((int)omega_positive_.size() + (int)gamma_positive_.size() + i) * size + ((int)omega_positive_.size() + (int)gamma_positive_.size() + j)] = matrix_->elementHessianInverse(gamma_negative_[i], gamma_negative_[j]);
     }
   }  // end for
 
@@ -1904,7 +1904,7 @@ void QPSolverActiveSet::evaluateDualVectors()
   }
 
   // Compute matrix-vector product
-  matrix_->matrixVectorProduct_HessianInverse(combination_translated_, dual_step_);
+  matrix_->matrixVectorProductHessianInverse(combination_translated_, dual_step_);
   dual_step_.scale(-1.0);
 
   // Compute feasible dual step by projection
@@ -1956,7 +1956,7 @@ void QPSolverActiveSet::evaluateSystemVector(int set,
     // Evaluate temporary vector
     for (int i = 0; i < gamma_length_; i++) {
       Vector col(gamma_length_, 0.0);
-      matrix_->column(i, col);
+      matrix_->columnHessianInverse(i, col);
       temporary_vector[i] = vector_list_[index]->innerProduct(col);
     }  // end for
 
@@ -1968,14 +1968,14 @@ void QPSolverActiveSet::evaluateSystemVector(int set,
     // Set "gamma positive" values, i.e.,
     for (int i = 0; i < (int)gamma_positive_.size(); i++) {
       Vector col(gamma_length_, 0.0);
-      matrix_->column(gamma_positive_[i], col);
+      matrix_->columnHessianInverse(gamma_positive_[i], col);
       system_vector[(int)omega_positive_.size() + i] = vector_list_[index]->innerProduct(col);
     }  // end for
 
     // Set "gamma negative" values, i.e.,
     for (int i = 0; i < (int)gamma_negative_.size(); i++) {
       Vector col(gamma_length_, 0.0);
-      matrix_->column(gamma_negative_[i], col);
+      matrix_->columnHessianInverse(gamma_negative_[i], col);
       system_vector[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] = vector_list_[index]->innerProduct(col);
     }  // end for
 
@@ -1991,18 +1991,18 @@ void QPSolverActiveSet::evaluateSystemVector(int set,
     // Set "omega" values, i.e., ith value = G(:,omega_positive_[i])'*W(:,kkt_residual_minimum_index)
     for (int i = 0; i < (int)omega_positive_.size(); i++) {
       Vector col(gamma_length_, 0.0);
-      matrix_->column(index, col);
+      matrix_->columnHessianInverse(index, col);
       system_vector[i] = vector_list_[omega_positive_[i]]->innerProduct(col);
     }  // end for
 
     // Set "gamma positive" values, i.e., W(gamma_positive_[i],kkt_residual_minimum_index)
     for (int i = 0; i < (int)gamma_positive_.size(); i++) {
-      system_vector[(int)omega_positive_.size() + i] = matrix_->element(gamma_positive_[i], index);
+      system_vector[(int)omega_positive_.size() + i] = matrix_->elementHessianInverse(gamma_positive_[i], index);
     }
 
     // Set "gamma negative" values, i.e., W(gamma_positive_[i],kkt_residual_minimum_index)
     for (int i = 0; i < (int)gamma_negative_.size(); i++) {
-      system_vector[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] = matrix_->element(gamma_negative_[i], index);
+      system_vector[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] = matrix_->elementHessianInverse(gamma_negative_[i], index);
     }
 
   }  // end else
