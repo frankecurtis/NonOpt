@@ -5,11 +5,12 @@
 // Author(s) : Frank E. Curtis
 
 #include <cmath>
-#include "setDim.hpp"
+
 #include "MxHilb.hpp"
 
 // Constructor
-MxHilb::MxHilb() {}
+MxHilb::MxHilb(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 MxHilb::~MxHilb() {}
@@ -19,8 +20,7 @@ bool MxHilb::numberOfVariables(int& n)
 {
 
   // Set number of variables
-	setDim di;
-  n = di.getDim();
+  n = number_of_variables_;
 
   // Return
   return true;

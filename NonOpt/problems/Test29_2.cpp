@@ -2,14 +2,15 @@
 //
 // This code is published under the MIT License.
 //
-// Author(s) : Minhan Li
+// Author(s) : Frank E. Curtis and Minhan Li
 
 #include <cmath>
-#include "setDim.hpp"
+
 #include "Test29_2.hpp"
 
 // Constructor
-Test29_2::Test29_2() {}
+Test29_2::Test29_2(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 Test29_2::~Test29_2() {}
@@ -19,9 +20,7 @@ bool Test29_2::numberOfVariables(int& n)
 {
 
   // Set number of variables
-	setDim di;
-  n = di.getDim();
-
+  n = number_of_variables_;
 
   // Return
   return true;
@@ -30,15 +29,15 @@ bool Test29_2::numberOfVariables(int& n)
 
 // Initial point
 bool Test29_2::initialPoint(int n,
-                               double* x)
+                            double* x)
 {
 
   // Set initial point
-  for (int i = 1; i <=n/2; i++) {
-    x[i-1] = i/(double)n;
+  for (int i = 0; i < n / 2; i++) {
+    x[i] = double(i + 1) / (double)n;
   }
-  for (int i = n/2+1; i <=n; i++) {
-    x[i-1] = -i/(double)n;
+  for (int i = n / 2; i < n; i++) {
+    x[i] = double(-i) / (double)n;
   }
 
   // Return
@@ -48,16 +47,16 @@ bool Test29_2::initialPoint(int n,
 
 // Objective value
 bool Test29_2::evaluateObjective(int n,
-                                    const double* x,
-                                    double& f)
+                                 const double* x,
+                                 double& f)
 {
 
-  // Evaluate maximum value
-  f = -1.0;
+  // Evaluate maximum absolute value
+  f = 0.0;
   for (int i = 0; i < n; i++) {
-	  if(fabs(x[i])>f){
-		  f=fabs(x[i]);
-	  }
+    if (fabs(x[i]) > f) {
+      f = fabs(x[i]);
+    }
   }  // end for
 
   // Return
@@ -67,31 +66,21 @@ bool Test29_2::evaluateObjective(int n,
 
 // Gradient value
 bool Test29_2::evaluateGradient(int n,
-                                   const double* x,
-                                   double* g)
+                                const double* x,
+                                double* g)
 {
 
-  // Initialize gradient and evaluate maximum value
+  // Initialize gradient and evaluate maximum absolute value
   int max_ind = 0;
-  double max_val=-1.0;
+  double max_val = 0.0;
   for (int i = 0; i < n; i++) {
-	  if(fabs(x[i])>max_val){
-		  max_val=fabs(x[i]);
-		  max_ind=i;
-	  }
-	  g[i] = 0.0;
+    if (fabs(x[i]) > max_val) {
+      max_ind = i;
+      max_val = fabs(x[i]);
+    }
+    g[i] = 0.0;
   }
-  if(x[max_ind]>=0){
-	  g[max_ind]=1.0;
-  }
-  else{
-	  g[max_ind]=-1.0;
-  }
-
-
-
-
-
+  g[max_ind] = ((x[max_ind] > 0.0) ? 1.0 : ((x[max_ind] < 0.0) ? -1.0 : 0.0));
 
   // Return
   return true;
@@ -100,9 +89,9 @@ bool Test29_2::evaluateGradient(int n,
 
 // Finalize solution
 bool Test29_2::finalizeSolution(int n,
-                                   const double* x,
-                                   double f,
-                                   const double* g)
+                                const double* x,
+                                double f,
+                                const double* g)
 {
   return true;
 }

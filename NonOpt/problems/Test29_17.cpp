@@ -2,16 +2,15 @@
 //
 // This code is published under the MIT License.
 //
-// Author(s) : Minhan Li
+// Author(s) : Frank E. Curtis and Minhan Li
 
 #include <cmath>
-#include <math.h>
-#include "setDim.hpp"
-#include <vector>
+
 #include "Test29_17.hpp"
 
 // Constructor
-Test29_17::Test29_17() {}
+Test29_17::Test29_17(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 Test29_17::~Test29_17() {}
@@ -21,9 +20,7 @@ bool Test29_17::numberOfVariables(int& n)
 {
 
   // Set number of variables
-	setDim di;
-  n = di.getDim();
-
+  n = number_of_variables_;
 
   // Return
   return true;
@@ -32,12 +29,12 @@ bool Test29_17::numberOfVariables(int& n)
 
 // Initial point
 bool Test29_17::initialPoint(int n,
-                               double* x)
+                             double* x)
 {
 
   // Set initial point
   for (int i = 0; i < n; i++) {
-    x[i] = 1.0/n;
+    x[i] = 1.0 / (double)n;
   }
 
   // Return
@@ -47,17 +44,15 @@ bool Test29_17::initialPoint(int n,
 
 // Objective value
 bool Test29_17::evaluateObjective(int n,
-                                    const double* x,
-                                    double& f)
+                                  const double* x,
+                                  double& f)
 {
 
   // Evaluate maximum value
   f = 0.0;
-  std::vector<double> term(n,0.0);
   for (int i = 0; i < n; i++) {
-	  int j=i/5;
-	  term[i]=5-(j+1)*(1-cos(x[i]))-sin(x[i])-cos(x[5*j])-cos(x[5*j+1])-cos(x[5*j+2])-cos(x[5*j+3])-cos(x[5*j+4]);
-	  f=fmax(f,fabs(term[i]));
+    int j = i / 5;
+    f = fmax(f, fabs(5 - (double)(j + 1) * (1 - cos(x[i])) - sin(x[i]) - cos(x[5 * j]) - cos(x[5 * j + 1]) - cos(x[5 * j + 2]) - cos(x[5 * j + 3]) - cos(x[5 * j + 4])));
   }  // end for
 
   // Return
@@ -67,49 +62,36 @@ bool Test29_17::evaluateObjective(int n,
 
 // Gradient value
 bool Test29_17::evaluateGradient(int n,
-                                   const double* x,
-                                   double* g)
+                                 const double* x,
+                                 double* g)
 {
 
-  // Initialize gradient and evaluate maximum value
+  // Initialize gradient
+  for (int i = 0; i < n; i++) {
+    g[i] = 0.0;
+  }
+
+  // Evaluate gradient
   int max_ind = 0;
-  double max_val=-1.0;
+  double max_val = 0.0;
+  double max_term = 0.0;
   for (int i = 0; i < n; i++) {
-	  g[i] = 0.0;
-  }
-  std::vector<double> term(n,0.0);
-  for (int i = 0; i < n; i++) {
-	  int j=i/5;
-	  term[i]=5-(j+1)*(1-cos(x[i]))-sin(x[i])-cos(x[5*j])-cos(x[5*j+1])-cos(x[5*j+2])-cos(x[5*j+3])-cos(x[5*j+4]);
-	  if(fabs(term[i])>max_val){
-		  max_val=fabs(term[i]);
-		  max_ind=i;
-
-	  }
-  }  // end for
-  int j=max_ind/5;
-
-  if(term[max_ind]>=0){
-	  g[max_ind]+=-(j+1)*sin(x[max_ind])-cos(x[max_ind]);
-	  g[5*j]+=sin(x[5*j]);
-	  g[5*j+1]+=sin(x[5*j+1]);
-	  g[5*j+2]+=sin(x[5*j+2]);
-	  g[5*j+3]+=sin(x[5*j+3]);
-	  g[5*j+4]+=sin(x[5*j+4]);
-  }
-  else {
-	  g[max_ind]+=(j+1)*sin(x[max_ind])+cos(x[max_ind]);
-	  g[5*j]-=sin(x[5*j]);
-	  g[5*j+1]-=sin(x[5*j+1]);
-	  g[5*j+2]-=sin(x[5*j+2]);
-	  g[5*j+3]-=sin(x[5*j+3]);
-	  g[5*j+4]-=sin(x[5*j+4]);
-  }
-
-
-
-
-
+    int j = i / 5;
+    double term = 5 - (double)(j + 1) * (1 - cos(x[i])) - sin(x[i]) - cos(x[5 * j]) - cos(x[5 * j + 1]) - cos(x[5 * j + 2]) - cos(x[5 * j + 3]) - cos(x[5 * j + 4]);
+    if (fabs(term) > max_val) {
+      max_ind = i;
+      max_val = fabs(term);
+      max_term = term;
+    }  // end if
+  }    // end for
+  int j = max_ind / 5;
+  double sign = ((max_term >= 0) ? 1.0 : -1.0);
+  g[max_ind] += sign * (-(double)(j + 1) * sin(x[max_ind]) - cos(x[max_ind]));
+  g[5 * j] += sign * sin(x[5 * j]);
+  g[5 * j + 1] += sign * sin(x[5 * j + 1]);
+  g[5 * j + 2] += sign * sin(x[5 * j + 2]);
+  g[5 * j + 3] += sign * sin(x[5 * j + 3]);
+  g[5 * j + 4] += sign * sin(x[5 * j + 4]);
 
   // Return
   return true;
@@ -118,9 +100,9 @@ bool Test29_17::evaluateGradient(int n,
 
 // Finalize solution
 bool Test29_17::finalizeSolution(int n,
-                                   const double* x,
-                                   double f,
-                                   const double* g)
+                                 const double* x,
+                                 double f,
+                                 const double* g)
 {
   return true;
 }

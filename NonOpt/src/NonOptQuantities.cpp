@@ -245,7 +245,7 @@ void Quantities::updateRadii(double stationarity_tolerance)
   trust_region_radius_ = trust_region_radius_update_factor_ * trust_region_radius_;
 
   // reset step size
-  stepsize_=1.0;
+  stepsize_ = 1.0;
 }  // end updateRadii
 
 // Print header

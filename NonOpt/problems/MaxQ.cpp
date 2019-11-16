@@ -5,11 +5,12 @@
 // Author(s) : Frank E. Curtis
 
 #include <cmath>
-#include "setDim.hpp"
+
 #include "MaxQ.hpp"
 
 // Constructor
-MaxQ::MaxQ() {}
+MaxQ::MaxQ(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 MaxQ::~MaxQ() {}
@@ -19,9 +20,7 @@ bool MaxQ::numberOfVariables(int& n)
 {
 
   // Set number of variables
-	setDim di;
-  n = di.getDim();
-
+  n = number_of_variables_;
 
   // Return
   return true;

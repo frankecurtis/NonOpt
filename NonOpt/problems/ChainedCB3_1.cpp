@@ -5,11 +5,12 @@
 // Author(s) : Frank E. Curtis
 
 #include <cmath>
-#include "setDim.hpp"
+
 #include "ChainedCB3_1.hpp"
 
 // Constructor
-ChainedCB3_1::ChainedCB3_1() {}
+ChainedCB3_1::ChainedCB3_1(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 ChainedCB3_1::~ChainedCB3_1() {}
@@ -19,8 +20,7 @@ bool ChainedCB3_1::numberOfVariables(int& n)
 {
 
   // Set number of variables
-	setDim di;
-  n = di.getDim();
+  n = number_of_variables_;
 
   // Return
   return true;

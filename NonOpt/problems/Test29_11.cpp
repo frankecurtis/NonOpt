@@ -2,15 +2,15 @@
 //
 // This code is published under the MIT License.
 //
-// Author(s) : Minhan Li
+// Author(s) : Frank E. Curtis and Minhan Li
 
 #include <cmath>
-#include "setDim.hpp"
-#include <vector>
+
 #include "Test29_11.hpp"
 
 // Constructor
-Test29_11::Test29_11() {}
+Test29_11::Test29_11(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 Test29_11::~Test29_11() {}
@@ -20,9 +20,7 @@ bool Test29_11::numberOfVariables(int& n)
 {
 
   // Set number of variables
-	setDim di;
-  n = di.getDim();
-
+  n = number_of_variables_;
 
   // Return
   return true;
@@ -31,18 +29,14 @@ bool Test29_11::numberOfVariables(int& n)
 
 // Initial point
 bool Test29_11::initialPoint(int n,
-                               double* x)
+                             double* x)
 {
 
   // Set initial point
-  for (int i = 0; i < n-1; i++) {
+  for (int i = 0; i < n - 1; i++) {
     x[i] = 0.5;
   }
-  x[n-1]=-2.0;
-
-//  for (int i = 0; i < n; i++) {
-//	  x[i]=1.0;
-//  }
+  x[n - 1] = -2.0;
 
   // Return
   return true;
@@ -51,22 +45,20 @@ bool Test29_11::initialPoint(int n,
 
 // Objective value
 bool Test29_11::evaluateObjective(int n,
-                                    const double* x,
-                                    double& f)
+                                  const double* x,
+                                  double& f)
 {
 
-  // Evaluate maximum value
+  // Evaluate sum of absolute values
   f = 0.0;
-  std::vector<double> term(2*n-2,0.0);
-  for (int k = 1; k <= 2*n-2; k++) {
-	  int i=(int) (k+1)/2;
-	  if(k%2==1){
-		  term[k-1]=x[i-1]+x[i]*((5-x[i])*x[i]-2)-13;
-	  }
-	  else{
-		  term[k-1]=x[i-1]+x[i]*((1+x[i])*x[i]-14)-29;
-	  }
-	  f+=fabs(term[k-1]);
+  for (int k = 1; k <= 2 * n - 2; k++) {
+    int i = (k + 1) / 2;
+    if (k % 2 == 1) {
+      f += fabs(x[i - 1] + x[i] * ((5.0 - x[i]) * x[i] - 2.0) - 13.0);
+    }
+    else {
+      f += fabs(x[i - 1] + x[i] * ((1.0 + x[i]) * x[i] - 14.0) - 29.0);
+    }
   }  // end for
 
   // Return
@@ -76,58 +68,31 @@ bool Test29_11::evaluateObjective(int n,
 
 // Gradient value
 bool Test29_11::evaluateGradient(int n,
-                                   const double* x,
-                                   double* g)
+                                 const double* x,
+                                 double* g)
 {
 
-  // Initialize gradient and evaluate maximum value
-
+  // Initialize gradient
   for (int i = 0; i < n; i++) {
     g[i] = 0.0;
   }
-  std::vector<double> term(2*n-2,0.0);
-  for (int k = 1; k <= 2*n-2; k++) {
-	  int i=(int) (k+1)/2;
-	  if(k%2==1){
-		  term[k-1]=x[i-1]+x[i]*((5-x[i])*x[i]-2)-13;
-	  }
-	  else{
-		  term[k-1]=x[i-1]+x[i]*((1+x[i])*x[i]-14)-29;
-	  }
-  }  // end for
 
-  for (int k = 1; k < 2*n-1; k++) {
-	  int i=(int) (k+1)/2;
-
-	  if(term[k-1]>=0){
-		  if(k%2==0){
-			  g[i-1]+=1.0;
-			  g[i]+=(1+x[i])*x[i]-14+x[i]*(2*x[i]+1);
-		  }
-		  else{
-			  g[i-1]+=1.0;
-			  g[i]+=(5-x[i])*x[i]-2+x[i]*(-2*x[i]+5);
-		  }
-	  }
-	  else{
-		  if(k%2==0){
-			  g[i-1]-=1.0;
-			  g[i]+=-(1+x[i])*x[i]-14+x[i]*(2*x[i]+1);
-		  }
-		  else{
-			  g[i-1]-=1.0;
-			  g[i]+=-(5-x[i])*x[i]-2+x[i]*(-2*x[i]+5);
-		  }
-	  }
-  }  // end for
-
-
-
-
-
-
-
-
+  // Evaluate gradient
+  for (int k = 1; k <= 2 * n - 2; k++) {
+    int i = (k + 1) / 2;
+    if (k % 2 == 1) {
+      double term = x[i - 1] + x[i] * ((5.0 - x[i]) * x[i] - 2.0) - 13.0;
+      double sign = ((term >= 0.0) ? 1.0 : -1.0);
+      g[i - 1] += sign * (1.0);
+      g[i] += sign * (-3.0 * x[i] * x[i] + 10.0 * x[i] - 2.0);
+    }  // end if
+    else {
+      double term = x[i - 1] + x[i] * ((1.0 + x[i]) * x[i] - 14.0) - 29.0;
+      double sign = ((term >= 0.0) ? 1.0 : -1.0);
+      g[i - 1] += sign * (1.0);
+      g[i] += sign * (3.0 * x[i] * x[i] + 2.0 * x[i] - 14.0);
+    }  // end else
+  }    // end for
 
   // Return
   return true;
@@ -136,9 +101,9 @@ bool Test29_11::evaluateGradient(int n,
 
 // Finalize solution
 bool Test29_11::finalizeSolution(int n,
-                                   const double* x,
-                                   double f,
-                                   const double* g)
+                                 const double* x,
+                                 double f,
+                                 const double* g)
 {
   return true;
 }

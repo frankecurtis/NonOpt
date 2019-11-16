@@ -15,12 +15,10 @@ QuadPoly::QuadPoly(int n,
                    int m,
                    int a,
                    double s)
+    : number_of_active_affine_(a),
+      number_of_affine_(m),
+      number_of_variables_(n)
 {
-
-  // Set problem size
-  number_of_variables_ = n;
-  number_of_affine_ = m;
-  number_of_active_affine_ = a;
 
   // Declare scaling factor
   double symmetric_matrix_scaling = s;

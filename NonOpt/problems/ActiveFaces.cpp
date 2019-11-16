@@ -5,11 +5,12 @@
 // Author(s) : Frank E. Curtis
 
 #include <cmath>
-#include "setDim.hpp"
+
 #include "ActiveFaces.hpp"
 
 // Constructor
-ActiveFaces::ActiveFaces() {}
+ActiveFaces::ActiveFaces(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 ActiveFaces::~ActiveFaces() {}
@@ -19,9 +20,7 @@ bool ActiveFaces::numberOfVariables(int& n)
 {
 
   // Set number of variables
-	setDim di;
-  n = di.getDim();
-
+  n = number_of_variables_;
 
   // Return
   return true;

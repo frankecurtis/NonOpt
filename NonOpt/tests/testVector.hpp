@@ -257,6 +257,17 @@ int testVectorImplementation(int option)
                   "inf-norm (should be  4                 ) : %+23.16e\n",
                   w1, w2, wInf);
 
+  // Check option
+  if (option == 1) {
+    // Print final message
+    if (result == 0) {
+      reporter.printf(R_NL, R_BASIC, "TEST WAS SUCCESSFUL.\n");
+    }
+    else {
+      reporter.printf(R_NL, R_BASIC, "TEST FAILED.\n");
+    }
+  }  // end if
+
   // Return
   return result;
 

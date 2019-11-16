@@ -32,7 +32,7 @@ class BrownFunction_2 : public Problem
   /**
    * Constructor
    */
-  BrownFunction_2();
+  BrownFunction_2(int n);
   //@}
 
   /** @name Destructor */
@@ -114,6 +114,11 @@ class BrownFunction_2 : public Problem
    * Overloaded equals operator
    */
   void operator=(const BrownFunction_2&);
+  //@}
+
+  /** @name Private members */
+  //@{
+  int number_of_variables_; /**< Number of variables */
   //@}
 
 };  // end BrownFunction_2

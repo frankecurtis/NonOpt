@@ -5,11 +5,12 @@
 // Author(s) : Frank E. Curtis
 
 #include <cmath>
-#include "setDim.hpp"
+
 #include "ChainedLQ.hpp"
 
 // Constructor
-ChainedLQ::ChainedLQ() {}
+ChainedLQ::ChainedLQ(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 ChainedLQ::~ChainedLQ() {}
@@ -19,8 +20,7 @@ bool ChainedLQ::numberOfVariables(int& n)
 {
 
   // Set number of variables
-	setDim di;
-  n = di.getDim();
+  n = number_of_variables_;
 
   // Return
   return true;

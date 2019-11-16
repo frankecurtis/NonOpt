@@ -5,13 +5,12 @@
 // Author(s) : Frank E. Curtis
 
 // Description : Implementation for NonOpt of the objective
-//                 f(x) = max{g(-sum_{j=1}^n x_i),max_{i=1..n} g(x_i)}
+//                 f(x) = max_{i=1..n} ((3 - 2*x_i)*x_i - x_{i-1} - 2*x_{i+1} + 1)^2
 //               where
-//                 g(y) = ln(|y|+1)
+//                 x_0 = x_{n+1} = 0.0
 //               with initial point
-//                 x_i = 1.0 for all i = 1..n
+//                 x_i = -1.0 for all i = 1..n
 // Notes       : THIS PROBLEM IS NONCONVEX
-//               Optimal value: 0.0
 
 #ifndef __TEST29_19_HPP__
 #define __TEST29_19_HPP__
@@ -32,7 +31,7 @@ class Test29_19 : public Problem
   /**
    * Constructor
    */
-  Test29_19();
+  Test29_19(int n);
   //@}
 
   /** @name Destructor */
@@ -114,6 +113,11 @@ class Test29_19 : public Problem
    * Overloaded equals operator
    */
   void operator=(const Test29_19&);
+  //@}
+
+  /** @name Private members */
+  //@{
+  int number_of_variables_; /**< Number of variables */
   //@}
 
 };  // end Test29_19

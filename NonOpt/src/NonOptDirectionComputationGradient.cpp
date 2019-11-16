@@ -4,9 +4,9 @@
 //
 // Author(s) : Frank E. Curtis
 
+#include "NonOptDirectionComputationGradient.hpp"
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
-#include "NonOptDirectionComputationGradient.hpp"
 
 namespace NonOpt
 {

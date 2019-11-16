@@ -85,61 +85,61 @@ class SymmetricMatrix : public Strategy
   /** @name Get methods */
   //@{
   /**
-   * Get column of Hessian
+   * Get column of symmetric matrix
    * \param[in] index is index of column to return
    * \param[out] column is Vector to store column values
    */
-  virtual void const columnHessian(int column_index,
-                                   Vector& column) = 0;
+  virtual void const column(int column_index,
+                            Vector& column) = 0;
   /**
-   * Get column of inverse Hessian
+   * Get column of symmetric matrix inverse
    * \param[in] index is index of column to return
    * \param[out] column is Vector to store column values
    */
-  virtual void const columnHessianInverse(int column_index,
-                                          Vector& column) = 0;
+  virtual void const columnOfInverse(int column_index,
+                                     Vector& column) = 0;
   /**
-    * Get element of Hessian
+    * Get element of symmetric matrix
     * \param[in] row_index is row index number
     * \param[in] column_index is column index number
     * \return (row_index,column_index) element of matrix
     */
-  virtual double const elementHessian(int row_index,
-                                      int column_index) = 0;
+  virtual double const element(int row_index,
+                               int column_index) = 0;
   /**
-    * Get element of inverse Hessian
+    * Get element of symmetric matrix inverse
     * \param[in] row_index is row index number
     * \param[in] column_index is column index number
     * \return (row_index,column_index) element of matrix
     */
-  virtual double const elementHessianInverse(int row_index,
-                                             int column_index) = 0;
+  virtual double const elementOfInverse(int row_index,
+                                        int column_index) = 0;
   /**
-   * Get inner product of Hessian with vector
+   * Get inner product of symmetric matrix with vector
    * \param[in] vector is reference to a Vector
    * \return inner product of vector with this vector
    */
-  virtual double innerProductHessian(const Vector& vector) = 0;
+  virtual double innerProduct(const Vector& vector) = 0;
   /**
-   * Get inner product of inverse Hessian with vector
+   * Get inner product of symmetric matrix inverse with vector
    * \param[in] vector is reference to a Vector
    * \return inner product of vector with this vector
    */
-  virtual double innerProductHessianInverse(const Vector& vector) = 0;
+  virtual double innerProductOfInverse(const Vector& vector) = 0;
   /**
-   * Get product of Hessian with vector
+   * Get product of symmetric matrix with vector
    * \param[in] vector is reference to a Vector
    * \param[out] product is Vector to store product values
    */
-  virtual void matrixVectorProductHessian(const Vector& vector,
-                                          Vector& product) = 0;
+  virtual void matrixVectorProduct(const Vector& vector,
+                                   Vector& product) = 0;
   /**
-   * Get product of inverse Hessian with vector
+   * Get product of symmetric matrix inverse with vector
    * \param[in] vector is reference to a Vector
    * \param[out] product is Vector to store product values
    */
-  virtual void matrixVectorProductHessianInverse(const Vector& vector,
-                                                 Vector& product) = 0;
+  virtual void matrixVectorProductOfInverse(const Vector& vector,
+                                            Vector& product) = 0;
   /**
    * Get name of strategy
    * \return string with name of strategy

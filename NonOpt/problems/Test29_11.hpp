@@ -5,13 +5,15 @@
 // Author(s) : Frank E. Curtis
 
 // Description : Implementation for NonOpt of the objective
-//                 f(x) = max{g(-sum_{j=1}^n x_i),max_{i=1..n} g(x_i)}
+//                 f(x) = sum_{k=1..2*(n-1)} |f_k(x)|
 //               where
-//                 g(y) = ln(|y|+1)
+//                 i = (k+1)/2,
+//                 f_k(x) = x_i + x_{i+1}*((1 + x_{i+1})*x_{i+1} - 14) - 29 for mod(k,2) = 0, and
+//                 f_k(x) = x_i + x_{i+1}*((5 - x_{i+1})*x_{i+1} - 2) - 13 for mod(k,1)
 //               with initial point
-//                 x_i = 1.0 for all i = 1..n
+//                 x_i = 0.5 for all i = 1..n-1 and
+//                 x_n = -2.0
 // Notes       : THIS PROBLEM IS NONCONVEX
-//               Optimal value: 0.0
 
 #ifndef __TEST29_11_HPP__
 #define __TEST29_11_HPP__
@@ -32,7 +34,7 @@ class Test29_11 : public Problem
   /**
    * Constructor
    */
-  Test29_11();
+  Test29_11(int n);
   //@}
 
   /** @name Destructor */
@@ -114,6 +116,11 @@ class Test29_11 : public Problem
    * Overloaded equals operator
    */
   void operator=(const Test29_11&);
+  //@}
+
+  /** @name Private members */
+  //@{
+  int number_of_variables_; /**< Number of variables */
   //@}
 
 };  // end Test29_11

@@ -39,7 +39,7 @@ int testProblemImplementation(int option)
   }  // end if
 
   // Declare problem
-  MaxQ problem;
+  MaxQ problem(50);
 
   // Declare problem size
   int n;
@@ -112,6 +112,17 @@ int testProblemImplementation(int option)
   // Delete objects
   delete[] x;
   delete[] g;
+
+  // Check option
+  if (option == 1) {
+    // Print final message
+    if (result == 0) {
+      reporter.printf(R_NL, R_BASIC, "TEST WAS SUCCESSFUL.\n");
+    }
+    else {
+      reporter.printf(R_NL, R_BASIC, "TEST FAILED.\n");
+    }
+  }  // end if
 
   // Return
   return result;

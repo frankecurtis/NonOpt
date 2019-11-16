@@ -218,7 +218,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
 
     // Clear data on QP failure
     if (strategies->qpSolver()->status() != QP_SUCCESS) {
-    	//printf("sanity check 1\n");
+      //printf("sanity check 1\n");
 
       // Clear data
       QP_gradient_list.clear();
@@ -257,7 +257,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
            (strategies->qpSolver()->dualStepNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
-    	  //printf("stop with regular?  with LHS %.4e and RHS %.4e and threshold %.4e\n",quantities->trialIterate()->objective(),quantities->currentIterate()->objective(),-step_acceptance_tolerance_ * strategies->qpSolver()->objectiveQuadraticValue());
+        //printf("stop with regular?  with LHS %.4e and RHS %.4e and threshold %.4e\n",quantities->trialIterate()->objective(),quantities->currentIterate()->objective(),-step_acceptance_tolerance_ * strategies->qpSolver()->objectiveQuadraticValue());
         THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
       }
 
@@ -321,7 +321,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
              (strategies->qpSolver()->dualStepNormInf() <= quantities->stationarityRadius() &&
               strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
               strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
-        	//printf("stop with shorted? the shorten size is %+.4e with LHS %.4e and RHS %.4e and threshold %.4e\n",shortened_stepsize,quantities->trialIterate()->objective(),quantities->currentIterate()->objective(),-step_acceptance_tolerance_ * shortened_stepsize * strategies->qpSolver()->objectiveQuadraticValue());
+          //printf("stop with shorted? the shorten size is %+.4e with LHS %.4e and RHS %.4e and threshold %.4e\n",shortened_stepsize,quantities->trialIterate()->objective(),quantities->currentIterate()->objective(),-step_acceptance_tolerance_ * shortened_stepsize * strategies->qpSolver()->objectiveQuadraticValue());
           THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
         }
 

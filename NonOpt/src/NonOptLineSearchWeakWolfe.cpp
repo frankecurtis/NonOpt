@@ -164,9 +164,9 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
 
     // Initialize stepsize
     quantities->setStepsize(fmin(stepsize_increase_factor_ * quantities->stepsize(), fmin(stepsize_initial_, stepsize_maximum_)));
-    if(quantities->stepsize()==0.0){
-    	//printf("meet zero initial step\n");
-    	quantities->setStepsize(stepsize_initial_);
+    if (quantities->stepsize() == 0.0) {
+      //printf("meet zero initial step\n");
+      quantities->setStepsize(stepsize_initial_);
     }
 
     // Loop

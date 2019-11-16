@@ -152,7 +152,12 @@ class QPSolverActiveSet : public QPSolver
   /**
    * Set dual step to zero
    */
-  void setDualStepToZero() { dual_step_.scale(0.0); dual_step_feasible_.scale(0.0); dual_step_feasible_best_.scale(0.0); };
+  void setDualStepToZero()
+  {
+    dual_step_.scale(0.0);
+    dual_step_feasible_.scale(0.0);
+    dual_step_feasible_best_.scale(0.0);
+  };
   /**
    * Set matrix
    * \param[in] matrix is pointer to SymmetricMatrix to be set as QP "W" data
@@ -172,13 +177,16 @@ class QPSolverActiveSet : public QPSolver
    * \param[in] vector is vector of double values to be set as QP "b" data
    */
   //void setVector(const std::vector<double> vector){vector_=vector; };
-  void setVector(const std::vector<double> vector){ std::vector<double> vector2(vector.size(), 0.0); vector_ =vector2 ;};
+  void setVector(const std::vector<double> vector)
+  {
+    std::vector<double> vector2(vector.size(), 0.0);
+    vector_ = vector2;
+  };
   /**
    * Set scalar
    * \param[in] scalar is double value to be set as QP "r" data
    */
-  //void setScalar(double scalar) { scalar_ =scalar; };//
-  void setScalar(double scalar) { scalar_ = std::numeric_limits<double>::max(); };
+  void setScalar(double scalar) { scalar_ = scalar; };
   //@}
 
   /** @name Add data methods */

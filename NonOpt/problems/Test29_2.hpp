@@ -5,12 +5,11 @@
 // Author(s) : Frank E. Curtis
 
 // Description : Implementation for NonOpt of the objective
-//                 f(x) = max{g(-sum_{j=1}^n x_i),max_{i=1..n} g(x_i)}
-//               where
-//                 g(y) = ln(|y|+1)
+//                 f(x) = max_{i=1..n} |x_i|
 //               with initial point
-//                 x_i = 1.0 for all i = 1..n
-// Notes       : THIS PROBLEM IS NONCONVEX
+//                 x_i =  i/n for all i = 1..n/2
+//                 x_i = -i/n for all i = n/2+1..n
+// Notes       : THIS PROBLEM IS CONVEX
 //               Optimal value: 0.0
 
 #ifndef __TEST29_2_HPP__
@@ -32,7 +31,7 @@ class Test29_2 : public Problem
   /**
    * Constructor
    */
-  Test29_2();
+  Test29_2(int n);
   //@}
 
   /** @name Destructor */
@@ -114,6 +113,11 @@ class Test29_2 : public Problem
    * Overloaded equals operator
    */
   void operator=(const Test29_2&);
+  //@}
+
+  /** @name Private members */
+  //@{
+  int number_of_variables_; /**< Number of variables */
   //@}
 
 };  // end Test29_2

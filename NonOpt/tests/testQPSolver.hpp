@@ -63,6 +63,9 @@ int testQPSolverImplementation(int option)
   // Add options
   q.addOptions(&options, &reporter);
 
+  // Use exact solves
+  options.modifyBoolValue(&reporter, "QPAS_allow_inexact_termination", false);
+
   // Set options
   q.setOptions(&options, &reporter);
 
@@ -258,13 +261,13 @@ int testQPSolverImplementation(int option)
     for (int i = 0; i < numberVariables; i++) {
       for (int j = 0; j < numberVariables; j++) {
         for (int k = 0; k < numberVariables; k++) {
-          matrix->valuesModifiableHessianInverse()[i * numberVariables + j] = matrix->valuesHessianInverse()[i * numberVariables + j] + hessianInverse_init[i * numberVariables + k] * hessianInverse_init[j * numberVariables + k];
+          matrix->valuesOfInverseModifiable()[i * numberVariables + j] = matrix->valuesOfInverse()[i * numberVariables + j] + hessianInverse_init[i * numberVariables + k] * hessianInverse_init[j * numberVariables + k];
         }
       }  // end for
     }    // end for
     for (int i = 0; i < numberVariables; i++) {
       for (int j = 0; j < numberVariables; j++) {
-        matrix->valuesModifiableHessianInverse()[i * numberVariables + j] = hess_scaling * matrix->valuesHessianInverse()[i * numberVariables + j];
+        matrix->valuesOfInverseModifiable()[i * numberVariables + j] = hess_scaling * matrix->valuesOfInverse()[i * numberVariables + j];
       }
     }  // end for
 
@@ -328,6 +331,17 @@ int testQPSolverImplementation(int option)
     delete[] hessianInverse_init;
 
   }  // end for
+
+  // Check option
+  if (option == 1) {
+    // Print final message
+    if (result == 0) {
+      reporter.printf(R_QP, R_BASIC, "TEST WAS SUCCESSFUL.\n");
+    }
+    else {
+      reporter.printf(R_QP, R_BASIC, "TEST FAILED.\n");
+    }
+  }  // end if
 
   // Return
   return result;

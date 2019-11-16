@@ -1,5 +1,5 @@
-.DS_Store
 .clang-format
+.DS_Store
 NonOpt-doxygen.config
 NonOpt-Documentation
 NonOpt-Manual

@@ -5,9 +5,9 @@
 // Author(s) : Frank E. Curtis
 
 // Description : Implementation for NonOpt of the objective
-//                 f(x) = max{g(-sum_{j=1}^n x_i),max_{i=1..n} g(x_i)}
+//                 f(x) = max_{i=1..n} |2*x_i + (10/((n+1.0)^2))*sinh(10*x_i) - x_{i-1} - x_{i+1}|
 //               where
-//                 g(y) = ln(|y|+1)
+//                 x_0 = 0.0 and x_{n+1} = 1.0
 //               with initial point
 //                 x_i = 1.0 for all i = 1..n
 // Notes       : THIS PROBLEM IS NONCONVEX
@@ -32,7 +32,7 @@ class Test29_24 : public Problem
   /**
    * Constructor
    */
-  Test29_24();
+  Test29_24(int n);
   //@}
 
   /** @name Destructor */
@@ -114,6 +114,11 @@ class Test29_24 : public Problem
    * Overloaded equals operator
    */
   void operator=(const Test29_24&);
+  //@}
+
+  /** @name Private members */
+  //@{
+  int number_of_variables_; /**< Number of variables */
   //@}
 
 };  // end Test29_24

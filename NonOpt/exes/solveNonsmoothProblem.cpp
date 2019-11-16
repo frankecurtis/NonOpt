@@ -32,34 +32,34 @@ int main(int argc, char* argv[])
   // Declare problem
   std::shared_ptr<Problem> problem;
   if (strcmp(argv[1], "ActiveFaces") == 0) {
-    problem = std::make_shared<ActiveFaces>();
+    problem = std::make_shared<ActiveFaces>(50);
   }
   else if (strcmp(argv[1], "BrownFunction_2") == 0) {
-    problem = std::make_shared<BrownFunction_2>();
+    problem = std::make_shared<BrownFunction_2>(50);
   }
   else if (strcmp(argv[1], "ChainedCB3_1") == 0) {
-    problem = std::make_shared<ChainedCB3_1>();
+    problem = std::make_shared<ChainedCB3_1>(50);
   }
   else if (strcmp(argv[1], "ChainedCB3_2") == 0) {
-    problem = std::make_shared<ChainedCB3_2>();
+    problem = std::make_shared<ChainedCB3_2>(50);
   }
   else if (strcmp(argv[1], "ChainedCrescent_1") == 0) {
-    problem = std::make_shared<ChainedCrescent_1>();
+    problem = std::make_shared<ChainedCrescent_1>(50);
   }
   else if (strcmp(argv[1], "ChainedCrescent_2") == 0) {
-    problem = std::make_shared<ChainedCrescent_2>();
+    problem = std::make_shared<ChainedCrescent_2>(50);
   }
   else if (strcmp(argv[1], "ChainedLQ") == 0) {
-    problem = std::make_shared<ChainedLQ>();
+    problem = std::make_shared<ChainedLQ>(50);
   }
   else if (strcmp(argv[1], "ChainedMifflin_2") == 0) {
-    problem = std::make_shared<ChainedMifflin_2>();
+    problem = std::make_shared<ChainedMifflin_2>(50);
   }
   else if (strcmp(argv[1], "MaxQ") == 0) {
-    problem = std::make_shared<MaxQ>();
+    problem = std::make_shared<MaxQ>(50);
   }
   else if (strcmp(argv[1], "MxHilb") == 0) {
-    problem = std::make_shared<MxHilb>();
+    problem = std::make_shared<MxHilb>(50);
   }
   else {
     problem = std::make_shared<QuadPoly>(50, 10, 5, 10.0);

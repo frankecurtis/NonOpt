@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#include "NonOptDefinitions.hpp"
 #include "NonOptPointSetUpdateProximity.hpp"
+#include "NonOptDefinitions.hpp"
 
 namespace NonOpt
 {

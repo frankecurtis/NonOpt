@@ -2,8 +2,12 @@ The main author of NonOpt is:
 
 Frank E. Curtis <frank.e.curtis@gmail.com>
 
-Other authors of subroutines:
+Other authors:
 
-- NonOptQPSolverActiveSet.hpp/.cpp:
+- Dual active-set subproblem solver:
 
   Baoyu Zhou <baz216@lehigh.edu>
+
+- Inexactness conditions for dual active-set subproblem solver and TEST29 problems:
+
+  Minhan Li <mil417@lehigh.edu>

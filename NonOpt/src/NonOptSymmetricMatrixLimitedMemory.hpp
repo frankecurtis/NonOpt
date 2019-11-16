@@ -27,12 +27,16 @@ class SymmetricMatrixLimitedMemory : public SymmetricMatrix
   SymmetricMatrixLimitedMemory()
       : size_(-1),
         history_(-1),
-        initial_diagonal_value_(0.0)
+        initial_diagonal_value_(1.0),
+        values_(nullptr)
   {
     s_.clear();
     y_.clear();
     rho_.clear();
     computed_columns_.clear();
+    computed_columns_of_inverse_.clear();
+    computed_column_indices_.clear();
+    computed_column_indices_of_inverse_.clear();
   };
   //@}
 
@@ -78,61 +82,61 @@ class SymmetricMatrixLimitedMemory : public SymmetricMatrix
   /** @name Get methods */
   //@{
   /**
-   * Get column of Hessian
+   * Get column of symmetric matrix
    * \param[in] index is index of column to return
    * \param[out] column is Vector to store column values
    */
-  void const columnHessian(int column_index,
-                           Vector& column);
+  void const column(int column_index,
+                    Vector& column);
   /**
-   * Get column of inverse Hessian
+   * Get column of symmetric matrix inverse
    * \param[in] index is index of column to return
    * \param[out] column is Vector to store column values
    */
-  void const columnHessianInverse(int column_index,
-                                  Vector& column);
+  void const columnOfInverse(int column_index,
+                             Vector& column);
   /**
-    * Get element of Hessian
+    * Get element of symmetric matrix
     * \param[in] row_index is row index number
     * \param[in] column_index is column index number
     * \return (row_index,column_index) element of matrix
     */
-  double const elementHessian(int row_index,
-                              int column_index);
+  double const element(int row_index,
+                       int column_index);
   /**
-    * Get element of inverse Hessian
+    * Get element of symmetric matrix inverse
     * \param[in] row_index is row index number
     * \param[in] column_index is column index number
     * \return (row_index,column_index) element of matrix
     */
-  double const elementHessianInverse(int row_index,
-                                     int column_index);
+  double const elementOfInverse(int row_index,
+                                int column_index);
   /**
-   * Get inner product of Hessian with vector
+   * Get inner product of symmetric matrix with vector
    * \param[in] vector is reference to a Vector
    * \return inner product of vector with this vector
    */
-  double innerProductHessian(const Vector& vector);
+  double innerProduct(const Vector& vector);
   /**
-   * Get inner product of inverse Hessian with vector
+   * Get inner product of symmetric matrix inverse with vector
    * \param[in] vector is reference to a Vector
    * \return inner product of vector with this vector
    */
-  double innerProductHessianInverse(const Vector& vector);
+  double innerProductOfInverse(const Vector& vector);
   /**
-   * Get product of Hessian with vector
+   * Get product of symmetric matrix with vector
    * \param[in] vector is reference to a Vector
    * \param[out] product is Vector to store product values
    */
-  void matrixVectorProductHessian(const Vector& vector,
-                                  Vector& product);
+  void matrixVectorProduct(const Vector& vector,
+                           Vector& product);
   /**
-   * Get product of inverse Hessian with vector
+   * Get product of symmetric matrix inverse with vector
    * \param[in] vector is reference to a Vector
    * \param[out] product is Vector to store product values
    */
-  void matrixVectorProductHessianInverse(const Vector& vector,
-                                         Vector& product);
+  void matrixVectorProductOfInverse(const Vector& vector,
+                                    Vector& product);
   /**
    * Get name of strategy
    * \return string with name of strategy
@@ -191,14 +195,17 @@ class SymmetricMatrixLimitedMemory : public SymmetricMatrix
 
   /** @name Private members */
   //@{
-  int size_;                                               /**< Number of rows and number of columns */
-  int history_;                                            /**< Limited memory history length */
-  double initial_diagonal_value_;                          /**< Diagonal value of "initial" matrix */
-  std::vector<std::shared_ptr<Vector> > s_;                /**< Vector vector, "s" values */
-  std::vector<std::shared_ptr<Vector> > y_;                /**< Vector vector, "y" values */
-  std::vector<double> rho_;                                /**< Double vector, "rho" values */
-  std::vector<std::shared_ptr<Vector> > computed_columns_; /**< Vector vector, computed columns */
-  std::vector<int> computed_column_indices_;               /**< Integer vector, computed column indices */
+  int size_;                                                          /**< Number of rows and number of columns */
+  int history_;                                                       /**< Limited memory history length */
+  double initial_diagonal_value_;                                     /**< Diagonal value of "initial" matrix */
+  double* values_;                                                    /**< Double array, values of matrix (TEMPORARY) */
+  std::vector<std::shared_ptr<Vector> > s_;                           /**< Vector vector, "s" values */
+  std::vector<std::shared_ptr<Vector> > y_;                           /**< Vector vector, "y" values */
+  std::vector<double> rho_;                                           /**< Double vector, "rho" values */
+  std::vector<std::shared_ptr<Vector> > computed_columns_;            /**< Vector vector, computed columns */
+  std::vector<std::shared_ptr<Vector> > computed_columns_of_inverse_; /**< Vector vector, computed columns of inverse */
+  std::vector<int> computed_column_indices_;                          /**< Integer vector, computed column indices */
+  std::vector<int> computed_column_indices_of_inverse_;               /**< Integer vector, computed column indices of inverse */
   //@}
 
 };  // end SymmetricMatrixLimitedMemory

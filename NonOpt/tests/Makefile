@@ -19,9 +19,6 @@ depends = $(sources:.cpp=.d)
 # Executable(s)
 EXES = $(sources:.cpp=)
 
-# Directories
-LAPACKDIR = /Users/messi/Documents/Gradient_Sampling/C_code/lapack-3.8.0
-
 # Libraries
 NonOptLIB         = $(NONOPTDIR)/NonOpt/src/libNonOpt.a
 NonOptProblemsLIB = $(NONOPTDIR)/NonOpt/problems/libNonOptProblems.a

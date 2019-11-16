@@ -4,6 +4,7 @@
 //
 // Author(s) : Frank E. Curtis
 
+#include "NonOptStrategies.hpp"
 #include "NonOptDirectionComputationCuttingPlane.hpp"
 #include "NonOptDirectionComputationGradient.hpp"
 #include "NonOptDirectionComputationGradientCombination.hpp"
@@ -12,7 +13,6 @@
 #include "NonOptLineSearchWeakWolfe.hpp"
 #include "NonOptPointSetUpdateProximity.hpp"
 #include "NonOptQPSolverActiveSet.hpp"
-#include "NonOptStrategies.hpp"
 #include "NonOptSymmetricMatrixDense.hpp"
 #include "NonOptSymmetricMatrixLimitedMemory.hpp"
 

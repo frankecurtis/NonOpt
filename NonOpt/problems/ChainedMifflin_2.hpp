@@ -31,7 +31,7 @@ class ChainedMifflin_2 : public Problem
   /**
    * Constructor
    */
-  ChainedMifflin_2();
+  ChainedMifflin_2(int n);
   //@}
 
   /** @name Destructor */
@@ -113,6 +113,11 @@ class ChainedMifflin_2 : public Problem
    * Overloaded equals operator
    */
   void operator=(const ChainedMifflin_2&);
+  //@}
+
+  /** @name Private members */
+  //@{
+  int number_of_variables_; /**< Number of variables */
   //@}
 
 };  // end ChainedMifflin_2

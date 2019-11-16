@@ -142,61 +142,61 @@ int testNonOptImplementation()
                 // Switch on problems
                 switch (problem_count) {
                   case 0:
-                    problem = std::make_shared<ActiveFaces>();
+                    problem = std::make_shared<ActiveFaces>(50);
                     printf("ActiveFaces        ");
                     strcpy(out_file, (char*)"output/ActiveFaces");
                     optimal_value = 0.0;
                     break;
                   case 1:
-                    problem = std::make_shared<BrownFunction_2>();
+                    problem = std::make_shared<BrownFunction_2>(50);
                     printf("BrownFunction_2    ");
                     strcpy(out_file, (char*)"output/BrownFunction_2");
                     optimal_value = 0.0;
                     break;
                   case 2:
-                    problem = std::make_shared<ChainedCB3_1>();
+                    problem = std::make_shared<ChainedCB3_1>(50);
                     printf("ChainedCB3_1       ");
                     strcpy(out_file, (char*)"output/ChainedCB3_1");
                     optimal_value = 49.0 * 2.0;
                     break;
                   case 3:
-                    problem = std::make_shared<ChainedCB3_2>();
+                    problem = std::make_shared<ChainedCB3_2>(50);
                     printf("ChainedCB3_2       ");
                     strcpy(out_file, (char*)"output/ChainedCB3_2");
                     optimal_value = 49.0 * 2.0;
                     break;
                   case 4:
-                    problem = std::make_shared<ChainedCrescent_1>();
+                    problem = std::make_shared<ChainedCrescent_1>(50);
                     printf("ChainedCrescent_1  ");
                     strcpy(out_file, (char*)"output/ChainedCrescent_1");
                     optimal_value = 0.0;
                     break;
                   case 5:
-                    problem = std::make_shared<ChainedCrescent_2>();
+                    problem = std::make_shared<ChainedCrescent_2>(50);
                     printf("ChainedCrescent_2  ");
                     strcpy(out_file, (char*)"output/ChainedCrescent_2");
                     optimal_value = 0.0;
                     break;
                   case 6:
-                    problem = std::make_shared<ChainedLQ>();
+                    problem = std::make_shared<ChainedLQ>(50);
                     printf("ChainedLQ          ");
                     strcpy(out_file, (char*)"output/ChainedLQ");
                     optimal_value = -49.0 * sqrt(2.0);
                     break;
                   case 7:
-                    problem = std::make_shared<ChainedMifflin_2>();
+                    problem = std::make_shared<ChainedMifflin_2>(50);
                     printf("ChainedMifflin_2   ");
                     strcpy(out_file, (char*)"output/ChainedMifflin_2");
                     optimal_value = -34.795;
                     break;
                   case 8:
-                    problem = std::make_shared<MaxQ>();
+                    problem = std::make_shared<MaxQ>(50);
                     printf("MaxQ               ");
                     strcpy(out_file, (char*)"output/MaxQ");
                     optimal_value = 0.0;
                     break;
                   case 9:
-                    problem = std::make_shared<MxHilb>();
+                    problem = std::make_shared<MxHilb>(50);
                     printf("MxHilb             ");
                     strcpy(out_file, (char*)"output/MxHilb");
                     optimal_value = 0.0;

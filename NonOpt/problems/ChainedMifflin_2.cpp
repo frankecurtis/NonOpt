@@ -5,11 +5,12 @@
 // Author(s) : Frank E. Curtis
 
 #include <cmath>
-#include "setDim.hpp"
+
 #include "ChainedMifflin_2.hpp"
 
 // Constructor
-ChainedMifflin_2::ChainedMifflin_2() {}
+ChainedMifflin_2::ChainedMifflin_2(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 ChainedMifflin_2::~ChainedMifflin_2() {}
@@ -19,9 +20,7 @@ bool ChainedMifflin_2::numberOfVariables(int& n)
 {
 
   // Set number of variables
-	setDim di;
-  n = di.getDim();
-
+  n = number_of_variables_;
 
   // Return
   return true;

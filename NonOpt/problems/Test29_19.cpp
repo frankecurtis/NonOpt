@@ -2,15 +2,15 @@
 //
 // This code is published under the MIT License.
 //
-// Author(s) : Minhan Li
+// Author(s) : Frank E. Curtis and Minhan Li
 
 #include <cmath>
-#include "setDim.hpp"
+
 #include "Test29_19.hpp"
-#include <vector>
 
 // Constructor
-Test29_19::Test29_19() {}
+Test29_19::Test29_19(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 Test29_19::~Test29_19() {}
@@ -20,9 +20,7 @@ bool Test29_19::numberOfVariables(int& n)
 {
 
   // Set number of variables
-	setDim di;
-  n = di.getDim();
-
+  n = number_of_variables_;
 
   // Return
   return true;
@@ -31,7 +29,7 @@ bool Test29_19::numberOfVariables(int& n)
 
 // Initial point
 bool Test29_19::initialPoint(int n,
-                               double* x)
+                             double* x)
 {
 
   // Set initial point
@@ -46,23 +44,16 @@ bool Test29_19::initialPoint(int n,
 
 // Objective value
 bool Test29_19::evaluateObjective(int n,
-                                    const double* x,
-                                    double& f)
+                                  const double* x,
+                                  double& f)
 {
 
-	  // Evaluate maximum value
-
-	  std::vector<double> term(n,0.0);
-	  for (int i = 2; i <= n-1; i++) {
-		  term[i-1]=pow((3-2*x[i-1])*x[i-1]+1-x[i-2]-2*x[i],2);
-	  }
-	  term[0]=pow((3-2*x[0])*x[0]+1-2*x[1],2);
-	  term[n-1]=pow((3-2*x[n-1])*x[n-1]+1-x[n-2],2);
-
-	  f = x[0];
-	  for (int i = 1; i < n; i++) {
-		  f=fmax(f,term[i]);
-	  }
+  // Evaluate maximum value
+  f = pow((3.0 - 2.0 * x[0]) * x[0] - 2.0 * x[1] + 1.0, 2.0);
+  for (int i = 1; i < n - 1; i++) {
+    f = fmax(f, pow((3.0 - 2.0 * x[i]) * x[i] - x[i - 1] - 2.0 * x[i + 1] + 1.0, 2.0));
+  }
+  f = fmax(f, pow((3.0 - 2.0 * x[n - 1]) * x[n - 1] - x[n - 2] + 1.0, 2.0));
 
   // Return
   return true;
@@ -71,48 +62,42 @@ bool Test29_19::evaluateObjective(int n,
 
 // Gradient value
 bool Test29_19::evaluateGradient(int n,
-                                   const double* x,
-                                   double* g)
+                                 const double* x,
+                                 double* g)
 {
 
   // Initialize gradient and evaluate maximum value
-	  std::vector<double> term(n,0.0);
-	  for (int i = 2; i <= n-1; i++) {
-		  term[i-1]=pow((3-2*x[i-1])*x[i-1]+1-x[i-2]-2*x[i],2);
-	  }
-	  term[0]=pow((3-2*x[0])*x[0]+1-2*x[1],2);
-	  term[n-1]=pow((3-2*x[n-1])*x[n-1]+1-x[n-2],2);
-
   int max_ind = 0;
-  int max_val=term[0];
-  g[0]=0.0;
-  for (int i = 1; i < n; i++) {
-	  g[i] = 0.0;
-	  if(term[i]>max_val){
-		  max_val=term[i];
-		  max_ind=i;
-	  }
+  double term = (3.0 - 2.0 * x[0]) * x[0] - 2.0 * x[1] + 1.0;
+  double max_term = term;
+  double max_val = term * term;
+  g[0] = 0.0;
+  for (int i = 1; i < n - 1; i++) {
+    term = (3.0 - 2.0 * x[i]) * x[i] - x[i - 1] - 2.0 * x[i + 1] + 1.0;
+    if (term * term > max_val) {
+      max_ind = i;
+      max_term = term;
+      max_val = term * term;
+    }  // end if
+    g[i] = 0.0;
+  }  // end for
+  term = (3.0 - 2.0 * x[n - 1]) * x[n - 1] - x[n - 2] + 1.0;
+  if (term * term > max_val) {
+    max_ind = n - 1;
+    max_term = term;
+    max_val = term * term;
+  }  // end if
+  g[n - 1] = 0.0;
+
+  // Check index of maximum value
+  double sign = ((max_val >= 0.0) ? 1.0 : -1.0);
+  g[max_ind] = sign * (2.0 * max_term * (3.0 - 4.0 * x[max_ind]));
+  if (max_ind > 0) {
+    g[max_ind - 1] = sign * (2.0 * max_term * (-1.0));
   }
-
-  if(max_ind==0){
-	  g[max_ind]=2*((3-2*x[max_ind])*x[max_ind]+1-2*x[max_ind+1])*(3-4*x[max_ind]);
-	  g[max_ind+1]=2*((3-2*x[max_ind])*x[max_ind]+1-2*x[max_ind+1])*(-2);
+  if (max_ind < n - 1) {
+    g[max_ind + 1] = sign * (2.0 * max_term * (-2.0));
   }
-  else if(max_ind==n-1){
-	  g[max_ind]=2*((3-2*x[max_ind])*x[max_ind]+1-x[max_ind-1])*(3-4*x[max_ind]);
-	  g[max_ind-1]=2*((3-2*x[max_ind])*x[max_ind]+1-x[max_ind-1])*(-1);
-  }
-  else{
-	  g[max_ind]=2*((3-2*x[max_ind])*x[max_ind]+1-x[max_ind-1]-2*x[max_ind+1])*(3-4*x[max_ind]);
-	  g[max_ind-1]=2*((3-2*x[max_ind])*x[max_ind]+1-x[max_ind-1]-2*x[max_ind+1])*(-1);
-	  g[max_ind+1]=2*((3-2*x[max_ind])*x[max_ind]+1-x[max_ind-1]-2*x[max_ind+1])*(-2);
-  }
-
-
-
-
-
-
 
   // Return
   return true;
@@ -121,9 +106,9 @@ bool Test29_19::evaluateGradient(int n,
 
 // Finalize solution
 bool Test29_19::finalizeSolution(int n,
-                                   const double* x,
-                                   double f,
-                                   const double* g)
+                                 const double* x,
+                                 double f,
+                                 const double* g)
 {
   return true;
 }

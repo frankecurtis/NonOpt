@@ -5,11 +5,12 @@
 // Author(s) : Frank E. Curtis
 
 #include <cmath>
-#include "setDim.hpp"
+
 #include "ChainedCrescent_1.hpp"
 
 // Constructor
-ChainedCrescent_1::ChainedCrescent_1() {}
+ChainedCrescent_1::ChainedCrescent_1(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 ChainedCrescent_1::~ChainedCrescent_1() {}
@@ -19,8 +20,7 @@ bool ChainedCrescent_1::numberOfVariables(int& n)
 {
 
   // Set number of variables
-	setDim di;
-  n = di.getDim();
+  n = number_of_variables_;
 
   // Return
   return true;
