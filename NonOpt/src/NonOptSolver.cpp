@@ -47,7 +47,14 @@ NonOptSolver::~NonOptSolver()
 void NonOptSolver::addOptions()
 {
 
-  // Add double options (name, default value, lower bound, upper bound, description)
+  // Add bool options
+  options_.addBoolOption(&reporter_,
+                         "check_derivatives",
+                         false,
+                         "Determines whether to check derivatives at iterates.\n"
+                         "Default value: false.");
+
+  // Add double options
   options_.addDoubleOption(&reporter_,
                            "cpu_time_limit",
                            1e+04,
@@ -57,6 +64,13 @@ void NonOptSolver::addOptions()
                            "at the beginning of an iteration, so the true CPU time limit\n"
                            "also depends on the time required to a complete an iteration.\n"
                            "Default value: 1e+04.");
+  options_.addDoubleOption(&reporter_,
+                           "derivative_checker_increment",
+                           1e-06,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Increment for derivative checker.\n"
+                           "Default value: 1e-06.");
   options_.addDoubleOption(&reporter_,
                            "iterate_norm_tolerance",
                            1e+20,
@@ -88,7 +102,7 @@ void NonOptSolver::addOptions()
                            "stationarity_tolerance.\n"
                            "Default value: 1e+00.");
 
-  // Add integer options (name, default value, lower bound, upper bound, description)
+  // Add integer options
   options_.addIntegerOption(&reporter_,
                             "iteration_limit",
                             1e+04,
@@ -110,8 +124,12 @@ void NonOptSolver::addOptions()
 void NonOptSolver::setOptions()
 {
 
+  // Set bool options
+  options_.valueAsBool(&reporter_, "check_derivatives", check_derivatives_);
+
   // Set double options
   options_.valueAsDouble(&reporter_, "cpu_time_limit", cpu_time_limit_);
+  options_.valueAsDouble(&reporter_, "derivative_checker_increment", derivative_checker_increment_);
   options_.valueAsDouble(&reporter_, "iterate_norm_tolerance", iterate_norm_tolerance_);
   options_.valueAsDouble(&reporter_, "stationarity_tolerance", stationarity_tolerance_);
   options_.valueAsDouble(&reporter_, "stationarity_tolerance_factor", stationarity_tolerance_factor_);
@@ -181,6 +199,9 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
     // Initialize strategies
     strategies_.initialize(&options_, &quantities_, &reporter_);
 
+    // Set derivative checker increment
+    derivative_checker_.setIncrement(derivative_checker_increment_);
+
     // Print header
     printHeader();
 
@@ -192,6 +213,11 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
 
       // Print iteration header
       printIterationHeader();
+
+      // Check derivatives?
+      if (check_derivatives_) {
+        derivative_checker_.checkDerivatives(&reporter_,quantities_.currentIterate());
+      }
 
       // Print quantities iteration values
       quantities_.printIterationValues(&reporter_);
@@ -212,7 +238,6 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
 
       // Compute direction
       strategies_.directionComputation()->computeDirection(&options_, &quantities_, &reporter_, &strategies_);
-      //printf("%4d\n",strategies_.directionComputation()->status());
 
       // Check status
       if (strategies_.directionComputation()->status() != DC_SUCCESS) {

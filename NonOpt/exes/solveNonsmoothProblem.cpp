@@ -101,6 +101,8 @@ int main(int argc, char* argv[])
   // Add to reporter
   nonopt.reporter()->addReport(r);
 
+  nonopt.options()->modifyBoolValue(nonopt.reporter(), "check_derivatives", true);
+
   // Optimize
   nonopt.optimize(problem);
 

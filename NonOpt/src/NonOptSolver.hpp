@@ -10,6 +10,7 @@
 #include <ctime>
 #include <memory>
 
+#include "NonOptDerivativeChecker.hpp"
 #include "NonOptEnumerations.hpp"
 #include "NonOptOptions.hpp"
 #include "NonOptProblem.hpp"
@@ -160,7 +161,9 @@ class NonOptSolver
 
   /** @name Private members */
   //@{
+  bool check_derivatives_;
   double cpu_time_limit_;
+  double derivative_checker_increment_;
   double iterate_norm_tolerance_;
   double stationarity_tolerance_;
   double stationarity_tolerance_factor_;
@@ -172,6 +175,7 @@ class NonOptSolver
 
   /** @name Private members, objects */
   //@{
+  DerivativeChecker derivative_checker_;
   Options options_;
   Quantities quantities_;
   Reporter reporter_;

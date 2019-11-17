@@ -123,6 +123,11 @@ class Point
   /** @name Get methods */
   //@{
   /**
+   * Get pointer to Problem
+   * \return is pointer to Problem corresponding to point
+   */
+  inline std::shared_ptr<Problem> problem() const { return problem_; };
+  /**
    * Get pointer to vector
    * \return is pointer to Vector defining point
    */
