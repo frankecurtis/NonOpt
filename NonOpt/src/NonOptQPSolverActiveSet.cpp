@@ -538,8 +538,7 @@ void QPSolverActiveSet::addData(const std::vector<std::shared_ptr<Vector> > vect
   // Loop through new elements
   for (int i = 0; i < (int)vector.size(); i++) {
     vector_list_.push_back(vector_list[i]);
-    //vector_.push_back(vector[i]);
-    vector_.push_back(0.0);
+    vector_.push_back(vector[i]);
   }
 
 }  // end addData
@@ -940,15 +939,8 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
                        kkt_error_);
 
       // Check for successful solve
-
       if (kkt_error_ >= -kkt_tolerance_ ||
           (allow_inexact_termination_ && inexactTerminationCondition(reporter))) {
-        if (kkt_error_ >= -kkt_tolerance_ && allow_inexact_termination_) {
-          inexactTerminationCondition(reporter);
-        };
-        if (!allow_inexact_termination_) {
-          reporter->printf(R_QP, R_PER_INNER_ITERATION_IN, "%+.4e\n", kkt_error_);
-        };
         THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
       }
 
@@ -1870,14 +1862,10 @@ void QPSolverActiveSet::evaluateDualVectors()
   dual_step_.scale(0.0);
   dual_step_feasible_.scale(0.0);
 
-  //printf("Iteration %d\n",iteration_count_);
   // Loop to compute gradient combination
   for (int i = 0; i < (int)omega_positive_best_.size(); i++) {
     combination_.addScaledVector(system_solution_best_[i], *vector_list_[omega_positive_best_[i]]);
-    //printf("omega is %+.4e with index %4d and the norm is %+.4e,",system_solution_best_[i],omega_positive_best_[i],vector_list_[omega_positive_best_[i]]->normInf());
-    //if(combination_.normInf()<1e-10){printf("combination is %+.4e at iteration %4d\n",combination_.normInf(),iteration_count_);};
   }
-  //printf("\n");
 
   // Initialize gradient combination shifted
   combination_translated_.copy(combination_);

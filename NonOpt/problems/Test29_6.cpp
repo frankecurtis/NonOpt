@@ -51,9 +51,9 @@ bool Test29_6::evaluateObjective(int n,
   // Evaluate maximum value
   f = fabs((3.0 - 2.0 * x[0]) * x[0] + 1.0 - x[1]);
   for (int i = 1; i < n - 1; i++) {
-    f = fmax(f, fabs((3.0 - 2.0 * x[i]) * x[i] + 1.0 - x[i - 1] - x[i + 1]));
+    f = fmax(f, fabs((3.0 - 2.0 * x[i]) * x[i] + 1.0 - x[i-1] - x[i+1]));
   }  // end for
-  f = fmax(f, fabs((3.0 - 2.0 * x[n - 1]) * x[n - 1] + 1.0 - x[n - 2]));
+  f = fmax(f, fabs((3.0 - 2.0 * x[n-1]) * x[n-1] + 1.0 - x[n-2]));
 
   // Return
   return true;
@@ -73,21 +73,21 @@ bool Test29_6::evaluateGradient(int n,
   double max_val = fabs(term);
   g[0] = 0.0;
   for (int i = 1; i < n - 1; i++) {
-    term = (3.0 - 2.0 * x[i]) * x[i] + 1.0 - x[i - 1] - x[i + 1];
-    if (term > max_val) {
+    term = (3.0 - 2.0 * x[i]) * x[i] + 1.0 - x[i-1] - x[i+1];
+    if (fabs(term) > max_val) {
       max_ind = i;
       max_term = term;
       max_val = fabs(term);
     }  // end if
     g[i] = 0.0;
   }  // end for
-  term = (3.0 - 2.0 * x[n - 1]) * x[n - 1] + 1.0 - x[n - 2];
-  if (term > max_val) {
-    max_ind = n - 1;
+  term = (3.0 - 2.0 * x[n-1]) * x[n-1] + 1.0 - x[n-2];
+  if (fabs(term) > max_val) {
+    max_ind = n-1;
     max_term = term;
     max_val = fabs(term);
   }  // end if
-  g[n - 1] = 0.0;
+  g[n-1] = 0.0;
 
   // Evaluate gradient
   double sign = ((max_term >= 0.0) ? 1.0 : -1.0);

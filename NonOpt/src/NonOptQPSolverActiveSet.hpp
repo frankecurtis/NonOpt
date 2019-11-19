@@ -176,12 +176,7 @@ class QPSolverActiveSet : public QPSolver
    * Set vector
    * \param[in] vector is vector of double values to be set as QP "b" data
    */
-  //void setVector(const std::vector<double> vector){vector_=vector; };
-  void setVector(const std::vector<double> vector)
-  {
-    std::vector<double> vector2(vector.size(), 0.0);
-    vector_ = vector2;
-  };
+  void setVector(const std::vector<double> vector) { vector_ = vector; };
   /**
    * Set scalar
    * \param[in] scalar is double value to be set as QP "r" data

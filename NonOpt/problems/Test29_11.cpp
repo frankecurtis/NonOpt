@@ -81,15 +81,15 @@ bool Test29_11::evaluateGradient(int n,
   for (int k = 1; k <= 2 * n - 2; k++) {
     int i = (k + 1) / 2;
     if (k % 2 == 1) {
-      double term = x[i - 1] + x[i] * ((5.0 - x[i]) * x[i] - 2.0) - 13.0;
+      double term = x[i-1] + x[i] * ((5.0 - x[i]) * x[i] - 2.0) - 13.0;
       double sign = ((term >= 0.0) ? 1.0 : -1.0);
-      g[i - 1] += sign * (1.0);
+      g[i-1] += sign * (1.0);
       g[i] += sign * (-3.0 * x[i] * x[i] + 10.0 * x[i] - 2.0);
     }  // end if
     else {
       double term = x[i - 1] + x[i] * ((1.0 + x[i]) * x[i] - 14.0) - 29.0;
       double sign = ((term >= 0.0) ? 1.0 : -1.0);
-      g[i - 1] += sign * (1.0);
+      g[i-1] += sign * (1.0);
       g[i] += sign * (3.0 * x[i] * x[i] + 2.0 * x[i] - 14.0);
     }  // end else
   }    // end for
