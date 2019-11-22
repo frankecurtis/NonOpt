@@ -164,6 +164,7 @@ class NonOptSolver
   bool check_derivatives_;
   double cpu_time_limit_;
   double derivative_checker_increment_;
+  double derivative_checker_tolerance_;
   double iterate_norm_tolerance_;
   double stationarity_tolerance_;
   double stationarity_tolerance_factor_;

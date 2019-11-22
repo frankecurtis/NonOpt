@@ -56,9 +56,6 @@ int main()
     // Set settings name
     std::string settings_name = settings_names[settings_number];
 
-    // Read options
-    nonopt.options()->modifyOptionsFromFile(nonopt.reporter(), settings_names[settings_number] + ".txt");
-
     // Print header
     printf("Start testing %s\n", settings_name.c_str());
     printf("================================================================================================================================================================\n");
@@ -171,13 +168,13 @@ int main()
           problem = std::make_shared<Test29_11>(50);
           printf("Test29_11          ");
           strcpy(out_file_stub, (char*)"output/Test29_11");
-          optimal_value = 20.0;
+          optimal_value = 0.0;
           break;
         case 15:
           problem = std::make_shared<Test29_13>(50);
           printf("Test29_13          ");
           strcpy(out_file_stub, (char*)"output/Test29_13");
-          optimal_value = 0.94;
+          optimal_value = 0.0;
           break;
         case 16:
           problem = std::make_shared<Test29_17>(50);
@@ -207,7 +204,7 @@ int main()
           problem = std::make_shared<Test29_24>(50);
           printf("Test29_24          ");
           strcpy(out_file_stub, (char*)"output/Test29_24");
-          optimal_value = 0.4;
+          optimal_value = 0.0;
           break;
       }  // end switch
 
@@ -226,6 +223,9 @@ int main()
       // Add to reporter
       nonopt.reporter()->addReport(r_NL);
       nonopt.reporter()->addReport(r_QP);
+
+      // Read options
+      nonopt.options()->modifyOptionsFromFile(nonopt.reporter(), settings_names[settings_number] + ".txt");
 
       // Optimize
       nonopt.optimize(problem);

@@ -32,7 +32,8 @@ class DerivativeChecker
    * Constructor
    */
   DerivativeChecker()
-      : increment_(1e-6){};
+      : increment_(1e-8),
+        tolerance_(1e-4){};
   //@}
 
   /** @name Destructor */
@@ -49,6 +50,10 @@ class DerivativeChecker
    * Set increment
    */
   inline void setIncrement(double increment) { if (increment > 0.0) { increment_ = increment; } }
+  /**
+   * Set tolerance
+   */
+  inline void setTolerance(double tolerance) { if (tolerance > 0.0) { tolerance_ = tolerance; } }
   //@}
 
   /** @name Derivative checker methods */
@@ -80,6 +85,7 @@ class DerivativeChecker
   /** @name Private members */
   //@{
   double increment_;
+  double tolerance_;
   //@}
 
 };  // end DerivativeChecker

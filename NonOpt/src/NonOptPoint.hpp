@@ -111,6 +111,14 @@ class Point
    */
   bool evaluateGradient(Quantities& quantities);
   /**
+   * Scale objective
+   */
+  void scaleObjective()
+  {
+    ASSERT_EXCEPTION(objective_evaluated_, NONOPT_FUNCTION_EVALUATION_ASSERT_EXCEPTION, "Objective should have been evaluated, but wasn't.");
+    objective_ *= scale_;
+  }
+  /**
    * Scale gradient
    */
   void scaleGradient()

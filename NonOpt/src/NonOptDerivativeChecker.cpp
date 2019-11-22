@@ -39,6 +39,10 @@ void DerivativeChecker::checkDerivatives(const Reporter *reporter,
     bool evaluated_plus = point->problem()->evaluateObjective(point->vector()->length(), perturbation_plus->values(), objective_plus);
     bool evaluated_minus = point->problem()->evaluateObjective(point->vector()->length(), perturbation_minus->values(), objective_minus);
 
+    // Apply objective scaling
+    objective_plus *= point->scale();
+    objective_minus *= point->scale();
+
     // Check evaluation errors
     if (!evaluated_plus || !evaluated_minus) {
 
@@ -51,12 +55,31 @@ void DerivativeChecker::checkDerivatives(const Reporter *reporter,
     }  // end if
     else {
 
-      // Evaluate error
-      double finite_difference_derivative = (objective_plus - objective_minus)/(2.0*increment_);
-      double error = fabs(finite_difference_derivative - point->gradient()->values()[i]);
+      // Evaluate errors
+      double finite_difference_derivative_forward = (objective_plus - point->objective())/increment_;
+      double finite_difference_derivative_backward = (point->objective() - objective_minus)/increment_;
+      double finite_difference_derivative_central = (objective_plus - objective_minus)/(2*increment_);
+      double error_forward = fabs(finite_difference_derivative_forward - point->gradient()->values()[i]) / fmax(finite_difference_derivative_central,1.0);
+      double error_backward = fabs(finite_difference_derivative_backward - point->gradient()->values()[i]) / fmax(finite_difference_derivative_central,1.0);
+      double error_central = fabs(finite_difference_derivative_central - point->gradient()->values()[i]) / fmax(finite_difference_derivative_central,1.0);
+
+      // Set best error
+      double finite_difference_derivative, error;
+      if (error_forward <= error_backward && error_forward <= error_central) {
+        finite_difference_derivative = finite_difference_derivative_forward;
+        error = error_forward;
+      }
+      else if (error_backward <= error_forward && error_backward <= error_central) {
+        finite_difference_derivative = finite_difference_derivative_backward;
+        error = error_backward;
+      }
+      else {
+        finite_difference_derivative = finite_difference_derivative_central;
+        error = error_central;
+      }
 
       // Check error
-      if (error >= increment_) {
+      if (error > tolerance_) {
 
         // Increment poor counter
         poor_count++;

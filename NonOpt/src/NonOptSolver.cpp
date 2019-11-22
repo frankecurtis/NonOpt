@@ -66,11 +66,18 @@ void NonOptSolver::addOptions()
                            "Default value: 1e+04.");
   options_.addDoubleOption(&reporter_,
                            "derivative_checker_increment",
-                           1e-06,
+                           1e-08,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Increment for derivative checker.\n"
-                           "Default value: 1e-06.");
+                           "Default value: 1e-08.");
+  options_.addDoubleOption(&reporter_,
+                           "derivative_checker_tolerance",
+                           1e-04,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Tolerance for derivative checker.\n"
+                           "Default value: 1e-04.");
   options_.addDoubleOption(&reporter_,
                            "iterate_norm_tolerance",
                            1e+20,
@@ -130,6 +137,7 @@ void NonOptSolver::setOptions()
   // Set double options
   options_.valueAsDouble(&reporter_, "cpu_time_limit", cpu_time_limit_);
   options_.valueAsDouble(&reporter_, "derivative_checker_increment", derivative_checker_increment_);
+  options_.valueAsDouble(&reporter_, "derivative_checker_tolerance", derivative_checker_tolerance_);
   options_.valueAsDouble(&reporter_, "iterate_norm_tolerance", iterate_norm_tolerance_);
   options_.valueAsDouble(&reporter_, "stationarity_tolerance", stationarity_tolerance_);
   options_.valueAsDouble(&reporter_, "stationarity_tolerance_factor", stationarity_tolerance_factor_);
@@ -187,6 +195,9 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
     // Determine problem scaling
     quantities_.currentIterate()->determineScale(quantities_);
 
+    // Scale evaluated objective
+    quantities_.currentIterate()->scaleObjective();
+
     // Scale evaluated gradient
     quantities_.currentIterate()->scaleGradient();
 
@@ -199,8 +210,9 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
     // Initialize strategies
     strategies_.initialize(&options_, &quantities_, &reporter_);
 
-    // Set derivative checker increment
+    // Set derivative checker increment and tolerance
     derivative_checker_.setIncrement(derivative_checker_increment_);
+    derivative_checker_.setTolerance(derivative_checker_tolerance_);
 
     // Print header
     printHeader();
