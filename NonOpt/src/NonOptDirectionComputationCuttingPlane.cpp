@@ -204,6 +204,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
     strategies->qpSolver()->setVectorList(QP_gradient_list);
     strategies->qpSolver()->setVector(QP_vector);
     strategies->qpSolver()->setScalar(quantities->trustRegionRadius());
+    strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
 
     // Solve QP
     strategies->qpSolver()->solveQP(options, reporter);
