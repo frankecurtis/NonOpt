@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis, Baoyu Zhou
 
-#ifndef __NONOPTQPSOLVERACTIVESET_HPP__
-#define __NONOPTQPSOLVERACTIVESET_HPP__
+#ifndef __NONOPTQPSOLVERDUALACTIVESET_HPP__
+#define __NONOPTQPSOLVERDUALACTIVESET_HPP__
 
 #include <deque>
 
@@ -15,9 +15,9 @@ namespace NonOpt
 {
 
 /**
- * QPSolverActiveSet class
+ * QPSolverDualActiveSet class
  */
-class QPSolverActiveSet : public QPSolver
+class QPSolverDualActiveSet : public QPSolver
 {
 
  public:
@@ -26,7 +26,7 @@ class QPSolverActiveSet : public QPSolver
   /**
    * Constructor
    */
-  QPSolverActiveSet();
+  QPSolverDualActiveSet();
   //@}
 
   /** @name Destructor */
@@ -34,7 +34,7 @@ class QPSolverActiveSet : public QPSolver
   /**
    * Destructor
    */
-  ~QPSolverActiveSet();
+  ~QPSolverDualActiveSet();
   //@}
 
   /** @name Options handling methods */
@@ -86,81 +86,80 @@ class QPSolverActiveSet : public QPSolver
    */
   double combinationTranslatedNormInf();
   /**
-   * Get dual step
-   * \param[out] vector is dual step given by "-W*(G*omega + gamma)"
+   * Get dual objective quadratic value
+   * \return "(G*omega + gamma)'*W*(G*omega + gamma)"
    */
-  void dualStep(double vector[]);
+  double dualObjectiveQuadraticValue();
   /**
-   * Get feasible dual step
-   * \param[out] vector is dual step given by "-W*(G*omega + gamma)" projected onto feasible region
+   * Get dual objective quadratic value, scaled to correspond to feasible "d"
+   * \return scaled "(G*omega + gamma)'*W*(G*omega + gamma)"
    */
-  void dualStepFeasible(double vector[]);
+  double dualObjectiveQuadraticValueScaled();
   /**
-   * Get dual step's infinity norm
-   * \return "||W*(G*omega + gamma)||_inf"
+   * Get dual solution
+   * \param[out] vector is dual solution
    */
-  double dualStepNormInf();
-  /**
-   * Get feasible dual step's infinity norm
-   * \return "||d||_inf" where d is projection of -W*(G*omega + gamma) onto feasible region
-   */
-  double dualStepFeasibleNormInf();
-  /**
-   * Get objective quadratic value
-   * \return (G*omega + gamma)'*W*(G*omega + gamma)
-   */
-  double objectiveQuadraticValue();
-  /**
-   * Get objective quadratic value
-   * \return "d'*H*d" where d is projection of -W*(G*omega + gamma) onto feasible region
-   */
-  double objectiveQuadraticValueFeasible();
-  /**
-   * Get gamma
-   * \param[out] vector is "gamma" solution value
-   */
-  void gamma(double vector[]);
+  void dualSolution(double omega[], double gamma[]);
   /**
    * Get KKT error
-   * \return solver's KKT error corresponding to current solution (ignores certain conditions assumed to be satisfied during solve)
+   * \return solver's KKT error
    */
   double KKTError() { return kkt_error_; };
   /**
    * Get KKT error full
-   * \return full KKT error corresponding to current solution
+   * \return full KKT error corresponding to dual solution
    */
-  double KKTErrorFull();
-  /**
-   * Get name of strategy
-   * \return string with name of strategy
-   */
-  std::string name() { return "ActiveSet"; };
+  double KKTErrorDual();
   /**
    * Get iteration count
    * \return number of iterations performed
    */
-  int numberOfIterations() { return iteration_count_; };
+  int numberOfIterations() { return iteration_count_; };;
   /**
-   * Get omega
-   * \param[out] vector is "omega" solution value
+   * Get primal solution
+   * \param[out] "d" (equal to "-W*(G*omega + gamma)" if solution is exact)
    */
-  void omega(double vector[]);
+  void primalSolution(double d[]);
+  /**
+   * Get primal solution that is feasible
+   * \param[out] feasible primal solution
+   */
+  void primalSolutionFeasible(double d_feasible[]);
+  /**
+   * Get primal solution infinity norm
+   * \return "||d||_inf"
+   */
+  double primalSolutionNormInf();
+  /**
+   * Get feasible primal solution infinity norm
+   * \return inf-norm of feasible primal solution
+   */
+  double primalSolutionFeasibleNormInf();
+  /**
+   * Get name of strategy
+   * \return string with name of strategy
+   */
+  std::string name() { return "ActiveSet"; };;
   //@}
 
   /** @name Set methods */
   //@{
   /**
-   * Set dual step to zero
+   * Set inexact solution tolerance
    */
-  void setDualStepToZero()
+  void setInexactSolutionTolerance(double tolerance) { inexact_solution_tolerance_ = tolerance; };
+  /**
+   * Set "d" to zero
+   */
+  void setPrimalSolutionToZero()
   {
-    dual_step_.scale(0.0);
-    dual_step_feasible_.scale(0.0);
-    dual_step_feasible_best_.scale(0.0);
+    primal_solution_.scale(0.0);
+    primal_solution_feasible_.scale(0.0);
+    primal_solution_feasible_best_.scale(0.0);
   };
   /**
-   * Set matrix
-   * \param[in] matrix is pointer to SymmetricMatrix to be set as QP "W" data
+  * Set matrix
+  * \param[in] matrix is pointer to SymmetricMatrix, for which "W" is the "Inverse"
    */
   void setMatrix(const std::shared_ptr<SymmetricMatrix> matrix) { matrix_ = matrix; };
   /**
@@ -230,11 +229,11 @@ class QPSolverActiveSet : public QPSolver
   /**
    * Copy constructor
    */
-  QPSolverActiveSet(const QPSolverActiveSet&);
+  QPSolverDualActiveSet(const QPSolverDualActiveSet&);
   /**
    * Overloaded equals operator
    */
-  void operator=(const QPSolverActiveSet&);
+  void operator=(const QPSolverDualActiveSet&);
   //@}
 
   /** @name Private members */
@@ -252,6 +251,7 @@ class QPSolverActiveSet : public QPSolver
   bool allow_inexact_termination_;
   double cholesky_tolerance_;
   double kkt_tolerance_;
+  double inexact_solution_tolerance_;
   double inexact_termination_factor_;
   double inexact_termination_ratio_min_;
   double linear_independence_tolerance_;
@@ -269,9 +269,13 @@ class QPSolverActiveSet : public QPSolver
    */
   int iteration_count_;
   double kkt_error_;
-  double dual_objective_best_;
+  double dual_objective_reference_;
+  double primal_directional_derivative_feasible_best_;
+  double primal_objective_feasible_best_;
   double primal_objective_reference_;
-  double dual_objective_simple_;
+  double primal_objective_simple_;
+  double primal_quadratic_feasible_best_;
+  double primal_solution_feasible_best_norm_inf_;
   /**
    * Algorithm quantities
    */
@@ -289,16 +293,16 @@ class QPSolverActiveSet : public QPSolver
   /**
    * Solution quantities
    */
+  double multiplier_;
+  double primal_solution_projection_scalar_;
   Vector combination_;
   Vector combination_translated_;
-  Vector dual_step_;
-  double dual_step_projection_scalar_;
-  Vector dual_step_feasible_;
-  Vector dual_step_feasible_best_;
-  Vector dual_step_simple_;
   Vector gamma_;
-  double multiplier_;
   Vector omega_;
+  Vector primal_solution_;
+  Vector primal_solution_feasible_;
+  Vector primal_solution_feasible_best_;
+  Vector primal_solution_simple_;
   //@}
 
   /** @name Private methods */
@@ -328,9 +332,9 @@ class QPSolverActiveSet : public QPSolver
                       double solution1[],
                       double solution2[]);
   void choleskyFromScratch(const Reporter* reporter);
-  void evaluateDualVectors();
-  void evaluateDualMultiplier(double solution1[],
-                              double solution2[]);
+  void evaluatePrimalVectors();
+  void evaluatePrimalMultiplier(double solution1[],
+                                double solution2[]);
   void evaluateSystemVector(int set,
                             int index,
                             double system_vector[]);
@@ -353,8 +357,8 @@ class QPSolverActiveSet : public QPSolver
                             double solution[]);
   //@}
 
-};  // end QPSolverActiveSet
+};  // end QPSolverDualActiveSet
 
 }  // namespace NonOpt
 
-#endif /* __NONOPTQPSOLVERACTIVESET_HPP__ */
+#endif /* __NONOPTQPSOLVERDUALACTIVESET_HPP__ */

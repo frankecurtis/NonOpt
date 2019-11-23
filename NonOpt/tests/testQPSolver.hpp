@@ -11,7 +11,7 @@
 #include <iostream>
 #include <random>
 
-#include "NonOptQPSolverActiveSet.hpp"
+#include "NonOptQPSolverDualActiveSet.hpp"
 #include "NonOptSymmetricMatrix.hpp"
 #include "NonOptSymmetricMatrixDense.hpp"
 
@@ -58,7 +58,7 @@ int testQPSolverImplementation(int option)
   Options options;
 
   // Declare QP solver object
-  QPSolverActiveSet q;
+  QPSolverDualActiveSet q;
 
   // Add options
   q.addOptions(&options, &reporter);
@@ -309,18 +309,18 @@ int testQPSolverImplementation(int option)
         reporter.printf(R_QP, R_BASIC, "fail");
       }
 
-      // Get dual step
-      Vector dual_step(numberVariables);
-      q.dualStep(dual_step.valuesModifiable());
+      // Get primal solution
+      Vector primal_solution(numberVariables);
+      q.primalSolution(primal_solution.valuesModifiable());
 
       // Check results
-      if (q.status() != QP_SUCCESS || q.KKTError() > 1e-08 || q.KKTErrorFull() > 1e-06 || dual_step.normInf() > 1.0 / ((double)(test) + 1.0) + 1e-06) {
+      if (q.status() != QP_SUCCESS || q.KKTError() > 1e-08 || q.KKTErrorDual() > 1e-06 || primal_solution.normInf() > 1.0 / ((double)(test) + 1.0) + 1e-06) {
         result = 1;
       }
 
       // Print solve status information
-      reporter.printf(R_QP, R_BASIC, "  status: %d  iters: %6d  kkt error: %+.4e  kkt error (full): %+.4e  ||step||_inf: %+.4e\n",
-                      q.status(), q.numberOfIterations(), q.KKTError(), q.KKTErrorFull(), dual_step.normInf());
+      reporter.printf(R_QP, R_BASIC, "  status: %d  iters: %6d  kkt error: %+.4e  kkt error (dual): %+.4e  ||step||_inf: %+.4e\n",
+                      q.status(), q.numberOfIterations(), q.KKTError(), q.KKTErrorDual(), primal_solution.normInf());
 
     }  // end for
 

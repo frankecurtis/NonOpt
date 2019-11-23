@@ -258,7 +258,7 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
 
       // Check termination conditions
       if (quantities_.stationarityRadius() <= stationarity_tolerance_ &&
-          strategies_.qpSolver()->dualStepNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_ &&
+          strategies_.qpSolver()->primalSolutionNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_ &&
           strategies_.qpSolver()->combinationNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_ &&
           strategies_.qpSolver()->combinationTranslatedNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_) {
         THROW_EXCEPTION(NONOPT_SUCCESS_EXCEPTION, "Stationary point found.");
@@ -266,7 +266,7 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
 
       // Check radius update conditions
       if (stationarity_tolerance_ < quantities_.stationarityRadius() &&
-          strategies_.qpSolver()->dualStepNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
+          strategies_.qpSolver()->primalSolutionNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
           strategies_.qpSolver()->combinationNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
           strategies_.qpSolver()->combinationTranslatedNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_) {
         quantities_.updateRadii(stationarity_tolerance_);

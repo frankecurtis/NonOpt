@@ -12,7 +12,7 @@
 #include "NonOptLineSearchBacktracking.hpp"
 #include "NonOptLineSearchWeakWolfe.hpp"
 #include "NonOptPointSetUpdateProximity.hpp"
-#include "NonOptQPSolverActiveSet.hpp"
+#include "NonOptQPSolverDualActiveSet.hpp"
 #include "NonOptSymmetricMatrixDense.hpp"
 #include "NonOptSymmetricMatrixLimitedMemory.hpp"
 
@@ -47,9 +47,9 @@ void Strategies::addOptions(Options* options,
                            "Default value: Proximity.");
   options->addStringOption(reporter,
                            "qp_solver",
-                           "ActiveSet",
+                           "DualActiveSet",
                            "QP solver strategy to use.\n"
-                           "Default value: ActiveSet.");
+                           "Default value: DualActiveSet.");
   options->addStringOption(reporter,
                            "symmetric_matrix",
                            "Dense",
@@ -88,7 +88,7 @@ void Strategies::addOptions(Options* options,
 
   // Add options for QP solver strategies
   std::shared_ptr<QPSolver> qp_solver;
-  qp_solver = std::make_shared<QPSolverActiveSet>();
+  qp_solver = std::make_shared<QPSolverDualActiveSet>();
   qp_solver->addOptions(options, reporter);
   // ADD NEW QP SOLVER STRATEGIES HERE AND IN SWITCH BELOW //
 
@@ -165,11 +165,11 @@ void Strategies::setOptions(const Options* options,
   }
 
   // Set QP solver strategy
-  if (qp_solver_name.compare("ActiveSet") == 0) {
-    qp_solver_ = std::make_shared<QPSolverActiveSet>();
+  if (qp_solver_name.compare("DualActiveSet") == 0) {
+    qp_solver_ = std::make_shared<QPSolverDualActiveSet>();
   }
   else {
-    qp_solver_ = std::make_shared<QPSolverActiveSet>();
+    qp_solver_ = std::make_shared<QPSolverDualActiveSet>();
   }
 
   // Set symmetric matrix strategy

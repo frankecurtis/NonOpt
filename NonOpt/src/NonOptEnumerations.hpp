@@ -107,7 +107,7 @@ enum ReportLevel
   R_BASIC = 0,
   R_PER_ITERATION,
   R_PER_INNER_ITERATION,
-  R_PER_INNER_ITERATION_IN
+  R_PER_INNER_ITERATION_INEXACT
 };
 /**
  * Symmetric matrix enumerations
