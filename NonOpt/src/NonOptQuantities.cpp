@@ -108,7 +108,7 @@ void Quantities::addOptions(Options* options,
   // Add integer options
   options->addIntegerOption(reporter,
                             "function_evaluation_limit",
-                            1e+04,
+                            1e+05,
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of function evaluations that will be.\n"
@@ -116,7 +116,7 @@ void Quantities::addOptions(Options* options,
                             "Default value: 1e+04.");
   options->addIntegerOption(reporter,
                             "gradient_evaluation_limit",
-                            1e+04,
+                            3e+04,
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of gradient evaluations that will be.\n"
