@@ -112,6 +112,11 @@ class QPSolver : public Strategy
    */
   virtual double combinationTranslatedNormInf() = 0;
   /**
+   * Get translated combination of vectors' infinity norm
+   * \return "||G*omega + gamma||_2^2"
+   */
+  virtual double combinationTranslatedNorm2Square()=0;
+  /**
    * Get dual objective quadratic value
    * \return "(G*omega + gamma)'*W*(G*omega + gamma)"
    */
@@ -121,6 +126,10 @@ class QPSolver : public Strategy
    * \param[out] vector is dual solution
    */
   virtual void dualSolution(double omega[], double gamma[]) = 0;
+
+  virtual int gamma_length()=0;
+  virtual int omega_length()=0;
+  virtual std::vector<double> dualSolution_omega()=0;
   /**
    * Get KKT error
    * \return solver's KKT error
@@ -146,6 +155,11 @@ class QPSolver : public Strategy
    * \return "||d||_inf"
    */
   virtual double primalSolutionNormInf() = 0;
+  /**
+   * Get primal solution 2-norm square
+   * \return "||d||_2^2"
+   */
+  virtual double primalSolutionNorm2Square()=0;
   /**
    * Get name of strategy
    * \return string with name of strategy
@@ -214,14 +228,16 @@ class QPSolver : public Strategy
    * \param[in] reporter is pointer to Reporter object from NonOpt
    */
   virtual void solveQP(const Options* options,
-                       const Reporter* reporter) = 0;
+                       const Reporter* reporter,
+					   Quantities* quantities) = 0;
   /**
    * Solve QP hot, after new data added, re-using previous solution, factorization, etc.
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    */
   virtual void solveQPHot(const Options* options,
-                          const Reporter* reporter) = 0;
+                          const Reporter* reporter,
+						  Quantities* quantities) = 0;
   //@}
 
  private:

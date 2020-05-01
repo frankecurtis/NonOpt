@@ -204,6 +204,9 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
     // Initialize radii
     quantities_.initializeRadii(&options_, &reporter_);
 
+    // Initialize inexact termination factor
+    quantities_.initializeInexactTerminationFactor(&options_, &reporter_);
+
     // Store norm of initial point (for termination check)
     double initial_iterate_norm = quantities_.currentIterate()->vector()->norm2();
 
@@ -258,11 +261,15 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
 
       // Check termination conditions
       if (quantities_.stationarityRadius() <= stationarity_tolerance_ &&
-          strategies_.qpSolver()->primalSolutionNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_ &&
-          strategies_.qpSolver()->combinationNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_ &&
-          strategies_.qpSolver()->combinationTranslatedNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_) {
+    		  strategies_.qpSolver()->combinationTranslatedNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_) {
         THROW_EXCEPTION(NONOPT_SUCCESS_EXCEPTION, "Stationary point found.");
       }
+//      if (quantities_.stationarityRadius() <= stationarity_tolerance_ &&
+//          strategies_.qpSolver()->primalSolutionNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_ &&
+//          strategies_.qpSolver()->combinationNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_ &&
+//          strategies_.qpSolver()->combinationTranslatedNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_) {
+//        THROW_EXCEPTION(NONOPT_SUCCESS_EXCEPTION, "Stationary point found.");
+//      }
 
       // Check radius update conditions
       if (stationarity_tolerance_ < quantities_.stationarityRadius() &&
@@ -271,6 +278,7 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
           strategies_.qpSolver()->combinationTranslatedNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_) {
         quantities_.updateRadii(stationarity_tolerance_);
       }
+
 
       // Run line search
       strategies_.lineSearch()->runLineSearch(&options_, &quantities_, &reporter_, &strategies_);
@@ -293,6 +301,17 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
         quantities_.pointSet()->push_back(quantities_.currentIterate());
       }
 
+      // update inexact termination factor
+      if (stationarity_tolerance_ < quantities_.stationarityRadius() &&
+          strategies_.qpSolver()->primalSolutionNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
+          strategies_.qpSolver()->combinationNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
+          strategies_.qpSolver()->combinationTranslatedNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_) {
+        quantities_.initializeInexactTerminationFactor(&options_, &reporter_);
+      }
+      else if (quantities_.stepsize() < 1e-5) {
+        quantities_.updateInexactTerminationFactor();
+      }
+
       // Update iterate
       quantities_.setCurrentIterate(quantities_.trialIterate());
 
@@ -309,6 +328,11 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
       if (strategies_.pointSetUpdate()->status() != PS_SUCCESS) {
         THROW_EXCEPTION(NONOPT_POINT_SET_UPDATE_FAILURE_EXCEPTION, "Point set update failed.");
       }
+
+      // Turn off aggregation by switching the file to be called
+//      if (quantities_.stationarityRadius() < 1e-3){
+//    	  options_.modifyStringValue(&reporter_, "direction_computation", "GradientCombination");
+//      }
 
       // Print end of line
       reporter_.printf(R_NL, R_PER_ITERATION, "\n");

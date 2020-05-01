@@ -86,6 +86,11 @@ class QPSolverDualActiveSet : public QPSolver
    */
   double combinationTranslatedNormInf();
   /**
+   * Get translated combination of vectors' infinity norm
+   * \return "||G*omega + gamma||_2^2"
+   */
+  double combinationTranslatedNorm2Square();
+  /**
    * Get dual objective quadratic value
    * \return "(G*omega + gamma)'*W*(G*omega + gamma)"
    */
@@ -100,6 +105,11 @@ class QPSolverDualActiveSet : public QPSolver
    * \param[out] vector is dual solution
    */
   void dualSolution(double omega[], double gamma[]);
+
+  int gamma_length(){return gamma_length_;}
+  int omega_length(){return (int)vector_.size();};
+
+  std::vector<double> dualSolution_omega();
   /**
    * Get KKT error
    * \return solver's KKT error
@@ -130,6 +140,11 @@ class QPSolverDualActiveSet : public QPSolver
    * \return "||d||_inf"
    */
   double primalSolutionNormInf();
+  /**
+   * Get primal solution 2-norm square
+   * \return "||d||_2^2"
+   */
+  double primalSolutionNorm2Square();
   /**
    * Get feasible primal solution infinity norm
    * \return inf-norm of feasible primal solution
@@ -202,14 +217,16 @@ class QPSolverDualActiveSet : public QPSolver
    * \param[in] reporter is pointer to Reporter object from NonOpt
    */
   void solveQP(const Options* options,
-               const Reporter* reporter);
+               const Reporter* reporter,
+			   Quantities* quantities);
   /**
    * Solve QP hot, after new data added, re-using previous solution, factorization, etc.
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    */
   void solveQPHot(const Options* options,
-                  const Reporter* reporter);
+                  const Reporter* reporter,
+				  Quantities* quantities);
   //@}
 
   /** @name Print methods */
@@ -249,6 +266,7 @@ class QPSolverDualActiveSet : public QPSolver
    */
   bool fail_on_factorization_error_;
   bool allow_inexact_termination_;
+  bool do_skip_;
   double cholesky_tolerance_;
   double kkt_tolerance_;
   double inexact_solution_tolerance_;
@@ -276,6 +294,7 @@ class QPSolverDualActiveSet : public QPSolver
   double primal_objective_simple_;
   double primal_quadratic_feasible_best_;
   double primal_solution_feasible_best_norm_inf_;
+  double skip_factor_;
   /**
    * Algorithm quantities
    */

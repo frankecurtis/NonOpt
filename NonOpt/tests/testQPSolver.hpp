@@ -26,6 +26,7 @@ int testQPSolverImplementation(int option)
 
   // Declare reporter
   Reporter reporter;
+  Quantities quantities;
 
   // Check option
   if (option == 1) {
@@ -284,7 +285,7 @@ int testQPSolverImplementation(int option)
         q.setScalar(regularization);
 
         // Solve QP
-        q.solveQP(&options, &reporter);
+        q.solveQP(&options, &reporter, &quantities);
 
       }  // end if
 
@@ -294,7 +295,7 @@ int testQPSolverImplementation(int option)
         q.addData(new_vector_list, new_vector);
 
         // Solve QP hot
-        q.solveQPHot(&options, &reporter);
+        q.solveQPHot(&options, &reporter,&quantities);
 
         // Print new line
         reporter.printf(R_QP, R_BASIC, "... adding %2d vectors... ", numberPointsAdd);

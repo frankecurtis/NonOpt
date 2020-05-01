@@ -87,7 +87,7 @@ class DirectionComputationAggregation : public DirectionComputation
    * Get name of strategy
    * \return string with name of strategy
    */
-  std::string name() { return "GradientCombination"; };
+  std::string name() { return "GradientCombinationAgg"; };
   //@}
 
   /** @name Direction computation method */
@@ -125,11 +125,15 @@ class DirectionComputationAggregation : public DirectionComputation
   bool fail_on_iteration_limit_;
   bool fail_on_QP_failure_;
   bool try_shortened_step_;
+  bool used_full_last_;
   double downshift_constant_;
   double random_sample_fraction_;
   double shortened_stepsize_;
   double step_acceptance_tolerance_;
-  double size_factor_;
+  double full_size_factor_;
+  double * yk;
+  double * gamm;
+  bool do_agg_next_;
   int inner_iteration_limit_;
   RandomNumberGenerator random_number_generator_;
   //@}

@@ -118,6 +118,8 @@ class PointSetUpdateProximity : public PointSetUpdate
   //@{
   double envelope_factor_;
   double size_factor_;
+  double lower_size_;
+  double lower_epsilon_;
   //@}
 
 };  // end PointSetUpdateProximity

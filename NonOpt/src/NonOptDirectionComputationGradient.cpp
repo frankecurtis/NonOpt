@@ -105,7 +105,7 @@ void DirectionComputationGradient::computeDirection(const Options* options,
     strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
 
     // Solve QP
-    strategies->qpSolver()->solveQP(options, reporter);
+    strategies->qpSolver()->solveQP(options, reporter,quantities);
 
     // Convert QP solution to step
     convertQPSolutionToStep(quantities, strategies);

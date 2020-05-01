@@ -207,7 +207,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
     strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
 
     // Solve QP
-    strategies->qpSolver()->solveQP(options, reporter);
+    strategies->qpSolver()->solveQP(options, reporter,quantities);
 
     // Convert QP solution to step
     convertQPSolutionToStep(quantities, strategies);
@@ -235,7 +235,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       strategies->qpSolver()->setVector(QP_vector);
 
       // Solve QP
-      strategies->qpSolver()->solveQP(options, reporter);
+      strategies->qpSolver()->solveQP(options, reporter,quantities);
 
       // Convert QP solution to step
       convertQPSolutionToStep(quantities, strategies);
@@ -253,7 +253,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
 
       // Check for sufficient decrease
       if (evaluation_success &&
-          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * strategies->qpSolver()->dualObjectiveQuadraticValue() ||
+          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(),strategies->qpSolver()->primalSolutionNorm2Square()) ||
            (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
@@ -316,7 +316,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
 
         // Check for sufficient decrease
         if (evaluation_success &&
-            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * strategies->qpSolver()->dualObjectiveQuadraticValue() ||
+            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(),strategies->qpSolver()->primalSolutionNorm2Square()) ||
              (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
               strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
               strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
@@ -348,8 +348,16 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
 
       }  // end if (try_shortened_step_)
 
+      int added_points=0;
+      if(random_sample_fraction_>1.0){
+    	  added_points=(int)random_sample_fraction_;
+      }
+      else{
+    	  added_points=(int)(random_sample_fraction_ * quantities->numberOfVariables());
+      }
+      //int added_points=(int) random_sample_fraction_ *quantities->pointSet()->size();
       // Loop over sample size
-      for (int point_count = 0; point_count < std::max(1, (int)(random_sample_fraction_ * quantities->numberOfVariables())); point_count++) {
+      for (int point_count = 0; point_count < std::max(1, added_points); point_count++) {
 
         // Randomly generate new point
         std::shared_ptr<Point> random_point = quantities->currentIterate()->makeNewRandom(quantities->stationarityRadius(), &random_number_generator_);
@@ -415,7 +423,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       strategies->qpSolver()->addData(QP_gradient_list_new, QP_vector_new);
 
       // Solve QP hot
-      strategies->qpSolver()->solveQPHot(options, reporter);
+      strategies->qpSolver()->solveQPHot(options, reporter,quantities);
 
       // Convert QP solution to step
       convertQPSolutionToStep(quantities, strategies);
@@ -443,7 +451,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
         strategies->qpSolver()->setVector(QP_vector);
 
         // Solve QP
-        strategies->qpSolver()->solveQP(options, reporter);
+        strategies->qpSolver()->solveQP(options, reporter,quantities);
 
         // Convert QP solution to step
         convertQPSolutionToStep(quantities, strategies);

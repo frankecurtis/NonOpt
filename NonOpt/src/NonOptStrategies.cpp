@@ -137,7 +137,7 @@ void Strategies::setOptions(const Options* options,
     direction_computation_ = std::make_shared<DirectionComputationGradientCombination>();
   }
   else if (direction_computation_name.compare("Aggregation") == 0) {
-    direction_computation_ = std::make_shared<DirectionComputationGradientCombination>();
+    direction_computation_ = std::make_shared<DirectionComputationAggregation>();
   }
   else {
     direction_computation_ = std::make_shared<DirectionComputationCuttingPlane>();

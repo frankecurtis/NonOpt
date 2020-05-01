@@ -186,7 +186,8 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
       if (evaluation_success) {
 
         // Check for sufficient decrease
-        sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * strategies->qpSolver()->dualObjectiveQuadraticValue());
+        //sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * strategies->qpSolver()->dualObjectiveQuadraticValue());
+        sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(),strategies->qpSolver()->primalSolutionNorm2Square()));
 
         // Check Armijo condition
         if (sufficient_decrease) {

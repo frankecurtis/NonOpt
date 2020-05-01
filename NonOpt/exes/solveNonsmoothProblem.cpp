@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
     problem = std::make_shared<Test29_6>(p_size);
   }
   else if (strcmp(argv[1], "Test29_11") == 0) {
-    problem = std::make_shared<Test29_11>(p_size);
+    problem = std::make_shared<Test29_11>(p_size-80);
   }
   else if (strcmp(argv[1], "Test29_13") == 0) {
     problem = std::make_shared<Test29_13>(p_size);
@@ -109,17 +109,36 @@ int main(int argc, char* argv[])
   NonOptSolver nonopt;
 
   // Modify direction computation option
-  nonopt.options()->modifyStringValue(nonopt.reporter(), "direction_computation", argv[2]);
-  nonopt.options()->modifyStringValue(nonopt.reporter(), "inverse_hessian_update", argv[3]);
-  nonopt.options()->modifyStringValue(nonopt.reporter(), "line_search", argv[4]);
-  nonopt.options()->modifyStringValue(nonopt.reporter(), "point_set_update", argv[5]);
-  nonopt.options()->modifyStringValue(nonopt.reporter(), "qp_solver", argv[6]);
-  nonopt.options()->modifyStringValue(nonopt.reporter(), "symmetric_matrix", argv[7]);
+//  nonopt.options()->modifyStringValue(nonopt.reporter(), "direction_computation", argv[2]);
+//  nonopt.options()->modifyStringValue(nonopt.reporter(), "inverse_hessian_update", argv[3]);
+//  nonopt.options()->modifyStringValue(nonopt.reporter(), "line_search", argv[4]);
+//  nonopt.options()->modifyStringValue(nonopt.reporter(), "point_set_update", argv[5]);
+//  nonopt.options()->modifyStringValue(nonopt.reporter(), "qp_solver", argv[6]);
+//  nonopt.options()->modifyStringValue(nonopt.reporter(), "symmetric_matrix", argv[7]);
 
-//  // Declare file report
- // std::shared_ptr<FileReport> r(new FileReport("f", R_NL, R_PER_INNER_ITERATION));
-//  std::shared_ptr<FileReport> r_NL(new FileReport("f", R_NL, R_PER_INNER_ITERATION));
-//  std::shared_ptr<FileReport> r_QP(new FileReport("f", R_QP, R_PER_INNER_ITERATION));
+
+  nonopt.options()->modifyBoolValue(nonopt.reporter(), "QPAS_allow_skip_inexact", true);
+  nonopt.options()->modifyDoubleValue(nonopt.reporter(), "QPAS_inexact_termination_ratio_min", 0.01);
+  nonopt.options()->modifyDoubleValue(nonopt.reporter(), "cpu_time_limit", 600.0);
+  nonopt.options()->modifyDoubleValue(nonopt.reporter(), "PSP_size_factor", 10.0);
+
+  nonopt.options()->modifyDoubleValue(nonopt.reporter(), "QPAS_skip_factor", 0.25);
+  nonopt.options()->modifyDoubleValue(nonopt.reporter(), "PSP_envelope_factor", 2000);
+  nonopt.options()->modifyDoubleValue(nonopt.reporter(), "DCGC_random_sample_fraction", 5.0);
+  nonopt.options()->modifyDoubleValue(nonopt.reporter(), "DCAgg_random_sample_fraction", 5.0);
+  nonopt.options()->modifyDoubleValue(nonopt.reporter(), "DCGC_shortened_stepsize", 0.2);
+  nonopt.options()->modifyDoubleValue(nonopt.reporter(), "DCAgg_shortened_stepsize", 0.2);
+
+  nonopt.options()->modifyDoubleValue(nonopt.reporter(), "DCAgg_size_factor", 10.0);
+
+  nonopt.options()->modifyBoolValue(nonopt.reporter(), "QPAS_allow_inexact_termination", true);
+  nonopt.options()->modifyStringValue(nonopt.reporter(), "direction_computation", "Aggregation");
+
+  // Declare file report
+
+  std::shared_ptr<FileReport> r(new FileReport("f", R_NL, R_PER_INNER_ITERATION));
+  std::shared_ptr<FileReport> r_NL(new FileReport("f", R_NL, R_PER_INNER_ITERATION));
+  std::shared_ptr<FileReport> r_QP(new FileReport("f", R_QP, R_PER_INNER_ITERATION));
 //
 //  // Open file
 //  char out_file[100];
@@ -141,8 +160,8 @@ int main(int argc, char* argv[])
 //  r->open(out_file);
 //
 //  // Add to reporter
-  //nonopt.reporter()->addReport(r);
-  nonopt.reporter()->deleteReports();
+  nonopt.reporter()->addReport(r);
+//  nonopt.reporter()->deleteReports();
 
 
   //nonopt.options()->modifyBoolValue(nonopt.reporter(), "check_derivatives", true);

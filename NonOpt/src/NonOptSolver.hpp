@@ -70,6 +70,11 @@ class NonOptSolver
    */
   inline int const iterations() const { return quantities_.iterationCounter(); };
   /**
+   * Get number of variables
+   * \return number of variables
+   */
+  inline int const numberOfVariables() const { return quantities_.numberOfVariables(); };
+  /**
    * Get inner iteration counter
    * \return total inner iterations performed so far
    */

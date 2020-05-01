@@ -104,6 +104,24 @@ void Quantities::addOptions(Options* options,
                            "for updating the stationarity and trust region radii are met,\n"
                            "then the trust region radius is multiplied by this fraction.\n"
                            "Default value: 1e-01.");
+  options->addDoubleOption(reporter,
+                           "inexact_termination_factor_initial",
+                           1.5,
+                           0.0,
+                           4.0,
+                           "Initial inexact termination, if allowed.  Factor by which\n"
+                           "norm of inexact solution needs to be within true norm of true\n"
+                           "(unknown) projection of origin onto convex hull of gradients.\n"
+                           "Default value: 1.5.");
+  options->addDoubleOption(reporter,
+                           "inexact_termination_update_factor",
+                           1.0,
+                           0.0,
+                           1.0,
+                           "Factor for updating the inexact termination factor.  If the conditions\n"
+                           "for updating the inexact termination factor is met,\n"
+                           "then the inexact termination factor is multiplied by this fraction.\n"
+                           "Default value: 0.9999.");
 
   // Add integer options
   options->addIntegerOption(reporter,
@@ -116,7 +134,7 @@ void Quantities::addOptions(Options* options,
                             "Default value: 1e+04.");
   options->addIntegerOption(reporter,
                             "gradient_evaluation_limit",
-                            3e+04,
+                            5e+04,
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of gradient evaluations that will be.\n"
@@ -138,7 +156,8 @@ void Quantities::setOptions(const Options* options,
   options->valueAsDouble(reporter, "trust_region_radius_initialization_minimum", trust_region_radius_initialization_minimum_);
   options->valueAsDouble(reporter, "trust_region_radius_initialization_factor", trust_region_radius_initialization_factor_);
   options->valueAsDouble(reporter, "trust_region_radius_update_factor", trust_region_radius_update_factor_);
-
+  options->valueAsDouble(reporter, "inexact_termination_factor_initial", inexact_termination_factor_initial_);
+  options->valueAsDouble(reporter, "inexact_termination_update_factor", inexact_termination_update_factor_);
   // Read integer options
   options->valueAsInteger(reporter, "function_evaluation_limit", function_evaluation_limit_);
   options->valueAsInteger(reporter, "gradient_evaluation_limit", gradient_evaluation_limit_);
@@ -205,6 +224,9 @@ bool Quantities::initialize(const std::shared_ptr<Problem> problem)
   // Initialize radii
   stationarity_radius_ = 0.0;
   trust_region_radius_ = 0.0;
+
+  // Initialize inexact termination factor
+  inexact_termination_factor_= 0.0;
 
   // Return
   return success;
