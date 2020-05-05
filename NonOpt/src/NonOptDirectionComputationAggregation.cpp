@@ -271,12 +271,12 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
     }  // end if
 
 
-//    yk = nullptr;
-//    gamm= nullptr;
-
     do_agg_next_=true;
 
     // Inner loop
+    int inner_count=0;
+    int pointset_init_size=(int)quantities->pointSet()->size();
+    int added_point=0;
     while (true) {
 
       // Flush reporter buffer
@@ -285,17 +285,21 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
       // Evaluate trial iterate objective
       evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
 
-      // Check for sufficient decrease (double)quantities->pointSet()->size() > 10 * (double)quantities->numberOfVariables()||
       if (evaluation_success &&
           (
         		  quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(),strategies->qpSolver()->primalSolutionNorm2Square()) ||
            (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
+//    	if(inner_count>5){
+//    		int removed_points=(int)0.5*added_point+pointset_init_size;
+//    		quantities->pointSet()->erase(quantities->pointSet()->begin()+pointset_init_size,quantities->pointSet()->begin()+removed_points );
+//
+//    	}
+
         THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
       }
 
-//quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * strategies->qpSolver()->dualObjectiveQuadraticValue()
 
       // Check for inner iteration limit
       if (quantities->innerIterationCounter() > inner_iteration_limit_) {
@@ -313,15 +317,7 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
 
 
 
-
       if(do_agg_next_){
-
-//          if (yk != nullptr) {
-//            delete[] yk;
-//          }
-//          if (gamm != nullptr) {
-//            delete[] gamm;
-//          }
 
           yk=new double[strategies->qpSolver()->omega_length()];
           gamm=new double[quantities->numberOfVariables()];
@@ -339,19 +335,6 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
           delete[] yk;
           delete[] gamm;
 
-
-
-
-//          std::vector<double> yk=strategies->qpSolver()->dualSolution_omega();
-//
-//          std::shared_ptr<Vector> combination_temp(new Vector(quantities->numberOfVariables()));
-//          double downshifting_obj=0.0;
-//          int idx=0;
-//          for (std::vector<double>::iterator it = yk.begin(); it != yk.end(); ++it) {
-//                  combination_temp->addScaledVector(*it, *QP_gradient_list_agg[idx]);
-//              downshifting_obj+=(*it) * (QP_vector[idx]);
-//              idx++;
-//          }
 
           // Clear data
           QP_gradient_list_agg.clear();
@@ -381,6 +364,7 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
 
          // Add trial iterate to point set
          quantities->pointSet()->push_back(quantities->trialIterate());
+         added_point++;
 
          // Add pointer to gradient in point set to list
          QP_gradient_list_agg.push_back(quantities->trialIterate()->gradient());
@@ -435,6 +419,7 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
 
          // Add trial iterate to point set
          quantities->pointSet()->push_back(quantities->trialIterate());
+         added_point++;
 
          // Add pointer to gradient in point set to list
          QP_gradient_list_agg.push_back(quantities->trialIterate()->gradient());
@@ -460,7 +445,7 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
      }  // end if (try_shortened_step_)
 
       // Loop over sample size
-      //for (int point_count = 0; point_count < std::max(1, (int)(random_sample_fraction_ * quantities->numberOfVariables())); point_count++) {
+
      int added_points=0;
      if(random_sample_fraction_>1.0){
    	  added_points=(int)random_sample_fraction_;
@@ -484,6 +469,7 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
 
           // Add random point to point set
           quantities->pointSet()->push_back(random_point);
+          added_point++;
 
           // Add pointer to gradient to list
           QP_gradient_list.push_back(random_point->gradient());
@@ -612,6 +598,8 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
         convertQPSolutionToStep(quantities, strategies);
 
       }  // end if
+
+      inner_count++;
 
     }  // end while
 

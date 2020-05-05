@@ -1077,7 +1077,7 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
         THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
       }
 
-
+      // Check for inexact termination
       if (allow_inexact_termination_){
     	  if(do_skip_){
     		  if( (iteration_count_==0 || (iteration_count_>=skip_factor_*(int)vector_.size()&&iteration_count_%4==0) )  && inexactTerminationCondition(reporter)){
