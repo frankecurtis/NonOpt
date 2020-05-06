@@ -274,9 +274,7 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
     do_agg_next_=true;
 
     // Inner loop
-    int inner_count=0;
-    int pointset_init_size=(int)quantities->pointSet()->size();
-    int added_point=0;
+
     while (true) {
 
       // Flush reporter buffer
@@ -291,11 +289,6 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
            (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
-//    	if(inner_count>5){
-//    		int removed_points=(int)0.5*added_point+pointset_init_size;
-//    		quantities->pointSet()->erase(quantities->pointSet()->begin()+pointset_init_size,quantities->pointSet()->begin()+removed_points );
-//
-//    	}
 
         THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
       }
@@ -364,7 +357,6 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
 
          // Add trial iterate to point set
          quantities->pointSet()->push_back(quantities->trialIterate());
-         added_point++;
 
          // Add pointer to gradient in point set to list
          QP_gradient_list_agg.push_back(quantities->trialIterate()->gradient());
@@ -419,7 +411,6 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
 
          // Add trial iterate to point set
          quantities->pointSet()->push_back(quantities->trialIterate());
-         added_point++;
 
          // Add pointer to gradient in point set to list
          QP_gradient_list_agg.push_back(quantities->trialIterate()->gradient());
@@ -469,7 +460,6 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
 
           // Add random point to point set
           quantities->pointSet()->push_back(random_point);
-          added_point++;
 
           // Add pointer to gradient to list
           QP_gradient_list.push_back(random_point->gradient());
@@ -599,7 +589,7 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
 
       }  // end if
 
-      inner_count++;
+
 
     }  // end while
 
