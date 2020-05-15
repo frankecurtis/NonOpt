@@ -295,6 +295,7 @@ class QPSolverDualActiveSet : public QPSolver
   double primal_quadratic_feasible_best_;
   double primal_solution_feasible_best_norm_inf_;
   double skip_factor_;
+  double kappa_;
   /**
    * Algorithm quantities
    */
@@ -309,6 +310,7 @@ class QPSolverDualActiveSet : public QPSolver
   std::deque<int> omega_positive_best_;
   double* system_solution_;
   double* system_solution_best_;
+
   /**
    * Solution quantities
    */

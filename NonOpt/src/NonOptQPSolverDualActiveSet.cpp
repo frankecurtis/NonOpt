@@ -102,6 +102,12 @@ void QPSolverDualActiveSet::addOptions(Options* options,
 //                           "(unknown) projection of origin onto convex hull of gradients.\n"
 //                           "Default value: 1.5.");
   options->addDoubleOption(reporter,
+                           "QPAS_descent_factor",
+                           1e-02,
+                           0.0,
+                           1.0,
+                           "Factor for checking if the direction is indeed a descent direction");
+  options->addDoubleOption(reporter,
                            "QPAS_inexact_termination_ratio_min",
                            1e-02,
                            0.0,
@@ -158,6 +164,7 @@ void QPSolverDualActiveSet::setOptions(const Options* options,
   options->valueAsDouble(reporter, "QPAS_kkt_tolerance", kkt_tolerance_);
   options->valueAsDouble(reporter, "QPAS_cholesky_tolerance", cholesky_tolerance_);
 //  options->valueAsDouble(reporter, "QPAS_inexact_termination_factor", inexact_termination_factor_);
+  options->valueAsDouble(reporter, "QPAS_descent_factor", kappa_);
   options->valueAsDouble(reporter, "QPAS_inexact_termination_ratio_min", inexact_termination_ratio_min_);
   options->valueAsDouble(reporter, "QPAS_linear_independence_tolerance", linear_independence_tolerance_);
   options->valueAsDouble(reporter, "QPAS_skip_factor", skip_factor_);
@@ -664,7 +671,7 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
   ////////////////////////////////////////////////////////////////////////////////
 
   // Check iteration count
-  if (iteration_count_ == 0) {
+  if (iteration_count_ == 1) {
 
     // Set simple primal feasible solution based on average of gradients
     for (int i = 0; i < (int)vector_list_.size(); i++) {
@@ -703,7 +710,7 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
   ///////////////////////////////////////////////////
 
   // Check iteration count
-  if (iteration_count_ == 0) {
+  if (iteration_count_ == 1) {
     dual_objective_reference_ = dual_objective;
     if (primal_objective_feasible <= primal_objective_simple_) {
       primal_objective_feasible_best_ = primal_objective_feasible;
@@ -742,7 +749,7 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
 
   // Print information
 
-  if (iteration_count_ == 0) {
+  if (iteration_count_ == 1) {
     reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "===============================================================================================================================================================================\n");
     reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "%8s %8s %8s %8s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s\n",
                                                           "tol",
@@ -795,17 +802,20 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
     condition_bool = true;
   }
   // Check first "nonzero d" condition
-  else if (dual_objective - dual_objective_reference_ >=
-           fmax(inexact_termination_ratio, inexact_termination_ratio_min_) * (primal_objective_feasible_best_ - dual_objective_reference_)) {
-    primal_solution_.copy(primal_solution_feasible_best_);
-    condition_bool = true;
-  }  // end if
-  // Check second "nonzero d" condition
-  else if ((pow(inexact_termination_factor_, 2.0) + 2 * inexact_termination_factor_) * (primal_objective_reference_ - primal_objective_feasible_best_) >=
-      primal_objective_feasible_best_ - dual_objective) {
-    primal_solution_.copy(primal_solution_feasible_best_);
-    condition_bool = true;
-  }  // end if
+  else if (vector_list_[0]->innerProduct(primal_solution_feasible_) <= -1.0*kappa_ * dualObjectiveQuadraticValue() ){
+	  if (dual_objective - dual_objective_reference_ >=
+	           fmax(inexact_termination_ratio, inexact_termination_ratio_min_) * (primal_objective_feasible_best_ - dual_objective_reference_)) {
+	    primal_solution_.copy(primal_solution_feasible_best_);
+	    condition_bool = true;
+	  }  // end if
+	  // Check second "nonzero d" condition
+	  else if ((pow(inexact_termination_factor_, 2.0) + 2 * inexact_termination_factor_) * (primal_objective_reference_ - primal_objective_feasible_best_) >=
+	      primal_objective_feasible_best_ - dual_objective) {
+	    primal_solution_.copy(primal_solution_feasible_best_);
+	    condition_bool = true;
+	  }  // end if
+  }
+
 
   // Return
   return condition_bool;
@@ -1072,6 +1082,9 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
                        kkt_residual_minimum_index,
                        kkt_error_);
 
+      // Increment iteration counter
+      iteration_count_++;
+
       // Check for successful solve
       if (kkt_error_ >= -kkt_tolerance_) {
         THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
@@ -1080,7 +1093,7 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
       // Check for inexact termination
       if (allow_inexact_termination_){
     	  if(do_skip_){
-    		  if( (iteration_count_==0 || (iteration_count_>=skip_factor_*(int)vector_.size()&&iteration_count_%4==0) )  && inexactTerminationCondition(reporter)){
+    		  if( (iteration_count_-1==0 || (iteration_count_-1>=skip_factor_*(int)vector_.size()&&(iteration_count_-1)%4==0) )  && inexactTerminationCondition(reporter)){
     			  THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
     		  }
     	  }
@@ -1096,7 +1109,7 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
 
 
       // Check for iteration limit
-      if (iteration_count_ >= iteration_limit) {
+      if (iteration_count_ -1 >= iteration_limit) {
         THROW_EXCEPTION(QP_ITERATION_LIMIT_EXCEPTION, "QP solve unsuccessful. Iteration limit reached.");
       }
 
@@ -1107,8 +1120,7 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
                        kkt_residual_minimum_index,
                        kkt_residual_minimum_set);
 
-      // Increment iteration counter
-      iteration_count_++;
+
 
       // Evaluate new system vector
       evaluateSystemVector(kkt_residual_minimum_set, kkt_residual_minimum_index, new_system_vector);
