@@ -4,9 +4,9 @@
 //
 // Author(s) : Frank E. Curtis
 
+#include "NonOptDirectionComputationGradient.hpp"
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
-#include "NonOptDirectionComputationGradient.hpp"
 
 namespace NonOpt
 {
@@ -61,7 +61,7 @@ void DirectionComputationGradient::computeDirection(const Options* options,
 
   // Initialize values
   setStatus(DC_UNSET);
-  strategies->qpSolver()->setDualStepToZero();
+  strategies->qpSolver()->setPrimalSolutionToZero();
   quantities->resetInnerIterationCounter();
   quantities->resetQPIterationCounter();
   quantities->setTrialIterateToCurrentIterate();
@@ -102,9 +102,10 @@ void DirectionComputationGradient::computeDirection(const Options* options,
     strategies->qpSolver()->setVectorList(QP_gradient_list);
     strategies->qpSolver()->setVector(QP_vector);
     strategies->qpSolver()->setScalar(quantities->trustRegionRadius());
+    strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
 
     // Solve QP
-    strategies->qpSolver()->solveQP(options, reporter);
+    strategies->qpSolver()->solveQP(options, reporter,quantities);
 
     // Convert QP solution to step
     convertQPSolutionToStep(quantities, strategies);
@@ -136,10 +137,10 @@ void DirectionComputationGradient::computeDirection(const Options* options,
                    quantities->innerIterationCounter(),
                    quantities->QPIterationCounter(),
                    strategies->qpSolver()->status(),
-                   strategies->qpSolver()->KKTErrorFull(),
+                   strategies->qpSolver()->KKTErrorDual(),
                    strategies->qpSolver()->combinationNormInf(),
-                   strategies->qpSolver()->dualStepNormInf(),
-                   strategies->qpSolver()->objectiveQuadraticValue());
+                   strategies->qpSolver()->primalSolutionNormInf(),
+                   strategies->qpSolver()->dualObjectiveQuadraticValue());
 
   // Increment total inner iteration counter
   quantities->incrementTotalInnerIterationCounter();
@@ -160,8 +161,8 @@ void DirectionComputationGradient::convertQPSolutionToStep(Quantities* quantitie
   // Increment inner iteration counter
   quantities->incrementInnerIterationCounter(1);
 
-  // Get step (which is dual as far as QP is concerned)
-  strategies->qpSolver()->dualStep(quantities->direction()->valuesModifiable());
+  // Get primal solution
+  strategies->qpSolver()->primalSolution(quantities->direction()->valuesModifiable());
 
   // Set trial iterate
   quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, 1.0, *quantities->direction()));

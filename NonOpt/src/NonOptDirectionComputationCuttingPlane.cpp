@@ -132,7 +132,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
   // Initialize values
   setStatus(DC_UNSET);
-  strategies->qpSolver()->setDualStepToZero();
+  strategies->qpSolver()->setPrimalSolutionToZero();
   quantities->resetInnerIterationCounter();
   quantities->resetQPIterationCounter();
   quantities->setTrialIterateToCurrentIterate();
@@ -204,9 +204,10 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
     strategies->qpSolver()->setVectorList(QP_gradient_list);
     strategies->qpSolver()->setVector(QP_vector);
     strategies->qpSolver()->setScalar(quantities->trustRegionRadius());
+    strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
 
     // Solve QP
-    strategies->qpSolver()->solveQP(options, reporter);
+    strategies->qpSolver()->solveQP(options, reporter,quantities);
 
     // Convert QP solution to step
     convertQPSolutionToStep(quantities, strategies);
@@ -234,7 +235,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
       strategies->qpSolver()->setVector(QP_vector);
 
       // Solve QP
-      strategies->qpSolver()->solveQP(options, reporter);
+      strategies->qpSolver()->solveQP(options, reporter,quantities);
 
       // Convert QP solution to step
       convertQPSolutionToStep(quantities, strategies);
@@ -252,8 +253,8 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
       // Check for sufficient decrease
       if (evaluation_success &&
-          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * strategies->qpSolver()->objectiveQuadraticValue() ||
-           (strategies->qpSolver()->dualStepNormInf() <= quantities->stationarityRadius() &&
+          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(),strategies->qpSolver()->primalSolutionNorm2Square())  ||
+           (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
         THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
@@ -311,7 +312,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
       if (try_shortened_step_) {
 
         // Set shortened stepsize
-        double shortened_stepsize = shortened_stepsize_ * fmin(quantities->stationarityRadius(), strategies->qpSolver()->dualStepNormInf()) / strategies->qpSolver()->dualStepNormInf();
+        double shortened_stepsize = shortened_stepsize_ * fmin(quantities->stationarityRadius(), strategies->qpSolver()->primalSolutionNormInf()) / strategies->qpSolver()->primalSolutionNormInf();
 
         // Compute shortened trial iterate
         quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, shortened_stepsize, *quantities->direction()));
@@ -321,8 +322,8 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
         // Check for sufficient decrease
         if (evaluation_success &&
-            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * strategies->qpSolver()->objectiveQuadraticValue() ||
-             (strategies->qpSolver()->dualStepNormInf() <= quantities->stationarityRadius() &&
+            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(),strategies->qpSolver()->primalSolutionNorm2Square()) ||
+             (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
               strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
               strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
           THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
@@ -365,10 +366,10 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
                        quantities->innerIterationCounter(),
                        quantities->QPIterationCounter(),
                        strategies->qpSolver()->status(),
-                       strategies->qpSolver()->KKTErrorFull(),
+                       strategies->qpSolver()->KKTErrorDual(),
                        strategies->qpSolver()->combinationNormInf(),
-                       strategies->qpSolver()->dualStepNormInf(),
-                       strategies->qpSolver()->objectiveQuadraticValue());
+                       strategies->qpSolver()->primalSolutionNormInf(),
+                       strategies->qpSolver()->dualObjectiveQuadraticValue());
 
       // Set blank solve string
       std::string blank_solve = "";
@@ -395,7 +396,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
       strategies->qpSolver()->addData(QP_gradient_list_new, QP_vector_new);
 
       // Solve QP hot
-      strategies->qpSolver()->solveQPHot(options, reporter);
+      strategies->qpSolver()->solveQPHot(options, reporter,quantities);
 
       // Convert QP solution to step
       convertQPSolutionToStep(quantities, strategies);
@@ -423,7 +424,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
         strategies->qpSolver()->setVector(QP_vector);
 
         // Solve QP
-        strategies->qpSolver()->solveQP(options, reporter);
+        strategies->qpSolver()->solveQP(options, reporter,quantities);
 
         // Convert QP solution to step
         convertQPSolutionToStep(quantities, strategies);
@@ -454,10 +455,10 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
                    quantities->innerIterationCounter(),
                    quantities->QPIterationCounter(),
                    strategies->qpSolver()->status(),
-                   strategies->qpSolver()->KKTErrorFull(),
+                   strategies->qpSolver()->KKTErrorDual(),
                    strategies->qpSolver()->combinationNormInf(),
-                   strategies->qpSolver()->dualStepNormInf(),
-                   strategies->qpSolver()->objectiveQuadraticValue());
+                   strategies->qpSolver()->primalSolutionNormInf(),
+                   strategies->qpSolver()->dualObjectiveQuadraticValue());
 
   // Increment total inner iteration counter
   quantities->incrementTotalInnerIterationCounter();
@@ -478,8 +479,8 @@ void DirectionComputationCuttingPlane::convertQPSolutionToStep(Quantities* quant
   // Increment inner iteration counter
   quantities->incrementInnerIterationCounter(1);
 
-  // Get step (which is dual as far as QP is concerned)
-  strategies->qpSolver()->dualStep(quantities->direction()->valuesModifiable());
+  // Get primal solution
+  strategies->qpSolver()->primalSolution(quantities->direction()->valuesModifiable());
 
   // Set trial iterate
   quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, 1.0, *quantities->direction()));

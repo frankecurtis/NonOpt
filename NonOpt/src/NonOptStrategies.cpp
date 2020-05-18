@@ -4,15 +4,16 @@
 //
 // Author(s) : Frank E. Curtis
 
+#include "NonOptStrategies.hpp"
 #include "NonOptDirectionComputationCuttingPlane.hpp"
 #include "NonOptDirectionComputationGradient.hpp"
 #include "NonOptDirectionComputationGradientCombination.hpp"
+#include "NonOptDirectionComputationAggregation.hpp"
 #include "NonOptInverseHessianUpdateBFGS.hpp"
 #include "NonOptLineSearchBacktracking.hpp"
 #include "NonOptLineSearchWeakWolfe.hpp"
 #include "NonOptPointSetUpdateProximity.hpp"
-#include "NonOptQPSolverActiveSet.hpp"
-#include "NonOptStrategies.hpp"
+#include "NonOptQPSolverDualActiveSet.hpp"
 #include "NonOptSymmetricMatrixDense.hpp"
 #include "NonOptSymmetricMatrixLimitedMemory.hpp"
 
@@ -47,9 +48,9 @@ void Strategies::addOptions(Options* options,
                            "Default value: Proximity.");
   options->addStringOption(reporter,
                            "qp_solver",
-                           "ActiveSet",
+                           "DualActiveSet",
                            "QP solver strategy to use.\n"
-                           "Default value: ActiveSet.");
+                           "Default value: DualActiveSet.");
   options->addStringOption(reporter,
                            "symmetric_matrix",
                            "Dense",
@@ -63,6 +64,8 @@ void Strategies::addOptions(Options* options,
   direction_computation = std::make_shared<DirectionComputationGradient>();
   direction_computation->addOptions(options, reporter);
   direction_computation = std::make_shared<DirectionComputationGradientCombination>();
+  direction_computation->addOptions(options, reporter);
+  direction_computation = std::make_shared<DirectionComputationAggregation>();
   direction_computation->addOptions(options, reporter);
   // ADD NEW DIRECTION COMPUTATION STRATEGIES HERE AND IN SWITCH BELOW //
 
@@ -88,7 +91,7 @@ void Strategies::addOptions(Options* options,
 
   // Add options for QP solver strategies
   std::shared_ptr<QPSolver> qp_solver;
-  qp_solver = std::make_shared<QPSolverActiveSet>();
+  qp_solver = std::make_shared<QPSolverDualActiveSet>();
   qp_solver->addOptions(options, reporter);
   // ADD NEW QP SOLVER STRATEGIES HERE AND IN SWITCH BELOW //
 
@@ -133,6 +136,9 @@ void Strategies::setOptions(const Options* options,
   else if (direction_computation_name.compare("GradientCombination") == 0) {
     direction_computation_ = std::make_shared<DirectionComputationGradientCombination>();
   }
+  else if (direction_computation_name.compare("Aggregation") == 0) {
+    direction_computation_ = std::make_shared<DirectionComputationAggregation>();
+  }
   else {
     direction_computation_ = std::make_shared<DirectionComputationCuttingPlane>();
   }
@@ -165,11 +171,11 @@ void Strategies::setOptions(const Options* options,
   }
 
   // Set QP solver strategy
-  if (qp_solver_name.compare("ActiveSet") == 0) {
-    qp_solver_ = std::make_shared<QPSolverActiveSet>();
+  if (qp_solver_name.compare("DualActiveSet") == 0) {
+    qp_solver_ = std::make_shared<QPSolverDualActiveSet>();
   }
   else {
-    qp_solver_ = std::make_shared<QPSolverActiveSet>();
+    qp_solver_ = std::make_shared<QPSolverDualActiveSet>();
   }
 
   // Set symmetric matrix strategy

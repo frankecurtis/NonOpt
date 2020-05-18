@@ -6,10 +6,15 @@
 
 /**
  *
- * QP solver for problems of the form
+ * Primal/dual QP solver for pair of the form
  *
- * min_(omega, gamma) 0.5*(G*omega + gamma)'*W*(G*omega + gamma) - b'*omega + r*||gamma||_1
- * s.t.               sum(omega) = 1 and omega >= 0
+ * (PRIMAL) max_d (max_i b_i + g_i'*d) + 0.5*d'*H*d
+ *          s.t. ||d||_inf <= r
+ *
+ * and, with G = [g_1 ... g_m] and W = inv(H),
+ *
+ * (DUAL) min_(omega, gamma) 0.5*(G*omega + gamma)'*W*(G*omega + gamma) - b'*omega + r*||gamma||_1
+ *        s.t.               sum(omega) = 1 and omega >= 0.
  *
  */
 
@@ -107,45 +112,54 @@ class QPSolver : public Strategy
    */
   virtual double combinationTranslatedNormInf() = 0;
   /**
-   * Get dual step
-   * \param[out] vector is dual step given by "-W*(G*omega + gamma)"
+   * Get translated combination of vectors' infinity norm
+   * \return "||G*omega + gamma||_2^2"
    */
-  virtual void dualStep(double vector[]) = 0;
+  virtual double combinationTranslatedNorm2Square()=0;
   /**
-   * Get dual step's infinity norm
-   * \return "||W*(G*omega + gamma)||_inf"
+   * Get dual objective quadratic value
+   * \return "(G*omega + gamma)'*W*(G*omega + gamma)"
    */
-  virtual double dualStepNormInf() = 0;
+  virtual double dualObjectiveQuadraticValue() = 0;
   /**
-   * Get objective quadratic value
-   * \return (G*omega + gamma)'*W*(G*omega + gamma)
+   * Get dual solution
+   * \param[out] vector is dual solution
    */
-  virtual double objectiveQuadraticValue() = 0;
-  /**
-   * Get gamma
-   * \param[out] vector is "gamma" solution value
-   */
-  virtual void gamma(double vector[]) = 0;
+  virtual void dualSolution(double omega[], double gamma[]) = 0;
+
+  virtual int gamma_length()=0;
+  virtual int omega_length()=0;
+  virtual std::vector<double> dualSolution_omega()=0;
   /**
    * Get KKT error
-   * \return solver's KKT error corresponding to current solution (ignores certain conditions assumed to be satisfied during solve)
+   * \return solver's KKT error
    */
   virtual double KKTError() = 0;
   /**
    * Get KKT error full
-   * \return full KKT error corresponding to current solution
+   * \return full KKT error corresponding to dual solution
    */
-  virtual double KKTErrorFull() = 0;
+  virtual double KKTErrorDual() = 0;
   /**
    * Get iteration count
    * \return number of iterations performed
    */
   virtual int numberOfIterations() = 0;
   /**
-   * Get omega
-   * \param[out] vector is "omega" solution value
+   * Get primal solution
+   * \param[out] "d" (equal to "-W*(G*omega + gamma)" if solution is exact)
    */
-  virtual void omega(double vector[]) = 0;
+  virtual void primalSolution(double d[]) = 0;
+  /**
+   * Get primal solution infinity norm
+   * \return "||d||_inf"
+   */
+  virtual double primalSolutionNormInf() = 0;
+  /**
+   * Get primal solution 2-norm square
+   * \return "||d||_2^2"
+   */
+  virtual double primalSolutionNorm2Square()=0;
   /**
    * Get name of strategy
    * \return string with name of strategy
@@ -161,12 +175,16 @@ class QPSolver : public Strategy
   /** @name Set method */
   //@{
   /**
-   * Set dual step to zero
+   * Set inexact solution tolerance
    */
-  virtual void setDualStepToZero() = 0;
+  virtual void setInexactSolutionTolerance(double tolerance) = 0;
+  /**
+   * Set "d" to zero
+   */
+  virtual void setPrimalSolutionToZero() = 0;
   /**
    * Set matrix
-   * \param[in] matrix is pointer to SymmetricMatrix to be set as QP "W" data
+   * \param[in] matrix is pointer to SymmetricMatrix, for which "W" is the "Inverse"
    */
   virtual void setMatrix(const std::shared_ptr<SymmetricMatrix> matrix) = 0;
   /**
@@ -210,14 +228,16 @@ class QPSolver : public Strategy
    * \param[in] reporter is pointer to Reporter object from NonOpt
    */
   virtual void solveQP(const Options* options,
-                       const Reporter* reporter) = 0;
+                       const Reporter* reporter,
+					   Quantities* quantities) = 0;
   /**
    * Solve QP hot, after new data added, re-using previous solution, factorization, etc.
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    */
   virtual void solveQPHot(const Options* options,
-                          const Reporter* reporter) = 0;
+                          const Reporter* reporter,
+						  Quantities* quantities) = 0;
   //@}
 
  private:

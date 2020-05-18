@@ -9,7 +9,8 @@
 #include "ActiveFaces.hpp"
 
 // Constructor
-ActiveFaces::ActiveFaces() {}
+ActiveFaces::ActiveFaces(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 ActiveFaces::~ActiveFaces() {}
@@ -19,7 +20,7 @@ bool ActiveFaces::numberOfVariables(int& n)
 {
 
   // Set number of variables
-  n = 50;
+  n = number_of_variables_;
 
   // Return
   return true;

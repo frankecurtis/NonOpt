@@ -94,7 +94,6 @@ class Quantities
    */
   inline clock_t const startTime() const { return start_time_; };
   /**
-   * End time
    * \return end time that was set
    */
   inline clock_t const endTime() const { return end_time_; };
@@ -221,6 +220,22 @@ class Quantities
    * \param[in] stationarity_tolerance is stationarity tolerance for reference
    */
   void updateRadii(double stationarity_tolerance);
+  /**
+   * Update inexact_termination_factor
+   */
+  inline void updateInexactTerminationFactor(){inexact_termination_factor_=inexact_termination_factor_*inexact_termination_update_factor_;};
+  /**
+   * Initialize inexact termination factor
+   * \param[in] options is pointer to Options object from NonOpt
+   * \param[in] reporter is pointer to Reporter object from NonOpt
+   */
+  inline void initializeInexactTerminationFactor(const Options* options,
+          const Reporter* reporter){inexact_termination_factor_=inexact_termination_factor_initial_;};
+  /**
+   * Get trust inexact termination factor
+   * \return current inexact termination factor
+   */
+  inline double const inexactTerminationFactor() const { return inexact_termination_factor_; };
   //@}
 
   /** @name Increment methods */
@@ -350,6 +365,9 @@ class Quantities
   double stationarity_radius_;
   double trust_region_radius_;
   double stepsize_;
+  double inexact_termination_factor_;
+  double inexact_termination_factor_initial_;
+  double inexact_termination_update_factor_;
   //@}
 
   /** @name Private members (options) */

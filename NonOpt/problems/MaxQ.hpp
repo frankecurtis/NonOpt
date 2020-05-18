@@ -31,7 +31,7 @@ class MaxQ : public Problem
   /**
    * Constructor
    */
-  MaxQ();
+  MaxQ(int n);
   //@}
 
   /** @name Destructor */
@@ -113,6 +113,11 @@ class MaxQ : public Problem
    * Overloaded equals operator
    */
   void operator=(const MaxQ&);
+  //@}
+
+  /** @name Private members */
+  //@{
+  int number_of_variables_; /**< Number of variables */
   //@}
 
 };  // end MaxQ

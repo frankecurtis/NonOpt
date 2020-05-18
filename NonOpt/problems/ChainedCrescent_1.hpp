@@ -32,7 +32,7 @@ class ChainedCrescent_1 : public Problem
   /**
    * Constructor
    */
-  ChainedCrescent_1();
+  ChainedCrescent_1(int n);
   //@}
 
   /** @name Destructor */
@@ -114,6 +114,11 @@ class ChainedCrescent_1 : public Problem
    * Overloaded equals operator
    */
   void operator=(const ChainedCrescent_1&);
+  //@}
+
+  /** @name Private members */
+  //@{
+  int number_of_variables_; /**< Number of variables */
   //@}
 
 };  // end ChainedCrescent_1

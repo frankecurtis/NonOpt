@@ -44,7 +44,7 @@ int testPointImplementation(int option)
   }  // end if
 
   // Declare problem
-  std::shared_ptr<MaxQ> problem(new MaxQ);
+  std::shared_ptr<MaxQ> problem(new MaxQ(50));
 
   // Declare problem size
   int n;
@@ -238,6 +238,17 @@ int testPointImplementation(int option)
   reporter.printf(R_NL, R_BASIC, "... should be near 1: %+23.16e\n", s->objective());
   reporter.printf(R_NL, R_BASIC, "... should be near [0,...,0,2,0,...,0]:\n");
   gs->print(&reporter, "GradientAtRandomVector");
+
+  // Check option
+  if (option == 1) {
+    // Print final message
+    if (result == 0) {
+      reporter.printf(R_NL, R_BASIC, "TEST WAS SUCCESSFUL.\n");
+    }
+    else {
+      reporter.printf(R_NL, R_BASIC, "TEST FAILED.\n");
+    }
+  }  // end if
 
   // Return
   return result;

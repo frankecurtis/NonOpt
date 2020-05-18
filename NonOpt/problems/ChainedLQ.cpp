@@ -9,7 +9,8 @@
 #include "ChainedLQ.hpp"
 
 // Constructor
-ChainedLQ::ChainedLQ() {}
+ChainedLQ::ChainedLQ(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 ChainedLQ::~ChainedLQ() {}
@@ -19,7 +20,7 @@ bool ChainedLQ::numberOfVariables(int& n)
 {
 
   // Set number of variables
-  n = 50;
+  n = number_of_variables_;
 
   // Return
   return true;

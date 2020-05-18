@@ -32,7 +32,7 @@ class ChainedCB3_2 : public Problem
   /**
    * Constructor
    */
-  ChainedCB3_2();
+  ChainedCB3_2(int n);
   //@}
 
   /** @name Destructor */
@@ -114,6 +114,11 @@ class ChainedCB3_2 : public Problem
    * Overloaded equals operator
    */
   void operator=(const ChainedCB3_2&);
+  //@}
+
+  /** @name Private members */
+  //@{
+  int number_of_variables_; /**< Number of variables */
   //@}
 
 };  // end ChainedCB3_2

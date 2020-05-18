@@ -31,7 +31,7 @@ class MxHilb : public Problem
   /**
    * Constructor
    */
-  MxHilb();
+  MxHilb(int n);
   //@}
 
   /** @name Destructor */
@@ -113,6 +113,11 @@ class MxHilb : public Problem
    * Overloaded equals operator
    */
   void operator=(const MxHilb&);
+  //@}
+
+  /** @name Private members */
+  //@{
+  int number_of_variables_; /**< Number of variables */
   //@}
 
 };  // end MxHilb

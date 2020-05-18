@@ -6,26 +6,29 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdio>
 #include <iterator>
 
 #include "NonOptBLAS.hpp"
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
-#include "NonOptQPSolverActiveSet.hpp"
+#include "NonOptQPSolverDualActiveSet.hpp"
+#include <iostream>
 
 namespace NonOpt
 {
 
 // Constructor
-QPSolverActiveSet::QPSolverActiveSet()
-    : factor_(nullptr),
+QPSolverDualActiveSet::QPSolverDualActiveSet()
+    : inexact_solution_tolerance_(0.0),
+      factor_(nullptr),
       inner_solution_1_(nullptr),
       inner_solution_2_(nullptr),
       system_solution_(nullptr),
       system_solution_best_(nullptr) {}
 
 // Destructor
-QPSolverActiveSet::~QPSolverActiveSet()
+QPSolverDualActiveSet::~QPSolverDualActiveSet()
 {
 
   // Delete arrays
@@ -48,7 +51,7 @@ QPSolverActiveSet::~QPSolverActiveSet()
 }  // end destructor
 
 // Add options
-void QPSolverActiveSet::addOptions(Options* options,
+void QPSolverDualActiveSet::addOptions(Options* options,
                                    const Reporter* reporter)
 {
 
@@ -62,6 +65,11 @@ void QPSolverActiveSet::addOptions(Options* options,
                          "QPAS_allow_inexact_termination",
                          true,
                          "Indicator for whether to allow early termination.\n"
+                         "Default value: true.");
+  options->addBoolOption(reporter,
+                         "QPAS_allow_skip_inexact",
+                         false,
+                         "Indicator for whether to allow skipping checking inexact termination.\n"
                          "Default value: true.");
   // Add double options
   options->addDoubleOption(reporter,
@@ -84,15 +92,21 @@ void QPSolverActiveSet::addOptions(Options* options,
                            "the factorization may be re-computed from scratch and/or the\n"
                            "diagonal value may be replaced by this tolerance value.\n"
                            "Default value: 1e-12.");
+//  options->addDoubleOption(reporter,
+//                           "QPAS_inexact_termination_factor",
+//                           1.5,
+//                           0.0,
+//                           4.0,
+//                           "Factor for inexact termination, if allowed.  Factor by which\n"
+//                           "norm of inexact solution needs to be within true norm of true\n"
+//                           "(unknown) projection of origin onto convex hull of gradients.\n"
+//                           "Default value: 1.5.");
   options->addDoubleOption(reporter,
-                           "QPAS_inexact_termination_factor",
-                           sqrt(2.0)-1.0-1e-2,
+                           "QPAS_descent_factor",
+                           1e-02,
                            0.0,
-                           sqrt(2.0)-1.0,
-                           "Factor for inexact termination, if allowed.  Factor by which\n"
-                           "norm of inexact solution needs to be within true norm of true\n"
-                           "(unknown) projection of origin onto convex hull of gradients.\n"
-                           "Default value: 0.1.");
+                           1.0,
+                           "Factor for checking if the direction is indeed a descent direction");
   options->addDoubleOption(reporter,
                            "QPAS_inexact_termination_ratio_min",
                            1e-02,
@@ -110,6 +124,13 @@ void QPSolverActiveSet::addOptions(Options* options,
                            "below this tolerance, then indices are exchanged to maintain\n"
                            "linear independence of the augmented matrix.\n"
                            "Default value: 1e-12.");
+  options->addDoubleOption(reporter,
+                           "QPAS_skip_factor",
+                           2.5e-1,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Used to determine the how many iterations to skip at first \n"
+						   "before checking the inexact termination condition");
 
   // Add integer options
   options->addIntegerOption(reporter,
@@ -130,20 +151,23 @@ void QPSolverActiveSet::addOptions(Options* options,
 }  // end addOptions
 
 // Set options
-void QPSolverActiveSet::setOptions(const Options* options,
+void QPSolverDualActiveSet::setOptions(const Options* options,
                                    const Reporter* reporter)
 {
 
   // Read bool options
   options->valueAsBool(reporter, "QPAS_fail_on_factorization_error", fail_on_factorization_error_);
   options->valueAsBool(reporter, "QPAS_allow_inexact_termination", allow_inexact_termination_);
+  options->valueAsBool(reporter, "QPAS_allow_skip_inexact", do_skip_);
 
   // Read double options
   options->valueAsDouble(reporter, "QPAS_kkt_tolerance", kkt_tolerance_);
   options->valueAsDouble(reporter, "QPAS_cholesky_tolerance", cholesky_tolerance_);
-  options->valueAsDouble(reporter, "QPAS_inexact_termination_factor", inexact_termination_factor_);
+//  options->valueAsDouble(reporter, "QPAS_inexact_termination_factor", inexact_termination_factor_);
+  options->valueAsDouble(reporter, "QPAS_descent_factor", kappa_);
   options->valueAsDouble(reporter, "QPAS_inexact_termination_ratio_min", inexact_termination_ratio_min_);
   options->valueAsDouble(reporter, "QPAS_linear_independence_tolerance", linear_independence_tolerance_);
+  options->valueAsDouble(reporter, "QPAS_skip_factor", skip_factor_);
 
   // Read integer options
   options->valueAsInteger(reporter, "QPAS_iteration_limit_minimum", iteration_limit_minimum_);
@@ -152,7 +176,7 @@ void QPSolverActiveSet::setOptions(const Options* options,
 }  // end setOptions
 
 // Initialize
-void QPSolverActiveSet::initialize(const Options* options,
+void QPSolverDualActiveSet::initialize(const Options* options,
                                    Quantities* quantities,
                                    const Reporter* reporter)
 {
@@ -160,7 +184,7 @@ void QPSolverActiveSet::initialize(const Options* options,
 }
 
 // Initialize data
-void QPSolverActiveSet::initializeData(int gamma_length)
+void QPSolverDualActiveSet::initializeData(int gamma_length)
 {
 
   // Set length parameters
@@ -219,7 +243,7 @@ void QPSolverActiveSet::initializeData(int gamma_length)
 }  // end initializeData
 
 // Get combination norm
-double QPSolverActiveSet::combinationNormInf()
+double QPSolverDualActiveSet::combinationNormInf()
 {
 
   // Set inputs for blas
@@ -244,7 +268,7 @@ double QPSolverActiveSet::combinationNormInf()
 }  // end combinationNormInf
 
 // Get translated combination norm
-double QPSolverActiveSet::combinationTranslatedNormInf()
+double QPSolverDualActiveSet::combinationTranslatedNormInf()
 {
 
   // Set inputs for blas
@@ -268,84 +292,30 @@ double QPSolverActiveSet::combinationTranslatedNormInf()
 
 }  // end combinationTranslatedNormInf
 
-// Get dual step
-void QPSolverActiveSet::dualStep(double vector[])
+// Get translated combination 2-norm square
+double QPSolverDualActiveSet::combinationTranslatedNorm2Square()
 {
 
   // Set inputs for blas
   int length = gamma_length_;
   int increment = 1;
 
-  // Copy values
-  dcopy_(&length, dual_step_.values(), &increment, vector, &increment);
-
-}  // end dualStep
-
-// Get feasible dual step
-void QPSolverActiveSet::dualStepFeasible(double vector[])
-{
-
-  // Set inputs for blas
-  int length = gamma_length_;
-  int increment = 1;
-
-  // Copy values
-  dcopy_(&length, dual_step_feasible_.values(), &increment, vector, &increment);
-
-}  // end dualStepFeasible
-
-// Get dual step norm
-double QPSolverActiveSet::dualStepNormInf()
-{
-
-  // Set inputs for blas
-  int length = gamma_length_;
-  int increment = 1;
-
-  // Find index of element with maximum absolute value
-  // (returns index from 1,...,length)
-  int i = idamax_(&length, dual_step_.values(), &increment);
 
   // Set norm
-  double dual_step_norm_inf = fabs(dual_step_.values()[i - 1]);
+  double combination_translated_norm_2 = dnrm2_(&length, combination_translated_.values(), &increment);
 
   // Set maximum
-  if (isnan(dual_step_norm_inf) || dual_step_norm_inf > NONOPT_DOUBLE_INFINITY) {
-    dual_step_norm_inf = NONOPT_DOUBLE_INFINITY;
+  if (isnan(combination_translated_norm_2) || combination_translated_norm_2 > NONOPT_DOUBLE_INFINITY) {
+	  combination_translated_norm_2 = NONOPT_DOUBLE_INFINITY;
   }
 
-  // Return inf-norm
-  return dual_step_norm_inf;
+  // Return 2-norm square
+  return combination_translated_norm_2*combination_translated_norm_2;
 
-}  // end dualStepNormInf
+}  // end combinationTranslatedNorm2Square
 
-// Get feasible dual step norm
-double QPSolverActiveSet::dualStepFeasibleNormInf()
-{
-
-  // Set inputs for blas
-  int length = gamma_length_;
-  int increment = 1;
-
-  // Find index of element with maximum absolute value
-  // (returns index from 1,...,length)
-  int i = idamax_(&length, dual_step_feasible_.values(), &increment);
-
-  // Set norm
-  double dual_step_norm_inf = fabs(dual_step_feasible_.values()[i - 1]);
-
-  // Set maximum
-  if (isnan(dual_step_norm_inf) || dual_step_norm_inf > NONOPT_DOUBLE_INFINITY) {
-    dual_step_norm_inf = NONOPT_DOUBLE_INFINITY;
-  }
-
-  // Return inf-norm
-  return dual_step_norm_inf;
-
-}  // end dualStepFeasibleNormInf
-
-// Get objective quadratic value
-double QPSolverActiveSet::objectiveQuadraticValue()
+// Get dual objective quadratic value
+double QPSolverDualActiveSet::dualObjectiveQuadraticValue()
 {
 
   // Set inputs for blas
@@ -353,20 +323,20 @@ double QPSolverActiveSet::objectiveQuadraticValue()
   int increment = 1;
 
   // Set quadratic value
-  double objective_quadratic_value = -ddot_(&length, dual_step_.values(), &increment, combination_translated_.values(), &increment);
+  double dual_objective_quadratic_value = -ddot_(&length, primal_solution_.values(), &increment, combination_translated_.values(), &increment);
 
   // Set maximum
-  if (isnan(objective_quadratic_value) || objective_quadratic_value > NONOPT_DOUBLE_INFINITY) {
-    objective_quadratic_value = NONOPT_DOUBLE_INFINITY;
+  if (isnan(dual_objective_quadratic_value) || dual_objective_quadratic_value > NONOPT_DOUBLE_INFINITY) {
+    dual_objective_quadratic_value = NONOPT_DOUBLE_INFINITY;
   }
 
   // Return
-  return objective_quadratic_value;
+  return dual_objective_quadratic_value;
 
-}  // end objectiveQuadraticValue
+}  // end dualObjectiveQuadraticValue
 
 // Get objective quadratic value for feasible dual step
-double QPSolverActiveSet::objectiveQuadraticValueFeasible()
+double QPSolverDualActiveSet::dualObjectiveQuadraticValueScaled()
 {
 
   // Set inputs for blas
@@ -374,36 +344,50 @@ double QPSolverActiveSet::objectiveQuadraticValueFeasible()
   int increment = 1;
 
   // Set quadratic value
-  double objective_quadratic_value = -ddot_(&length, dual_step_.values(), &increment, combination_translated_.values(), &increment);
+  double dual_objective_quadratic_value_scaled = -ddot_(&length, primal_solution_.values(), &increment, combination_translated_.values(), &increment);
 
   // Scale so value corresponds to feasible dual step
-  objective_quadratic_value *= pow(dual_step_projection_scalar_, 2.0);
+  dual_objective_quadratic_value_scaled *= pow(primal_solution_projection_scalar_, 2.0);
 
   // Set maximum
-  if (isnan(objective_quadratic_value) || objective_quadratic_value > NONOPT_DOUBLE_INFINITY) {
-    objective_quadratic_value = NONOPT_DOUBLE_INFINITY;
+  if (isnan(dual_objective_quadratic_value_scaled) || dual_objective_quadratic_value_scaled > NONOPT_DOUBLE_INFINITY) {
+    dual_objective_quadratic_value_scaled = NONOPT_DOUBLE_INFINITY;
   }
 
   // Return
-  return objective_quadratic_value;
+  return dual_objective_quadratic_value_scaled;
 
-}  // end objectiveQuadraticValueFeasible
+}  // end dualObjectiveQuadraticValueScaled
 
-// Get solution, gamma
-void QPSolverActiveSet::gamma(double vector[])
+// Get dual solution
+void QPSolverDualActiveSet::dualSolution(double omega[], double gamma[])
 {
 
   // Set inputs for blas
-  int length = gamma_length_;
+  int length = (int)vector_.size();
   int increment = 1;
 
   // Copy values
-  dcopy_(&length, gamma_.values(), &increment, vector, &increment);
+  dcopy_(&length, omega_.values(), &increment, omega, &increment);
 
-}  // end gamma
+  // Set inputs for blas
+  length = gamma_length_;
 
-// Get full KKT error
-double QPSolverActiveSet::KKTErrorFull()
+  // Copy values
+  dcopy_(&length, gamma_.values(), &increment, gamma, &increment);
+
+}  // end dualSolution
+
+std::vector<double> QPSolverDualActiveSet::dualSolution_omega(){
+	std::vector<double> vec;
+	int length = (int)vector_.size();
+//	unsigned dataArraySize = sizeof(dataArray) / sizeof(int);
+	vec.insert(vec.end(), &omega_.values()[0], &omega_.values()[length]);
+	return vec;
+}
+
+// Get KKT error from dual solution
+double QPSolverDualActiveSet::KKTErrorDual()
 {
 
   // Evaluate gradient combination
@@ -417,7 +401,7 @@ double QPSolverActiveSet::KKTErrorFull()
   d0.addScaledVector(-1.0, Gomega);
   d0.addScaledVector(-1.0, gamma_);
   Vector d(gamma_length_);
-  matrix_->matrixVectorProduct(d0, d);
+  matrix_->matrixVectorProductOfInverse(d0, d);
 
   // Evaluate gradient inner products
   Vector Gtd;
@@ -486,30 +470,119 @@ double QPSolverActiveSet::KKTErrorFull()
   // Return
   return kkt_error;
 
-}  // end KKTErrorFull
+}  // end KKTErrorDual
 
-// Get solution, omega
-void QPSolverActiveSet::omega(double vector[])
+// Get primal solution
+void QPSolverDualActiveSet::primalSolution(double d[])
 {
 
   // Set inputs for blas
-  int length = (int)vector_.size();
+  int length = gamma_length_;
   int increment = 1;
 
   // Copy values
-  dcopy_(&length, omega_.values(), &increment, vector, &increment);
+  dcopy_(&length, primal_solution_.values(), &increment, d, &increment);
 
-}  // end omega
+}  // end primalSolution
+
+// Get feasible primal solution
+void QPSolverDualActiveSet::primalSolutionFeasible(double d_feasible[])
+{
+
+  // Set inputs for blas
+  int length = gamma_length_;
+  int increment = 1;
+
+  // Copy values
+  dcopy_(&length, primal_solution_feasible_.values(), &increment, d_feasible, &increment);
+
+}  // end primalSolutionFeasible
+
+// Get primal solution inf-norm
+double QPSolverDualActiveSet::primalSolutionNormInf()
+{
+
+  // Set inputs for blas
+  int length = gamma_length_;
+  int increment = 1;
+
+  // Find index of element with maximum absolute value
+  // (returns index from 1,...,length)
+  int i = idamax_(&length, primal_solution_.values(), &increment);
+
+  // Set norm
+  double primal_solution_norm_inf = fabs(primal_solution_.values()[i - 1]);
+
+  // Set maximum
+  if (isnan(primal_solution_norm_inf) || primal_solution_norm_inf > NONOPT_DOUBLE_INFINITY) {
+    primal_solution_norm_inf = NONOPT_DOUBLE_INFINITY;
+  }
+
+  // Return inf-norm
+  return primal_solution_norm_inf;
+
+}  // end primalSolutionNormInf
+
+// Get primal solution 2-norm square
+double QPSolverDualActiveSet::primalSolutionNorm2Square()
+{
+
+  // Set inputs for blas
+  int length = gamma_length_;
+  int increment = 1;
+
+
+  // Set norm
+  double primal_solution_norm_2 = dnrm2_(&length, primal_solution_.values(), &increment);
+
+  // Set maximum
+  if (isnan(primal_solution_norm_2) || primal_solution_norm_2 > NONOPT_DOUBLE_INFINITY) {
+	  primal_solution_norm_2 = NONOPT_DOUBLE_INFINITY;
+  }
+
+  // Return 2-norm square
+  return primal_solution_norm_2*primal_solution_norm_2;
+
+}  // end primalSolutionNorm2Square
+
+// Get feasible primal solution norm
+double QPSolverDualActiveSet::primalSolutionFeasibleNormInf()
+{
+
+  // Set inputs for blas
+  int length = gamma_length_;
+  int increment = 1;
+
+  // Find index of element with maximum absolute value
+  // (returns index from 1,...,length)
+  int i = idamax_(&length, primal_solution_feasible_.values(), &increment);
+
+  // Set norm
+  double primal_solution_feasible_norm_inf = fabs(primal_solution_feasible_.values()[i - 1]);
+
+  // Set maximum
+  if (isnan(primal_solution_feasible_norm_inf) || primal_solution_feasible_norm_inf > NONOPT_DOUBLE_INFINITY) {
+    primal_solution_feasible_norm_inf = NONOPT_DOUBLE_INFINITY;
+  }
+
+  // Return inf-norm
+  return primal_solution_feasible_norm_inf;
+
+}  // end primalSolutionFeasibleNormInf
 
 // Initialize data
-void QPSolverActiveSet::setNullSolution()
+void QPSolverDualActiveSet::setNullSolution()
 {
 
   // Algorithm parameters
   iteration_count_ = 0;
   kkt_error_ = -NONOPT_DOUBLE_INFINITY;
-  dual_objective_best_ = NONOPT_DOUBLE_INFINITY;
-  primal_objective_reference_ = -NONOPT_DOUBLE_INFINITY;
+  dual_objective_reference_ = -NONOPT_DOUBLE_INFINITY;
+  primal_directional_derivative_feasible_best_ = NONOPT_DOUBLE_INFINITY;
+  primal_objective_feasible_best_ = NONOPT_DOUBLE_INFINITY;
+  primal_objective_reference_ = NONOPT_DOUBLE_INFINITY;
+  primal_objective_simple_ = NONOPT_DOUBLE_INFINITY;
+  primal_quadratic_feasible_best_ = -NONOPT_DOUBLE_INFINITY;
 
   // Clear solution arrays
   omega_positive_.clear();
@@ -522,16 +595,23 @@ void QPSolverActiveSet::setNullSolution()
   // Initialize dual values
   multiplier_ = 0.0;
   combination_.setLength(gamma_length_);
+  combination_.scale(0.0);
   combination_translated_.setLength(gamma_length_);
-  dual_step_.setLength(gamma_length_);
-  dual_step_projection_scalar_ = 0.0;
-  dual_step_feasible_.setLength(gamma_length_);
-  dual_step_feasible_best_.setLength(gamma_length_);
+  combination_translated_.scale(0.0);
+  primal_solution_.setLength(gamma_length_);
+  primal_solution_.scale(0.0);
+  primal_solution_feasible_.setLength(gamma_length_);
+  primal_solution_feasible_.scale(0.0);
+  primal_solution_feasible_best_.setLength(gamma_length_);
+  primal_solution_feasible_best_.scale(0.0);
+  primal_solution_simple_.setLength(gamma_length_);
+  primal_solution_simple_.scale(0.0);
+  primal_solution_projection_scalar_ = 0.0;
 
 }  // end setNullSolution
 
 // Add vectors
-void QPSolverActiveSet::addData(const std::vector<std::shared_ptr<Vector> > vector_list,
+void QPSolverDualActiveSet::addData(const std::vector<std::shared_ptr<Vector> > vector_list,
                                 const std::vector<double> vector)
 {
 
@@ -544,91 +624,211 @@ void QPSolverActiveSet::addData(const std::vector<std::shared_ptr<Vector> > vect
 }  // end addData
 
 // Inexact termination condition
-bool QPSolverActiveSet::inexactTerminationCondition()
+bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter)
 {
 
-  // Finalize solution (to set omega_ and gamma_)
+  // Finalize solution to set omega and gamma
   finalizeSolution();
 
-  // Evaluate dual vectors
-  evaluateDualVectors();
+  /////////////////////////////////////////////////////////////////////////////
+  // EVALUATE DUAL OBJECTIVE CORRESPONDING TO CURRENT DUAL SOLUTION ESTIMATE //
+  /////////////////////////////////////////////////////////////////////////////
 
-  // Set "b"
-  Vector b((int)vector_.size());
+  // Initialize dual objective
+  double dual_objective = -0.5 * dualObjectiveQuadraticValue();
+
+  // Add linear term
   for (int i = 0; i < (int)vector_.size(); i++) {
-    b.values()[i] = vector_[i];
+    dual_objective += vector_[i] * omega_.values()[i];
   }
 
-  // Evaluate primal objective value
-  double primal_objective = -0.5*objectiveQuadraticValue() + omega_.innerProduct(b) - scalar_*gamma_.norm1();
-
-  // Evaluate dual objective value
-  Vector bPlusGd((int)vector_.size());
-  bPlusGd.copy(b);
-  for (int i = 0; i < (int)vector_.size(); i++) {
-    bPlusGd.values()[i] += vector_list_[i]->innerProduct(dual_step_feasible_);
-  }
-  double dual_objective = bPlusGd.max() + 0.5*objectiveQuadraticValueFeasible();
-
-  // Initialize in first iteration, else update best dual objective value
-  if (iteration_count_ == 0) {
-    //printf("\n");
-    //printf("inexact_termination_factor_ = %e\n",inexact_termination_factor_);
-    //printf("gamma^2 + 2*gamma           = %e\n",pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_);
-    //printf("%11s  %11s  %11s  %11s  %11s  %15s\n","prim-ref","prim-obj","dual-obj","dual-best","obj-ratio","term-ratio");
-    dual_objective_best_ = dual_objective;
-    dual_step_feasible_best_.copy(dual_step_feasible_);
-    primal_objective_reference_ = primal_objective;
-  }
-  else {
-    if (dual_objective < dual_objective_best_) {
-      dual_objective_best_ = dual_objective;
-      dual_step_feasible_best_.copy(dual_step_feasible_);
+  // Add norm term
+  if (scalar_ < NONOPT_DOUBLE_INFINITY) {
+    for (int i = 0; i < gamma_length_; i++) {
+      dual_objective -= scalar_ * gamma_.values()[i];
     }
-  }
+  }  // end if
+
+  //////////////////////////////////////////////////////////////////////////////////
+  // EVALUATE PRIMAL OBJECTIVE CORRESPONDING TO PRIMAL FEASIBLE SOLUTION ESTIMATE //
+  //////////////////////////////////////////////////////////////////////////////////
+
+  // Initialize primal objective
+  double primal_objective_feasible = 0.5 * dualObjectiveQuadraticValueScaled();
+
+  // Add max of linear terms
+  double bPlusGd_max = -NONOPT_DOUBLE_INFINITY;
+  for (int i = 0; i < (int)vector_.size(); i++) {
+    double bgd = vector_[i] + vector_list_[i]->innerProduct(primal_solution_feasible_);
+    if (bgd > bPlusGd_max) {
+      bPlusGd_max = bgd;
+    }
+  }  // end for
+  primal_objective_feasible += bPlusGd_max;
+
+  ////////////////////////////////////////////////////////////////////////////////
+  // EVALUATE PRIMAL OBJECTIVE CORRESPONDING TO SIMPLE PRIMAL FEASIBLE SOLUTION //
+  ////////////////////////////////////////////////////////////////////////////////
+
+  // Check iteration count
+  if (iteration_count_ == 1) {
+
+    // Set simple primal feasible solution based on average of gradients
+    for (int i = 0; i < (int)vector_list_.size(); i++) {
+      primal_solution_simple_.addScaledVector(1.0 / (double)vector_list_.size(), *vector_list_[i].get());
+    }
+    double projection_scalar_ = fmin(1.0, scalar_ / primal_solution_simple_.normInf());
+    primal_solution_simple_.scale(projection_scalar_);
+
+    // Initialize primal objective
+    primal_objective_simple_ = 0.5 * matrix_->innerProduct(primal_solution_simple_);
+
+    // Add max of linear terms
+    primal_objective_reference_ = -NONOPT_DOUBLE_INFINITY;
+    double bPlusGd_max = -NONOPT_DOUBLE_INFINITY;
+    for (int i = 0; i < (int)vector_.size(); i++) {
+      if (vector_[i] > primal_objective_reference_) {
+        primal_objective_reference_ = vector_[i];
+      }
+      double bgd = vector_[i] + vector_list_[i]->innerProduct(primal_solution_simple_);
+      if (bgd > bPlusGd_max) {
+        bPlusGd_max = bgd;
+      }
+    }  // end for
+    primal_objective_simple_ += bPlusGd_max;
+
+    // Check for reversion to zero solution
+    if (primal_objective_simple_ > primal_objective_reference_) {
+      primal_solution_simple_.scale(0.0);
+      primal_objective_simple_ = primal_objective_reference_;
+    }  // end if
+
+  }  // end if
+
+  ///////////////////////////////////////////////////
+  // UPDATE BEST PRIMAL FEASIBLE SOLUTION ESTIMATE //
+  ///////////////////////////////////////////////////
+
+  // Check iteration count
+  if (iteration_count_ == 1) {
+    dual_objective_reference_ = dual_objective;
+    if (primal_objective_feasible <= primal_objective_simple_) {
+      primal_objective_feasible_best_ = primal_objective_feasible;
+      primal_solution_feasible_best_.copy(primal_solution_feasible_);
+      primal_directional_derivative_feasible_best_ = vector_list_[0]->innerProduct(primal_solution_feasible_best_);
+      primal_quadratic_feasible_best_ = matrix_->innerProduct(primal_solution_feasible_best_);
+    }  // end if
+    else {
+      primal_objective_feasible_best_ = primal_objective_simple_;
+      primal_solution_feasible_best_.copy(primal_solution_simple_);
+      primal_directional_derivative_feasible_best_ = vector_list_[0]->innerProduct(primal_solution_feasible_best_);
+      primal_quadratic_feasible_best_ = matrix_->innerProduct(primal_solution_feasible_best_);
+    }  // end else
+  }    // end if
+  else {
+    if (primal_objective_feasible < primal_objective_feasible_best_) {
+      primal_objective_feasible_best_ = primal_objective_feasible;
+      primal_solution_feasible_best_.copy(primal_solution_feasible_);
+      primal_directional_derivative_feasible_best_ = vector_list_[0]->innerProduct(primal_solution_feasible_best_);
+      primal_quadratic_feasible_best_ = matrix_->innerProduct(primal_solution_feasible_best_);
+    }  // end if
+  }    // end else
+
+  //////////////////////
+  // CHECK CONDITIONS //
+  //////////////////////
 
   // Set objective ratio
-  double objective_ratio = (b.max() - primal_objective_reference_) / (b.max() - dual_objective_best_);
+  double objective_ratio = NONOPT_DOUBLE_INFINITY;
+  if (primal_objective_feasible_best_ < primal_objective_reference_) {
+    objective_ratio = (primal_objective_reference_ - dual_objective_reference_) / (primal_objective_reference_ - primal_objective_feasible_best_);
+  }
 
   // Set inexact termination ratio value
-  double inexact_termination_ratio = 1 - (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)/(objective_ratio - 1.0);
+  double inexact_termination_ratio = 1.0 - (pow(inexact_termination_factor_, 2.0) + 2 * inexact_termination_factor_) / (objective_ratio - 1.0);
 
-/*
-  printf("%+.4e  %+.4e  %+.4e  %+.4e  %+.4e  %+.4e  %+.4e  %+.4e  %+.4e  %+.4e\n",
-         b.max() - primal_objective_reference_,
-         b.max() - primal_objective,
-         b.max() - dual_objective,
-         b.max() - dual_objective_best_,
-         objective_ratio,
-         inexact_termination_ratio,
-         primal_objective - primal_objective_reference_,
-         fmax(inexact_termination_ratio,inexact_termination_ratio_min_)*(dual_objective_best_ - primal_objective_reference_),
-         (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)*(b.max() - dual_objective_best_),
-         dual_objective_best_ - primal_objective);
-*/
+  // Print information
+
+  if (iteration_count_ == 1) {
+    reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "===============================================================================================================================================================================\n");
+    reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "%8s %8s %8s %8s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s\n",
+                                                          "tol",
+                                                          "|G*o+g|W",
+                                                          "|G*o|i",
+                                                          "|G*o+g|i",
+                                                          "q_0",
+                                                          "q_k",
+                                                          "p_ref",
+                                                          "p_k",
+                                                          "p_best",
+                                                          "g'*p_b",
+                                                          "p_b*H*p_b",
+                                                          "lhs",
+                                                          "rhs",
+                                                          "p_b-q_0",
+                                                          "p_ref-p_b",
+                                                          "lhs",
+                                                          "rhs",
+                                                          "kkt");
+    reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "===============================================================================================================================================================================\n");
+  }  // end if
+  reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "%.2e %.2e %.2e %.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e\n",
+                   inexact_solution_tolerance_,
+                   primalSolutionNormInf(),
+                   combinationNormInf(),
+                   combinationTranslatedNormInf(),
+                   dual_objective_reference_,
+                   dual_objective,
+                   primal_objective_reference_,
+                   primal_objective_feasible,
+                   primal_objective_feasible_best_,
+                   primal_directional_derivative_feasible_best_,
+                   primal_quadratic_feasible_best_,
+                   dual_objective - dual_objective_reference_,
+                   fmax(inexact_termination_ratio, inexact_termination_ratio_min_) * (primal_objective_feasible_best_ - dual_objective_reference_),
+                   primal_objective_feasible_best_ - dual_objective_reference_,
+                   primal_objective_reference_ - primal_objective_feasible_best_,
+                   (pow(inexact_termination_factor_, 2.0) + 2 * inexact_termination_factor_) * (primal_objective_reference_ - primal_objective_feasible_best_),
+                   primal_objective_feasible_best_ - dual_objective,
+                   kkt_error_);
 
   // Initialize return value
   bool condition_bool = false;
 
-  // Check condition
-  if (dual_objective_best_ < b.max() &&
-      (primal_objective - primal_objective_reference_ >=
-      fmax(inexact_termination_ratio,inexact_termination_ratio_min_)*(dual_objective_best_ - primal_objective_reference_) ||
-       dual_objective_best_ - primal_objective <= (pow(inexact_termination_factor_,2.0) + 2*inexact_termination_factor_)*(b.max() - dual_objective_best_))) {
-    dual_step_feasible_.copy(dual_step_feasible_best_);
+  // Check "zero d" condition
+  if (primalSolutionNormInf() <= inexact_solution_tolerance_ &&
+      combinationNormInf() <= inexact_solution_tolerance_ &&
+      combinationTranslatedNormInf() <= inexact_solution_tolerance_) {
     condition_bool = true;
   }
+  // Check first "nonzero d" condition
+  else if (vector_list_[0]->innerProduct(primal_solution_feasible_) <= -1.0*kappa_ * dualObjectiveQuadraticValue() ){
+	  if (dual_objective - dual_objective_reference_ >=
+	           fmax(inexact_termination_ratio, inexact_termination_ratio_min_) * (primal_objective_feasible_best_ - dual_objective_reference_)) {
+	    primal_solution_.copy(primal_solution_feasible_best_);
+	    condition_bool = true;
+	  }  // end if
+	  // Check second "nonzero d" condition
+	  else if ((pow(inexact_termination_factor_, 2.0) + 2 * inexact_termination_factor_) * (primal_objective_reference_ - primal_objective_feasible_best_) >=
+	      primal_objective_feasible_best_ - dual_objective) {
+	    primal_solution_.copy(primal_solution_feasible_best_);
+	    condition_bool = true;
+	  }  // end if
+  }
+
 
   // Return
   return condition_bool;
 }
 
-
 // Solve
-void QPSolverActiveSet::solveQP(const Options* options,
-                                const Reporter* reporter)
+void QPSolverDualActiveSet::solveQP(const Options* options,
+                                const Reporter* reporter,
+								Quantities* quantities)
 {
 
+	inexact_termination_factor_=quantities->inexactTerminationFactor();
+	//std::cout<<"inexact factor 1 is "<<inexact_termination_factor_<<"\n";
   // Initialize values
   setStatus(QP_UNSET);
   setNullSolution();
@@ -648,8 +848,8 @@ void QPSolverActiveSet::solveQP(const Options* options,
     // Loop through vector list
     for (int i = 0; i < (int)vector_list_.size(); i++) {
 
-      // Compute objective value
-      double t = 0.5 * matrix_->innerProduct(*vector_list_[i]) - vector_[i];
+      // Compute objective value 0.5*g_i^T*W*g_i-b_i
+      double t = 0.5 * matrix_->innerProductOfInverse(*vector_list_[i]) - vector_[i];
 
       // Check for minimum
       if (t < value) {
@@ -671,9 +871,9 @@ void QPSolverActiveSet::solveQP(const Options* options,
     omega_positive_.push_back(index);
 
     // Set factor
-    factor_[0] = sqrt(1.0 + matrix_->innerProduct(*vector_list_[index]));
+    factor_[0] = sqrt(1.0 + matrix_->innerProductOfInverse(*vector_list_[index]));
 
-    // Set dual multiplier
+    // Set dual multiplier b_i-g_i^T*W*g_i
     multiplier_ = 1.0 + vector_[index] - pow(factor_[0], 2);
 
     // Set system solution
@@ -683,7 +883,7 @@ void QPSolverActiveSet::solveQP(const Options* options,
     inner_solution_2_[0] = vector_[index] / factor_[0];
 
     // Solve hot
-    solveQPHot(options, reporter);
+    solveQPHot(options, reporter, quantities);
 
   }  // end try
 
@@ -695,11 +895,13 @@ void QPSolverActiveSet::solveQP(const Options* options,
 }  // end solveQP
 
 // Solve hot
-void QPSolverActiveSet::solveQPHot(const Options* options,
-                                   const Reporter* reporter)
+void QPSolverDualActiveSet::solveQPHot(const Options* options,
+                                   const Reporter* reporter,
+								   Quantities* quantities)
 {
-
   // Initialize values
+	inexact_termination_factor_=quantities->inexactTerminationFactor();
+	//std::cout<<"inexact factor 2 is "<<inexact_termination_factor_<<"\n";
   setStatus(QP_UNSET);
   iteration_count_ = 0;
   kkt_error_ = -NONOPT_DOUBLE_INFINITY;
@@ -728,6 +930,15 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
 
     // Iteration loop
     while (true) {
+
+	  if (iteration_count_ == 0) {
+		reporter->printf(R_QP, R_PER_INNER_ITERATION, "======================================================================================================\n");
+		reporter->printf(R_QP, R_PER_INNER_ITERATION, "Starting iteration %6d and Inner iteration %6d\n",
+				quantities->iterationCounter(),
+				quantities->innerIterationCounter()
+		);
+		reporter->printf(R_QP, R_PER_INNER_ITERATION, "======================================================================================================\n");
+	  }  // end if
 
       // Print message
       if (iteration_count_ % 20 == 0) {
@@ -772,8 +983,8 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
       // Update best solution
       bool real_solution = updateBestSolution();
 
-      // Evaluate dual vectors
-      evaluateDualVectors();
+      // Evaluate primal vectors
+      evaluatePrimalVectors();
 
       // Check nan error
       if (!real_solution) {
@@ -789,9 +1000,9 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
       int kkt_residual_minimum_set;
       int kkt_residual_minimum_index;
 
-      // Evaluate omega's KKT error components
+      // Evaluate omega's KKT error components  -g_i^T*W*g_i-g_i^Td
       for (int i = 0; i < (int)vector_.size(); i++) {
-        kkt_residual_omega[i] = multiplier_ - vector_[i] - vector_list_[i]->innerProduct(dual_step_);
+        kkt_residual_omega[i] = multiplier_ - vector_[i] - vector_list_[i]->innerProduct(primal_solution_);
       }
 
       // Zero-out omega's KKT error components for positive set
@@ -801,7 +1012,7 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
 
       // Evaluate gamma's KKT error components for positive side
       for (int i = 0; i < gamma_length_; i++) {
-        kkt_residual_gamma_positive[i] = scalar_ - dual_step_.values()[i];
+        kkt_residual_gamma_positive[i] = scalar_ - primal_solution_.values()[i];
       }
 
       // Zero-out gamma's KKT error components for positive side and positive set
@@ -811,7 +1022,7 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
 
       // Evaluate gamma's KKT error components for negative side
       for (int i = 0; i < gamma_length_; i++) {
-        kkt_residual_gamma_negative[i] = scalar_ + dual_step_.values()[i];
+        kkt_residual_gamma_negative[i] = scalar_ + primal_solution_.values()[i];
       }
 
       // Zero-out gamma's KKT error components for negative side and negative set
@@ -871,14 +1082,34 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
                        kkt_residual_minimum_index,
                        kkt_error_);
 
+      // Increment iteration counter
+      iteration_count_++;
+
       // Check for successful solve
-      if (kkt_error_ >= -kkt_tolerance_ ||
-          (allow_inexact_termination_ && inexactTerminationCondition())) {
+      if (kkt_error_ >= -kkt_tolerance_) {
         THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
       }
 
+      // Check for inexact termination
+      if (allow_inexact_termination_){
+    	  if(do_skip_){
+    		  if( (iteration_count_-1==0 || (iteration_count_-1>=skip_factor_*(int)vector_.size()&&(iteration_count_-1)%4==0) )  && inexactTerminationCondition(reporter)){
+    			  THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
+    		  }
+    	  }
+    	  else if(inexactTerminationCondition(reporter)){
+    		  THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
+    	  }
+
+
+      }
+
+
+
+
+
       // Check for iteration limit
-      if (iteration_count_ >= iteration_limit) {
+      if (iteration_count_ -1 >= iteration_limit) {
         THROW_EXCEPTION(QP_ITERATION_LIMIT_EXCEPTION, "QP solve unsuccessful. Iteration limit reached.");
       }
 
@@ -889,8 +1120,7 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
                        kkt_residual_minimum_index,
                        kkt_residual_minimum_set);
 
-      // Increment iteration counter
-      iteration_count_++;
+
 
       // Evaluate new system vector
       evaluateSystemVector(kkt_residual_minimum_set, kkt_residual_minimum_index, new_system_vector);
@@ -906,10 +1136,10 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
 
       // Check which set is being updated
       if (kkt_residual_minimum_set == 1) {
-        new_diagonal_squared = 1.0 + matrix_->innerProduct(*vector_list_[kkt_residual_minimum_index]);
+        new_diagonal_squared = 1.0 + matrix_->innerProductOfInverse(*vector_list_[kkt_residual_minimum_index]);
       }
       else {
-        new_diagonal_squared = matrix_->element(kkt_residual_minimum_index, kkt_residual_minimum_index);
+        new_diagonal_squared = matrix_->elementOfInverse(kkt_residual_minimum_index, kkt_residual_minimum_index);
       }
 
       // Set inputs for blas
@@ -1121,7 +1351,7 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
       }  // end if
 
       // Compute multiplier
-      evaluateDualMultiplier(inner_solution_1_, inner_solution_2_);
+      evaluatePrimalMultiplier(inner_solution_1_, inner_solution_2_);
 
       // Set inner iteration limit
       int inner_iteration_limit = (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size();
@@ -1265,7 +1495,7 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
             setDelete(reporter, delete_set, delete_index, inner_solution_1_, inner_solution_2_);
 
             // Evaluate multiplier
-            evaluateDualMultiplier(inner_solution_1_, inner_solution_2_);
+            evaluatePrimalMultiplier(inner_solution_1_, inner_solution_2_);
 
           }  // end if
 
@@ -1349,13 +1579,13 @@ void QPSolverActiveSet::solveQPHot(const Options* options,
 }  // end solveQPHot
 
 // Print method
-void QPSolverActiveSet::printData(const Reporter* reporter)
+void QPSolverDualActiveSet::printData(const Reporter* reporter)
 {
   // Print matrix values
   reporter->printf(R_QP, R_BASIC, "\nMATRIX:\n");
   for (int i = 0; i < gamma_length_; i++) {
     for (int j = 0; j < gamma_length_; j++) {
-      reporter->printf(R_QP, R_BASIC, " %+23.16e", matrix_->element(i, j));
+      reporter->printf(R_QP, R_BASIC, " %+23.16e", matrix_->elementOfInverse(i, j));
     }
     reporter->printf(R_QP, R_BASIC, "\n");
   }  // end for
@@ -1382,7 +1612,7 @@ void QPSolverActiveSet::printData(const Reporter* reporter)
 }  // end printData
 
 // Check quantities
-bool QPSolverActiveSet::checkQuantityCompatibility()
+bool QPSolverDualActiveSet::checkQuantityCompatibility()
 {
 
   // Check for null pointer to matrix
@@ -1421,7 +1651,7 @@ bool QPSolverActiveSet::checkQuantityCompatibility()
 }  // end checkQuantityCompatibility
 
 // Update best solution
-bool QPSolverActiveSet::updateBestSolution()
+bool QPSolverDualActiveSet::updateBestSolution()
 {
 
   // Initialize boolean
@@ -1455,7 +1685,7 @@ bool QPSolverActiveSet::updateBestSolution()
 }  // end updateBestSolution
 
 // Cholesky augmentation
-bool QPSolverActiveSet::choleskyAugment(double system_vector[],
+bool QPSolverDualActiveSet::choleskyAugment(double system_vector[],
                                         int index,
                                         double solution1[],
                                         double value1,
@@ -1596,7 +1826,7 @@ bool QPSolverActiveSet::choleskyAugment(double system_vector[],
 }  // end choleskyAugment
 
 // Cholesky deletion
-void QPSolverActiveSet::choleskyDelete(int index,
+void QPSolverDualActiveSet::choleskyDelete(int index,
                                        double solution1[],
                                        double solution2[])
 {
@@ -1657,7 +1887,7 @@ void QPSolverActiveSet::choleskyDelete(int index,
 }  // end choleskyDelete
 
 // Cholesky factorization from scratch
-void QPSolverActiveSet::choleskyFromScratch(const Reporter* reporter)
+void QPSolverDualActiveSet::choleskyFromScratch(const Reporter* reporter)
 {
 
   // Set size of matrix
@@ -1678,7 +1908,7 @@ void QPSolverActiveSet::choleskyFromScratch(const Reporter* reporter)
   // Compute WG matrix
   for (int i = 0; i < (int)omega_positive_.size(); i++) {
     std::shared_ptr<Vector> product(new Vector(gamma_length_));
-    matrix_->matrixVectorProduct(*vector_list_[omega_positive_[i]], *product);
+    matrix_->matrixVectorProductOfInverse(*vector_list_[omega_positive_[i]], *product);
     WG.push_back(product);
   }  // end for
 
@@ -1706,21 +1936,21 @@ void QPSolverActiveSet::choleskyFromScratch(const Reporter* reporter)
   // Compute (2,2)-block (upper triangle)
   for (int i = 0; i < (int)gamma_positive_.size(); i++) {
     for (int j = i; j < (int)gamma_positive_.size(); j++) {
-      matrix[((int)omega_positive_.size() + i) * size + ((int)omega_positive_.size() + j)] = matrix_->element(gamma_positive_[i], gamma_positive_[j]);
+      matrix[((int)omega_positive_.size() + i) * size + ((int)omega_positive_.size() + j)] = matrix_->elementOfInverse(gamma_positive_[i], gamma_positive_[j]);
     }
   }  // end for
 
   // Compute (2,3)-block (upper triangle)
   for (int i = 0; i < (int)gamma_positive_.size(); i++) {
     for (int j = 0; j < (int)gamma_negative_.size(); j++) {
-      matrix[((int)omega_positive_.size() + i) * size + ((int)omega_positive_.size() + (int)gamma_positive_.size() + j)] = matrix_->element(gamma_positive_[i], gamma_negative_[j]);
+      matrix[((int)omega_positive_.size() + i) * size + ((int)omega_positive_.size() + (int)gamma_positive_.size() + j)] = matrix_->elementOfInverse(gamma_positive_[i], gamma_negative_[j]);
     }
   }  // end for
 
   // Compute (3,3)-block (upper triangle)
   for (int i = 0; i < (int)gamma_negative_.size(); i++) {
     for (int j = i; j < (int)gamma_negative_.size(); j++) {
-      matrix[((int)omega_positive_.size() + (int)gamma_positive_.size() + i) * size + ((int)omega_positive_.size() + (int)gamma_positive_.size() + j)] = matrix_->element(gamma_negative_[i], gamma_negative_[j]);
+      matrix[((int)omega_positive_.size() + (int)gamma_positive_.size() + i) * size + ((int)omega_positive_.size() + (int)gamma_positive_.size() + j)] = matrix_->elementOfInverse(gamma_negative_[i], gamma_negative_[j]);
     }
   }  // end for
 
@@ -1786,14 +2016,14 @@ void QPSolverActiveSet::choleskyFromScratch(const Reporter* reporter)
 }  // end choleskyFromScratch
 
 // Evaluate dual vectors
-void QPSolverActiveSet::evaluateDualVectors()
+void QPSolverDualActiveSet::evaluatePrimalVectors()
 {
 
   // Zero-out vectors
   combination_.scale(0.0);
   combination_translated_.scale(0.0);
-  dual_step_.scale(0.0);
-  dual_step_feasible_.scale(0.0);
+  primal_solution_.scale(0.0);
+  primal_solution_feasible_.scale(0.0);
 
   // Loop to compute gradient combination
   for (int i = 0; i < (int)omega_positive_best_.size(); i++) {
@@ -1812,19 +2042,19 @@ void QPSolverActiveSet::evaluateDualVectors()
   }
 
   // Compute matrix-vector product
-  matrix_->matrixVectorProduct(combination_translated_, dual_step_);
-  dual_step_.scale(-1.0);
+  matrix_->matrixVectorProductOfInverse(combination_translated_, primal_solution_);
+  primal_solution_.scale(-1.0);
 
-  // Compute feasible dual step by projection
-  dual_step_feasible_.copy(dual_step_);
-  dual_step_projection_scalar_ = fmin(1.0, scalar_ / dual_step_.normInf());
-  dual_step_feasible_.scale(dual_step_projection_scalar_);
+  // Compute feasible primal step by projection
+  primal_solution_feasible_.copy(primal_solution_);
+  primal_solution_projection_scalar_ = fmin(1.0, scalar_ / primal_solution_.normInf());
+  primal_solution_feasible_.scale(primal_solution_projection_scalar_);
 
-}  // end evaluateDualVectors
+}  // end evaluatePrimalVectors
 
-// Evaluate dual multiplier
-void QPSolverActiveSet::evaluateDualMultiplier(double solution1[],
-                                               double solution2[])
+// Evaluate primal multiplier
+void QPSolverDualActiveSet::evaluatePrimalMultiplier(double solution1[],
+                                                     double solution2[])
 {
 
   // Set inputs for blas
@@ -1838,12 +2068,12 @@ void QPSolverActiveSet::evaluateDualMultiplier(double solution1[],
   // Evaluate multiplier
   multiplier_ = (solution1_norm_squared + solution1_solution2 - 1.0) / solution1_norm_squared;
 
-}  // end evaluateDualMultiplier
+}  // end evaluatePrimalMultiplier
 
 // Evaluate system vector
-void QPSolverActiveSet::evaluateSystemVector(int set,
-                                             int index,
-                                             double system_vector[])
+void QPSolverDualActiveSet::evaluateSystemVector(int set,
+                                                 int index,
+                                                 double system_vector[])
 {
 
   // Set inputs for blas
@@ -1864,7 +2094,7 @@ void QPSolverActiveSet::evaluateSystemVector(int set,
     // Evaluate temporary vector
     for (int i = 0; i < gamma_length_; i++) {
       Vector col(gamma_length_, 0.0);
-      matrix_->column(i, col);
+      matrix_->columnOfInverse(i, col);
       temporary_vector[i] = vector_list_[index]->innerProduct(col);
     }  // end for
 
@@ -1876,14 +2106,14 @@ void QPSolverActiveSet::evaluateSystemVector(int set,
     // Set "gamma positive" values, i.e.,
     for (int i = 0; i < (int)gamma_positive_.size(); i++) {
       Vector col(gamma_length_, 0.0);
-      matrix_->column(gamma_positive_[i], col);
+      matrix_->columnOfInverse(gamma_positive_[i], col);
       system_vector[(int)omega_positive_.size() + i] = vector_list_[index]->innerProduct(col);
     }  // end for
 
     // Set "gamma negative" values, i.e.,
     for (int i = 0; i < (int)gamma_negative_.size(); i++) {
       Vector col(gamma_length_, 0.0);
-      matrix_->column(gamma_negative_[i], col);
+      matrix_->columnOfInverse(gamma_negative_[i], col);
       system_vector[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] = vector_list_[index]->innerProduct(col);
     }  // end for
 
@@ -1899,18 +2129,18 @@ void QPSolverActiveSet::evaluateSystemVector(int set,
     // Set "omega" values, i.e., ith value = G(:,omega_positive_[i])'*W(:,kkt_residual_minimum_index)
     for (int i = 0; i < (int)omega_positive_.size(); i++) {
       Vector col(gamma_length_, 0.0);
-      matrix_->column(index, col);
+      matrix_->columnOfInverse(index, col);
       system_vector[i] = vector_list_[omega_positive_[i]]->innerProduct(col);
     }  // end for
 
     // Set "gamma positive" values, i.e., W(gamma_positive_[i],kkt_residual_minimum_index)
     for (int i = 0; i < (int)gamma_positive_.size(); i++) {
-      system_vector[(int)omega_positive_.size() + i] = matrix_->element(gamma_positive_[i], index);
+      system_vector[(int)omega_positive_.size() + i] = matrix_->elementOfInverse(gamma_positive_[i], index);
     }
 
     // Set "gamma negative" values, i.e., W(gamma_positive_[i],kkt_residual_minimum_index)
     for (int i = 0; i < (int)gamma_negative_.size(); i++) {
-      system_vector[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] = matrix_->element(gamma_negative_[i], index);
+      system_vector[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] = matrix_->elementOfInverse(gamma_negative_[i], index);
     }
 
   }  // end else
@@ -1918,7 +2148,7 @@ void QPSolverActiveSet::evaluateSystemVector(int set,
 }  // end evaluateSystemVector
 
 // Finalize solution
-void QPSolverActiveSet::finalizeSolution()
+void QPSolverDualActiveSet::finalizeSolution()
 {
 
   // Set sizes
@@ -1951,13 +2181,13 @@ void QPSolverActiveSet::finalizeSolution()
 }  // end finalizeSolution
 
 // Set augment
-bool QPSolverActiveSet::setAugment(const Reporter* reporter,
-                                   int set,
-                                   int index,
-                                   double system_vector[],
-                                   double solution1[],
-                                   double solution2[],
-                                   double augmentation_value)
+bool QPSolverDualActiveSet::setAugment(const Reporter* reporter,
+                                       int set,
+                                       int index,
+                                       double system_vector[],
+                                       double solution1[],
+                                       double solution2[],
+                                       double augmentation_value)
 {
 
   // Initialize return value
@@ -2033,11 +2263,11 @@ bool QPSolverActiveSet::setAugment(const Reporter* reporter,
 }  // end setAugment
 
 // Set delete
-void QPSolverActiveSet::setDelete(const Reporter* reporter,
-                                  int set,
-                                  int index,
-                                  double solution1[],
-                                  double solution2[])
+void QPSolverDualActiveSet::setDelete(const Reporter* reporter,
+                                      int set,
+                                      int index,
+                                      double solution1[],
+                                      double solution2[])
 {
 
   // Check set from which to delete
@@ -2089,8 +2319,8 @@ void QPSolverActiveSet::setDelete(const Reporter* reporter,
 }  // end setDelete
 
 // Solve linear system
-void QPSolverActiveSet::solveSystem(double right_hand_side[],
-                                    double solution[])
+void QPSolverDualActiveSet::solveSystem(double right_hand_side[],
+                                        double solution[])
 {
 
   // Set inputs for blas
@@ -2110,8 +2340,8 @@ void QPSolverActiveSet::solveSystem(double right_hand_side[],
 }  // end solveSystem
 
 // Solve triangular system with transpose
-void QPSolverActiveSet::solveSystemTranspose(double right_hand_side[],
-                                             double solution[])
+void QPSolverDualActiveSet::solveSystemTranspose(double right_hand_side[],
+                                                 double solution[])
 {
 
   // Set inputs for blas

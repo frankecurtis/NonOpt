@@ -142,6 +142,7 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
     if (!evaluation_success) {
       quantities->setStepsize(0.0);
       THROW_EXCEPTION(LS_EVALUATION_FAILURE_EXCEPTION, "Line search unsuccessful. Evaluation failed.");
+      printf("bad func");
     }
 
     // Evaluate gradient at current point
@@ -151,6 +152,7 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
     if (!evaluation_success) {
       quantities->setStepsize(0.0);
       THROW_EXCEPTION(LS_EVALUATION_FAILURE_EXCEPTION, "Line search unsuccessful. Evaluation failed.");
+      printf("bad grad");
     }
 
     // Compute directional derivative
@@ -162,6 +164,10 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
 
     // Initialize stepsize
     quantities->setStepsize(fmin(stepsize_increase_factor_ * quantities->stepsize(), fmin(stepsize_initial_, stepsize_maximum_)));
+    if (quantities->stepsize() == 0.0) {
+      //printf("meet zero initial step\n");
+      quantities->setStepsize(stepsize_initial_);
+    }
 
     // Loop
     while (true) {
@@ -180,7 +186,8 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
       if (evaluation_success) {
 
         // Check for sufficient decrease
-        sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * strategies->qpSolver()->objectiveQuadraticValue());
+        //sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * strategies->qpSolver()->dualObjectiveQuadraticValue());
+        sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(),strategies->qpSolver()->primalSolutionNorm2Square()));
 
         // Check Armijo condition
         if (sufficient_decrease) {
@@ -212,6 +219,7 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
         // Check for failure on interval
         if (fail_on_small_interval_) {
           THROW_EXCEPTION(LS_INTERVAL_TOO_SMALL_EXCEPTION, "Line search unsuccessful.  Interval too small.");
+          printf("small interval");
         }
 
         // Evaluate objective at trial iterate

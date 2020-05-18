@@ -111,6 +111,14 @@ class Point
    */
   bool evaluateGradient(Quantities& quantities);
   /**
+   * Scale objective
+   */
+  void scaleObjective()
+  {
+    ASSERT_EXCEPTION(objective_evaluated_, NONOPT_FUNCTION_EVALUATION_ASSERT_EXCEPTION, "Objective should have been evaluated, but wasn't.");
+    objective_ *= scale_;
+  }
+  /**
    * Scale gradient
    */
   void scaleGradient()
@@ -122,6 +130,11 @@ class Point
 
   /** @name Get methods */
   //@{
+  /**
+   * Get pointer to Problem
+   * \return is pointer to Problem corresponding to point
+   */
+  inline std::shared_ptr<Problem> problem() const { return problem_; };
   /**
    * Get pointer to vector
    * \return is pointer to Vector defining point

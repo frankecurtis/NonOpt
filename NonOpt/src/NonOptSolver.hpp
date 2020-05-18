@@ -10,6 +10,7 @@
 #include <ctime>
 #include <memory>
 
+#include "NonOptDerivativeChecker.hpp"
 #include "NonOptEnumerations.hpp"
 #include "NonOptOptions.hpp"
 #include "NonOptProblem.hpp"
@@ -69,10 +70,20 @@ class NonOptSolver
    */
   inline int const iterations() const { return quantities_.iterationCounter(); };
   /**
+   * Get number of variables
+   * \return number of variables
+   */
+  inline int const numberOfVariables() const { return quantities_.numberOfVariables(); };
+  /**
    * Get inner iteration counter
    * \return total inner iterations performed so far
    */
   inline int const totalInnerIterations() const { return quantities_.totalInnerIterationCounter(); };
+  /**
+   * Get inner iteration counter
+   * \return total inner iterations performed so far
+   */
+  inline int const totalQPIterations() const { return quantities_.totalQPIterationCounter(); };
   /**
    * Get objective value
    * \return objective value of current iterate
@@ -155,7 +166,10 @@ class NonOptSolver
 
   /** @name Private members */
   //@{
+  bool check_derivatives_;
   double cpu_time_limit_;
+  double derivative_checker_increment_;
+  double derivative_checker_tolerance_;
   double iterate_norm_tolerance_;
   double stationarity_tolerance_;
   double stationarity_tolerance_factor_;
@@ -167,6 +181,7 @@ class NonOptSolver
 
   /** @name Private members, objects */
   //@{
+  DerivativeChecker derivative_checker_;
   Options options_;
   Quantities quantities_;
   Reporter reporter_;

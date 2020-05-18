@@ -32,7 +32,7 @@ class ChainedLQ : public Problem
   /**
    * Constructor
    */
-  ChainedLQ();
+  ChainedLQ(int n);
   //@}
 
   /** @name Destructor */
@@ -114,6 +114,11 @@ class ChainedLQ : public Problem
    * Overloaded equals operator
    */
   void operator=(const ChainedLQ&);
+  //@}
+
+  /** @name Private members */
+  //@{
+  int number_of_variables_; /**< Number of variables */
   //@}
 
 };  // end ChainedLQ

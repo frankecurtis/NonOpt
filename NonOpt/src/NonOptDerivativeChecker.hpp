@@ -31,8 +31,9 @@ class DerivativeChecker
   /**
    * Constructor
    */
-  DerivativeChecker(double increment)
-      : increment_(increment){};
+  DerivativeChecker()
+      : increment_(1e-8),
+        tolerance_(1e-4){};
   //@}
 
   /** @name Destructor */
@@ -40,17 +41,30 @@ class DerivativeChecker
   /**
    * Destructor
    */
-  ~DerivativeChecker();
+  ~DerivativeChecker(){};
+  //@}
+
+  /** @name Set methods */
+  //@{
+  /**
+   * Set increment
+   */
+  inline void setIncrement(double increment) { if (increment > 0.0) { increment_ = increment; } }
+  /**
+   * Set tolerance
+   */
+  inline void setTolerance(double tolerance) { if (tolerance > 0.0) { tolerance_ = tolerance; } }
   //@}
 
   /** @name Derivative checker methods */
   //@{
   /**
    * Check derivatives at a point
+   * \param[in] reporter is pointer to Reporter
    * \param[in] point is pointer to Point
    */
-  void checkDerivativesAtPoint(const Reporter *reporter,
-                               const Point *point) const;
+  void checkDerivatives(const Reporter *reporter,
+                        const std::shared_ptr<Point> point) const;
   //@}
 
  private:
@@ -71,6 +85,7 @@ class DerivativeChecker
   /** @name Private members */
   //@{
   double increment_;
+  double tolerance_;
   //@}
 
 };  // end DerivativeChecker

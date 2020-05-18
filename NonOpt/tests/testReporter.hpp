@@ -154,20 +154,20 @@ int testReporterImplementation(int option)
     result = 1;
   }
 
-  // Check option
-  if (option == 1) {
-    // Print message re: file reports
-    if (result == 0) {
-      printf("File reports are good!\n");
-    }
-    else {
-      printf("File reports did not print correctly!\n");
-    }
-  }  // end if
-
   // Delete files
   remove("NonOpt_filereport_NL.txt");
   remove("NonOpt_filereport_QP.txt");
+
+  // Check option
+  if (option == 1) {
+    // Print final message
+    if (result == 0) {
+      printf("TEST WAS SUCCESSFUL.\n");
+    }
+    else {
+      printf("TEST FAILED.\n");
+    }
+  }  // end if
 
   // Return
   return result;

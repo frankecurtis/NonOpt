@@ -9,7 +9,8 @@
 #include "ChainedCrescent_1.hpp"
 
 // Constructor
-ChainedCrescent_1::ChainedCrescent_1() {}
+ChainedCrescent_1::ChainedCrescent_1(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 ChainedCrescent_1::~ChainedCrescent_1() {}
@@ -19,7 +20,7 @@ bool ChainedCrescent_1::numberOfVariables(int& n)
 {
 
   // Set number of variables
-  n = 50;
+  n = number_of_variables_;
 
   // Return
   return true;

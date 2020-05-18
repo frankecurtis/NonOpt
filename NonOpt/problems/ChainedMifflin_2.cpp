@@ -9,7 +9,8 @@
 #include "ChainedMifflin_2.hpp"
 
 // Constructor
-ChainedMifflin_2::ChainedMifflin_2() {}
+ChainedMifflin_2::ChainedMifflin_2(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 ChainedMifflin_2::~ChainedMifflin_2() {}
@@ -19,7 +20,7 @@ bool ChainedMifflin_2::numberOfVariables(int& n)
 {
 
   // Set number of variables
-  n = 50;
+  n = number_of_variables_;
 
   // Return
   return true;

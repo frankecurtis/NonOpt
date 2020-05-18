@@ -9,7 +9,8 @@
 #include "MxHilb.hpp"
 
 // Constructor
-MxHilb::MxHilb() {}
+MxHilb::MxHilb(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 MxHilb::~MxHilb() {}
@@ -19,7 +20,7 @@ bool MxHilb::numberOfVariables(int& n)
 {
 
   // Set number of variables
-  n = 50;
+  n = number_of_variables_;
 
   // Return
   return true;

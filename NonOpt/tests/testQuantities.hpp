@@ -42,7 +42,7 @@ int testQuantitiesImplementation(int option)
   }  // end if
 
   // Declare problem
-  std::shared_ptr<MaxQ> problem(new MaxQ);
+  std::shared_ptr<MaxQ> problem(new MaxQ(50));
 
   // Declare quantities
   Quantities quantities;
@@ -169,6 +169,17 @@ int testQuantitiesImplementation(int option)
   quantities.currentIterate()->print(&reporter, "Current iterate (reset)");
   reporter.printf(R_NL, R_BASIC, "Stationarity radius (reset): %+23.16e\n", quantities.stationarityRadius());
   reporter.printf(R_NL, R_BASIC, "Trust region radius (reset): %+23.16e\n", quantities.trustRegionRadius());
+
+  // Check option
+  if (option == 1) {
+    // Print final message
+    if (result == 0) {
+      reporter.printf(R_NL, R_BASIC, "TEST WAS SUCCESSFUL.\n");
+    }
+    else {
+      reporter.printf(R_NL, R_BASIC, "TEST FAILED.\n");
+    }
+  }  // end if
 
   // Return
   return result;

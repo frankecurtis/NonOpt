@@ -47,7 +47,14 @@ NonOptSolver::~NonOptSolver()
 void NonOptSolver::addOptions()
 {
 
-  // Add double options (name, default value, lower bound, upper bound, description)
+  // Add bool options
+  options_.addBoolOption(&reporter_,
+                         "check_derivatives",
+                         false,
+                         "Determines whether to check derivatives at iterates.\n"
+                         "Default value: false.");
+
+  // Add double options
   options_.addDoubleOption(&reporter_,
                            "cpu_time_limit",
                            1e+04,
@@ -57,6 +64,20 @@ void NonOptSolver::addOptions()
                            "at the beginning of an iteration, so the true CPU time limit\n"
                            "also depends on the time required to a complete an iteration.\n"
                            "Default value: 1e+04.");
+  options_.addDoubleOption(&reporter_,
+                           "derivative_checker_increment",
+                           1e-08,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Increment for derivative checker.\n"
+                           "Default value: 1e-08.");
+  options_.addDoubleOption(&reporter_,
+                           "derivative_checker_tolerance",
+                           1e-04,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Tolerance for derivative checker.\n"
+                           "Default value: 1e-04.");
   options_.addDoubleOption(&reporter_,
                            "iterate_norm_tolerance",
                            1e+20,
@@ -88,7 +109,7 @@ void NonOptSolver::addOptions()
                            "stationarity_tolerance.\n"
                            "Default value: 1e+00.");
 
-  // Add integer options (name, default value, lower bound, upper bound, description)
+  // Add integer options
   options_.addIntegerOption(&reporter_,
                             "iteration_limit",
                             1e+04,
@@ -110,8 +131,13 @@ void NonOptSolver::addOptions()
 void NonOptSolver::setOptions()
 {
 
+  // Set bool options
+  options_.valueAsBool(&reporter_, "check_derivatives", check_derivatives_);
+
   // Set double options
   options_.valueAsDouble(&reporter_, "cpu_time_limit", cpu_time_limit_);
+  options_.valueAsDouble(&reporter_, "derivative_checker_increment", derivative_checker_increment_);
+  options_.valueAsDouble(&reporter_, "derivative_checker_tolerance", derivative_checker_tolerance_);
   options_.valueAsDouble(&reporter_, "iterate_norm_tolerance", iterate_norm_tolerance_);
   options_.valueAsDouble(&reporter_, "stationarity_tolerance", stationarity_tolerance_);
   options_.valueAsDouble(&reporter_, "stationarity_tolerance_factor", stationarity_tolerance_factor_);
@@ -169,17 +195,27 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
     // Determine problem scaling
     quantities_.currentIterate()->determineScale(quantities_);
 
+    // Scale evaluated objective
+    quantities_.currentIterate()->scaleObjective();
+
     // Scale evaluated gradient
     quantities_.currentIterate()->scaleGradient();
 
     // Initialize radii
     quantities_.initializeRadii(&options_, &reporter_);
 
+    // Initialize inexact termination factor
+    quantities_.initializeInexactTerminationFactor(&options_, &reporter_);
+
     // Store norm of initial point (for termination check)
     double initial_iterate_norm = quantities_.currentIterate()->vector()->norm2();
 
     // Initialize strategies
     strategies_.initialize(&options_, &quantities_, &reporter_);
+
+    // Set derivative checker increment and tolerance
+    derivative_checker_.setIncrement(derivative_checker_increment_);
+    derivative_checker_.setTolerance(derivative_checker_tolerance_);
 
     // Print header
     printHeader();
@@ -192,6 +228,11 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
 
       // Print iteration header
       printIterationHeader();
+
+      // Check derivatives?
+      if (check_derivatives_) {
+        derivative_checker_.checkDerivatives(&reporter_,quantities_.currentIterate());
+      }
 
       // Print quantities iteration values
       quantities_.printIterationValues(&reporter_);
@@ -220,19 +261,18 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
 
       // Check termination conditions
       if (quantities_.stationarityRadius() <= stationarity_tolerance_ &&
-          strategies_.qpSolver()->dualStepNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_ &&
-          strategies_.qpSolver()->combinationNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_ &&
-          strategies_.qpSolver()->combinationTranslatedNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_) {
+    		  strategies_.qpSolver()->combinationTranslatedNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_) {
         THROW_EXCEPTION(NONOPT_SUCCESS_EXCEPTION, "Stationary point found.");
       }
 
       // Check radius update conditions
       if (stationarity_tolerance_ < quantities_.stationarityRadius() &&
-          strategies_.qpSolver()->dualStepNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
+          strategies_.qpSolver()->primalSolutionNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
           strategies_.qpSolver()->combinationNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
           strategies_.qpSolver()->combinationTranslatedNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_) {
         quantities_.updateRadii(stationarity_tolerance_);
       }
+
 
       // Run line search
       strategies_.lineSearch()->runLineSearch(&options_, &quantities_, &reporter_, &strategies_);
@@ -255,6 +295,17 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
         quantities_.pointSet()->push_back(quantities_.currentIterate());
       }
 
+      // update inexact termination factor
+      if (stationarity_tolerance_ < quantities_.stationarityRadius() &&
+          strategies_.qpSolver()->primalSolutionNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
+          strategies_.qpSolver()->combinationNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
+          strategies_.qpSolver()->combinationTranslatedNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_) {
+        quantities_.initializeInexactTerminationFactor(&options_, &reporter_);
+      }
+      else if (quantities_.stepsize() < 1e-10) {// update sigma
+        quantities_.updateInexactTerminationFactor();
+      }
+
       // Update iterate
       quantities_.setCurrentIterate(quantities_.trialIterate());
 
@@ -271,6 +322,7 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
       if (strategies_.pointSetUpdate()->status() != PS_SUCCESS) {
         THROW_EXCEPTION(NONOPT_POINT_SET_UPDATE_FAILURE_EXCEPTION, "Point set update failed.");
       }
+
 
       // Print end of line
       reporter_.printf(R_NL, R_PER_ITERATION, "\n");

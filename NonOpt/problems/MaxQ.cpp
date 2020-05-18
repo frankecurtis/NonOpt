@@ -9,7 +9,8 @@
 #include "MaxQ.hpp"
 
 // Constructor
-MaxQ::MaxQ() {}
+MaxQ::MaxQ(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 MaxQ::~MaxQ() {}
@@ -19,7 +20,7 @@ bool MaxQ::numberOfVariables(int& n)
 {
 
   // Set number of variables
-  n = 50;
+  n = number_of_variables_;
 
   // Return
   return true;

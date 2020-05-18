@@ -26,7 +26,8 @@ class SymmetricMatrixDense : public SymmetricMatrix
     */
   SymmetricMatrixDense()
       : size_(-1),
-        values_(nullptr){};
+        values_(nullptr),
+        values_of_inverse_(nullptr){};
   //@}
 
   /** @name Destructor */
@@ -71,33 +72,61 @@ class SymmetricMatrixDense : public SymmetricMatrix
   /** @name Get methods */
   //@{
   /**
-   * Get column
+   * Get column of symmetric matrix
    * \param[in] index is index of column to return
    * \param[out] column is Vector to store column values
    */
   void const column(int column_index,
                     Vector& column);
   /**
-   * Get element (const)
-   * \param[in] row_index is row index number
-   * \param[in] column_index is column index number
-   * \return (row_index,column_index) element of matrix
+   * Get column of symmetric matrix inverse
+   * \param[in] index is index of column to return
+   * \param[out] column is Vector to store column values
    */
+  void const columnOfInverse(int column_index,
+                             Vector& column);
+  /**
+    * Get element of symmetric matrix
+    * \param[in] row_index is row index number
+    * \param[in] column_index is column index number
+    * \return (row_index,column_index) element of matrix
+    */
   double const element(int row_index,
                        int column_index);
   /**
-   * Get inner product with vector
+    * Get element of symmetric matrix inverse
+    * \param[in] row_index is row index number
+    * \param[in] column_index is column index number
+    * \return (row_index,column_index) element of matrix
+    */
+  double const elementOfInverse(int row_index,
+                                int column_index);
+  /**
+   * Get inner product of symmetric matrix with vector
    * \param[in] vector is reference to a Vector
    * \return inner product of vector with this vector
    */
   double innerProduct(const Vector& vector);
   /**
-   * Get product with vector
+   * Get inner product of symmetric matrix inverse with vector
+   * \param[in] vector is reference to a Vector
+   * \return inner product of vector with this vector
+   */
+  double innerProductOfInverse(const Vector& vector);
+  /**
+   * Get product of symmetric matrix with vector
    * \param[in] vector is reference to a Vector
    * \param[out] product is Vector to store product values
    */
   void matrixVectorProduct(const Vector& vector,
                            Vector& product);
+  /**
+   * Get product of symmetric matrix inverse with vector
+   * \param[in] vector is reference to a Vector
+   * \param[out] product is Vector to store product values
+   */
+  void matrixVectorProductOfInverse(const Vector& vector,
+                                    Vector& product);
   /**
    * Get name of strategy
    * \return string with name of strategy
@@ -109,15 +138,25 @@ class SymmetricMatrixDense : public SymmetricMatrix
     */
   inline int const size() const { return size_; };
   /**
-   * Get values (const)
-   * \return is pointer to array of SymmetricMatrixDense values
+   * Get values (const) of symmetric matrix
+   * \return is pointer to array of values
    */
   inline double* const values() const { return values_; };
   /**
-   * Get values (modifiable)
-   * \return is pointer to array of SymmetricMatrixDense values (to allow modification of array)
+   * Get values (const) of symmetric matrix inverse
+   * \return is pointer to array of values
+   */
+  inline double* const valuesOfInverse() const { return values_of_inverse_; };
+  /**
+   * Get values (modifiable) of symmetric matrix
+   * \return is pointer to array of values (to allow modification of array)
    */
   inline double* valuesModifiable() { return values_; };
+  /**
+   * Get values (modifiable) of symmetric matrix inverse
+   * \return is pointer to array of values (to allow modification of array)
+   */
+  inline double* valuesOfInverseModifiable() { return values_of_inverse_; };
   //@}
 
   /** @name Modify methods */
@@ -166,9 +205,10 @@ class SymmetricMatrixDense : public SymmetricMatrix
 
   /** @name Private members */
   //@{
-  int size_;       /**< Number of rows and number of columns */
-  int length_;     /**< Number of rows *   number of columns */
-  double* values_; /**< Double array                         */
+  int size_;                  /**< Number of rows and number of columns */
+  int length_;                /**< Number of rows *   number of columns */
+  double* values_;            /**< Double array */
+  double* values_of_inverse_; /**< Double array */
   //@}
 
   /** @name Indexing methods */

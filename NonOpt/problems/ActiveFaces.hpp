@@ -32,7 +32,7 @@ class ActiveFaces : public Problem
   /**
    * Constructor
    */
-  ActiveFaces();
+  ActiveFaces(int n);
   //@}
 
   /** @name Destructor */
@@ -114,6 +114,11 @@ class ActiveFaces : public Problem
    * Overloaded equals operator
    */
   void operator=(const ActiveFaces&);
+  //@}
+
+  /** @name Private members */
+  //@{
+  int number_of_variables_; /**< Number of variables */
   //@}
 
 };  // end ActiveFaces

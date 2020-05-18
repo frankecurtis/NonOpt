@@ -92,6 +92,9 @@ int main()
     printf("testing NonOpt.....................\n");
     testNonOptImplementation();
   }
+  else {
+    printf("testing NonOpt..................... skipped (due to failure above).\n");
+  }
 
   // Return
   return 0;

@@ -9,7 +9,8 @@
 #include "BrownFunction_2.hpp"
 
 // Constructor
-BrownFunction_2::BrownFunction_2() {}
+BrownFunction_2::BrownFunction_2(int n)
+    : number_of_variables_(n) {}
 
 // Destructor
 BrownFunction_2::~BrownFunction_2() {}
@@ -19,7 +20,7 @@ bool BrownFunction_2::numberOfVariables(int& n)
 {
 
   // Set number of variables
-  n = 50;
+  n = number_of_variables_;
 
   // Return
   return true;
