@@ -24,7 +24,7 @@ NonOptLIB         = $(NONOPTDIR)/NonOpt/src/libNonOpt.a
 NonOptProblemsLIB = $(NONOPTDIR)/NonOpt/problems/libNonOptProblems.a
 
 # Includes
-INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(NONOPTDIR)/NonOpt/problems -I /usr/local/include
+INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(NONOPTDIR)/NonOpt/problems
 
 # Rule for all
 all: $(EXES)

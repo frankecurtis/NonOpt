@@ -10,51 +10,56 @@ CXX = g++
 # C++ compiler flags
 CXXFLAGS = -g -Wall -std=c++11
 
-# Set sources, etc.
-headers = $(wildcard *.hpp)
-sources = $(wildcard *.cpp)
-objects = $(sources:.cpp=.o)
-depends = $(sources:.cpp=.d)
+# Library utility command
+AR = ar rv
 
-# Executable(s)
-EXES = $(sources:.cpp=)
+# Library
+LIB = libAMPLProblem.a
+
+# Executable
+EXE = solveAMPLProblem
 
 # Libraries
 NonOptLIB = $(NONOPTDIR)/NonOpt/src/libNonOpt.a
 AMPLLIB   = $(AMPLDIR)/amplsolver.a
 
 # Includes
-INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(AMPLDIR) -I /usr/local/include
+INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(AMPLDIR)
 
 # Rule for all
-all: $(EXES)
+all: $(LIB) $(EXE)
 
-# Dependence for executable
-$(EXES): % : %.o
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(AMPLLIB) -L $(LAPACKDIR) -ldl -lblas -llapack
+# Create library
+$(LIB): AMPLProblem.o
+	$(AR) $@ $<
 
-# Dependencies for executable
-$(EXES): $(NonOptLIB)
-
-# Rules for libraries
-$(NonOptLIB):
-	$(MAKE) --directory=$(NONOPTDIR)/NonOpt/src
-
-# Dependencies for libraries
-$(NonOptLIB): $(wildcard $(NONOPTDIR)/NonOpt/src/*.hpp) $(wildcard $(NONOPTDIR)/NonOpt/src/*.cpp)
-
-# Rule for .cpp.o
-.cpp.o:
+# Rule for object
+AMPLProblem.o: AMPLProblem.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
-# Objects depend on headers and sources
-$(objects): $(headers)
-$(objects): $(sources)
+# Dependence
+AMPLProblem.cpp: AMPLProblem.hpp
+
+# Create executable
+$(EXE): solveAMPLProblem.o
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(AMPLLIB) $(LIB) -L $(LAPACKDIR) -ldl -lblas -llapack
+
+# Rule for object
+solveAMPLProblem.o: solveAMPLProblem.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+# Dependencies
+$(LIB): $(NonOptLIB)
+$(EXE): $(NonOptLIB)
+
+# Rules
+$(NonOptLIB): $(wildcard $(NONOPTDIR)/NonOpt/src/*.hpp) $(wildcard $(NONOPTDIR)/NonOpt/src/*.cpp)
+	$(MAKE) --directory=$(NONOPTDIR)/NonOpt/src
 
 # Clean
 clean:
-	rm -f $(objects) $(depends)
+	rm -f AMPLProblem.o solveAMPLProblem.o
 
 # Very clean
 veryclean: clean
-	rm -f $(EXES)
+	rm -f $(LIB) $(EXE)

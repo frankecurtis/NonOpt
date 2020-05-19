@@ -29,7 +29,6 @@ int main(int argc, char* argv[])
 
   // Open file
   char nl_file[100];
-  strcpy(nl_file, (char*)"cute_unconstrained/");
   strcat(nl_file, argv[1]);
   strcat(nl_file, (char*)".nl");
 
