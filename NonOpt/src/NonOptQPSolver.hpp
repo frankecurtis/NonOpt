@@ -123,13 +123,20 @@ public:
   virtual double dualObjectiveQuadraticValue() = 0;
   /**
    * Get dual solution
-   * \param[out] vector is dual solution
+   * \param[out] omega is dual solution, omega part
+   * \param[out] gamma is dual solution, gamma part
    */
   virtual void dualSolution(double omega[], double gamma[]) = 0;
-
-  virtual int gamma_length() = 0;
-  virtual int omega_length() = 0;
-  virtual std::vector<double> dualSolution_omega() = 0;
+  /**
+   * Get dual solution, omega part
+   * \param[out] omega is dual solution, omega part
+   */
+  virtual void dualSolutionOmega(double omega[]) = 0;
+  /**
+   * Get dual solution, omega part, length
+   * \return dual solution, omega part, length
+   */
+  virtual int dualSolutionOmegaLength() = 0;
   /**
    * Get KKT error
    * \return solver's KKT error

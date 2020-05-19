@@ -17,7 +17,7 @@ using namespace NonOpt;
 class AMPLProblem : public Problem
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -98,7 +98,7 @@ class AMPLProblem : public Problem
                         const double* g);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -122,6 +122,6 @@ class AMPLProblem : public Problem
   char* stub_; /**< Stub, i.e., name of problem */
   //@}
 
-};  // end AMPLProblem
+}; // end AMPLProblem
 
 #endif /* __AMPLPROBLEM_HPP__ */

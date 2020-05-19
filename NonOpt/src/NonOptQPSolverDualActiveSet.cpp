@@ -377,14 +377,18 @@ void QPSolverDualActiveSet::dualSolution(double omega[], double gamma[])
 
 } // end dualSolution
 
-std::vector<double> QPSolverDualActiveSet::dualSolution_omega()
+// Get dual solution, omega part
+void QPSolverDualActiveSet::dualSolutionOmega(double omega[])
 {
-  std::vector<double> vec;
+
+  // Set inputs for blas
   int length = (int)vector_.size();
-  //	unsigned dataArraySize = sizeof(dataArray) / sizeof(int);
-  vec.insert(vec.end(), &omega_.values()[0], &omega_.values()[length]);
-  return vec;
-}
+  int increment = 1;
+
+  // Copy values
+  dcopy_(&length, omega_.values(), &increment, omega, &increment);
+
+} // end dualSolutionOmega
 
 // Get KKT error from dual solution
 double QPSolverDualActiveSet::KKTErrorDual()

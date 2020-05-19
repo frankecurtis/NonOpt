@@ -42,7 +42,7 @@ AMPLProblem::AMPLProblem(char* stub)
   // Read from nl
   fg_read(nl, 0);
 
-}  // end AMPLProblem
+} // end AMPLProblem
 
 // Destructor
 AMPLProblem::~AMPLProblem() {}
@@ -57,7 +57,7 @@ bool AMPLProblem::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool AMPLProblem::initialPoint(int n,
@@ -72,7 +72,7 @@ bool AMPLProblem::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool AMPLProblem::evaluateObjective(int n,
@@ -93,7 +93,7 @@ bool AMPLProblem::evaluateObjective(int n,
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool AMPLProblem::evaluateGradient(int n,
@@ -114,7 +114,7 @@ bool AMPLProblem::evaluateGradient(int n,
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool AMPLProblem::finalizeSolution(int n,

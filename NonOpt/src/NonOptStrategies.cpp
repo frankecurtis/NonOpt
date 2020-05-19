@@ -5,7 +5,6 @@
 // Author(s) : Frank E. Curtis
 
 #include "NonOptStrategies.hpp"
-#include "NonOptDirectionComputationAggregation.hpp"
 #include "NonOptDirectionComputationCuttingPlane.hpp"
 #include "NonOptDirectionComputationGradient.hpp"
 #include "NonOptDirectionComputationGradientCombination.hpp"
@@ -64,8 +63,6 @@ void Strategies::addOptions(Options* options,
   direction_computation = std::make_shared<DirectionComputationGradient>();
   direction_computation->addOptions(options, reporter);
   direction_computation = std::make_shared<DirectionComputationGradientCombination>();
-  direction_computation->addOptions(options, reporter);
-  direction_computation = std::make_shared<DirectionComputationAggregation>();
   direction_computation->addOptions(options, reporter);
   // ADD NEW DIRECTION COMPUTATION STRATEGIES HERE AND IN SWITCH BELOW //
 
@@ -135,9 +132,6 @@ void Strategies::setOptions(const Options* options,
   }
   else if (direction_computation_name.compare("GradientCombination") == 0) {
     direction_computation_ = std::make_shared<DirectionComputationGradientCombination>();
-  }
-  else if (direction_computation_name.compare("Aggregation") == 0) {
-    direction_computation_ = std::make_shared<DirectionComputationAggregation>();
   }
   else {
     direction_computation_ = std::make_shared<DirectionComputationCuttingPlane>();

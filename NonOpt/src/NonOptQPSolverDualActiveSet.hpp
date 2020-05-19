@@ -102,14 +102,20 @@ public:
   double dualObjectiveQuadraticValueScaled();
   /**
    * Get dual solution
-   * \param[out] vector is dual solution
+   * \param[out] omega is dual solution, omega part
+   * \param[out] gamma is dual solution, gamma part
    */
   void dualSolution(double omega[], double gamma[]);
-
-  int gamma_length() { return gamma_length_; }
-  int omega_length() { return (int)vector_.size(); };
-
-  std::vector<double> dualSolution_omega();
+  /**
+   * Get dual solution, omega part
+   * \param[out] omega is dual solution, omega part
+   */
+  void dualSolutionOmega(double omega[]);
+  /**
+   * Get dual solution, omega part, length
+   * \return dual solution, omega part, length
+   */
+  int dualSolutionOmegaLength() { return (int)vector_.size(); };
   /**
    * Get KKT error
    * \return solver's KKT error
@@ -125,7 +131,7 @@ public:
    * \return number of iterations performed
    */
   int numberOfIterations() { return iteration_count_; };
-  ;
+
   /**
    * Get primal solution
    * \param[out] "d" (equal to "-W*(G*omega + gamma)" if solution is exact)
@@ -155,8 +161,7 @@ public:
    * Get name of strategy
    * \return string with name of strategy
    */
-  std::string name() { return "ActiveSet"; };
-  ;
+  std::string name() { return "DualActiveSet"; };
   //@}
 
   /** @name Set methods */

@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
   // Check number of input arguments
   if (argc < 2) {
     printf("Too few arguments. Quitting.\n");
-    printf("%s",usage.c_str());
+    printf("%s", usage.c_str());
     return 1;
   }
 
@@ -44,4 +44,4 @@ int main(int argc, char* argv[])
   // Return
   return 0;
 
-}  // end main
+} // end main
