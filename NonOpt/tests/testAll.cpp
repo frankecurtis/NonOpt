@@ -4,6 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
+#include <cstdio>
+
 #include "testNonOpt.hpp"
 #include "testOptions.hpp"
 #include "testPoint.hpp"
@@ -89,7 +91,7 @@ int main()
 
   // Test algorithm if results are good
   if (result == 0) {
-    printf("testing NonOpt.....................\n");
+    printf("testing NonOpt..................... ");
     testNonOptImplementation();
   }
   else {
@@ -99,4 +101,4 @@ int main()
   // Return
   return 0;
 
-}  // end main
+} // end main

@@ -16,7 +16,7 @@ namespace NonOpt
 class Problem
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -85,7 +85,7 @@ class Problem
                                 const double* g) = 0;
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -100,8 +100,8 @@ class Problem
   void operator=(const Problem&);
   //@}
 
-};  // end Problem
+}; // end Problem
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTPROBLEM_HPP__ */

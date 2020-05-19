@@ -36,7 +36,7 @@ int testOptionsImplementation(int option)
     // Add stream report to reporter
     reporter.addReport(sr);
 
-  }  // end if
+  } // end if
 
   // Declare option
   Options o;
@@ -346,11 +346,11 @@ int testOptionsImplementation(int option)
     else {
       reporter.printf(R_NL, R_BASIC, "TEST FAILED.\n");
     }
-  }  // end if
+  } // end if
 
   // Return
   return result;
 
-}  // end testOptionsImplementation
+} // end testOptionsImplementation
 
 #endif /* __TESTOPTIONS_HPP__ */

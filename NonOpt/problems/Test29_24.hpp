@@ -26,7 +26,7 @@ using namespace NonOpt;
 class Test29_24 : public Problem
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -101,7 +101,7 @@ class Test29_24 : public Problem
                         const double* g);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -121,6 +121,6 @@ class Test29_24 : public Problem
   int number_of_variables_; /**< Number of variables */
   //@}
 
-};  // end Test29_24
+}; // end Test29_24
 
 #endif /* __Test29_24_HPP__ */

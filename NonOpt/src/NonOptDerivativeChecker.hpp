@@ -25,15 +25,15 @@ class Reporter;
 class DerivativeChecker
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
    * Constructor
    */
   DerivativeChecker()
-      : increment_(1e-8),
-        tolerance_(1e-4){};
+    : increment_(1e-8),
+      tolerance_(1e-4){};
   //@}
 
   /** @name Destructor */
@@ -49,11 +49,21 @@ class DerivativeChecker
   /**
    * Set increment
    */
-  inline void setIncrement(double increment) { if (increment > 0.0) { increment_ = increment; } }
+  inline void setIncrement(double increment)
+  {
+    if (increment > 0.0) {
+      increment_ = increment;
+    }
+  }
   /**
    * Set tolerance
    */
-  inline void setTolerance(double tolerance) { if (tolerance > 0.0) { tolerance_ = tolerance; } }
+  inline void setTolerance(double tolerance)
+  {
+    if (tolerance > 0.0) {
+      tolerance_ = tolerance;
+    }
+  }
   //@}
 
   /** @name Derivative checker methods */
@@ -63,11 +73,11 @@ class DerivativeChecker
    * \param[in] reporter is pointer to Reporter
    * \param[in] point is pointer to Point
    */
-  void checkDerivatives(const Reporter *reporter,
+  void checkDerivatives(const Reporter* reporter,
                         const std::shared_ptr<Point> point) const;
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -75,11 +85,11 @@ class DerivativeChecker
   /**
    * Copy constructor
    */
-  DerivativeChecker(const DerivativeChecker &);
+  DerivativeChecker(const DerivativeChecker&);
   /**
    * Overloaded equals operator
    */
-  void operator=(const DerivativeChecker &);
+  void operator=(const DerivativeChecker&);
   //@}
 
   /** @name Private members */
@@ -88,8 +98,8 @@ class DerivativeChecker
   double tolerance_;
   //@}
 
-};  // end DerivativeChecker
+}; // end DerivativeChecker
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTDERIVATIVECHECKER_HPP__ */

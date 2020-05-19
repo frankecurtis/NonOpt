@@ -35,7 +35,7 @@ class Vector;
 class Quantities
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -171,7 +171,7 @@ class Quantities
    * Get point set
    * \return pointer to vector of pointers to Points representing current point set
    */
-  inline std::shared_ptr<std::vector<std::shared_ptr<Point> > > pointSet() { return point_set_; };
+  inline std::shared_ptr<std::vector<std::shared_ptr<Point>>> pointSet() { return point_set_; };
   /**
    * Get scaling threshold
    * \return scaling threshold
@@ -223,14 +223,14 @@ class Quantities
   /**
    * Update inexact_termination_factor
    */
-  inline void updateInexactTerminationFactor(){inexact_termination_factor_=inexact_termination_factor_*inexact_termination_update_factor_;};
+  inline void updateInexactTerminationFactor() { inexact_termination_factor_ = inexact_termination_factor_ * inexact_termination_update_factor_; };
   /**
    * Initialize inexact termination factor
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    */
   inline void initializeInexactTerminationFactor(const Options* options,
-          const Reporter* reporter){inexact_termination_factor_=inexact_termination_factor_initial_;};
+                                                 const Reporter* reporter) { inexact_termination_factor_ = inexact_termination_factor_initial_; };
   /**
    * Get trust inexact termination factor
    * \return current inexact termination factor
@@ -330,7 +330,7 @@ class Quantities
   void finalize();
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -361,7 +361,7 @@ class Quantities
   std::shared_ptr<Point> current_iterate_;
   std::shared_ptr<Point> trial_iterate_;
   std::shared_ptr<Vector> direction_;
-  std::shared_ptr<std::vector<std::shared_ptr<Point> > > point_set_;
+  std::shared_ptr<std::vector<std::shared_ptr<Point>>> point_set_;
   double stationarity_radius_;
   double trust_region_radius_;
   double stepsize_;
@@ -383,8 +383,8 @@ class Quantities
   int gradient_evaluation_limit_;
   //@}
 
-};  // end Quantities
+}; // end Quantities
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTITERATIONQUANTITIES_HPP__ */

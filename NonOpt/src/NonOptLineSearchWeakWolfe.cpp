@@ -90,7 +90,7 @@ void LineSearchWeakWolfe::addOptions(Options* options,
                            "then the line search terminates.\n"
                            "Default value: 1e-20.");
 
-}  // end addOptions
+} // end addOptions
 
 // Set options
 void LineSearchWeakWolfe::setOptions(const Options* options,
@@ -110,7 +110,7 @@ void LineSearchWeakWolfe::setOptions(const Options* options,
   options->valueAsDouble(reporter, "LSWW_stepsize_increase_factor", stepsize_increase_factor_);
   options->valueAsDouble(reporter, "LSWW_stepsize_bound_tolerance", stepsize_bound_tolerance_);
 
-}  // end setOptions
+} // end setOptions
 
 // Initialize
 void LineSearchWeakWolfe::initialize(const Options* options,
@@ -187,7 +187,7 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
 
         // Check for sufficient decrease
         //sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * strategies->qpSolver()->dualObjectiveQuadraticValue());
-        sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(),strategies->qpSolver()->primalSolutionNorm2Square()));
+        sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(), strategies->qpSolver()->primalSolutionNorm2Square()));
 
         // Check Armijo condition
         if (sufficient_decrease) {
@@ -206,11 +206,11 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
               THROW_EXCEPTION(LS_SUCCESS_EXCEPTION, "Line search successful.");
             }
 
-          }  // end if
+          } // end if
 
-        }  // end if
+        } // end if
 
-      }  // end if
+      } // end if
 
       // Check if stepsize near bound
       if (quantities->stepsize() <= stepsize_minimum + stepsize_bound_tolerance_ ||
@@ -239,9 +239,9 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
               THROW_EXCEPTION(LS_SUCCESS_EXCEPTION, "Line search successful.");
             }
 
-          }  // end if
+          } // end if
 
-        }  // end if
+        } // end if
 
         // Set null step
         quantities->setStepsize(0.0);
@@ -252,7 +252,7 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
         // Terminate
         THROW_EXCEPTION(LS_SUCCESS_EXCEPTION, "Line search successful.");
 
-      }  // end if
+      } // end if
 
       // Update lower or upper bound
       if (sufficient_decrease && evaluation_success) {
@@ -265,24 +265,22 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
       // Update stepsize
       quantities->setStepsize((1 - stepsize_decrease_factor_) * stepsize_minimum + stepsize_decrease_factor_ * stepsize_maximum);
 
-    }  // end while
+    } // end while
 
-  }  // end try
+  } // end try
 
   // catch exceptions
   catch (LS_SUCCESS_EXCEPTION& exec) {
     setStatus(LS_SUCCESS);
-  }
-  catch (LS_EVALUATION_FAILURE_EXCEPTION& exec) {
+  } catch (LS_EVALUATION_FAILURE_EXCEPTION& exec) {
     setStatus(LS_EVALUATION_FAILURE);
-  }
-  catch (LS_STEPSIZE_TOO_SMALL_EXCEPTION& exec) {
+  } catch (LS_STEPSIZE_TOO_SMALL_EXCEPTION& exec) {
     setStatus(LS_STEPSIZE_TOO_SMALL);
-  }  // end catch
+  } // end catch
 
   // Print iterate information
   reporter->printf(R_NL, R_PER_ITERATION, "  %+.4e", quantities->stepsize());
 
-}  // end runLineSearch
+} // end runLineSearch
 
-}  // namespace NonOpt
+} // namespace NonOpt

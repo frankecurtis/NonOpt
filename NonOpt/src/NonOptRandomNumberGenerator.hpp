@@ -18,7 +18,7 @@ namespace NonOpt
 class RandomNumberGenerator
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -48,7 +48,7 @@ class RandomNumberGenerator
   };
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -56,11 +56,11 @@ class RandomNumberGenerator
   /**
    * Copy constructor
    */
-  RandomNumberGenerator(const RandomNumberGenerator &);
+  RandomNumberGenerator(const RandomNumberGenerator&);
   /**
    * Overloaded equals operator
    */
-  void operator=(const RandomNumberGenerator &);
+  void operator=(const RandomNumberGenerator&);
   //@}
 
   /** @name * Private members */
@@ -68,8 +68,8 @@ class RandomNumberGenerator
   std::default_random_engine generator; /**< Random number generator */
   //@}
 
-};  // end RandomNumberGenerator
+}; // end RandomNumberGenerator
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTRANDOMNUMBERGENERATOR_HPP__ */

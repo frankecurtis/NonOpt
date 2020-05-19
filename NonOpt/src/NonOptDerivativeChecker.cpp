@@ -11,7 +11,7 @@ namespace NonOpt
 {
 
 // Check derivatives
-void DerivativeChecker::checkDerivatives(const Reporter *reporter,
+void DerivativeChecker::checkDerivatives(const Reporter* reporter,
                                          const std::shared_ptr<Point> point) const
 {
 
@@ -52,16 +52,16 @@ void DerivativeChecker::checkDerivatives(const Reporter *reporter,
       // Print message
       reporter->printf(R_NL, R_PER_ITERATION, "\n  g[%8d] = evaluation error", i);
 
-    }  // end if
+    } // end if
     else {
 
       // Evaluate errors
-      double finite_difference_derivative_forward = (objective_plus - point->objective())/increment_;
-      double finite_difference_derivative_backward = (point->objective() - objective_minus)/increment_;
-      double finite_difference_derivative_central = (objective_plus - objective_minus)/(2*increment_);
-      double error_forward = fabs(finite_difference_derivative_forward - point->gradient()->values()[i]) / fmax(finite_difference_derivative_central,1.0);
-      double error_backward = fabs(finite_difference_derivative_backward - point->gradient()->values()[i]) / fmax(finite_difference_derivative_central,1.0);
-      double error_central = fabs(finite_difference_derivative_central - point->gradient()->values()[i]) / fmax(finite_difference_derivative_central,1.0);
+      double finite_difference_derivative_forward = (objective_plus - point->objective()) / increment_;
+      double finite_difference_derivative_backward = (point->objective() - objective_minus) / increment_;
+      double finite_difference_derivative_central = (objective_plus - objective_minus) / (2 * increment_);
+      double error_forward = fabs(finite_difference_derivative_forward - point->gradient()->values()[i]) / fmax(finite_difference_derivative_central, 1.0);
+      double error_backward = fabs(finite_difference_derivative_backward - point->gradient()->values()[i]) / fmax(finite_difference_derivative_central, 1.0);
+      double error_central = fabs(finite_difference_derivative_central - point->gradient()->values()[i]) / fmax(finite_difference_derivative_central, 1.0);
 
       // Set best error
       double finite_difference_derivative, error;
@@ -87,14 +87,14 @@ void DerivativeChecker::checkDerivatives(const Reporter *reporter,
         // Print message
         reporter->printf(R_NL, R_PER_ITERATION, "\n  g[%8d]=%+23.16e != %+23.16e", i, point->gradient()->values()[i], finite_difference_derivative);
 
-      }  // end if
-    }    // end else
+      } // end if
+    }   // end else
 
     // Remove perturbations from element
     perturbation_plus->valuesModifiable()[i] -= increment_;
     perturbation_minus->valuesModifiable()[i] += increment_;
 
-  }  // end for
+  } // end for
 
   // Check poor count
   if (poor_count == 0) {
@@ -104,6 +104,6 @@ void DerivativeChecker::checkDerivatives(const Reporter *reporter,
     reporter->printf(R_NL, R_PER_ITERATION, "\nErrors above due to nonsmoothness at point or bug in gradient computation.\n");
   }
 
-}  // end checkDerivativesAtPoint
+} // end checkDerivativesAtPoint
 
-}  // namespace NonOpt
+} // namespace NonOpt

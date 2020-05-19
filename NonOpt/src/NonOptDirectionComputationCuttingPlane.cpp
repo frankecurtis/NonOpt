@@ -83,7 +83,7 @@ void DirectionComputationCuttingPlane::addOptions(Options* options,
                             "Limit on the number of inner iterations that will be performed.\n"
                             "Default value: 2e+01.");
 
-}  // end addOptions
+} // end addOptions
 
 // Set options
 void DirectionComputationCuttingPlane::setOptions(const Options* options,
@@ -104,7 +104,7 @@ void DirectionComputationCuttingPlane::setOptions(const Options* options,
   // Read integer options
   options->valueAsInteger(reporter, "DCCP_inner_iteration_limit", inner_iteration_limit_);
 
-}  // end setOptions
+} // end setOptions
 
 // Initialize
 void DirectionComputationCuttingPlane::initialize(const Options* options,
@@ -160,7 +160,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
     }
 
     // Declare QP quantities
-    std::vector<std::shared_ptr<Vector> > QP_gradient_list;
+    std::vector<std::shared_ptr<Vector>> QP_gradient_list;
     std::vector<double> QP_vector;
 
     // Add pointer to current gradient to list
@@ -194,11 +194,11 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
           // Add linear term value based on cutting plane
           QP_vector.push_back(fmin(linearization_value, downshifting_value));
 
-        }  // end if
+        } // end if
 
-      }  // end if
+      } // end if
 
-    }  // end for
+    } // end for
 
     // Set QP data
     strategies->qpSolver()->setVectorList(QP_gradient_list);
@@ -207,7 +207,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
     strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
 
     // Solve QP
-    strategies->qpSolver()->solveQP(options, reporter,quantities);
+    strategies->qpSolver()->solveQP(options, reporter, quantities);
 
     // Convert QP solution to step
     convertQPSolutionToStep(quantities, strategies);
@@ -235,12 +235,12 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
       strategies->qpSolver()->setVector(QP_vector);
 
       // Solve QP
-      strategies->qpSolver()->solveQP(options, reporter,quantities);
+      strategies->qpSolver()->solveQP(options, reporter, quantities);
 
       // Convert QP solution to step
       convertQPSolutionToStep(quantities, strategies);
 
-    }  // end if
+    } // end if
 
     // Inner loop
     while (true) {
@@ -253,7 +253,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
       // Check for sufficient decrease
       if (evaluation_success &&
-          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(),strategies->qpSolver()->primalSolutionNorm2Square())  ||
+          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(), strategies->qpSolver()->primalSolutionNorm2Square()) ||
            (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
@@ -268,10 +268,10 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
         else {
           THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
         }
-      }  // end if
+      } // end if
 
       // Declare new QP data
-      std::vector<std::shared_ptr<Vector> > QP_gradient_list_new;
+      std::vector<std::shared_ptr<Vector>> QP_gradient_list_new;
       std::vector<double> QP_vector_new;
 
       // Check if adding far points
@@ -302,11 +302,11 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
             // Add linear term value based on cutting plane
             QP_vector_new.push_back(fmin(linearization_value, downshifting_value));
 
-          }  // end if
+          } // end if
 
-        }  // end if
+        } // end if
 
-      }  // end if
+      } // end if
 
       // Try shortened step?
       if (try_shortened_step_) {
@@ -322,7 +322,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
         // Check for sufficient decrease
         if (evaluation_success &&
-            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(),strategies->qpSolver()->primalSolutionNorm2Square()) ||
+            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(), strategies->qpSolver()->primalSolutionNorm2Square()) ||
              (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
               strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
               strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
@@ -354,22 +354,14 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
             // Add linear term value based on cutting plane
             QP_vector_new.push_back(fmin(linearization_value, downshifting_value));
 
-          }  // end if
+          } // end if
 
-        }  // end if
+        } // end if
 
-      }  // end if (try_shortened_step_)
+      } // end if (try_shortened_step_)
 
       // Print QP solve / step information
-      reporter->printf(R_NL, R_PER_INNER_ITERATION,
-                       "  %10d  %10d  %2d  %+.4e  %+.4e  %+.4e  %+.4e",
-                       quantities->innerIterationCounter(),
-                       quantities->QPIterationCounter(),
-                       strategies->qpSolver()->status(),
-                       strategies->qpSolver()->KKTErrorDual(),
-                       strategies->qpSolver()->combinationNormInf(),
-                       strategies->qpSolver()->primalSolutionNormInf(),
-                       strategies->qpSolver()->dualObjectiveQuadraticValue());
+      reporter->printf(R_NL, R_PER_INNER_ITERATION, "  %10d  %10d  %2d  %+.4e  %+.4e  %+.4e  %+.4e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
       // Set blank solve string
       std::string blank_solve = "";
@@ -387,16 +379,13 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
       }
 
       // Print blank solve information
-      reporter->printf(R_NL, R_PER_INNER_ITERATION,
-                       "%s\n%s",
-                       blank_solve.c_str(),
-                       quantities->iterationNullValues().c_str());
+      reporter->printf(R_NL, R_PER_INNER_ITERATION, "%s\n%s", blank_solve.c_str(), quantities->iterationNullValues().c_str());
 
       // Add QP data
       strategies->qpSolver()->addData(QP_gradient_list_new, QP_vector_new);
 
       // Solve QP hot
-      strategies->qpSolver()->solveQPHot(options, reporter,quantities);
+      strategies->qpSolver()->solveQPHot(options, reporter, quantities);
 
       // Convert QP solution to step
       convertQPSolutionToStep(quantities, strategies);
@@ -424,41 +413,30 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
         strategies->qpSolver()->setVector(QP_vector);
 
         // Solve QP
-        strategies->qpSolver()->solveQP(options, reporter,quantities);
+        strategies->qpSolver()->solveQP(options, reporter, quantities);
 
         // Convert QP solution to step
         convertQPSolutionToStep(quantities, strategies);
 
-      }  // end if
+      } // end if
 
-    }  // end while
+    } // end while
 
-  }  // end try
+  } // end try
 
   // catch exceptions
   catch (DC_SUCCESS_EXCEPTION& exec) {
     setStatus(DC_SUCCESS);
-  }
-  catch (DC_EVALUATION_FAILURE_EXCEPTION& exec) {
+  } catch (DC_EVALUATION_FAILURE_EXCEPTION& exec) {
     setStatus(DC_EVALUATION_FAILURE);
-  }
-  catch (DC_ITERATION_LIMIT_EXCEPTION& exec) {
+  } catch (DC_ITERATION_LIMIT_EXCEPTION& exec) {
     setStatus(DC_ITERATION_LIMIT);
-  }
-  catch (DC_QP_FAILURE_EXCEPTION& exec) {
+  } catch (DC_QP_FAILURE_EXCEPTION& exec) {
     setStatus(DC_QP_FAILURE);
   }
 
   // Print iteration information
-  reporter->printf(R_NL, R_PER_ITERATION,
-                   "  %10d  %10d  %2d  %+.4e  %+.4e  %+.4e  %+.4e",
-                   quantities->innerIterationCounter(),
-                   quantities->QPIterationCounter(),
-                   strategies->qpSolver()->status(),
-                   strategies->qpSolver()->KKTErrorDual(),
-                   strategies->qpSolver()->combinationNormInf(),
-                   strategies->qpSolver()->primalSolutionNormInf(),
-                   strategies->qpSolver()->dualObjectiveQuadraticValue());
+  reporter->printf(R_NL, R_PER_ITERATION, "  %10d  %10d  %2d  %+.4e  %+.4e  %+.4e  %+.4e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
   // Increment total inner iteration counter
   quantities->incrementTotalInnerIterationCounter();
@@ -466,7 +444,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
   // Increment total QP iteration counter
   quantities->incrementTotalQPIterationCounter();
 
-}  // end computeDirection
+} // end computeDirection
 
 // Convert QP solution to step
 void DirectionComputationCuttingPlane::convertQPSolutionToStep(Quantities* quantities,
@@ -485,6 +463,6 @@ void DirectionComputationCuttingPlane::convertQPSolutionToStep(Quantities* quant
   // Set trial iterate
   quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, 1.0, *quantities->direction()));
 
-}  // end convertQPSolutionToStep
+} // end convertQPSolutionToStep
 
-}  // namespace NonOpt
+} // namespace NonOpt

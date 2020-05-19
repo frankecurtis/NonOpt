@@ -34,7 +34,7 @@ class Vector;
 class SymmetricMatrix : public Strategy
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -191,7 +191,7 @@ class SymmetricMatrix : public Strategy
                      std::string name) const = 0;
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -211,8 +211,8 @@ class SymmetricMatrix : public Strategy
   SM_Status status_; /**< Termination status */
   //@}
 
-};  // end SymmetricMatrix
+}; // end SymmetricMatrix
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTSYMMETRICMATRIX_HPP__ */

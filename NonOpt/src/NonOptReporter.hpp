@@ -31,7 +31,7 @@ class StreamReport;
 class Reporter
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -133,7 +133,7 @@ class Reporter
   virtual void deleteReports();
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
     * (Hidden to avoid implicit creation/calling.)
     */
@@ -150,10 +150,10 @@ class Reporter
 
   /** @name Private members */
   //@{
-  std::vector<std::shared_ptr<Report> > reports_; /**< List (vector) of reports */
+  std::vector<std::shared_ptr<Report>> reports_; /**< List (vector) of reports */
   //@}
 
-};  // end Reporter
+}; // end Reporter
 
 /**
   * Report class
@@ -161,7 +161,7 @@ class Reporter
 class Report
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -249,7 +249,7 @@ class Report
   virtual void close() { closeImplementation(); }
   //@}
 
- protected:
+protected:
   /** @name Implementation methods */
   //@{
   /**
@@ -273,7 +273,7 @@ class Report
   virtual void closeImplementation() = 0;
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
     * (Hidden to avoid implicit creation/calling.)
     */
@@ -301,7 +301,7 @@ class Report
   ReportLevel level_;
   //@}
 
-};  // end Report
+}; // end Report
 
 /**
   * FileReport class
@@ -309,7 +309,7 @@ class Report
 class FileReport : public Report
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -341,7 +341,7 @@ class FileReport : public Report
   virtual bool open(const char* name);
   //@}
 
- protected:
+protected:
   /** @name Implementation methods */
   //@{
   /**
@@ -364,7 +364,7 @@ class FileReport : public Report
     */
   virtual void closeImplementation();
 
- private:
+private:
   /** @name Default compiler generated methods
     * (Hidden to avoid implicit creation/calling.)
     */
@@ -390,7 +390,7 @@ class FileReport : public Report
   FILE* file_;
   //@}
 
-};  // end FileReport
+}; // end FileReport
 
 /**
   * StreamReport class
@@ -398,7 +398,7 @@ class FileReport : public Report
 class StreamReport : public Report
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -429,7 +429,7 @@ class StreamReport : public Report
   void setStream(std::ostream* os);
   //@}
 
- protected:
+protected:
   /** @name Implementation methods */
   //@{
   /**
@@ -452,7 +452,7 @@ class StreamReport : public Report
     */
   virtual void closeImplementation(){};
 
- private:
+private:
   /** @name Default compiler generated methods
     * (Hidden to avoid implicit creation/calling.)
     */
@@ -479,8 +479,8 @@ class StreamReport : public Report
   char buffer_[32768];
   //@}
 
-};  // end StreamReport
+}; // end StreamReport
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTREPORTER_HPP__ */

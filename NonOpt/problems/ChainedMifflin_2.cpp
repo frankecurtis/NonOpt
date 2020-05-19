@@ -10,7 +10,7 @@
 
 // Constructor
 ChainedMifflin_2::ChainedMifflin_2(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 ChainedMifflin_2::~ChainedMifflin_2() {}
@@ -25,7 +25,7 @@ bool ChainedMifflin_2::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool ChainedMifflin_2::initialPoint(int n,
@@ -40,7 +40,7 @@ bool ChainedMifflin_2::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool ChainedMifflin_2::evaluateObjective(int n,
@@ -57,7 +57,7 @@ bool ChainedMifflin_2::evaluateObjective(int n,
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool ChainedMifflin_2::evaluateGradient(int n,
@@ -75,17 +75,17 @@ bool ChainedMifflin_2::evaluateGradient(int n,
     if (pow(x[i], 2) + pow(x[i + 1], 2) - 1.0 >= 0.0) {
       g[i] = g[i] - 1.0 + 7.5 * x[i];
       g[i + 1] = g[i + 1] + 7.5 * x[i + 1];
-    }  // end if
+    } // end if
     else {
       g[i] = g[i] - 1.0 + 0.5 * x[i];
       g[i + 1] = g[i + 1] + 0.5 * x[i + 1];
-    }  // end else
-  }    // end for
+    } // end else
+  }   // end for
 
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool ChainedMifflin_2::finalizeSolution(int n,

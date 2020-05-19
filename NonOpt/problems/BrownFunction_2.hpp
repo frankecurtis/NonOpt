@@ -26,7 +26,7 @@ using namespace NonOpt;
 class BrownFunction_2 : public Problem
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -101,7 +101,7 @@ class BrownFunction_2 : public Problem
                         const double* g);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -121,6 +121,6 @@ class BrownFunction_2 : public Problem
   int number_of_variables_; /**< Number of variables */
   //@}
 
-};  // end BrownFunction_2
+}; // end BrownFunction_2
 
 #endif /* __BROWNFUNCTION_2_HPP__ */

@@ -11,7 +11,7 @@
 
 // Constructor
 Test29_24::Test29_24(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 Test29_24::~Test29_24() {}
@@ -26,7 +26,7 @@ bool Test29_24::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool Test29_24::initialPoint(int n,
@@ -41,7 +41,7 @@ bool Test29_24::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool Test29_24::evaluateObjective(int n,
@@ -52,14 +52,14 @@ bool Test29_24::evaluateObjective(int n,
   // Evaluate maximum value
   f = fabs(2 * x[0] + (10.0 / ((double)(n * n + 2 * n + 1))) * sinh(10.0 * x[0]) - x[1]);
   for (int i = 1; i < n - 1; i++) {
-    f = fmax(f, fabs(2 * x[i] + (10.0 / ((double)(n * n + 2 * n + 1))) * sinh(10.0 * x[i]) - x[i-1] - x[i+1]));
+    f = fmax(f, fabs(2 * x[i] + (10.0 / ((double)(n * n + 2 * n + 1))) * sinh(10.0 * x[i]) - x[i - 1] - x[i + 1]));
   }
-  f = fmax(f, fabs(2 * x[n-1] + (10.0 / ((double)(n * n + 2 * n + 1))) * sinh(10.0 * x[n-1]) - x[n-2] - 1.0));
+  f = fmax(f, fabs(2 * x[n - 1] + (10.0 / ((double)(n * n + 2 * n + 1))) * sinh(10.0 * x[n - 1]) - x[n - 2] - 1.0));
 
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool Test29_24::evaluateGradient(int n,
@@ -79,15 +79,15 @@ bool Test29_24::evaluateGradient(int n,
       max_ind = i;
       max_term = term;
       max_val = fabs(term);
-    }  // end if
+    } // end if
     g[i] = 0.0;
-  }  // end for
+  } // end for
   term = 2 * x[n - 1] + (10.0 / ((double)(n * n + 2 * n + 1))) * sinh(10.0 * x[n - 1]) - x[n - 2] - 1.0;
   if (fabs(term) > max_val) {
     max_ind = n - 1;
     max_term = term;
     max_val = fabs(term);
-  }  // end if
+  } // end if
   g[n - 1] = 0.0;
 
   // Evaluate gradient
@@ -103,7 +103,7 @@ bool Test29_24::evaluateGradient(int n,
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool Test29_24::finalizeSolution(int n,

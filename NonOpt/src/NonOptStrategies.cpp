@@ -5,10 +5,10 @@
 // Author(s) : Frank E. Curtis
 
 #include "NonOptStrategies.hpp"
+#include "NonOptDirectionComputationAggregation.hpp"
 #include "NonOptDirectionComputationCuttingPlane.hpp"
 #include "NonOptDirectionComputationGradient.hpp"
 #include "NonOptDirectionComputationGradientCombination.hpp"
-#include "NonOptDirectionComputationAggregation.hpp"
 #include "NonOptInverseHessianUpdateBFGS.hpp"
 #include "NonOptLineSearchBacktracking.hpp"
 #include "NonOptLineSearchWeakWolfe.hpp"
@@ -103,7 +103,7 @@ void Strategies::addOptions(Options* options,
   symmetric_matrix->addOptions(options, reporter);
   // ADD NEW SYMMETRIC MATRIX STRATEGIES HERE AND IN SWITCH BELOW //
 
-}  // end addOptions
+} // end addOptions
 
 // Set options
 void Strategies::setOptions(const Options* options,
@@ -207,7 +207,7 @@ void Strategies::setOptions(const Options* options,
   // Set symmetric matrix options
   symmetric_matrix_->setOptions(options, reporter);
 
-}  // end setOptions
+} // end setOptions
 
 // Initialize
 void Strategies::initialize(const Options* options,
@@ -236,7 +236,7 @@ void Strategies::initialize(const Options* options,
   // Set QP matrix as pointer to inverse Hessian
   qp_solver_->setMatrix(symmetric_matrix_);
 
-}  // end initialize
+} // end initialize
 
 // Set iteration header
 void Strategies::setIterationHeader()
@@ -247,34 +247,33 @@ void Strategies::setIterationHeader()
   if (direction_computation_->iterationHeader().length() > 0) {
     iteration_header_ += "  ";
     iteration_header_ += direction_computation_->iterationHeader();
-  }  // end if
+  } // end if
   if (line_search_->iterationHeader().length() > 0) {
     iteration_header_ += "  ";
     iteration_header_ += line_search_->iterationHeader();
-  }  // end if
+  } // end if
   if (inverse_hessian_update_->iterationHeader().length() > 0) {
     iteration_header_ += "  ";
     iteration_header_ += inverse_hessian_update_->iterationHeader();
-  }  // end if
+  } // end if
   if (point_set_update_->iterationHeader().length() > 0) {
     iteration_header_ += "  ";
     iteration_header_ += point_set_update_->iterationHeader();
-  }  // end if
+  } // end if
 
-}  // end setIterationHeader
+} // end setIterationHeader
 
 // Print header
 void Strategies::printHeader(const Reporter* reporter)
 {
 
   // Print header
-  reporter->printf(R_NL, R_BASIC,
-                   "Direction computation strategy... : %s\n"
-                   "Inverse Hessian update strategy.. : %s\n"
-                   "Line search strategy............. : %s\n"
-                   "Point set update strategy........ : %s\n"
-                   "QP solver strategy............... : %s\n"
-                   "Symmetric matrix strategy........ : %s\n",
+  reporter->printf(R_NL, R_BASIC, "Direction computation strategy... : %s\n"
+                                  "Inverse Hessian update strategy.. : %s\n"
+                                  "Line search strategy............. : %s\n"
+                                  "Point set update strategy........ : %s\n"
+                                  "QP solver strategy............... : %s\n"
+                                  "Symmetric matrix strategy........ : %s\n",
                    direction_computation_->name().c_str(),
                    inverse_hessian_update_->name().c_str(),
                    line_search_->name().c_str(),
@@ -282,9 +281,9 @@ void Strategies::printHeader(const Reporter* reporter)
                    qp_solver_->name().c_str(),
                    symmetric_matrix_->name().c_str());
 
-}  // end printHeader
+} // end printHeader
 
 // Print footer
 void Strategies::printFooter(const Reporter* reporter) {}
 
-}  // namespace NonOpt
+} // namespace NonOpt

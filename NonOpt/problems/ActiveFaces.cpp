@@ -10,7 +10,7 @@
 
 // Constructor
 ActiveFaces::ActiveFaces(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 ActiveFaces::~ActiveFaces() {}
@@ -25,7 +25,7 @@ bool ActiveFaces::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool ActiveFaces::initialPoint(int n,
@@ -40,7 +40,7 @@ bool ActiveFaces::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool ActiveFaces::evaluateObjective(int n,
@@ -54,13 +54,13 @@ bool ActiveFaces::evaluateObjective(int n,
   for (int i = 0; i < n; i++) {
     f = fmax(f, log(fabs(x[i]) + 1.0));
     sum = sum + x[i];
-  }  // end for
+  } // end for
   f = fmax(f, log(fabs(sum) + 1.0));
 
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool ActiveFaces::evaluateGradient(int n,
@@ -79,14 +79,14 @@ bool ActiveFaces::evaluateGradient(int n,
     if (temp > max_val) {
       max_val = temp;
       max_ind = i;
-    }  // end if
+    } // end if
     sum = sum + x[i];
-  }  // end for
+  } // end for
   temp = log(fabs(sum) + 1.0);
   if (temp > max_val) {
     max_val = temp;
     max_ind = -1;
-  }  // end if
+  } // end if
 
   // Evaluate gradient
   if (max_ind >= 0) {
@@ -96,7 +96,7 @@ bool ActiveFaces::evaluateGradient(int n,
     else {
       g[max_ind] = -1 / (-x[max_ind] + 1);
     }
-  }  // end if
+  } // end if
   else {
     if (-sum >= 0) {
       for (int i = 0; i < n; i++) {
@@ -108,12 +108,12 @@ bool ActiveFaces::evaluateGradient(int n,
         g[i] = 1 / (sum + 1);
       }
     }
-  }  // end else
+  } // end else
 
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool ActiveFaces::finalizeSolution(int n,

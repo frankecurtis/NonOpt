@@ -35,7 +35,7 @@ class Strategy;
 class LineSearch : public Strategy
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -130,7 +130,7 @@ class LineSearch : public Strategy
                              Strategies* strategies) = 0;
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -150,8 +150,8 @@ class LineSearch : public Strategy
   LS_Status status_; /**< Termination status */
   //@}
 
-};  // end LineSearch
+}; // end LineSearch
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTLINESEARCH_HPP__ */

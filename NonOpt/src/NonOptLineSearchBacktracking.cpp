@@ -67,7 +67,7 @@ void LineSearchBacktracking::addOptions(Options* options,
                            "Factor for updating the stepsize before the line search.\n"
                            "Default value: 1e+02.");
 
-}  // end addOptions
+} // end addOptions
 
 // Set options
 void LineSearchBacktracking::setOptions(const Options* options,
@@ -84,7 +84,7 @@ void LineSearchBacktracking::setOptions(const Options* options,
   options->valueAsDouble(reporter, "LSB_stepsize_decrease_factor", stepsize_decrease_factor_);
   options->valueAsDouble(reporter, "LSB_stepsize_increase_factor", stepsize_increase_factor_);
 
-}  // end setOptions
+} // end setOptions
 
 // Initialize
 void LineSearchBacktracking::initialize(const Options* options,
@@ -146,9 +146,9 @@ void LineSearchBacktracking::runLineSearch(const Options* options,
             THROW_EXCEPTION(LS_SUCCESS_EXCEPTION, "Line search successful.");
           }
 
-        }  // end if
+        } // end if
 
-      }  // end if
+      } // end if
 
       // Check if stepsize below minimum
       if (quantities->stepsize() <= stepsize_minimum_) {
@@ -175,9 +175,9 @@ void LineSearchBacktracking::runLineSearch(const Options* options,
               THROW_EXCEPTION(LS_SUCCESS_EXCEPTION, "Line search successful.");
             }
 
-          }  // end if
+          } // end if
 
-        }  // end if
+        } // end if
 
         // Set null step
         quantities->setStepsize(0.0);
@@ -188,29 +188,27 @@ void LineSearchBacktracking::runLineSearch(const Options* options,
         // Terminate
         THROW_EXCEPTION(LS_SUCCESS_EXCEPTION, "Line search successful.");
 
-      }  // end if
+      } // end if
 
       // Update stepsize
       quantities->setStepsize(stepsize_decrease_factor_ * quantities->stepsize());
 
-    }  // end while
+    } // end while
 
-  }  // end try
+  } // end try
 
   // catch exceptions
   catch (LS_SUCCESS_EXCEPTION& exec) {
     setStatus(LS_SUCCESS);
-  }
-  catch (LS_EVALUATION_FAILURE_EXCEPTION& exec) {
+  } catch (LS_EVALUATION_FAILURE_EXCEPTION& exec) {
     setStatus(LS_EVALUATION_FAILURE);
-  }
-  catch (LS_STEPSIZE_TOO_SMALL_EXCEPTION& exec) {
+  } catch (LS_STEPSIZE_TOO_SMALL_EXCEPTION& exec) {
     setStatus(LS_STEPSIZE_TOO_SMALL);
-  }  // end catch
+  } // end catch
 
   // Print iteration information
   reporter->printf(R_NL, R_PER_ITERATION, "  %+.4e", quantities->stepsize());
 
-}  // end runLineSearch
+} // end runLineSearch
 
-}  // namespace NonOpt
+} // namespace NonOpt

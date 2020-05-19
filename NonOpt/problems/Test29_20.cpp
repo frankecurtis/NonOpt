@@ -10,7 +10,7 @@
 
 // Constructor
 Test29_20::Test29_20(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 Test29_20::~Test29_20() {}
@@ -25,7 +25,7 @@ bool Test29_20::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool Test29_20::initialPoint(int n,
@@ -40,7 +40,7 @@ bool Test29_20::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool Test29_20::evaluateObjective(int n,
@@ -58,7 +58,7 @@ bool Test29_20::evaluateObjective(int n,
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool Test29_20::evaluateGradient(int n,
@@ -78,15 +78,15 @@ bool Test29_20::evaluateGradient(int n,
       max_ind = i;
       max_term = term;
       max_val = fabs(term);
-    }  // end if
+    } // end if
     g[i] = 0.0;
-  }  // end for
+  } // end for
   term = (0.5 * x[n - 1] - 3.0) * x[n - 1] - 1.0 + x[n - 2];
   if (fabs(term) > max_val) {
     max_ind = n - 1;
     max_term = term;
     max_val = fabs(term);
-  }  // end if
+  } // end if
   g[n - 1] = 0.0;
 
   // Evaluate gradient
@@ -102,7 +102,7 @@ bool Test29_20::evaluateGradient(int n,
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool Test29_20::finalizeSolution(int n,

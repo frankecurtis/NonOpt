@@ -15,7 +15,7 @@ namespace NonOpt
 
 // Add options
 void DirectionComputationAggregation::addOptions(Options* options,
-                                                         const Reporter* reporter)
+                                                 const Reporter* reporter)
 {
 
   // Add bool options
@@ -93,11 +93,11 @@ void DirectionComputationAggregation::addOptions(Options* options,
                             "Limit on the number of inner iterations that will be performed.\n"
                             "Default value: 2e+01.");
 
-}  // end addOptions
+} // end addOptions
 
 // Set options
 void DirectionComputationAggregation::setOptions(const Options* options,
-                                                         const Reporter* reporter)
+                                                 const Reporter* reporter)
 {
 
   // Read bool options
@@ -112,16 +112,15 @@ void DirectionComputationAggregation::setOptions(const Options* options,
   options->valueAsDouble(reporter, "DCAgg_step_acceptance_tolerance", step_acceptance_tolerance_);
   options->valueAsDouble(reporter, "DCAgg_size_factor", full_size_factor_);
 
-
   // Read integer options
   options->valueAsInteger(reporter, "DCAgg_inner_iteration_limit", inner_iteration_limit_);
 
-}  // end setOptions
+} // end setOptions
 
 // Initialize
 void DirectionComputationAggregation::initialize(const Options* options,
-                                                         Quantities* quantities,
-                                                         const Reporter* reporter) {}
+                                                 Quantities* quantities,
+                                                 const Reporter* reporter) {}
 
 // Iteration header
 std::string DirectionComputationAggregation::iterationHeader()
@@ -137,9 +136,9 @@ std::string DirectionComputationAggregation::iterationNullValues()
 
 // Compute direction
 void DirectionComputationAggregation::computeDirection(const Options* options,
-                                                               Quantities* quantities,
-                                                               const Reporter* reporter,
-                                                               Strategies* strategies)
+                                                       Quantities* quantities,
+                                                       const Reporter* reporter,
+                                                       Strategies* strategies)
 {
 
   // Initialize values
@@ -172,12 +171,11 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
     }
 
     // Declare QP quantities
-    std::vector<std::shared_ptr<Vector> > QP_gradient_list_agg;
+    std::vector<std::shared_ptr<Vector>> QP_gradient_list_agg;
     std::vector<double> QP_vector_agg;
 
-
     // Declare new QP data
-    std::vector<std::shared_ptr<Vector> > QP_gradient_list;
+    std::vector<std::shared_ptr<Vector>> QP_gradient_list;
     std::vector<double> QP_vector;
 
     // Add pointer to current gradient to list
@@ -214,16 +212,16 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
           QP_vector_agg.push_back(downshifting_value);
           QP_vector.push_back(downshifting_value);
 
-        }  // end if
+        } // end if
 
-      }  // end if
+      } // end if
 
-    }  // end for
+    } // end for
 
     // Set QP data
     strategies->qpSolver()->setVectorList(QP_gradient_list_agg);
     strategies->qpSolver()->setVector(QP_vector_agg);
-//    used_full_last_=true;
+    //    used_full_last_=true;
     strategies->qpSolver()->setScalar(quantities->trustRegionRadius());
     strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
 
@@ -260,18 +258,17 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
       strategies->qpSolver()->setVectorList(QP_gradient_list_agg);
       strategies->qpSolver()->setVector(QP_vector_agg);
 
-//      used_full_last_=true;
+      //      used_full_last_=true;
 
       // Solve QP
-      strategies->qpSolver()->solveQP(options, reporter,quantities);
+      strategies->qpSolver()->solveQP(options, reporter, quantities);
 
       // Convert QP solution to step
       convertQPSolutionToStep(quantities, strategies);
 
-    }  // end if
+    } // end if
 
-
-    do_agg_next_=true;
+    do_agg_next_ = true;
 
     // Inner loop
 
@@ -284,15 +281,13 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
       evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
 
       if (evaluation_success &&
-          (
-        		  quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(),strategies->qpSolver()->primalSolutionNorm2Square()) ||
+          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(), strategies->qpSolver()->primalSolutionNorm2Square()) ||
            (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
 
         THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
       }
-
 
       // Check for inner iteration limit
       if (quantities->innerIterationCounter() > inner_iteration_limit_) {
@@ -302,159 +297,150 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
         else {
           THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
         }
-      }  // end if
+      } // end if
 
       // Declare new QP data
-      std::vector<std::shared_ptr<Vector> > QP_gradient_list_new;
+      std::vector<std::shared_ptr<Vector>> QP_gradient_list_new;
       std::vector<double> QP_vector_new;
 
+      if (do_agg_next_) {
 
+        yk = new double[strategies->qpSolver()->omega_length()];
+        gamm = new double[quantities->numberOfVariables()];
+        strategies->qpSolver()->dualSolution(yk, gamm);
 
-      if(do_agg_next_){
+        std::shared_ptr<Vector> combination_temp(new Vector(quantities->numberOfVariables()));
+        double downshifting_obj = 0.0;
 
-          yk=new double[strategies->qpSolver()->omega_length()];
-          gamm=new double[quantities->numberOfVariables()];
-          strategies->qpSolver()->dualSolution(yk,gamm);
+        for (int i = 0; i < strategies->qpSolver()->omega_length(); i++) {
+          combination_temp->addScaledVector(yk[i], *QP_gradient_list_agg[i]);
+          downshifting_obj += yk[i] * (QP_vector[i]);
+        }
 
-          std::shared_ptr<Vector> combination_temp(new Vector(quantities->numberOfVariables()));
-          double downshifting_obj=0.0;
+        delete[] yk;
+        delete[] gamm;
 
-          for (int i = 0; i < strategies->qpSolver()->omega_length(); i++) {
-        	  combination_temp->addScaledVector(yk[i], *QP_gradient_list_agg[i]);
-              downshifting_obj+=yk[i] * (QP_vector[i]);
-          }
+        // Clear data
+        QP_gradient_list_agg.clear();
+        QP_vector_agg.clear();
 
+        // Add pointer to current gradient to list
+        QP_gradient_list_agg.push_back(quantities->currentIterate()->gradient());
+        QP_vector_agg.push_back(quantities->currentIterate()->objective());
 
-          delete[] yk;
-          delete[] gamm;
-
-
-          // Clear data
-          QP_gradient_list_agg.clear();
-          QP_vector_agg.clear();
-
-          // Add pointer to current gradient to list
-          QP_gradient_list_agg.push_back(quantities->currentIterate()->gradient());
-          QP_vector_agg.push_back(quantities->currentIterate()->objective());
-
-          // Add combination term
-          QP_gradient_list_agg.push_back(combination_temp);
-          QP_vector_agg.push_back(downshifting_obj);
-
+        // Add combination term
+        QP_gradient_list_agg.push_back(combination_temp);
+        QP_vector_agg.push_back(downshifting_obj);
       }
 
+      // Add trial point, if inside stationarity radius
+      if (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius()) {
 
+        // Evaluate trial point gradient
+        evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
 
+        // Check for successful evaluation
+        if (evaluation_success) {
 
-     // Add trial point, if inside stationarity radius
-     if (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius()) {
+          // Add trial iterate to point set
+          quantities->pointSet()->push_back(quantities->trialIterate());
 
-       // Evaluate trial point gradient
-       evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
+          // Add pointer to gradient in point set to list
+          QP_gradient_list_agg.push_back(quantities->trialIterate()->gradient());
+          QP_gradient_list.push_back(quantities->trialIterate()->gradient());
 
-       // Check for successful evaluation
-       if (evaluation_success) {
+          // Create difference vector
+          std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *quantities->trialIterate()->vector());
 
-         // Add trial iterate to point set
-         quantities->pointSet()->push_back(quantities->trialIterate());
+          // Evaluate downshifting value
+          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * pow(difference->norm2(), 2.0);
 
-         // Add pointer to gradient in point set to list
-         QP_gradient_list_agg.push_back(quantities->trialIterate()->gradient());
-         QP_gradient_list.push_back(quantities->trialIterate()->gradient());
+          // Add linear term value
+          QP_vector_agg.push_back(downshifting_value);
+          QP_vector.push_back(downshifting_value);
 
+          if (!do_agg_next_) {
+            QP_gradient_list_new.push_back(quantities->trialIterate()->gradient());
+            QP_vector_new.push_back(downshifting_value);
+          }
 
-         // Create difference vector
-         std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *quantities->trialIterate()->vector());
+        } // end if
 
-         // Evaluate downshifting value
-         double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * pow(difference->norm2(), 2.0);
+      } // end if
 
-         // Add linear term value
-         QP_vector_agg.push_back(downshifting_value);
-         QP_vector.push_back(downshifting_value);
+      // Try shortened step?
+      if (try_shortened_step_) {
 
-         if(!do_agg_next_){
-        	 QP_gradient_list_new.push_back(quantities->trialIterate()->gradient());
-        	 QP_vector_new.push_back(downshifting_value);
-         }
+        // Set shortened stepsize
+        double shortened_stepsize = shortened_stepsize_ * fmin(quantities->stationarityRadius(), strategies->qpSolver()->primalSolutionNormInf()) / strategies->qpSolver()->primalSolutionNormInf();
 
-       }  // end if
+        // Compute shortened trial iterate
+        quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, shortened_stepsize, *quantities->direction()));
 
-     }  // end if
+        // Evaluate trial objective
+        evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
 
-     // Try shortened step?
-     if (try_shortened_step_) {
+        // Check for sufficient decrease
+        if (evaluation_success &&
+            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(), strategies->qpSolver()->primalSolutionNorm2Square()) ||
+             (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
+              strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
+              strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
+          THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
+        }
 
-       // Set shortened stepsize
-       double shortened_stepsize = shortened_stepsize_ * fmin(quantities->stationarityRadius(), strategies->qpSolver()->primalSolutionNormInf()) / strategies->qpSolver()->primalSolutionNormInf();
+        // Evaluate trial gradient
+        evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
 
-       // Compute shortened trial iterate
-       quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, shortened_stepsize, *quantities->direction()));
+        // Check for objective evaluation success
+        if (evaluation_success) {
 
-       // Evaluate trial objective
-       evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+          // Add trial iterate to point set
+          quantities->pointSet()->push_back(quantities->trialIterate());
 
-       // Check for sufficient decrease
-       if (evaluation_success &&
-           (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(),strategies->qpSolver()->primalSolutionNorm2Square()) ||
-            (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
-             strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
-             strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
-         THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
-       }
+          // Add pointer to gradient in point set to list
+          QP_gradient_list_agg.push_back(quantities->trialIterate()->gradient());
+          QP_gradient_list.push_back(quantities->trialIterate()->gradient());
 
-       // Evaluate trial gradient
-       evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
+          // Create difference vector
+          std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *quantities->trialIterate()->vector());
 
-       // Check for objective evaluation success
-       if (evaluation_success) {
+          // Evaluate downshifting value
+          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * pow(difference->norm2(), 2.0);
 
-         // Add trial iterate to point set
-         quantities->pointSet()->push_back(quantities->trialIterate());
+          // Add linear term value
+          QP_vector_agg.push_back(downshifting_value);
+          QP_vector.push_back(downshifting_value);
 
-         // Add pointer to gradient in point set to list
-         QP_gradient_list_agg.push_back(quantities->trialIterate()->gradient());
-         QP_gradient_list.push_back(quantities->trialIterate()->gradient());
+          if (!do_agg_next_) {
+            QP_gradient_list_new.push_back(quantities->trialIterate()->gradient());
+            QP_vector_new.push_back(downshifting_value);
+          }
 
-         // Create difference vector
-         std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *quantities->trialIterate()->vector());
+        } // end if
 
-         // Evaluate downshifting value
-         double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * pow(difference->norm2(), 2.0);
-
-         // Add linear term value
-         QP_vector_agg.push_back(downshifting_value);
-         QP_vector.push_back(downshifting_value);
-
-         if(!do_agg_next_){
-        	 QP_gradient_list_new.push_back(quantities->trialIterate()->gradient());
-        	 QP_vector_new.push_back(downshifting_value);
-         }
-
-       }  // end if
-
-     }  // end if (try_shortened_step_)
+      } // end if (try_shortened_step_)
 
       // Loop over sample size
 
-     int added_points=0;
-     if(random_sample_fraction_>1.0){
-   	  added_points=(int)random_sample_fraction_;
-     }
-     else{
-   	  added_points=(int)(random_sample_fraction_ * quantities->numberOfVariables());
-     }
+      int added_points = 0;
+      if (random_sample_fraction_ > 1.0) {
+        added_points = (int)random_sample_fraction_;
+      }
+      else {
+        added_points = (int)(random_sample_fraction_ * quantities->numberOfVariables());
+      }
 
-     //int added_points=(int) random_sample_fraction_ *quantities->pointSet()->size();
-     // Loop over sample size
-     for (int point_count = 0; point_count < std::max(1, added_points); point_count++) {
+      //int added_points=(int) random_sample_fraction_ *quantities->pointSet()->size();
+      // Loop over sample size
+      for (int point_count = 0; point_count < std::max(1, added_points); point_count++) {
         // Randomly generate new point
         std::shared_ptr<Point> random_point = quantities->currentIterate()->makeNewRandom(quantities->stationarityRadius(), &random_number_generator_);
 
         // Evaluate gradient at random point
         evaluation_success = random_point->evaluateGradient(*quantities);
 
-//        std::cout<<point_count<<"\n";
+        //        std::cout<<point_count<<"\n";
         // Check for gradient evaluation success
         if (evaluation_success) {
 
@@ -475,25 +461,17 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
           QP_vector.push_back(downshifting_value);
           QP_vector_agg.push_back(downshifting_value);
 
-          if(!do_agg_next_){
-         	 QP_gradient_list_new.push_back(random_point->gradient());
-         	 QP_vector_new.push_back(downshifting_value);
+          if (!do_agg_next_) {
+            QP_gradient_list_new.push_back(random_point->gradient());
+            QP_vector_new.push_back(downshifting_value);
           }
 
-        }  // end if
+        } // end if
 
-      }  // end for
+      } // end for
 
       // Print QP solve / step information
-      reporter->printf(R_NL, R_PER_INNER_ITERATION,
-                       "  %10d  %10d  %2d  %+.4e  %+.4e  %+.4e  %+.4e",
-                       quantities->innerIterationCounter(),
-                       quantities->QPIterationCounter(),
-                       strategies->qpSolver()->status(),
-                       strategies->qpSolver()->KKTErrorDual(),
-                       strategies->qpSolver()->combinationNormInf(),
-                       strategies->qpSolver()->primalSolutionNormInf(),
-                       strategies->qpSolver()->dualObjectiveQuadraticValue());
+      reporter->printf(R_NL, R_PER_INNER_ITERATION, "  %10d  %10d  %2d  %+.4e  %+.4e  %+.4e  %+.4e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
       // Set blank solve string
       std::string blank_solve = "";
@@ -511,44 +489,31 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
       }
 
       // Print blank solve information
-      reporter->printf(R_NL, R_PER_INNER_ITERATION,
-                       "%s\n%s",
-                       blank_solve.c_str(),
-                       quantities->iterationNullValues().c_str());
+      reporter->printf(R_NL, R_PER_INNER_ITERATION, "%s\n%s", blank_solve.c_str(), quantities->iterationNullValues().c_str());
 
-      if(do_agg_next_){
-          if ((double)quantities->pointSet()->size() > std::min(5000.0,full_size_factor_ * (double)quantities->numberOfVariables())) {
-              // Add QP data
-              strategies->qpSolver()->setVectorList(QP_gradient_list);
-              strategies->qpSolver()->setVector(QP_vector);
-              do_agg_next_=false;
-          }
-          else{
-              // Add QP data
-              strategies->qpSolver()->setVectorList(QP_gradient_list_agg);
-              strategies->qpSolver()->setVector(QP_vector_agg);
-          }
-
-          // Solve QP
-          strategies->qpSolver()->solveQP(options, reporter,quantities);
-
-      }
-      else{
+      if (do_agg_next_) {
+        if ((double)quantities->pointSet()->size() > std::min(5000.0, full_size_factor_ * (double)quantities->numberOfVariables())) {
           // Add QP data
-          strategies->qpSolver()->addData(QP_gradient_list_new, QP_vector_new);
+          strategies->qpSolver()->setVectorList(QP_gradient_list);
+          strategies->qpSolver()->setVector(QP_vector);
+          do_agg_next_ = false;
+        }
+        else {
+          // Add QP data
+          strategies->qpSolver()->setVectorList(QP_gradient_list_agg);
+          strategies->qpSolver()->setVector(QP_vector_agg);
+        }
 
-          // Solve QP hot
-          strategies->qpSolver()->solveQPHot(options, reporter,quantities);
+        // Solve QP
+        strategies->qpSolver()->solveQP(options, reporter, quantities);
       }
+      else {
+        // Add QP data
+        strategies->qpSolver()->addData(QP_gradient_list_new, QP_vector_new);
 
-
-
-
-
-
-
-
-
+        // Solve QP hot
+        strategies->qpSolver()->solveQPHot(options, reporter, quantities);
+      }
 
       // Convert QP solution to step
       convertQPSolutionToStep(quantities, strategies);
@@ -580,45 +545,32 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
         strategies->qpSolver()->setVectorList(QP_gradient_list);
         strategies->qpSolver()->setVector(QP_vector);
 
-//        used_full_last_=true;
+        //        used_full_last_=true;
         // Solve QP
-        strategies->qpSolver()->solveQP(options, reporter,quantities);
+        strategies->qpSolver()->solveQP(options, reporter, quantities);
 
         // Convert QP solution to step
         convertQPSolutionToStep(quantities, strategies);
 
-      }  // end if
+      } // end if
 
+    } // end while
 
-
-    }  // end while
-
-  }  // end try
+  } // end try
 
   // catch exceptions
   catch (DC_SUCCESS_EXCEPTION& exec) {
     setStatus(DC_SUCCESS);
-  }
-  catch (DC_EVALUATION_FAILURE_EXCEPTION& exec) {
+  } catch (DC_EVALUATION_FAILURE_EXCEPTION& exec) {
     setStatus(DC_EVALUATION_FAILURE);
-  }
-  catch (DC_ITERATION_LIMIT_EXCEPTION& exec) {
+  } catch (DC_ITERATION_LIMIT_EXCEPTION& exec) {
     setStatus(DC_ITERATION_LIMIT);
-  }
-  catch (DC_QP_FAILURE_EXCEPTION& exec) {
+  } catch (DC_QP_FAILURE_EXCEPTION& exec) {
     setStatus(DC_QP_FAILURE);
   }
 
   // Print iteration information
-  reporter->printf(R_NL, R_PER_ITERATION,
-                   "  %10d  %10d  %2d  %+.4e  %+.4e  %+.4e  %+.4e",
-                   quantities->innerIterationCounter(),
-                   quantities->QPIterationCounter(),
-                   strategies->qpSolver()->status(),
-                   strategies->qpSolver()->KKTErrorDual(),
-                   strategies->qpSolver()->combinationNormInf(),
-                   strategies->qpSolver()->primalSolutionNormInf(),
-                   strategies->qpSolver()->dualObjectiveQuadraticValue());
+  reporter->printf(R_NL, R_PER_ITERATION, "  %10d  %10d  %2d  %+.4e  %+.4e  %+.4e  %+.4e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
   // Increment total inner iteration counter
   quantities->incrementTotalInnerIterationCounter();
@@ -626,11 +578,11 @@ void DirectionComputationAggregation::computeDirection(const Options* options,
   // Increment total QP iteration counter
   quantities->incrementTotalQPIterationCounter();
 
-}  // end computeDirection
+} // end computeDirection
 
 // Convert QP solution to step
 void DirectionComputationAggregation::convertQPSolutionToStep(Quantities* quantities,
-                                                                      Strategies* strategies)
+                                                              Strategies* strategies)
 {
 
   // Increment QP iteration counter
@@ -645,6 +597,6 @@ void DirectionComputationAggregation::convertQPSolutionToStep(Quantities* quanti
   // Set trial iterate
   quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, 1.0, *quantities->direction()));
 
-}  // end convertQPSolutionToStep
+} // end convertQPSolutionToStep
 
-}  // namespace NonOpt
+} // namespace NonOpt

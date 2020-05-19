@@ -7,7 +7,6 @@
 #ifndef __TESTITERATIONQUANTITIES_HPP__
 #define __TESTITERATIONQUANTITIES_HPP__
 
-#include <cstring>
 #include <iostream>
 
 #include "MaxQ.hpp"
@@ -39,7 +38,7 @@ int testQuantitiesImplementation(int option)
     // Add stream report to reporter
     reporter.addReport(s);
 
-  }  // end if
+  } // end if
 
   // Declare problem
   std::shared_ptr<MaxQ> problem(new MaxQ(50));
@@ -78,7 +77,7 @@ int testQuantitiesImplementation(int option)
         result = 1;
       }
     }
-  }  // end for
+  } // end for
   if (quantities.stationarityRadius() < 1e+01 - 1e-12 || quantities.stationarityRadius() > 1e+01 + 1e-12) {
     result = 1;
   }
@@ -122,7 +121,7 @@ int testQuantitiesImplementation(int option)
     if (quantities.currentIterate()->vector()->values()[i] < 99.0 - 1e-12 || quantities.currentIterate()->vector()->values()[i] > 99.0 + 1e-12) {
       result = 1;
     }
-  }  // end for
+  } // end for
   if (quantities.stationarityRadius() < 1e+00 - 1e-12 || quantities.stationarityRadius() > 1e+00 + 1e-12) {
     result = 1;
   }
@@ -157,7 +156,7 @@ int testQuantitiesImplementation(int option)
         result = 1;
       }
     }
-  }  // end for
+  } // end for
   if (quantities.stationarityRadius() < 0.0 - 1e-12 || quantities.stationarityRadius() > 0.0 + 1e-12) {
     result = 1;
   }
@@ -179,11 +178,11 @@ int testQuantitiesImplementation(int option)
     else {
       reporter.printf(R_NL, R_BASIC, "TEST FAILED.\n");
     }
-  }  // end if
+  } // end if
 
   // Return
   return result;
 
-}  // end testQuantitiesImplementation
+} // end testQuantitiesImplementation
 
 #endif /* __TESTITERATIONQUANTITIES_HPP__ */

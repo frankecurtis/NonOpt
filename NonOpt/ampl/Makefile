@@ -11,6 +11,7 @@ CXX = g++
 CXXFLAGS = -g -Wall -std=c++11
 
 # Set sources, etc.
+headers = $(wildcard *.hpp)
 sources = $(wildcard *.cpp)
 objects = $(sources:.cpp=.o)
 depends = $(sources:.cpp=.d)
@@ -19,37 +20,35 @@ depends = $(sources:.cpp=.d)
 EXES = $(sources:.cpp=)
 
 # Libraries
-NonOptLIB         = $(NONOPTDIR)/NonOpt/src/libNonOpt.a
-NonOptProblemsLIB = $(NONOPTDIR)/NonOpt/problems/libNonOptProblems.a
+NonOptLIB = $(NONOPTDIR)/NonOpt/src/libNonOpt.a
+AMPLLIB   = $(AMPLDIR)/amplsolver.a
 
 # Includes
-INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(NONOPTDIR)/NonOpt/problems -I /usr/local/include
+INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(AMPLDIR) -I /usr/local/include
 
 # Rule for all
 all: $(EXES)
 
 # Dependence for executable
 $(EXES): % : %.o
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(NonOptProblemsLIB) -L $(LAPACKDIR) -ldl -lblas -llapack
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(AMPLLIB) -L $(LAPACKDIR) -ldl -lblas -llapack
 
 # Dependencies for executable
-$(EXES): $(NonOptLIB) $(NonOptProblemsLIB)
+$(EXES): $(NonOptLIB)
 
 # Rules for libraries
 $(NonOptLIB):
 	$(MAKE) --directory=$(NONOPTDIR)/NonOpt/src
-$(NonOptProblemsLIB):
-	$(MAKE) --directory=$(NONOPTDIR)/NonOpt/problems
 
 # Dependencies for libraries
 $(NonOptLIB): $(wildcard $(NONOPTDIR)/NonOpt/src/*.hpp) $(wildcard $(NONOPTDIR)/NonOpt/src/*.cpp)
-$(NonOptProblemsLIB): $(wildcard $(NONOPTDIR)/NonOpt/problems/*.hpp) $(wildcard $(NONOPTDIR)/NonOpt/problems/*.cpp)
 
 # Rule for .cpp.o
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
-# Objects depend on sources
+# Objects depend on headers and sources
+$(objects): $(headers)
 $(objects): $(sources)
 
 # Clean

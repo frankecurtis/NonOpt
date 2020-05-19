@@ -36,7 +36,7 @@ int testProblemImplementation(int option)
     // Add stream report to reporter
     reporter.addReport(s);
 
-  }  // end if
+  } // end if
 
   // Declare problem
   MaxQ problem(50);
@@ -77,7 +77,7 @@ int testProblemImplementation(int option)
       }
     }
     reporter.printf(R_NL, R_BASIC, "%+23.16e\n", x[i]);
-  }  // end for
+  } // end for
 
   // Evaluate objective value
   problem.evaluateObjective(n, x, f);
@@ -107,7 +107,7 @@ int testProblemImplementation(int option)
       }
     }
     reporter.printf(R_NL, R_BASIC, "%+23.16e\n", g[i]);
-  }  // end for
+  } // end for
 
   // Delete objects
   delete[] x;
@@ -122,11 +122,11 @@ int testProblemImplementation(int option)
     else {
       reporter.printf(R_NL, R_BASIC, "TEST FAILED.\n");
     }
-  }  // end if
+  } // end if
 
   // Return
   return result;
 
-}  // end testProblemImplementation
+} // end testProblemImplementation
 
 #endif /* __TESTPROBLEM_HPP__ */

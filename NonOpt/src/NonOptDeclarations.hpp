@@ -76,6 +76,6 @@ DECLARE_EXCEPTION(SM_SUCCESS_EXCEPTION);
 DECLARE_EXCEPTION(SM_FAILURE_EXCEPTION);
 //@}
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTDECLARATIONS_HPP__ */

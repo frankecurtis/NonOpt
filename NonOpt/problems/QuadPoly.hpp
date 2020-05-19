@@ -23,7 +23,7 @@ using namespace NonOpt;
 class QuadPoly : public Problem
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -105,7 +105,7 @@ class QuadPoly : public Problem
                         const double* g);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -135,6 +135,6 @@ class QuadPoly : public Problem
   double* symmetric_matrix_;    /**< Quadratic term, i.e., "Q" */
   //@}
 
-};  // end QuadPoly
+}; // end QuadPoly
 
 #endif /* __QUADPOLY_HPP__ */

@@ -35,7 +35,7 @@ class Vector;
 class Point
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -174,7 +174,7 @@ class Point
   inline double scale() const { return scale_; };
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -200,8 +200,8 @@ class Point
   std::shared_ptr<Vector> gradient_;
   //@}
 
-};  // end Point
+}; // end Point
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTPOINT_HPP__ */

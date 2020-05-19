@@ -25,7 +25,7 @@ using namespace NonOpt;
 class MaxQ : public Problem
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -100,7 +100,7 @@ class MaxQ : public Problem
                         const double* g);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -120,6 +120,6 @@ class MaxQ : public Problem
   int number_of_variables_; /**< Number of variables */
   //@}
 
-};  // end MaxQ
+}; // end MaxQ
 
 #endif /* __MAXQ_HPP__ */

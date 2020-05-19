@@ -15,16 +15,16 @@ QuadPoly::QuadPoly(int n,
                    int m,
                    int a,
                    double s)
-    : number_of_active_affine_(a),
-      number_of_affine_(m),
-      number_of_variables_(n)
+  : number_of_active_affine_(a),
+    number_of_affine_(m),
+    number_of_variables_(n)
 {
 
   // Declare scaling factor
   double symmetric_matrix_scaling = s;
 
   // Reset number of active affine
-  number_of_active_affine_ = fmin(number_of_active_affine_,number_of_affine_);
+  number_of_active_affine_ = fmin(number_of_active_affine_, number_of_affine_);
 
   // Declare random number generator
   std::default_random_engine generator;
@@ -38,11 +38,11 @@ QuadPoly::QuadPoly(int n,
   if (number_of_affine_ > 0) {
     constant_ = new double[number_of_affine_];
     matrix_ = new double[number_of_affine_ * number_of_variables_];
-  }  // end if
+  } // end if
   else {
     constant_ = nullptr;
     matrix_ = nullptr;
-  }  // end else
+  } // end else
 
   // Initialize quantities
   for (int i = 0; i < number_of_variables_; i++) {
@@ -87,7 +87,7 @@ QuadPoly::QuadPoly(int n,
     else {
       weights[i] = 0.0;
     }
-  }  // end for
+  } // end for
   for (int i = 0; i < number_of_active_affine_; i++) {
     weights[i] /= weights_sum;
   }
@@ -97,7 +97,7 @@ QuadPoly::QuadPoly(int n,
     for (int j = 0; j < number_of_affine_; j++) {
       linear_[i] = linear_[i] - matrix_[j * number_of_variables_ + i] * weights[j];
     }
-  }  // end for
+  } // end for
 
   // Declare and set values for symmetric matrix
   double* symmetric_matrix_init = new double[number_of_variables_ * number_of_variables_];
@@ -112,7 +112,7 @@ QuadPoly::QuadPoly(int n,
         symmetric_matrix_[i * number_of_variables_ + j] += symmetric_matrix_init[i * number_of_variables_ + k] * symmetric_matrix_init[j * number_of_variables_ + k];
       }
     }
-  }  // end for
+  } // end for
   for (int i = 0; i < number_of_variables_ * number_of_variables_; i++) {
     symmetric_matrix_[i] = symmetric_matrix_scaling * symmetric_matrix_[i];
   }
@@ -125,7 +125,7 @@ QuadPoly::QuadPoly(int n,
     delete[] symmetric_matrix_init;
   }
 
-}  // end constructor
+} // end constructor
 
 // Destructor
 QuadPoly::~QuadPoly()
@@ -145,7 +145,7 @@ QuadPoly::~QuadPoly()
     delete[] matrix_;
   }
 
-}  // end destructor
+} // end destructor
 
 // Number of variables
 bool QuadPoly::numberOfVariables(int& n)
@@ -157,7 +157,7 @@ bool QuadPoly::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool QuadPoly::initialPoint(int n,
@@ -177,7 +177,7 @@ bool QuadPoly::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool QuadPoly::evaluateObjective(int n,
@@ -198,7 +198,7 @@ bool QuadPoly::evaluateObjective(int n,
     for (int j = 0; j < number_of_variables_; j++) {
       f += 0.5 * symmetric_matrix_[i * number_of_variables_ + j] * x[i] * x[j];
     }
-  }  // end for
+  } // end for
 
   // Evaluate affine term
   double affine_max = -std::numeric_limits<double>::infinity();
@@ -210,7 +210,7 @@ bool QuadPoly::evaluateObjective(int n,
     if (affine > affine_max) {
       affine_max = affine;
     }
-  }  // end for
+  } // end for
   if (number_of_affine_ > 0) {
     f += affine_max;
   }
@@ -218,7 +218,7 @@ bool QuadPoly::evaluateObjective(int n,
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool QuadPoly::evaluateGradient(int n,
@@ -236,7 +236,7 @@ bool QuadPoly::evaluateGradient(int n,
     for (int j = 0; j < number_of_variables_; j++) {
       g[i] += symmetric_matrix_[i * number_of_variables_ + j] * x[j];
     }
-  }  // end for
+  } // end for
 
   // Evaluate affine term
   double affine_max = -std::numeric_limits<double>::infinity();
@@ -250,19 +250,19 @@ bool QuadPoly::evaluateGradient(int n,
       affine_max = affine;
       affine_ind = i;
     }
-  }  // end for
+  } // end for
 
   // Add gradient of max term
   if (number_of_affine_ > 0) {
     for (int i = 0; i < number_of_variables_; i++) {
       g[i] += matrix_[affine_ind * number_of_variables_ + i];
     }
-  }  // end if
+  } // end if
 
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool QuadPoly::finalizeSolution(int n,

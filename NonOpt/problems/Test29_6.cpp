@@ -10,7 +10,7 @@
 
 // Constructor
 Test29_6::Test29_6(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 Test29_6::~Test29_6() {}
@@ -25,7 +25,7 @@ bool Test29_6::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool Test29_6::initialPoint(int n,
@@ -40,7 +40,7 @@ bool Test29_6::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool Test29_6::evaluateObjective(int n,
@@ -51,14 +51,14 @@ bool Test29_6::evaluateObjective(int n,
   // Evaluate maximum value
   f = fabs((3.0 - 2.0 * x[0]) * x[0] + 1.0 - x[1]);
   for (int i = 1; i < n - 1; i++) {
-    f = fmax(f, fabs((3.0 - 2.0 * x[i]) * x[i] + 1.0 - x[i-1] - x[i+1]));
-  }  // end for
-  f = fmax(f, fabs((3.0 - 2.0 * x[n-1]) * x[n-1] + 1.0 - x[n-2]));
+    f = fmax(f, fabs((3.0 - 2.0 * x[i]) * x[i] + 1.0 - x[i - 1] - x[i + 1]));
+  } // end for
+  f = fmax(f, fabs((3.0 - 2.0 * x[n - 1]) * x[n - 1] + 1.0 - x[n - 2]));
 
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool Test29_6::evaluateGradient(int n,
@@ -73,21 +73,21 @@ bool Test29_6::evaluateGradient(int n,
   double max_val = fabs(term);
   g[0] = 0.0;
   for (int i = 1; i < n - 1; i++) {
-    term = (3.0 - 2.0 * x[i]) * x[i] + 1.0 - x[i-1] - x[i+1];
+    term = (3.0 - 2.0 * x[i]) * x[i] + 1.0 - x[i - 1] - x[i + 1];
     if (fabs(term) > max_val) {
       max_ind = i;
       max_term = term;
       max_val = fabs(term);
-    }  // end if
+    } // end if
     g[i] = 0.0;
-  }  // end for
-  term = (3.0 - 2.0 * x[n-1]) * x[n-1] + 1.0 - x[n-2];
+  } // end for
+  term = (3.0 - 2.0 * x[n - 1]) * x[n - 1] + 1.0 - x[n - 2];
   if (fabs(term) > max_val) {
-    max_ind = n-1;
+    max_ind = n - 1;
     max_term = term;
     max_val = fabs(term);
-  }  // end if
-  g[n-1] = 0.0;
+  } // end if
+  g[n - 1] = 0.0;
 
   // Evaluate gradient
   double sign = ((max_term >= 0.0) ? 1.0 : -1.0);
@@ -102,7 +102,7 @@ bool Test29_6::evaluateGradient(int n,
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool Test29_6::finalizeSolution(int n,

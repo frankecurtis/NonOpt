@@ -10,7 +10,7 @@
 
 // Constructor
 ChainedLQ::ChainedLQ(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 ChainedLQ::~ChainedLQ() {}
@@ -25,7 +25,7 @@ bool ChainedLQ::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool ChainedLQ::initialPoint(int n,
@@ -40,7 +40,7 @@ bool ChainedLQ::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool ChainedLQ::evaluateObjective(int n,
@@ -53,12 +53,12 @@ bool ChainedLQ::evaluateObjective(int n,
   for (int i = 0; i < n - 1; i++) {
     f = f + fmax(-x[i] - x[i + 1],
                  -x[i] - x[i + 1] + (pow(x[i], 2) + pow(x[i + 1], 2) - 1.0));
-  }  // end for
+  } // end for
 
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool ChainedLQ::evaluateGradient(int n,
@@ -76,17 +76,17 @@ bool ChainedLQ::evaluateGradient(int n,
     if (-x[i] - x[i + 1] >= -x[i] - x[i + 1] + (pow(x[i], 2) + pow(x[i + 1], 2) - 1.0)) {
       g[i] = g[i] - 1.0;
       g[i + 1] = g[i + 1] - 1.0;
-    }  // end if
+    } // end if
     else {
       g[i] = g[i] - 1.0 + 2.0 * x[i];
       g[i + 1] = g[i + 1] - 1.0 + 2.0 * x[i + 1];
-    }  // end else
-  }    // end for
+    } // end else
+  }   // end for
 
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool ChainedLQ::finalizeSolution(int n,

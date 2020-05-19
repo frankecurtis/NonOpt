@@ -26,7 +26,7 @@ using namespace NonOpt;
 class ChainedCrescent_1 : public Problem
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -101,7 +101,7 @@ class ChainedCrescent_1 : public Problem
                         const double* g);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -121,6 +121,6 @@ class ChainedCrescent_1 : public Problem
   int number_of_variables_; /**< Number of variables */
   //@}
 
-};  // end ChainedCrescent_1
+}; // end ChainedCrescent_1
 
 #endif /* __CHAINEDCRESCENT_1_HPP__ */

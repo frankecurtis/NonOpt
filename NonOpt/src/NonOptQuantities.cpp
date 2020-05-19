@@ -14,17 +14,17 @@ namespace NonOpt
 
 // Constructor
 Quantities::Quantities()
-    : evaluation_time_(0),
-      function_counter_(0),
-      gradient_counter_(0),
-      iteration_counter_(0),
-      inner_iteration_counter_(0),
-      total_inner_iteration_counter_(0),
-      total_qp_iteration_counter_(0),
-      number_of_variables_(0),
-      stationarity_radius_(0.0),
-      trust_region_radius_(0.0),
-      stepsize_(0.0)
+  : evaluation_time_(0),
+    function_counter_(0),
+    gradient_counter_(0),
+    iteration_counter_(0),
+    inner_iteration_counter_(0),
+    total_inner_iteration_counter_(0),
+    total_qp_iteration_counter_(0),
+    number_of_variables_(0),
+    stationarity_radius_(0.0),
+    trust_region_radius_(0.0),
+    stepsize_(0.0)
 {
   start_time_ = clock();
   end_time_ = start_time_;
@@ -141,7 +141,7 @@ void Quantities::addOptions(Options* options,
                             "performed.\n"
                             "Default value: 1e+04.");
 
-}  // end addOptions
+} // end addOptions
 
 // Set options
 void Quantities::setOptions(const Options* options,
@@ -162,7 +162,7 @@ void Quantities::setOptions(const Options* options,
   options->valueAsInteger(reporter, "function_evaluation_limit", function_evaluation_limit_);
   options->valueAsInteger(reporter, "gradient_evaluation_limit", gradient_evaluation_limit_);
 
-}  // end setOptions
+} // end setOptions
 
 // Initialization
 bool Quantities::initialize(const std::shared_ptr<Problem> problem)
@@ -219,19 +219,19 @@ bool Quantities::initialize(const std::shared_ptr<Problem> problem)
   direction_ = std::make_shared<Vector>(number_of_variables_);
 
   // Initialize point set
-  point_set_ = std::make_shared<std::vector<std::shared_ptr<Point> > >();
+  point_set_ = std::make_shared<std::vector<std::shared_ptr<Point>>>();
 
   // Initialize radii
   stationarity_radius_ = 0.0;
   trust_region_radius_ = 0.0;
 
   // Initialize inexact termination factor
-  inexact_termination_factor_= 0.0;
+  inexact_termination_factor_ = 0.0;
 
   // Return
   return success;
 
-}  // end initialize
+} // end initialize
 
 // Iteration header string
 std::string Quantities::iterationHeader()
@@ -256,7 +256,7 @@ void Quantities::initializeRadii(const Options* options,
   // Initialize trust region radius
   trust_region_radius_ = fmax(trust_region_radius_initialization_minimum_, trust_region_radius_initialization_factor_ * current_iterate_->gradient()->normInf());
 
-}  // end initializeRadii
+} // end initializeRadii
 
 // Update radii
 void Quantities::updateRadii(double stationarity_tolerance)
@@ -268,53 +268,44 @@ void Quantities::updateRadii(double stationarity_tolerance)
 
   // reset step size
   stepsize_ = 1.0;
-}  // end updateRadii
+} // end updateRadii
 
 // Print header
 void Quantities::printHeader(const Reporter* reporter)
 {
 
   // Print header
-  reporter->printf(R_NL, R_BASIC,
-                   "Number of variables.............. : %d\n",
-                   number_of_variables_);
+  reporter->printf(R_NL, R_BASIC, "Number of variables.............. : %d\n", number_of_variables_);
 
-}  // end printHeader
+} // end printHeader
 
 // Print iteration values
 void Quantities::printIterationValues(const Reporter* reporter)
 {
 
   // Print iteration values
-  reporter->printf(R_NL, R_PER_ITERATION,
-                   " %6d  %+.4e  %+.4e  %+.4e  %8d",
-                   iteration_counter_,
-                   current_iterate_->objective(),
-                   stationarity_radius_,
-                   trust_region_radius_,
-                   (int)point_set_->size());
+  reporter->printf(R_NL, R_PER_ITERATION, " %6d  %+.4e  %+.4e  %+.4e  %8d", iteration_counter_, current_iterate_->objective(), stationarity_radius_, trust_region_radius_, (int)point_set_->size());
 
-}  // end printIterationValues
+} // end printIterationValues
 
 // Print footer
 void Quantities::printFooter(const Reporter* reporter)
 {
 
   // Print quantities footer
-  reporter->printf(R_NL, R_BASIC,
-                   "\n\n"
-                   "Objective........................ : %e\n"
-                   "Objective (unscaled)............. : %e\n"
-                   "\n"
-                   "Number of iterations............. : %d\n"
-                   "Number of inner iterations....... : %d\n"
-                   "Number of QP iterations.......... : %d\n"
-                   "Number of function evaluations... : %d\n"
-                   "Number of gradient evaluations... : %d\n"
-                   "\n"
-                   "CPU seconds...................... : %f\n"
-                   "CPU seconds in NonOpt............ : %f\n"
-                   "CPU seconds in evaluations....... : %f\n",
+  reporter->printf(R_NL, R_BASIC, "\n\n"
+                                  "Objective........................ : %e\n"
+                                  "Objective (unscaled)............. : %e\n"
+                                  "\n"
+                                  "Number of iterations............. : %d\n"
+                                  "Number of inner iterations....... : %d\n"
+                                  "Number of QP iterations.......... : %d\n"
+                                  "Number of function evaluations... : %d\n"
+                                  "Number of gradient evaluations... : %d\n"
+                                  "\n"
+                                  "CPU seconds...................... : %f\n"
+                                  "CPU seconds in NonOpt............ : %f\n"
+                                  "CPU seconds in evaluations....... : %f\n",
                    current_iterate_->objective(),
                    current_iterate_->objectiveUnscaled(),
                    iteration_counter_,
@@ -326,7 +317,7 @@ void Quantities::printFooter(const Reporter* reporter)
                    (end_time_ - start_time_ - evaluation_time_) / (double)CLOCKS_PER_SEC,
                    evaluation_time_ / (double)CLOCKS_PER_SEC);
 
-}  // end printFooter
+} // end printFooter
 
 // Finalization
 void Quantities::finalize()
@@ -335,6 +326,6 @@ void Quantities::finalize()
   // Set end time
   end_time_ = clock();
 
-}  // end finalize
+} // end finalize
 
-}  // namespace NonOpt
+} // namespace NonOpt

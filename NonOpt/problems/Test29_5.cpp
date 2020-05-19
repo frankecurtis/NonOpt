@@ -10,7 +10,7 @@
 
 // Constructor
 Test29_5::Test29_5(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 Test29_5::~Test29_5() {}
@@ -25,7 +25,7 @@ bool Test29_5::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool Test29_5::initialPoint(int n,
@@ -40,7 +40,7 @@ bool Test29_5::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool Test29_5::evaluateObjective(int n,
@@ -61,7 +61,7 @@ bool Test29_5::evaluateObjective(int n,
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool Test29_5::evaluateGradient(int n,
@@ -84,12 +84,12 @@ bool Test29_5::evaluateGradient(int n,
     for (int j = 0; j < n; j++) {
       g[j] += sign / double(i + j + 1);
     }
-  }  // end for
+  } // end for
 
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool Test29_5::finalizeSolution(int n,

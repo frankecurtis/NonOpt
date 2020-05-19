@@ -35,7 +35,7 @@ class Strategy;
 class PointSetUpdate : public Strategy
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -130,7 +130,7 @@ class PointSetUpdate : public Strategy
                               Strategies* strategies) = 0;
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -150,8 +150,8 @@ class PointSetUpdate : public Strategy
   PS_Status status_; /**< Termination status */
   //@}
 
-};  // end PointSetUpdate
+}; // end PointSetUpdate
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTPOINTSETUPDATE_HPP__ */

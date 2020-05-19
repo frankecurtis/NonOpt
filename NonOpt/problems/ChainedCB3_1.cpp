@@ -10,7 +10,7 @@
 
 // Constructor
 ChainedCB3_1::ChainedCB3_1(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 ChainedCB3_1::~ChainedCB3_1() {}
@@ -25,7 +25,7 @@ bool ChainedCB3_1::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool ChainedCB3_1::initialPoint(int n,
@@ -40,7 +40,7 @@ bool ChainedCB3_1::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool ChainedCB3_1::evaluateObjective(int n,
@@ -54,12 +54,12 @@ bool ChainedCB3_1::evaluateObjective(int n,
     f = f + fmax(pow(x[i], 4) + pow(x[i + 1], 2),
                  fmax(pow(2.0 - x[i], 2) + pow(2.0 - x[i + 1], 2),
                       2.0 * exp(-x[i] + x[i + 1])));
-  }  // end for
+  } // end for
 
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool ChainedCB3_1::evaluateGradient(int n,
@@ -80,21 +80,21 @@ bool ChainedCB3_1::evaluateGradient(int n,
     if (term1 >= term2 && term1 >= term3) {
       g[i] = g[i] + 4.0 * pow(x[i], 3);
       g[i + 1] = g[i + 1] + 2.0 * x[i + 1];
-    }  // end if
+    } // end if
     else if (term2 >= term1 && term2 >= term3) {
       g[i] = g[i] - 2.0 * (2.0 - x[i]);
       g[i + 1] = g[i + 1] - 2.0 * (2.0 - x[i + 1]);
-    }  // end else if
+    } // end else if
     else {
       g[i] = g[i] - 2.0 * exp(-x[i] + x[i + 1]);
       g[i + 1] = g[i + 1] + 2.0 * exp(-x[i] + x[i + 1]);
-    }  // end else
-  }    // end for
+    } // end else
+  }   // end for
 
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool ChainedCB3_1::finalizeSolution(int n,

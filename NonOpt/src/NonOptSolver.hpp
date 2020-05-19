@@ -36,7 +36,7 @@ class Strategies;
 class NonOptSolver
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -149,7 +149,7 @@ class NonOptSolver
   void optimize(const std::shared_ptr<Problem> problem);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -198,8 +198,8 @@ class NonOptSolver
   void setOptions();
   //@}
 
-};  // end NonOptSolver
+}; // end NonOptSolver
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTSOLVER_HPP__ */

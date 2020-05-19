@@ -120,6 +120,6 @@ enum SM_Status
 };
 //@}
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTENUMERATIONS_HPP__ */

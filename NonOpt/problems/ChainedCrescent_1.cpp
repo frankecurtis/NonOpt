@@ -10,7 +10,7 @@
 
 // Constructor
 ChainedCrescent_1::ChainedCrescent_1(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 ChainedCrescent_1::~ChainedCrescent_1() {}
@@ -25,7 +25,7 @@ bool ChainedCrescent_1::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool ChainedCrescent_1::initialPoint(int n,
@@ -40,12 +40,12 @@ bool ChainedCrescent_1::initialPoint(int n,
     else {
       x[i] = 2.0;
     }
-  }  // end for
+  } // end for
 
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool ChainedCrescent_1::evaluateObjective(int n,
@@ -59,7 +59,7 @@ bool ChainedCrescent_1::evaluateObjective(int n,
   for (int i = 0; i < n - 1; i++) {
     sum1 = sum1 + pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0;
     sum2 = sum2 - pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0;
-  }  // end for
+  } // end for
 
   // Evaluate objective
   f = fmax(sum1, sum2);
@@ -67,7 +67,7 @@ bool ChainedCrescent_1::evaluateObjective(int n,
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool ChainedCrescent_1::evaluateGradient(int n,
@@ -82,7 +82,7 @@ bool ChainedCrescent_1::evaluateGradient(int n,
     g[i] = 0.0;
     sum1 = sum1 + pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0;
     sum2 = sum2 - pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0;
-  }  // end for
+  } // end for
   g[n - 1] = 0.0;
 
   // Evaluate gradient
@@ -90,19 +90,19 @@ bool ChainedCrescent_1::evaluateGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] = g[i] + 2.0 * x[i];
       g[i + 1] = g[i + 1] + 2.0 * (x[i + 1] - 1.0) + 1.0;
-    }  // end for
-  }    // end if
+    } // end for
+  }   // end if
   else {
     for (int i = 0; i < n - 1; i++) {
       g[i] = g[i] - 2.0 * x[i];
       g[i + 1] = g[i + 1] - 2.0 * (x[i + 1] - 1.0) + 1.0;
-    }  // end for
-  }    // end else
+    } // end for
+  }   // end else
 
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool ChainedCrescent_1::finalizeSolution(int n,

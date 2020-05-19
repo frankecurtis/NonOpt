@@ -27,18 +27,18 @@ void Option::print(const Reporter* reporter) const
     reporter->printf(R_NL, R_BASIC, "Value       : %+e\n", value_double_);
     reporter->printf(R_NL, R_BASIC, "Lower bound : %+e\n", lower_bound_double_);
     reporter->printf(R_NL, R_BASIC, "Upper bound : %+e\n", upper_bound_double_);
-  }  // end if
+  } // end if
   else if (type_.compare("integer") == 0) {
     reporter->printf(R_NL, R_BASIC, "Value       : %d\n", value_int_);
     reporter->printf(R_NL, R_BASIC, "Lower bound : %d\n", lower_bound_int_);
     reporter->printf(R_NL, R_BASIC, "Upper bound : %d\n", upper_bound_int_);
-  }  // end else if
+  } // end else if
   else {
     reporter->printf(R_NL, R_BASIC, "Value       : %s\n", value_string_.c_str());
   }
   reporter->printf(R_NL, R_BASIC, "Description : %s\n", description_.c_str());
 
-}  // end print
+} // end print
 
 /////////////
 // Options //
@@ -59,7 +59,7 @@ void Options::print(const Reporter* reporter) const
     option_list_[i]->print(reporter);
   }
 
-}  // end print
+} // end print
 
 // Options: Add bool option
 bool Options::addBoolOption(const Reporter* reporter,
@@ -73,8 +73,8 @@ bool Options::addBoolOption(const Reporter* reporter,
     if (option_list_[i]->name().compare(name) == 0) {
       reporter->printf(R_NL, R_BASIC, "Option with name \'%s\' already exists.  Ignoring addition request.\n", name.c_str());
       return false;
-    }  // end if
-  }    // end for
+    } // end if
+  }   // end for
 
   // Declare new pointer
   std::shared_ptr<Option> option(new Option(name, "bool", value, description));
@@ -85,7 +85,7 @@ bool Options::addBoolOption(const Reporter* reporter,
   // Return true
   return true;
 
-}  // end addBoolOption
+} // end addBoolOption
 
 // Options: Add double option
 bool Options::addDoubleOption(const Reporter* reporter,
@@ -101,20 +101,20 @@ bool Options::addDoubleOption(const Reporter* reporter,
     if (option_list_[i]->name().compare(name) == 0) {
       reporter->printf(R_NL, R_BASIC, "Option with name \'%s\' already exists.  Ignoring addition request.\n", name.c_str());
       return false;
-    }  // end if
-  }    // end for
+    } // end if
+  }   // end for
 
   // Check that lower bound is lower than upper bound
   if (lower_bound > upper_bound) {
     reporter->printf(R_NL, R_BASIC, "Attempted to add double option \'%s\', but lower bound \'%+e\' greater than upper bound \'%+e\'.  Ignoring addition request.\n", name.c_str(), lower_bound, upper_bound);
     return false;
-  }  // end if
+  } // end if
 
   // Check that value is within bounds
   if (value < lower_bound || value > upper_bound) {
     reporter->printf(R_NL, R_BASIC, "Attempted to add double option \'%s\', but value \'%+e\' outside of bound interval \'[%+e,%+e]\'.  Ignoring addition request.\n", name.c_str(), value, lower_bound, upper_bound);
     return false;
-  }  // end if
+  } // end if
 
   // Declare new pointer
   std::shared_ptr<Option> option(new Option(name, "double", value, lower_bound, upper_bound, description));
@@ -125,7 +125,7 @@ bool Options::addDoubleOption(const Reporter* reporter,
   // Return true
   return true;
 
-}  // end addDoubleOption
+} // end addDoubleOption
 
 // Options: Add integer option
 bool Options::addIntegerOption(const Reporter* reporter,
@@ -141,20 +141,20 @@ bool Options::addIntegerOption(const Reporter* reporter,
     if (option_list_[i]->name().compare(name) == 0) {
       reporter->printf(R_NL, R_BASIC, "Option with name \'%s\' already exists.  Ignoring addition request.\n", name.c_str());
       return false;
-    }  // end if
-  }    // end for
+    } // end if
+  }   // end for
 
   // Check that lower bound is lower than upper bound
   if (lower_bound > upper_bound) {
     reporter->printf(R_NL, R_BASIC, "Attempted to add integer option \'%s\', but lower bound \'%d\' greater than upper bound \'%d\'.  Ignoring addition request.\n", name.c_str(), lower_bound, upper_bound);
     return false;
-  }  // end if
+  } // end if
 
   // Check that value is within bounds
   if (value < lower_bound || value > upper_bound) {
     reporter->printf(R_NL, R_BASIC, "Attempted to add integer option \'%s\', but value \'%d\' outside of bound interval \'[%d,%d]\'.  Ignoring addition request.\n", name.c_str(), value, lower_bound, upper_bound);
     return false;
-  }  // end if
+  } // end if
 
   // Declare new pointer
   std::shared_ptr<Option> option(new Option(name, "integer", value, lower_bound, upper_bound, description));
@@ -165,7 +165,7 @@ bool Options::addIntegerOption(const Reporter* reporter,
   // Return true
   return true;
 
-}  // end addIntegerOption
+} // end addIntegerOption
 
 // Options: Add string option
 bool Options::addStringOption(const Reporter* reporter,
@@ -179,8 +179,8 @@ bool Options::addStringOption(const Reporter* reporter,
     if (option_list_[i]->name().compare(name) == 0) {
       reporter->printf(R_NL, R_BASIC, "Option with name \'%s\' already exists.  Ignoring addition request.\n", name.c_str());
       return false;
-    }  // end if
-  }    // end for
+    } // end if
+  }   // end for
 
   // Declare new pointer
   std::shared_ptr<Option> option(new Option(name, "string", value, description));
@@ -191,7 +191,7 @@ bool Options::addStringOption(const Reporter* reporter,
   // Return true
   return true;
 
-}  // end addStringOption
+} // end addStringOption
 
 // Options: Get lower bound as a double
 bool Options::lowerBoundAsDouble(const Reporter* reporter,
@@ -205,18 +205,18 @@ bool Options::lowerBoundAsDouble(const Reporter* reporter,
       if (option_list_[i]->type().compare("double") == 0) {
         value = option_list_[i]->lowerBoundAsDouble();
         return true;
-      }  // end if
+      } // end if
       else {
         reporter->printf(R_NL, R_BASIC, "Attempted to access lower bound for option \'%s\' as double, but type is %s.  Returning false.\n", name.c_str(), option_list_[i]->type().c_str());
         return false;
-      }  // end else
-    }    // end if
-  }      // end for
+      } // end else
+    }   // end if
+  }     // end for
 
   // Return false if option not found
   return false;
 
-}  // end lowerBoundAsDouble
+} // end lowerBoundAsDouble
 
 // Options: Get lower bound as an integer
 bool Options::lowerBoundAsInteger(const Reporter* reporter,
@@ -230,18 +230,18 @@ bool Options::lowerBoundAsInteger(const Reporter* reporter,
       if (option_list_[i]->type().compare("integer") == 0) {
         value = option_list_[i]->lowerBoundAsInteger();
         return true;
-      }  // end if
+      } // end if
       else {
         reporter->printf(R_NL, R_BASIC, "Attempted to access lower bound for option \'%s\' as integer, but type is %s.  Returning false.\n", name.c_str(), option_list_[i]->type().c_str());
         return false;
-      }  // end else
-    }    // end if
-  }      // end for
+      } // end else
+    }   // end if
+  }     // end for
 
   // Return false if option not found
   return false;
 
-}  // end lowerBoundAsInteger
+} // end lowerBoundAsInteger
 
 // Options: Get upper bound as a double
 bool Options::upperBoundAsDouble(const Reporter* reporter,
@@ -255,18 +255,18 @@ bool Options::upperBoundAsDouble(const Reporter* reporter,
       if (option_list_[i]->type().compare("double") == 0) {
         value = option_list_[i]->upperBoundAsDouble();
         return true;
-      }  // end if
+      } // end if
       else {
         reporter->printf(R_NL, R_BASIC, "Attempted to access upper bound for option \'%s\' as double, but type is %s.  Returning false.\n", name.c_str(), option_list_[i]->type().c_str());
         return false;
-      }  // end else
-    }    // end if
-  }      // end for
+      } // end else
+    }   // end if
+  }     // end for
 
   // Return false if option not found
   return false;
 
-}  // end upperBoundAsDouble
+} // end upperBoundAsDouble
 
 // Options: Get upper bound as an integer
 bool Options::upperBoundAsInteger(const Reporter* reporter,
@@ -280,18 +280,18 @@ bool Options::upperBoundAsInteger(const Reporter* reporter,
       if (option_list_[i]->type().compare("integer") == 0) {
         value = option_list_[i]->upperBoundAsInteger();
         return true;
-      }  // end if
+      } // end if
       else {
         reporter->printf(R_NL, R_BASIC, "Attempted to access upper bound for option \'%s\' as integer, but type is %s.  Returning false.\n", name.c_str(), option_list_[i]->type().c_str());
         return false;
-      }  // end else
-    }    // end if
-  }      // end for
+      } // end else
+    }   // end if
+  }     // end for
 
   // Return false if option not found
   return false;
 
-}  // end upperBoundAsInteger
+} // end upperBoundAsInteger
 
 // Options: Get value as a bool
 bool Options::valueAsBool(const Reporter* reporter,
@@ -305,18 +305,18 @@ bool Options::valueAsBool(const Reporter* reporter,
       if (option_list_[i]->type().compare("bool") == 0) {
         value = option_list_[i]->valueAsBool();
         return true;
-      }  // end if
+      } // end if
       else {
         reporter->printf(R_NL, R_BASIC, "Attempted to access value for option \'%s\' as string, but type is %s.  Returning false.\n", name.c_str(), option_list_[i]->type().c_str());
         return false;
-      }  // end else
-    }    // end if
-  }      // end for
+      } // end else
+    }   // end if
+  }     // end for
 
   // Return false if option not found
   return false;
 
-}  // end valueAsBool
+} // end valueAsBool
 
 // Options: Get value as a double
 bool Options::valueAsDouble(const Reporter* reporter,
@@ -330,18 +330,18 @@ bool Options::valueAsDouble(const Reporter* reporter,
       if (option_list_[i]->type().compare("double") == 0) {
         value = option_list_[i]->valueAsDouble();
         return true;
-      }  // end if
+      } // end if
       else {
         reporter->printf(R_NL, R_BASIC, "Attempted to access value for option \'%s\' as double, but type is %s.  Returning false.\n", name.c_str(), option_list_[i]->type().c_str());
         return false;
-      }  // end else
-    }    // end if
-  }      // end for
+      } // end else
+    }   // end if
+  }     // end for
 
   // Return false if option not found
   return false;
 
-}  // end valueAsDouble
+} // end valueAsDouble
 
 // Options: Get value as an integer
 bool Options::valueAsInteger(const Reporter* reporter,
@@ -355,18 +355,18 @@ bool Options::valueAsInteger(const Reporter* reporter,
       if (option_list_[i]->type().compare("integer") == 0) {
         value = option_list_[i]->valueAsInteger();
         return true;
-      }  // end if
+      } // end if
       else {
         reporter->printf(R_NL, R_BASIC, "Attempted to access value for option \'%s\' as integer, but type is %s.  Returning false.\n", name.c_str(), option_list_[i]->type().c_str());
         return false;
-      }  // end else
-    }    // end if
-  }      // end for
+      } // end else
+    }   // end if
+  }     // end for
 
   // Return false if option not found
   return false;
 
-}  // end valueAsInteger
+} // end valueAsInteger
 
 // Options: Get value as a string
 bool Options::valueAsString(const Reporter* reporter,
@@ -380,18 +380,18 @@ bool Options::valueAsString(const Reporter* reporter,
       if (option_list_[i]->type().compare("string") == 0) {
         value = option_list_[i]->valueAsString();
         return true;
-      }  // end if
+      } // end if
       else {
         reporter->printf(R_NL, R_BASIC, "Attempted to access value for option \'%s\' as string, but type is %s.  Returning false.\n", name.c_str(), option_list_[i]->type().c_str());
         return false;
-      }  // end else
-    }    // end if
-  }      // end for
+      } // end else
+    }   // end if
+  }     // end for
 
   // Return false if option not found
   return false;
 
-}  // end valueAsString
+} // end valueAsString
 
 // Options: Modify from file nonopt.opt
 void Options::modifyOptionsFromFile(const Reporter* reporter,
@@ -426,41 +426,38 @@ void Options::modifyOptionsFromFile(const Reporter* reporter,
         if (option_list_[i]->type().compare("bool") == 0) {
           try {
             modifyBoolValue(reporter, s1, (s2.compare("true") == 0 || s2.compare("1") == 0));
-          }
-          catch (...) {
+          } catch (...) {
             reporter->printf(R_NL, R_BASIC, "Attempted to set value for option \'%s\', but cannot convert \'%s\' to bool.  Ignoring request.\n", s1.c_str(), s2.c_str());
           }
         }
         else if (option_list_[i]->type().compare("double") == 0) {
           try {
             modifyDoubleValue(reporter, s1, std::stod(s2));
-          }
-          catch (...) {
+          } catch (...) {
             reporter->printf(R_NL, R_BASIC, "Attempted to set value for option \'%s\', but cannot convert \'%s\' to double.  Ignoring request.\n", s1.c_str(), s2.c_str());
           }
-        }  // end if
+        } // end if
         else if (option_list_[i]->type().compare("integer") == 0) {
           try {
             modifyIntegerValue(reporter, s1, (int)std::stod(s2));
-          }
-          catch (...) {
+          } catch (...) {
             reporter->printf(R_NL, R_BASIC, "Attempted to set value for option \'%s\', but cannot convert \'%s\' to int.  Ignoring request.\n", s1.c_str(), s2.c_str());
           }
-        }  // end else if
+        } // end else if
         else {
           modifyStringValue(reporter, s1, s2);
         }
-      }  // end if
-    }    // end for
+      } // end if
+    }   // end for
 
     // Print message if name not found
     if (!name_found) {
       reporter->printf(R_NL, R_BASIC, "Option with name \'%s\' does not exist.  Ignoring request.\n", s1.c_str());
     }
 
-  }  // end while
+  } // end while
 
-}  // end modifyOptionsFromFile
+} // end modifyOptionsFromFile
 
 // Options: Modify bool value
 bool Options::modifyBoolValue(const Reporter* reporter,
@@ -475,18 +472,18 @@ bool Options::modifyBoolValue(const Reporter* reporter,
         option_list_[i]->modifyBoolValue(value);
         reporter->printf(R_NL, R_BASIC, "Set value for option \'%s\' as %s.\n", name.c_str(), (value) ? "true" : "false");
         return true;
-      }  // end if
+      } // end if
       else {
         reporter->printf(R_NL, R_BASIC, "Attempted to set value for option \'%s\' as bool, but type is %s.  Ignoring request.\n", name.c_str(), option_list_[i]->type().c_str());
         return false;
-      }  // end else
-    }    // end if
-  }      // end for
+      } // end else
+    }   // end if
+  }     // end for
 
   // Return false (not found)
   return false;
 
-}  // end modifyBoolValue
+} // end modifyBoolValue
 
 // Options: Modify double value
 bool Options::modifyDoubleValue(const Reporter* reporter,
@@ -503,23 +500,23 @@ bool Options::modifyDoubleValue(const Reporter* reporter,
           option_list_[i]->modifyDoubleValue(value);
           reporter->printf(R_NL, R_BASIC, "Set value for option \'%s\' as %+e.\n", name.c_str(), value);
           return true;
-        }  // end if
+        } // end if
         else {
           reporter->printf(R_NL, R_BASIC, "Attempted to set value for option \'%s\', but value %+e outside of bound interval \'[%+e,%+e]\'.  Ignoring request.\n", name.c_str(), value, option_list_[i]->lowerBoundAsDouble(), option_list_[i]->upperBoundAsDouble());
           return false;
-        }  // end else
-      }    // end if
+        } // end else
+      }   // end if
       else {
         reporter->printf(R_NL, R_BASIC, "Attempted to set value for option \'%s\' as double, but type is %s.  Ignoring request.\n", name.c_str(), option_list_[i]->type().c_str());
         return false;
-      }  // end else
-    }    // end if
-  }      // end for
+      } // end else
+    }   // end if
+  }     // end for
 
   // Return false (not found)
   return false;
 
-}  // end modifyDoubleValue
+} // end modifyDoubleValue
 
 // Options: Modify integer value
 bool Options::modifyIntegerValue(const Reporter* reporter,
@@ -536,23 +533,23 @@ bool Options::modifyIntegerValue(const Reporter* reporter,
           option_list_[i]->modifyIntegerValue(value);
           reporter->printf(R_NL, R_BASIC, "Set value for option \'%s\' as %d.\n", name.c_str(), value);
           return true;
-        }  // end if
+        } // end if
         else {
           reporter->printf(R_NL, R_BASIC, "Attempted to set value for option \'%s\', but value %d outside of bound interval \'[%d,%d]\'.  Ignoring request.\n", name.c_str(), value, option_list_[i]->lowerBoundAsInteger(), option_list_[i]->upperBoundAsInteger());
           return false;
-        }  // end else
-      }    // end if
+        } // end else
+      }   // end if
       else {
         reporter->printf(R_NL, R_BASIC, "Attempted to set value for option \'%s\' as integer, but type is %s.  Ignoring request.\n", name.c_str(), option_list_[i]->type().c_str());
         return false;
-      }  // end else
-    }    // end if
-  }      // end for
+      } // end else
+    }   // end if
+  }     // end for
 
   // Return false (not found)
   return false;
 
-}  // end modifyIntegerValue
+} // end modifyIntegerValue
 
 // Options: Modify string value
 bool Options::modifyStringValue(const Reporter* reporter,
@@ -567,17 +564,17 @@ bool Options::modifyStringValue(const Reporter* reporter,
         option_list_[i]->modifyStringValue(value);
         reporter->printf(R_NL, R_BASIC, "Set value for option \'%s\' as %s.\n", name.c_str(), value.c_str());
         return true;
-      }  // end if
+      } // end if
       else {
         reporter->printf(R_NL, R_BASIC, "Attempted to set value for option \'%s\' as string, but type is %s.  Ignoring request.\n", name.c_str(), option_list_[i]->type().c_str());
         return false;
-      }  // end else
-    }    // end if
-  }      // end for
+      } // end else
+    }   // end if
+  }     // end for
 
   // Return false (not found)
   return false;
 
-}  // end modifyStringValue
+} // end modifyStringValue
 
-}  // namespace NonOpt
+} // namespace NonOpt

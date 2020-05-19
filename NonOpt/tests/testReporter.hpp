@@ -9,7 +9,6 @@
 
 #include <fstream>
 #include <iostream>
-#include <sstream>
 
 #include "NonOptReporter.hpp"
 
@@ -167,11 +166,11 @@ int testReporterImplementation(int option)
     else {
       printf("TEST FAILED.\n");
     }
-  }  // end if
+  } // end if
 
   // Return
   return result;
 
-}  // end testReporterImplementation
+} // end testReporterImplementation
 
 #endif /* __TESTREPORTER_HPP__ */

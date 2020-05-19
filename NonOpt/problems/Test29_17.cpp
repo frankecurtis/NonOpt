@@ -10,7 +10,7 @@
 
 // Constructor
 Test29_17::Test29_17(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 Test29_17::~Test29_17() {}
@@ -25,7 +25,7 @@ bool Test29_17::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool Test29_17::initialPoint(int n,
@@ -40,7 +40,7 @@ bool Test29_17::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool Test29_17::evaluateObjective(int n,
@@ -53,12 +53,12 @@ bool Test29_17::evaluateObjective(int n,
   for (int i = 0; i < n; i++) {
     int j = i / 5;
     f = fmax(f, fabs(5 - (double)(j + 1) * (1 - cos(x[i])) - sin(x[i]) - cos(x[5 * j]) - cos(x[5 * j + 1]) - cos(x[5 * j + 2]) - cos(x[5 * j + 3]) - cos(x[5 * j + 4])));
-  }  // end for
+  } // end for
 
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool Test29_17::evaluateGradient(int n,
@@ -82,8 +82,8 @@ bool Test29_17::evaluateGradient(int n,
       max_ind = i;
       max_val = fabs(term);
       max_term = term;
-    }  // end if
-  }    // end for
+    } // end if
+  }   // end for
   int j = max_ind / 5;
   double sign = ((max_term >= 0) ? 1.0 : -1.0);
   g[max_ind] += sign * (-(double)(j + 1) * sin(x[max_ind]) - cos(x[max_ind]));
@@ -96,7 +96,7 @@ bool Test29_17::evaluateGradient(int n,
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool Test29_17::finalizeSolution(int n,

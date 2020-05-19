@@ -18,7 +18,7 @@ namespace NonOpt
 class PointSetUpdateProximity : public PointSetUpdate
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -99,7 +99,7 @@ class PointSetUpdateProximity : public PointSetUpdate
                       Strategies* strategies);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -122,8 +122,8 @@ class PointSetUpdateProximity : public PointSetUpdate
   double lower_epsilon_;
   //@}
 
-};  // end PointSetUpdateProximity
+}; // end PointSetUpdateProximity
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTPOINTSETUPDATEPROXIMITY_HPP__ */

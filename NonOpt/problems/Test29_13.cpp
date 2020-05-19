@@ -11,7 +11,7 @@
 
 // Constructor
 Test29_13::Test29_13(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 Test29_13::~Test29_13() {}
@@ -26,7 +26,7 @@ bool Test29_13::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool Test29_13::initialPoint(int n,
@@ -35,24 +35,24 @@ bool Test29_13::initialPoint(int n,
 
   // Set initial point
   for (int i = 0; i < n; i++) {
-    if ((i+1) % 4 == 0) {
+    if ((i + 1) % 4 == 0) {
       x[i] = 0.8;
     }
-    else if ((i+1) % 4 == 1) {
+    else if ((i + 1) % 4 == 1) {
       x[i] = -0.8;
     }
-    else if ((i+1) % 4 == 2) {
+    else if ((i + 1) % 4 == 2) {
       x[i] = 1.2;
     }
     else {
       x[i] = -1.2;
     }
-  }  // end for
+  } // end for
 
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool Test29_13::evaluateObjective(int n,
@@ -65,25 +65,25 @@ bool Test29_13::evaluateObjective(int n,
 
   // Evaluate sum of absolute values
   f = 0.0;
-  for (int k = 1; k <= 2*n - 4; k++) {
-    int i = 2*((k+3) / 4) - 2;
-    int l = (k-1) % 4 + 1;
-    double term1 = y[l-1];
+  for (int k = 1; k <= 2 * n - 4; k++) {
+    int i = 2 * ((k + 3) / 4) - 2;
+    int l = (k - 1) % 4 + 1;
+    double term1 = y[l - 1];
     for (int h = 1; h <= 3; h++) {
       double term2 = ((double)(h * h) / (double)l);
       for (int j = 1; j <= 4; j++) {
-        double sign2 = ((x[i+j-1] > 0.0) ? 1.0 : ((x[i+j-1] < 0.0) ? -1.0 : 0.0));
-        term2 *= sign2 * pow(fabs(x[i+j-1]), (double)j / (double)(h*l));
+        double sign2 = ((x[i + j - 1] > 0.0) ? 1.0 : ((x[i + j - 1] < 0.0) ? -1.0 : 0.0));
+        term2 *= sign2 * pow(fabs(x[i + j - 1]), (double)j / (double)(h * l));
       }
       term1 += term2;
     }
     f += fabs(term1);
-  }  // end for
+  } // end for
 
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool Test29_13::evaluateGradient(int n,
@@ -100,20 +100,20 @@ bool Test29_13::evaluateGradient(int n,
   double y[4] = {-14.4, -6.8, -4.2, -3.2};
 
   // Evaluate gradient
-  for (int k = 1; k <= 2*n - 4; k++) {
-    int i = 2*((k+3) / 4) - 2;
-    int l = (k-1) % 4 + 1;
-    double term1 = y[l-1];
+  for (int k = 1; k <= 2 * n - 4; k++) {
+    int i = 2 * ((k + 3) / 4) - 2;
+    int l = (k - 1) % 4 + 1;
+    double term1 = y[l - 1];
     double p[3][4];
     for (int h = 1; h <= 3; h++) {
       double term2 = ((double)(h * h) / (double)l);
       for (int j = 1; j <= 4; j++) {
-        double sign2 = ((x[i+j-1] > 0.0) ? 1.0 : ((x[i+j-1] < 0.0) ? -1.0 : 0.0));
-        p[h-1][j-1] = sign2 * pow(fabs(x[i+j-1]), (double)j / (double)(h*l));
-        term2 *= p[h-1][j-1];
-      }  // end for
+        double sign2 = ((x[i + j - 1] > 0.0) ? 1.0 : ((x[i + j - 1] < 0.0) ? -1.0 : 0.0));
+        p[h - 1][j - 1] = sign2 * pow(fabs(x[i + j - 1]), (double)j / (double)(h * l));
+        term2 *= p[h - 1][j - 1];
+      } // end for
       term1 += term2;
-    }  // end for
+    } // end for
     double sign1 = ((term1 >= 0.0) ? 1.0 : -1.0);
     for (int h = 1; h <= 3; h++) {
       double product = sign1 * ((double)(h * h) / (double)l);
@@ -121,19 +121,19 @@ bool Test29_13::evaluateGradient(int n,
         double value = product;
         for (int m = 1; m <= 4; m++) {
           if (j != m) {
-            value *= p[h-1][m-1];
+            value *= p[h - 1][m - 1];
           }
-        }  // end for
-        double sign_x = ((x[i+j-1] >= 0.0) ? 1.0 : -1.0);
-        g[i+j-1] += value * sign_x * x[i+j-1] * ((double)j / double(h*l)) * pow(fabs(x[i+j-1]), ((double)j / (double)(h*l) - 2.0));
-      }  // end for
-    }    // end for
-  }      // end for
+        } // end for
+        double sign_x = ((x[i + j - 1] >= 0.0) ? 1.0 : -1.0);
+        g[i + j - 1] += value * sign_x * x[i + j - 1] * ((double)j / double(h * l)) * pow(fabs(x[i + j - 1]), ((double)j / (double)(h * l) - 2.0));
+      } // end for
+    }   // end for
+  }     // end for
 
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool Test29_13::finalizeSolution(int n,

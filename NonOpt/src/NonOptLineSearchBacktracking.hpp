@@ -18,7 +18,7 @@ namespace NonOpt
 class LineSearchBacktracking : public LineSearch
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -99,7 +99,7 @@ class LineSearchBacktracking : public LineSearch
                      Strategies* strategies);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -124,8 +124,8 @@ class LineSearchBacktracking : public LineSearch
   double stepsize_increase_factor_;
   //@}
 
-};  // end LineSearchBacktracking
+}; // end LineSearchBacktracking
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTLINESEARCHBACKTRACKING_HPP__ */

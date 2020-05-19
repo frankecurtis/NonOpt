@@ -15,10 +15,10 @@ namespace NonOpt
 Point::Point(std::shared_ptr<Problem> problem,
              std::shared_ptr<Vector> vector,
              double scale)
-    : objective_evaluated_(false),
-      gradient_evaluated_(false),
-      scale_(scale),
-      problem_(problem)
+  : objective_evaluated_(false),
+    gradient_evaluated_(false),
+    scale_(scale),
+    problem_(problem)
 {
 
   // Declare new vector
@@ -33,7 +33,7 @@ Point::Point(std::shared_ptr<Problem> problem,
   // Set gradient pointer to null
   gradient_.reset();
 
-}  // end constructor
+} // end constructor
 
 // Print
 void Point::print(const Reporter* reporter,
@@ -57,7 +57,7 @@ std::shared_ptr<Point> Point::makeNewLinearCombination(double scalar1,
   // Return
   return new_point;
 
-}  // end makeNewLinearCombination
+} // end makeNewLinearCombination
 
 // Make new Point by randomly generating one within an epsilon-ball around this Point's vector
 std::shared_ptr<Point> Point::makeNewRandom(double epsilon,
@@ -93,7 +93,7 @@ std::shared_ptr<Point> Point::makeNewRandom(double epsilon,
   // Return
   return new_point;
 
-}  // end makeNewRandom
+} // end makeNewRandom
 
 // Determine scale
 void Point::determineScale(Quantities& quantities)
@@ -107,7 +107,7 @@ void Point::determineScale(Quantities& quantities)
     scale_ = quantities.scalingThreshold() / gradient_->normInf();
   }
 
-}  // end determineScale
+} // end determineScale
 
 // Evaluate objective
 bool Point::evaluateObjective(Quantities& quantities)
@@ -141,12 +141,12 @@ bool Point::evaluateObjective(Quantities& quantities)
       THROW_EXCEPTION(NONOPT_FUNCTION_EVALUATION_LIMIT_EXCEPTION, "Function evaluation limit reached.");
     }
 
-  }  // end if
+  } // end if
 
   // Return
   return objective_evaluated_;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Evaluate gradient
 bool Point::evaluateGradient(Quantities& quantities)
@@ -199,11 +199,11 @@ bool Point::evaluateGradient(Quantities& quantities)
       THROW_EXCEPTION(NONOPT_GRADIENT_EVALUATION_LIMIT_EXCEPTION, "Gradient evaluation limit reached.");
     }
 
-  }  // end if
+  } // end if
 
   // Return
   return gradient_evaluated_;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
-}  // namespace NonOpt
+} // namespace NonOpt

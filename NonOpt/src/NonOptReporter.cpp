@@ -22,7 +22,7 @@ Reporter::~Reporter()
   // Clear elements
   reports_.clear();
 
-}  // end destructor
+} // end destructor
 
 // printf
 void Reporter::printf(ReportType type,
@@ -37,7 +37,7 @@ void Reporter::printf(ReportType type,
   printList(type, level, format, lst);
   va_end(lst);
 
-}  // end printf
+} // end printf
 
 // Print list
 void Reporter::printList(ReportType type,
@@ -53,10 +53,10 @@ void Reporter::printList(ReportType type,
       va_copy(lstcopy, lst);
       reports_[i]->printList(type, level, format, lstcopy);
       va_end(lstcopy);
-    }  // end if
-  }    // end for
+    } // end if
+  }   // end for
 
-}  // end printList
+} // end printList
 
 // Add report
 bool Reporter::addReport(const std::shared_ptr<Report> report)
@@ -68,7 +68,7 @@ bool Reporter::addReport(const std::shared_ptr<Report> report)
   // Return
   return true;
 
-}  // end addReport
+} // end addReport
 
 // Add file report
 bool Reporter::addFileReport(std::string report_name,
@@ -88,7 +88,7 @@ bool Reporter::addFileReport(std::string report_name,
   // Return
   return false;
 
-}  // end addFileReport
+} // end addFileReport
 
 // Get report
 std::shared_ptr<Report> Reporter::report(std::string name)
@@ -103,13 +103,13 @@ std::shared_ptr<Report> Reporter::report(std::string name)
     if (temp->name().compare(name) == 0) {
       returnValue = temp;
       break;
-    }  // end if
-  }    // end for
+    } // end if
+  }   // end for
 
   // Return
   return returnValue;
 
-}  // end report
+} // end report
 
 // Check accepted
 bool Reporter::isAccepted(ReportType type,
@@ -121,12 +121,12 @@ bool Reporter::isAccepted(ReportType type,
     if (reports_[i]->isAccepted(type, level)) {
       return true;
     }
-  }  // end for
+  } // end for
 
   // Return
   return false;
 
-}  // end isAccepted
+} // end isAccepted
 
 // Flush buffer
 void Reporter::flushBuffer() const
@@ -137,7 +137,7 @@ void Reporter::flushBuffer() const
     reports_[i]->flushBuffer();
   }
 
-}  // end flushBuffer
+} // end flushBuffer
 
 // Delete reports
 void Reporter::deleteReports()
@@ -147,12 +147,12 @@ void Reporter::deleteReports()
   for (int i = 0; i < (int)reports_.size(); i++) {
     reports_[i]->close();
     reports_[i] = nullptr;
-  }  // end for
+  } // end for
 
   // Resize
   reports_.resize(0);
 
-}  // end deleteReports
+} // end deleteReports
 
 //////////////////
 // Report class //
@@ -162,9 +162,9 @@ void Reporter::deleteReports()
 Report::Report(std::string name,
                ReportType type,
                ReportLevel level)
-    : name_(name),
-      type_(type),
-      level_(level) {}
+  : name_(name),
+    type_(type),
+    level_(level) {}
 
 // Destructor
 Report::~Report() {}
@@ -176,7 +176,7 @@ std::string Report::name()
   // Return
   return name_;
 
-}  // end name
+} // end name
 
 // Set type and level
 void Report::setTypeAndLevel(ReportType type,
@@ -187,7 +187,7 @@ void Report::setTypeAndLevel(ReportType type,
   type_ = type;
   level_ = level;
 
-}  // end setTypeAndLevel
+} // end setTypeAndLevel
 
 // Check accepted
 bool Report::isAccepted(ReportType type,
@@ -199,17 +199,17 @@ bool Report::isAccepted(ReportType type,
     if (type == type_ && level <= level_) {
       return true;
     }
-  }  // end if
+  } // end if
   else {
     if (type == type_ && level == level_) {
       return true;
     }
-  }  // end else
+  } // end else
 
   // Return
   return false;
 
-}  // end isAccepted
+} // end isAccepted
 
 //////////////////////
 // FileReport class //
@@ -219,8 +219,8 @@ bool Report::isAccepted(ReportType type,
 FileReport::FileReport(std::string name,
                        ReportType type,
                        ReportLevel level)
-    : Report(name, type, level),
-      file_(nullptr) {}
+  : Report(name, type, level),
+    file_(nullptr) {}
 
 // Destructor
 FileReport::~FileReport()
@@ -234,7 +234,7 @@ FileReport::~FileReport()
   // Set pointer to null
   file_ = nullptr;
 
-}  // end destructor
+} // end destructor
 
 // Open file
 bool FileReport::open(const char* name)
@@ -254,22 +254,22 @@ bool FileReport::open(const char* name)
   if (strcmp("stdout", name) == 0) {
     file_ = stdout;
     return true;
-  }  // end if
+  } // end if
   else if (strcmp("stderr", name) == 0) {
     file_ = stderr;
     return true;
-  }  // end else if
+  } // end else if
   else {
     file_ = fopen(name, "w+");
     if (file_) {
       return true;
     }
-  }  // end else
+  } // end else
 
   // Return default
   return false;
 
-}  // end open
+} // end open
 
 // Close
 void FileReport::closeImplementation()
@@ -283,7 +283,7 @@ void FileReport::closeImplementation()
   // Set pointer to null
   file_ = nullptr;
 
-}  // end closeImplementation
+} // end closeImplementation
 
 // Print list implementation
 void FileReport::printListImplementation(ReportType type,
@@ -297,7 +297,7 @@ void FileReport::printListImplementation(ReportType type,
     vfprintf(file_, format, lst);
   }
 
-}  // end printListImplementation
+} // end printListImplementation
 
 // Flush buffer
 void FileReport::flushBufferImplementation()
@@ -308,7 +308,7 @@ void FileReport::flushBufferImplementation()
     fflush(file_);
   }
 
-}  // end flushBufferImplementation
+} // end flushBufferImplementation
 
 ////////////////////////
 // StreamReport class //
@@ -318,8 +318,8 @@ void FileReport::flushBufferImplementation()
 StreamReport::StreamReport(std::string name,
                            ReportType type,
                            ReportLevel level)
-    : Report(name, type, level),
-      os_(nullptr) {}
+  : Report(name, type, level),
+    os_(nullptr) {}
 
 // Set stream
 void StreamReport::setStream(std::ostream* os)
@@ -328,7 +328,7 @@ void StreamReport::setStream(std::ostream* os)
   // Set stream
   os_ = os;
 
-}  // end setStream
+} // end setStream
 
 // Print list implementation
 void StreamReport::printListImplementation(ReportType type,
@@ -343,7 +343,7 @@ void StreamReport::printListImplementation(ReportType type,
     *os_ << buffer_;
   }
 
-}  // end printListImplementation
+} // end printListImplementation
 
 // Flush buffer
 void StreamReport::flushBufferImplementation()
@@ -354,6 +354,6 @@ void StreamReport::flushBufferImplementation()
     *os_ << std::flush;
   }
 
-}  // end flushBufferImplementation
+} // end flushBufferImplementation
 
-}  // namespace NonOpt
+} // namespace NonOpt

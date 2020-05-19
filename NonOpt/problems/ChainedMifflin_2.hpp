@@ -25,7 +25,7 @@ using namespace NonOpt;
 class ChainedMifflin_2 : public Problem
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -100,7 +100,7 @@ class ChainedMifflin_2 : public Problem
                         const double* g);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -120,6 +120,6 @@ class ChainedMifflin_2 : public Problem
   int number_of_variables_; /**< Number of variables */
   //@}
 
-};  // end ChainedMifflin_2
+}; // end ChainedMifflin_2
 
 #endif /* __CHAINEDMIFFLIN_2_HPP__ */

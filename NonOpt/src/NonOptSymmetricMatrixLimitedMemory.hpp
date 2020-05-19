@@ -18,17 +18,17 @@ namespace NonOpt
 class SymmetricMatrixLimitedMemory : public SymmetricMatrix
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
     * Construct SymmetricMatrixLimitedMemory
     */
   SymmetricMatrixLimitedMemory()
-      : size_(-1),
-        history_(-1),
-        initial_diagonal_value_(1.0),
-        values_(nullptr)
+    : size_(-1),
+      history_(-1),
+      initial_diagonal_value_(1.0),
+      values_(nullptr)
   {
     s_.clear();
     y_.clear();
@@ -178,7 +178,7 @@ class SymmetricMatrixLimitedMemory : public SymmetricMatrix
              std::string name) const;
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
     * (Hidden to avoid implicit creation/calling.)
     */
@@ -195,21 +195,21 @@ class SymmetricMatrixLimitedMemory : public SymmetricMatrix
 
   /** @name Private members */
   //@{
-  int size_;                                                          /**< Number of rows and number of columns */
-  int history_;                                                       /**< Limited memory history length */
-  double initial_diagonal_value_;                                     /**< Diagonal value of "initial" matrix */
-  double* values_;                                                    /**< Double array, values of matrix (TEMPORARY) */
-  std::vector<std::shared_ptr<Vector> > s_;                           /**< Vector vector, "s" values */
-  std::vector<std::shared_ptr<Vector> > y_;                           /**< Vector vector, "y" values */
-  std::vector<double> rho_;                                           /**< Double vector, "rho" values */
-  std::vector<std::shared_ptr<Vector> > computed_columns_;            /**< Vector vector, computed columns */
-  std::vector<std::shared_ptr<Vector> > computed_columns_of_inverse_; /**< Vector vector, computed columns of inverse */
-  std::vector<int> computed_column_indices_;                          /**< Integer vector, computed column indices */
-  std::vector<int> computed_column_indices_of_inverse_;               /**< Integer vector, computed column indices of inverse */
+  int size_;                                                         /**< Number of rows and number of columns */
+  int history_;                                                      /**< Limited memory history length */
+  double initial_diagonal_value_;                                    /**< Diagonal value of "initial" matrix */
+  double* values_;                                                   /**< Double array, values of matrix (TEMPORARY) */
+  std::vector<std::shared_ptr<Vector>> s_;                           /**< Vector vector, "s" values */
+  std::vector<std::shared_ptr<Vector>> y_;                           /**< Vector vector, "y" values */
+  std::vector<double> rho_;                                          /**< Double vector, "rho" values */
+  std::vector<std::shared_ptr<Vector>> computed_columns_;            /**< Vector vector, computed columns */
+  std::vector<std::shared_ptr<Vector>> computed_columns_of_inverse_; /**< Vector vector, computed columns of inverse */
+  std::vector<int> computed_column_indices_;                         /**< Integer vector, computed column indices */
+  std::vector<int> computed_column_indices_of_inverse_;              /**< Integer vector, computed column indices of inverse */
   //@}
 
-};  // end SymmetricMatrixLimitedMemory
+}; // end SymmetricMatrixLimitedMemory
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTSYMMETRICMATRIXLIMITEDMEMORY_HPP__ */

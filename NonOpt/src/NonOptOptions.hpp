@@ -21,7 +21,7 @@ namespace NonOpt
 class Option
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -35,10 +35,10 @@ class Option
          std::string type,
          bool value,
          std::string description)
-      : description_(description),
-        name_(name),
-        type_(type),
-        value_bool_(value){};
+    : description_(description),
+      name_(name),
+      type_(type),
+      value_bool_(value){};
   /**
    * Constructor of double option
    * \param[in] name is name of option
@@ -54,12 +54,12 @@ class Option
          double lower_bound,
          double upper_bound,
          std::string description)
-      : description_(description),
-        lower_bound_double_(lower_bound),
-        name_(name),
-        type_(type),
-        upper_bound_double_(upper_bound),
-        value_double_(value){};
+    : description_(description),
+      lower_bound_double_(lower_bound),
+      name_(name),
+      type_(type),
+      upper_bound_double_(upper_bound),
+      value_double_(value){};
   /**
    * Constructor of integer option
    * \param[in] name is name of option
@@ -75,12 +75,12 @@ class Option
          int lower_bound,
          int upper_bound,
          std::string description)
-      : description_(description),
-        lower_bound_int_(lower_bound),
-        name_(name),
-        type_(type),
-        upper_bound_int_(upper_bound),
-        value_int_(value){};
+    : description_(description),
+      lower_bound_int_(lower_bound),
+      name_(name),
+      type_(type),
+      upper_bound_int_(upper_bound),
+      value_int_(value){};
   /**
    * Constructor of string option
    * \param[in] name is name of option
@@ -92,10 +92,10 @@ class Option
          std::string type,
          std::string value,
          std::string description)
-      : description_(description),
-        name_(name),
-        type_(type),
-        value_string_(value){};
+    : description_(description),
+      name_(name),
+      type_(type),
+      value_string_(value){};
   //@}
 
   /** @name Destructor */
@@ -193,7 +193,7 @@ class Option
   inline void modifyStringValue(std::string value) { value_string_ = value; };
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -229,7 +229,7 @@ class Option
   std::string value_string_;  /**< Value as string */
   //@}
 
-};  // end Option
+}; // end Option
 
 /**
  * Options class
@@ -237,7 +237,7 @@ class Option
 class Options
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -442,7 +442,7 @@ class Options
                          std::string value);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -459,11 +459,11 @@ class Options
 
   /** @name Private members */
   //@{
-  std::vector<std::shared_ptr<Option> > option_list_; /**< Vector of options */
+  std::vector<std::shared_ptr<Option>> option_list_; /**< Vector of options */
   //@}
 
-};  // end Options
+}; // end Options
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTOPTION_HPP__ */

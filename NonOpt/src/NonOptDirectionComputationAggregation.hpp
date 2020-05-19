@@ -24,7 +24,7 @@ class RandomNumberGenerator;
 class DirectionComputationAggregation : public DirectionComputation
 {
 
- public:
+public:
   /** @name Constructor */
   //@{
   /**
@@ -105,7 +105,7 @@ class DirectionComputationAggregation : public DirectionComputation
                         Strategies* strategies);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -131,8 +131,8 @@ class DirectionComputationAggregation : public DirectionComputation
   double shortened_stepsize_;
   double step_acceptance_tolerance_;
   double full_size_factor_;
-  double * yk;
-  double * gamm;
+  double* yk;
+  double* gamm;
   bool do_agg_next_;
   int inner_iteration_limit_;
   RandomNumberGenerator random_number_generator_;
@@ -149,8 +149,8 @@ class DirectionComputationAggregation : public DirectionComputation
                                Strategies* strategies);
   //@}
 
-};  // end DirectionComputationAggregation
+}; // end DirectionComputationAggregation
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTDirectionComputationAggregation_HPP__ */

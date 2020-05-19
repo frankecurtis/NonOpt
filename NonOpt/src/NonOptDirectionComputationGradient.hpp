@@ -18,7 +18,7 @@ namespace NonOpt
 class DirectionComputationGradient : public DirectionComputation
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -99,7 +99,7 @@ class DirectionComputationGradient : public DirectionComputation
                         Strategies* strategies);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -130,8 +130,8 @@ class DirectionComputationGradient : public DirectionComputation
                                Strategies* strategies);
   //@}
 
-};  // end DirectionComputationGradient
+}; // end DirectionComputationGradient
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTDIRECTIONCOMPUTATIONGRADIENT_HPP__ */

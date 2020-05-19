@@ -29,7 +29,7 @@ class Reporter;
 class Strategy
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -85,7 +85,7 @@ class Strategy
   virtual std::string name() = 0;
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -100,8 +100,8 @@ class Strategy
   void operator=(const Strategy&);
   //@}
 
-};  // end Strategy
+}; // end Strategy
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTSTRATEGY_HPP__ */

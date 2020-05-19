@@ -46,7 +46,6 @@ void PointSetUpdateProximity::addOptions(Options* options,
                            "Lower size factor for determine unadulterated BFGS, alpha_lower will be "
                            "PSP_lower_size*radius ");
 
-
   options->addDoubleOption(reporter,
                            "PSP_lower_epsilon",
                            1e-01,
@@ -55,10 +54,9 @@ void PointSetUpdateProximity::addOptions(Options* options,
                            "Lower size factor for determine unadulterated BFGS, alpha_lower will be "
                            "PSP_lower_size*radius ");
 
-
   // Add integer options
 
-}  // end addOptions
+} // end addOptions
 
 // Set options
 void PointSetUpdateProximity::setOptions(const Options* options,
@@ -73,7 +71,7 @@ void PointSetUpdateProximity::setOptions(const Options* options,
 
   // Read integer options
 
-}  // end setOptions
+} // end setOptions
 
 // Initialize
 void PointSetUpdateProximity::initialize(const Options* options,
@@ -91,14 +89,14 @@ void PointSetUpdateProximity::updatePointSet(const Options* options,
   setStatus(PS_UNSET);
 
   // Check if Unadulterated BFGS, if is, then keep only current iterate in point set
-//  if(quantities->stepsize()> lower_size_*quantities->stationarityRadius() && lower_epsilon_*strategies->qpSolver()->primalSolutionNormInf()*strategies->qpSolver()->primalSolutionNormInf()<= strategies->qpSolver()->dualObjectiveQuadraticValue()){
-//	  quantities->pointSet()->clear();
-//	  quantities->pointSet()->push_back(quantities->currentIterate());
-//
-//  }
+  //  if(quantities->stepsize()> lower_size_*quantities->stationarityRadius() && lower_epsilon_*strategies->qpSolver()->primalSolutionNormInf()*strategies->qpSolver()->primalSolutionNormInf()<= strategies->qpSolver()->dualObjectiveQuadraticValue()){
+  //	  quantities->pointSet()->clear();
+  //	  quantities->pointSet()->push_back(quantities->currentIterate());
+  //
+  //  }
 
   // Remove old points
-  while ((double)quantities->pointSet()->size() > std::min(5000.0,size_factor_ * (double)quantities->numberOfVariables())) {
+  while ((double)quantities->pointSet()->size() > std::min(5000.0, size_factor_ * (double)quantities->numberOfVariables())) {
     quantities->pointSet()->erase(quantities->pointSet()->begin());
   }
 
@@ -109,7 +107,7 @@ void PointSetUpdateProximity::updatePointSet(const Options* options,
     std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *(*quantities->pointSet())[i]->vector());
 
     // Check distance between point and current iterate
-    if (difference->normInf() > std::max(2.0,envelope_factor_ / (double)quantities->numberOfVariables()) * quantities->stationarityRadius()) {
+    if (difference->normInf() > std::max(2.0, envelope_factor_ / (double)quantities->numberOfVariables()) * quantities->stationarityRadius()) {
 
       // Erase element
       quantities->pointSet()->erase(quantities->pointSet()->begin() + i);
@@ -117,13 +115,13 @@ void PointSetUpdateProximity::updatePointSet(const Options* options,
       // Decrement iterator
       i--;
 
-    }  // end if
+    } // end if
 
-  }  // end for
+  } // end for
 
   // Update status
   setStatus(PS_SUCCESS);
 
-}  // end updatePointSet
+} // end updatePointSet
 
-}  // namespace NonOpt
+} // namespace NonOpt

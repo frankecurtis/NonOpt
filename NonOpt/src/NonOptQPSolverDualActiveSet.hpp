@@ -20,7 +20,7 @@ namespace NonOpt
 class QPSolverDualActiveSet : public QPSolver
 {
 
- public:
+public:
   /** @name Constructor */
   //@{
   /**
@@ -106,8 +106,8 @@ class QPSolverDualActiveSet : public QPSolver
    */
   void dualSolution(double omega[], double gamma[]);
 
-  int gamma_length(){return gamma_length_;}
-  int omega_length(){return (int)vector_.size();};
+  int gamma_length() { return gamma_length_; }
+  int omega_length() { return (int)vector_.size(); };
 
   std::vector<double> dualSolution_omega();
   /**
@@ -124,7 +124,8 @@ class QPSolverDualActiveSet : public QPSolver
    * Get iteration count
    * \return number of iterations performed
    */
-  int numberOfIterations() { return iteration_count_; };;
+  int numberOfIterations() { return iteration_count_; };
+  ;
   /**
    * Get primal solution
    * \param[out] "d" (equal to "-W*(G*omega + gamma)" if solution is exact)
@@ -154,7 +155,8 @@ class QPSolverDualActiveSet : public QPSolver
    * Get name of strategy
    * \return string with name of strategy
    */
-  std::string name() { return "ActiveSet"; };;
+  std::string name() { return "ActiveSet"; };
+  ;
   //@}
 
   /** @name Set methods */
@@ -185,7 +187,7 @@ class QPSolverDualActiveSet : public QPSolver
    * Set vector list
    * \param[in] vector_list is vector of pointers to Vectors to be set as QP "G" data
    */
-  void setVectorList(const std::vector<std::shared_ptr<Vector> > vector_list) { vector_list_ = vector_list; };
+  void setVectorList(const std::vector<std::shared_ptr<Vector>> vector_list) { vector_list_ = vector_list; };
   /**
    * Set vector
    * \param[in] vector is vector of double values to be set as QP "b" data
@@ -205,7 +207,7 @@ class QPSolverDualActiveSet : public QPSolver
    * \param[in] vector_list is vector of pointers to Vectors to be added to QP "G" data
    * \param[in] vector is vector of double values to be added to QP "b" data
    */
-  void addData(const std::vector<std::shared_ptr<Vector> > vector_list,
+  void addData(const std::vector<std::shared_ptr<Vector>> vector_list,
                const std::vector<double> vector);
   //@}
 
@@ -218,7 +220,7 @@ class QPSolverDualActiveSet : public QPSolver
    */
   void solveQP(const Options* options,
                const Reporter* reporter,
-			   Quantities* quantities);
+               Quantities* quantities);
   /**
    * Solve QP hot, after new data added, re-using previous solution, factorization, etc.
    * \param[in] options is pointer to Options object from NonOpt
@@ -226,7 +228,7 @@ class QPSolverDualActiveSet : public QPSolver
    */
   void solveQPHot(const Options* options,
                   const Reporter* reporter,
-				  Quantities* quantities);
+                  Quantities* quantities);
   //@}
 
   /** @name Print methods */
@@ -238,7 +240,7 @@ class QPSolverDualActiveSet : public QPSolver
   void printData(const Reporter* reporter);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -278,10 +280,10 @@ class QPSolverDualActiveSet : public QPSolver
   /**
    * QP data quantities
    */
-  double scalar_;                                     /**< "r" */
-  std::shared_ptr<SymmetricMatrix> matrix_;           /**< "W" */
-  std::vector<std::shared_ptr<Vector> > vector_list_; /**< "G" */
-  std::vector<double> vector_;                        /**< "b" */
+  double scalar_;                                    /**< "r" */
+  std::shared_ptr<SymmetricMatrix> matrix_;          /**< "W" */
+  std::vector<std::shared_ptr<Vector>> vector_list_; /**< "G" */
+  std::vector<double> vector_;                       /**< "b" */
   /**
    * Algorithm parameters
    */
@@ -378,8 +380,8 @@ class QPSolverDualActiveSet : public QPSolver
                             double solution[]);
   //@}
 
-};  // end QPSolverDualActiveSet
+}; // end QPSolverDualActiveSet
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTQPSOLVERDUALACTIVESET_HPP__ */

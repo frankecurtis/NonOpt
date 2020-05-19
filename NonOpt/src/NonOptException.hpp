@@ -25,7 +25,7 @@ class Reporter;
 class Exception
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -39,19 +39,19 @@ class Exception
             std::string file_name,
             int line_number,
             std::string type = "Exception")
-      : message_(message),
-        file_name_(file_name),
-        line_number_(line_number),
-        type_(type) {}
+    : message_(message),
+      file_name_(file_name),
+      line_number_(line_number),
+      type_(type) {}
   /**
    * Copy constructor
    * \param[in] copy is Exception object to copy
    */
-  Exception(const Exception &copy)
-      : message_(copy.message_),
-        file_name_(copy.file_name_),
-        line_number_(copy.line_number_),
-        type_(copy.type_) {}
+  Exception(const Exception& copy)
+    : message_(copy.message_),
+      file_name_(copy.file_name_),
+      line_number_(copy.line_number_),
+      type_(copy.type_) {}
   //@}
 
   /** @name Destructor */
@@ -70,15 +70,16 @@ class Exception
    * \param[in] type is type for which to report exception
    * \param[in] level is level at which to report exception
    */
-  void print(const Reporter *reporter,
+  void print(const Reporter* reporter,
              ReportType type,
              ReportLevel level = R_BASIC) const
   {
-    reporter->printf(type, level,
-                     "\n"
-                     "Exception of type \"%s\" in file \"%s\" at line %d\n"
-                     "Exception message: %s\n",
-                     type_.c_str(), file_name_.c_str(), line_number_,
+    reporter->printf(type, level, "\n"
+                                  "Exception of type \"%s\" in file \"%s\" at line %d\n"
+                                  "Exception message: %s\n",
+                     type_.c_str(),
+                     file_name_.c_str(),
+                     line_number_,
                      message_.c_str());
   }
   //@}
@@ -89,13 +90,13 @@ class Exception
    * Message
    * \return exception message as string
    */
-  const std::string &message() const { return message_; };
+  const std::string& message() const { return message_; };
   //@}
 
   /**
    * Private
    */
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -107,7 +108,7 @@ class Exception
   /**
    * Overloaded equals operator
    */
-  void operator=(const Exception &);
+  void operator=(const Exception&);
   //@}
 
   /** @name Private members */
@@ -118,7 +119,7 @@ class Exception
   std::string type_;      /**< Type of exception */
   //@}
 
-};  // end Exception
+}; // end Exception
 
 #define THROW_EXCEPTION(__except_type, __message) \
   throw __except_type((__message), (__FILE__), (__LINE__));
@@ -134,16 +135,16 @@ class Exception
 #define DECLARE_EXCEPTION(__except_type)                                       \
   class __except_type : public Exception                                       \
   {                                                                            \
-   public:                                                                     \
+  public:                                                                      \
     __except_type(std::string message, std::string file_name, int line_number) \
-        : Exception(message, file_name, line_number, #__except_type) {}        \
-    __except_type(const __except_type &copy) : Exception(copy) {}              \
+      : Exception(message, file_name, line_number, #__except_type) {}          \
+    __except_type(const __except_type& copy) : Exception(copy) {}              \
                                                                                \
-   private:                                                                    \
+  private:                                                                     \
     __except_type();                                                           \
-    void operator=(const __except_type &);                                     \
+    void operator=(const __except_type&);                                      \
   }
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTEXCEPTION_HPP__ */

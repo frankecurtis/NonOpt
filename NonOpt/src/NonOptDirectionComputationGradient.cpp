@@ -23,7 +23,7 @@ void DirectionComputationGradient::addOptions(Options* options,
                          "Determines whether to fail if QP solver ever fails.\n"
                          "Default value: false.");
 
-}  // end addOptions
+} // end addOptions
 
 // Set options
 void DirectionComputationGradient::setOptions(const Options* options,
@@ -33,7 +33,7 @@ void DirectionComputationGradient::setOptions(const Options* options,
   // Read bool options
   options->valueAsBool(reporter, "DCG_fail_on_QP_failure", fail_on_QP_failure_);
 
-}  // end setOptions
+} // end setOptions
 
 // Initialize
 void DirectionComputationGradient::initialize(const Options* options,
@@ -89,7 +89,7 @@ void DirectionComputationGradient::computeDirection(const Options* options,
     }
 
     // Declare QP quantities
-    std::vector<std::shared_ptr<Vector> > QP_gradient_list;
+    std::vector<std::shared_ptr<Vector>> QP_gradient_list;
     std::vector<double> QP_vector;
 
     // Add pointer to current gradient to list
@@ -105,7 +105,7 @@ void DirectionComputationGradient::computeDirection(const Options* options,
     strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
 
     // Solve QP
-    strategies->qpSolver()->solveQP(options, reporter,quantities);
+    strategies->qpSolver()->solveQP(options, reporter, quantities);
 
     // Convert QP solution to step
     convertQPSolutionToStep(quantities, strategies);
@@ -118,29 +118,19 @@ void DirectionComputationGradient::computeDirection(const Options* options,
       THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.")
     }
 
-  }  // end try
+  } // end try
 
   // catch exceptions
   catch (DC_SUCCESS_EXCEPTION& exec) {
     setStatus(DC_SUCCESS);
-  }
-  catch (DC_EVALUATION_FAILURE_EXCEPTION& exec) {
+  } catch (DC_EVALUATION_FAILURE_EXCEPTION& exec) {
     setStatus(DC_EVALUATION_FAILURE);
-  }
-  catch (DC_QP_FAILURE_EXCEPTION& exec) {
+  } catch (DC_QP_FAILURE_EXCEPTION& exec) {
     setStatus(DC_QP_FAILURE);
   }
 
   // Print iteration information
-  reporter->printf(R_NL, R_PER_ITERATION,
-                   "  %10d  %10d  %2d  %+.4e  %+.4e  %+.4e  %+.4e",
-                   quantities->innerIterationCounter(),
-                   quantities->QPIterationCounter(),
-                   strategies->qpSolver()->status(),
-                   strategies->qpSolver()->KKTErrorDual(),
-                   strategies->qpSolver()->combinationNormInf(),
-                   strategies->qpSolver()->primalSolutionNormInf(),
-                   strategies->qpSolver()->dualObjectiveQuadraticValue());
+  reporter->printf(R_NL, R_PER_ITERATION, "  %10d  %10d  %2d  %+.4e  %+.4e  %+.4e  %+.4e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
   // Increment total inner iteration counter
   quantities->incrementTotalInnerIterationCounter();
@@ -148,7 +138,7 @@ void DirectionComputationGradient::computeDirection(const Options* options,
   // Increment total QP iteration counter
   quantities->incrementTotalQPIterationCounter();
 
-}  // end computeDirection
+} // end computeDirection
 
 // Convert QP solution to step
 void DirectionComputationGradient::convertQPSolutionToStep(Quantities* quantities,
@@ -167,6 +157,6 @@ void DirectionComputationGradient::convertQPSolutionToStep(Quantities* quantitie
   // Set trial iterate
   quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, 1.0, *quantities->direction()));
 
-}  // end convertQPSolutionToStep
+} // end convertQPSolutionToStep
 
-}  // namespace NonOpt
+} // namespace NonOpt

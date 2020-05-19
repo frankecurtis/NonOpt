@@ -18,16 +18,16 @@ namespace NonOpt
 class SymmetricMatrixDense : public SymmetricMatrix
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
     * Construct SymmetricMatrixDense
     */
   SymmetricMatrixDense()
-      : size_(-1),
-        values_(nullptr),
-        values_of_inverse_(nullptr){};
+    : size_(-1),
+      values_(nullptr),
+      values_of_inverse_(nullptr){};
   //@}
 
   /** @name Destructor */
@@ -188,7 +188,7 @@ class SymmetricMatrixDense : public SymmetricMatrix
              std::string name) const;
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
     * (Hidden to avoid implicit creation/calling.)
     */
@@ -227,8 +227,8 @@ class SymmetricMatrixDense : public SymmetricMatrix
   inline int const col_(int i) const { return i % size_; };
   //@}
 
-};  // end SymmetricMatrixDense
+}; // end SymmetricMatrixDense
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTSYMMETRICMATRIXDENSE_HPP__ */

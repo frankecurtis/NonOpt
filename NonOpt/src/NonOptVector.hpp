@@ -25,15 +25,15 @@ class Reporter;
 class Vector
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
    * Constructor; length and values not initialized
    */
   Vector()
-      : values_(nullptr),
-        length_(-1){};
+    : values_(nullptr),
+      length_(-1){};
   /**
    * Constructor with given length; values initialized to zero
    * \param[in] length is length of Vector to construct
@@ -63,7 +63,7 @@ class Vector
    * \param[in] reporter is pointer to Reporter object from NonOpt
    * \param[in] name is name of Vector to print
    */
-  void print(const Reporter *reporter,
+  void print(const Reporter* reporter,
              std::string name) const;
   //@}
 
@@ -83,7 +83,7 @@ class Vector
    */
   std::shared_ptr<Vector> makeNewLinearCombination(double scalar1,
                                                    double scalar2,
-                                                   const Vector &other_vector) const;
+                                                   const Vector& other_vector) const;
   //@}
 
   /** @name Get methods */
@@ -97,12 +97,12 @@ class Vector
    * Get values (const)
    * \return is pointer to array of Vector values
    */
-  inline double *const values() const { return values_; };
+  inline double* const values() const { return values_; };
   /**
    * Get values (modifiable)
    * \return is pointer to array of Vector values (to allow modification of array)
    */
-  inline double *valuesModifiable() { return values_; };
+  inline double* valuesModifiable() { return values_; };
   //@}
 
   /** @name Modify methods */
@@ -123,12 +123,12 @@ class Vector
    * Copy elements of other Vector
    * \param[in] other_vector is reference to other Vector to copy
    */
-  void copy(const Vector &other_vector);
+  void copy(const Vector& other_vector);
   /**
    * Copy elements of double array
    * \param[in] array is array of double values to copy
    */
-  void copyArray(double *array);
+  void copyArray(double* array);
   /**
    * Scale elements by given scalar
    * \param[in] scalar is scalar for scaling
@@ -140,7 +140,7 @@ class Vector
    * \param[in] other_vector is reference to other Vector
    */
   void addScaledVector(double scalar,
-                       const Vector &other_vector);
+                       const Vector& other_vector);
   /**
    * Set values as linear combination (scalar1*vector1 + scalar2*vector2)
    * \param[in] scalar1 is scalar value for linear combination
@@ -149,9 +149,9 @@ class Vector
    * \param[in] vector2 is reference to other Vector
    */
   void linearCombination(double scalar1,
-                         const Vector &vector1,
+                         const Vector& vector1,
                          double scalar2,
-                         const Vector &vector2);
+                         const Vector& vector2);
   //@}
 
   /** @name Scalar functions */
@@ -160,7 +160,7 @@ class Vector
    * Inner product with given vector
    * \param[in] vector is reference to other Vector
    */
-  double innerProduct(const Vector &vector) const;
+  double innerProduct(const Vector& vector) const;
   /**
    * maximum value
    */
@@ -183,7 +183,7 @@ class Vector
   double normInf() const;
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -191,21 +191,21 @@ class Vector
   /**
    * Copy constructor
    */
-  Vector(const Vector &);
+  Vector(const Vector&);
   /**
    * Overloaded equals operator
    */
-  void operator=(const Vector &);
+  void operator=(const Vector&);
   //@}
 
   /** @name Private members */
   //@{
-  double *values_; /**< Double array */
+  double* values_; /**< Double array */
   int length_;     /**< Length of array */
   //@}
 
-};  // end Vector
+}; // end Vector
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __VECTOR_HPP__ */

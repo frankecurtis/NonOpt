@@ -18,7 +18,7 @@ namespace NonOpt
 class InverseHessianUpdateBFGS : public InverseHessianUpdate
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -99,7 +99,7 @@ class InverseHessianUpdateBFGS : public InverseHessianUpdate
                             Strategies* strategies);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -136,8 +136,8 @@ class InverseHessianUpdateBFGS : public InverseHessianUpdate
                                     double& scalar);
   //@}
 
-};  // end InverseHessianUpdateBFGS
+}; // end InverseHessianUpdateBFGS
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTINVERSEHESSIANUPDATEBFGS_HPP__ */

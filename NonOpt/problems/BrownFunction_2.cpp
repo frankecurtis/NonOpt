@@ -10,7 +10,7 @@
 
 // Constructor
 BrownFunction_2::BrownFunction_2(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 BrownFunction_2::~BrownFunction_2() {}
@@ -25,7 +25,7 @@ bool BrownFunction_2::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool BrownFunction_2::initialPoint(int n,
@@ -40,7 +40,7 @@ bool BrownFunction_2::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool BrownFunction_2::evaluateObjective(int n,
@@ -57,7 +57,7 @@ bool BrownFunction_2::evaluateObjective(int n,
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool BrownFunction_2::evaluateGradient(int n,
@@ -75,25 +75,25 @@ bool BrownFunction_2::evaluateGradient(int n,
     if (x[i] >= 0.0 && x[i + 1] >= 0.0) {
       g[i] = g[i] + (pow(x[i + 1], 2) + 1.0) * pow(x[i], pow(x[i + 1], 2)) + 2.0 * x[i] * log(x[i + 1]) * pow(x[i + 1], pow(x[i], 2) + 1.0);
       g[i + 1] = g[i + 1] + 2.0 * x[i + 1] * log(x[i]) * pow(x[i], pow(x[i + 1], 2) + 1.0) + (pow(x[i], 2) + 1.0) * pow(x[i + 1], pow(x[i], 2));
-    }  // end if
+    } // end if
     else if (x[i] >= 0.0 && x[i + 1] < 0.0) {
       g[i] = g[i] + (pow(x[i + 1], 2) + 1.0) * pow(x[i], pow(x[i + 1], 2)) + 2.0 * x[i] * log(-x[i + 1]) * pow(-x[i + 1], pow(x[i], 2) + 1.0);
       g[i + 1] = g[i + 1] + 2.0 * x[i + 1] * log(x[i]) * pow(x[i], pow(x[i + 1], 2) + 1.0) - (pow(x[i], 2) + 1.0) * pow(-x[i + 1], pow(x[i], 2));
-    }  // end else if
+    } // end else if
     else if (x[i] < 0.0 && x[i + 1] >= 0.0) {
       g[i] = g[i] - (pow(x[i + 1], 2) + 1.0) * pow(-x[i], pow(x[i + 1], 2)) + 2.0 * x[i] * log(x[i + 1]) * pow(x[i + 1], pow(x[i], 2) + 1.0);
       g[i + 1] = g[i + 1] + 2.0 * x[i + 1] * log(-x[i]) * pow(-x[i], pow(x[i + 1], 2) + 1.0) + (pow(x[i], 2) + 1.0) * pow(x[i + 1], pow(x[i], 2));
-    }  // end else if
+    } // end else if
     else {
       g[i] = g[i] - (pow(x[i + 1], 2) + 1.0) * pow(-x[i], pow(x[i + 1], 2)) + 2.0 * x[i] * log(-x[i + 1]) * pow(-x[i + 1], pow(x[i], 2) + 1.0);
       g[i + 1] = g[i + 1] + 2.0 * x[i + 1] * log(-x[i]) * pow(-x[i], pow(x[i + 1], 2) + 1.0) - (pow(x[i], 2) + 1.0) * pow(-x[i + 1], pow(x[i], 2));
-    }  // end else
-  }    // end for
+    } // end else
+  }   // end for
 
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool BrownFunction_2::finalizeSolution(int n,

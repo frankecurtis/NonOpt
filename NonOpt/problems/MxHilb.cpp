@@ -10,7 +10,7 @@
 
 // Constructor
 MxHilb::MxHilb(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 MxHilb::~MxHilb() {}
@@ -25,7 +25,7 @@ bool MxHilb::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool MxHilb::initialPoint(int n,
@@ -40,7 +40,7 @@ bool MxHilb::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool MxHilb::evaluateObjective(int n,
@@ -56,12 +56,12 @@ bool MxHilb::evaluateObjective(int n,
       sum = sum + x[j] / ((double)i + (double)j + 1.0);
     }
     f = fmax(f, fabs(sum));
-  }  // end for
+  } // end for
 
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool MxHilb::evaluateGradient(int n,
@@ -76,7 +76,7 @@ bool MxHilb::evaluateGradient(int n,
     for (int j = 0; j < n; j++) {
       sum[i] = sum[i] + x[j] / ((double)i + (double)j + 1.0);
     }
-  }  // end for
+  } // end for
 
   // Evaluate maximum of absolute values
   double max_val = 0.0;
@@ -86,19 +86,19 @@ bool MxHilb::evaluateGradient(int n,
       max_val = fabs(sum[i]);
       max_ind = i;
     }
-  }  // end for
+  } // end for
 
   // Evaluate gradient
   if (sum[max_ind] >= 0.0) {
     for (int j = 0; j < n; j++) {
       g[j] = 1.0 / ((double)max_ind + (double)j + 1.0);
     }
-  }  // end if
+  } // end if
   else {
     for (int j = 0; j < n; j++) {
       g[j] = -1.0 / ((double)max_ind + (double)j + 1.0);
     }
-  }  // end else
+  } // end else
 
   // Delete sums
   delete[] sum;
@@ -106,7 +106,7 @@ bool MxHilb::evaluateGradient(int n,
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool MxHilb::finalizeSolution(int n,

@@ -41,7 +41,7 @@ int testPointImplementation(int option)
     // Add stream report to reporter
     reporter.addReport(sr);
 
-  }  // end if
+  } // end if
 
   // Declare problem
   std::shared_ptr<MaxQ> problem(new MaxQ(50));
@@ -64,7 +64,7 @@ int testPointImplementation(int option)
     if (vp->values()[i] < 1.0 - 1e-12 || vp->values()[i] > 1.0 + 1e-12) {
       result = 1;
     }
-  }  // end for
+  } // end for
 
   // Print point
   reporter.printf(R_NL, R_BASIC, "Testing constructor... should be ones vector:\n");
@@ -107,7 +107,7 @@ int testPointImplementation(int option)
         result = 1;
       }
     }
-  }  // end for
+  } // end for
 
   // Print gradient value
   reporter.printf(R_NL, R_BASIC, "Testing gradient evaluation... should be [2,0,...,0]:\n");
@@ -122,7 +122,7 @@ int testPointImplementation(int option)
     if (rp->values()[i] < 3.0 - 1e-12 || rp->values()[i] > 3.0 + 1e-12) {
       result = 1;
     }
-  }  // end for
+  } // end for
 
   // Print linear combination of Point
   reporter.printf(R_NL, R_BASIC, "Testing new linear combination method... should be vector of threes:\n");
@@ -155,7 +155,7 @@ int testPointImplementation(int option)
         result = 1;
       }
     }
-  }  // end for
+  } // end for
 
   // Print gradient value
   reporter.printf(R_NL, R_BASIC, "Testing gradient evaluation of linear combination... should be [6,0,...,0]:\n");
@@ -174,7 +174,7 @@ int testPointImplementation(int option)
     if (sp->values()[i] < 1.0 - epsilon - 1e-12 || sp->values()[i] > 1.0 + epsilon + 1e-12) {
       result = 1;
     }
-  }  // end for
+  } // end for
 
   // Print random point
   reporter.printf(R_NL, R_BASIC, "Testing new random point method... should be close to ones vector:\n");
@@ -203,7 +203,7 @@ int testPointImplementation(int option)
       index = i;
       value = gs->values()[i];
     }
-  }  // end for
+  } // end for
   for (int i = 0; i < n; i++) {
     if (i == index) {
       if (gs->values()[i] < 2.0 * (1.0 - epsilon) - 1e-12 || gs->values()[i] > 2.0 * (1.0 + epsilon) + 1e-12) {
@@ -215,7 +215,7 @@ int testPointImplementation(int option)
         result = 1;
       }
     }
-  }  // end for
+  } // end for
 
   // Print gradient value
   reporter.printf(R_NL, R_BASIC, "Testing gradient evaluation of random point... should be near [0,...,0,2,0,...,0]:\n");
@@ -248,11 +248,11 @@ int testPointImplementation(int option)
     else {
       reporter.printf(R_NL, R_BASIC, "TEST FAILED.\n");
     }
-  }  // end if
+  } // end if
 
   // Return
   return result;
 
-}  // end testPointImplementation
+} // end testPointImplementation
 
 #endif /* __TESTPOINT_HPP__ */

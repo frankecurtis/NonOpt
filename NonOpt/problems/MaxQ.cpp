@@ -10,7 +10,7 @@
 
 // Constructor
 MaxQ::MaxQ(int n)
-    : number_of_variables_(n) {}
+  : number_of_variables_(n) {}
 
 // Destructor
 MaxQ::~MaxQ() {}
@@ -25,7 +25,7 @@ bool MaxQ::numberOfVariables(int& n)
   // Return
   return true;
 
-}  // end numberOfVariables
+} // end numberOfVariables
 
 // Initial point
 bool MaxQ::initialPoint(int n,
@@ -43,7 +43,7 @@ bool MaxQ::initialPoint(int n,
   // Return
   return true;
 
-}  // end initialPoint
+} // end initialPoint
 
 // Objective value
 bool MaxQ::evaluateObjective(int n,
@@ -60,7 +60,7 @@ bool MaxQ::evaluateObjective(int n,
   // Return
   return true;
 
-}  // end evaluateObjective
+} // end evaluateObjective
 
 // Gradient value
 bool MaxQ::evaluateGradient(int n,
@@ -78,7 +78,7 @@ bool MaxQ::evaluateGradient(int n,
       max_val = temp;
       max_ind = i;
     }
-  }  // end for
+  } // end for
 
   // Evaluate gradient
   g[max_ind] = 2 * x[max_ind];
@@ -86,7 +86,7 @@ bool MaxQ::evaluateGradient(int n,
   // Return
   return true;
 
-}  // end evaluateGradient
+} // end evaluateGradient
 
 // Finalize solution
 bool MaxQ::finalizeSolution(int n,

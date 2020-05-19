@@ -35,7 +35,7 @@ class Strategy;
 class InverseHessianUpdate : public Strategy
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -130,7 +130,7 @@ class InverseHessianUpdate : public Strategy
                                     Strategies* strategies) = 0;
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -150,8 +150,8 @@ class InverseHessianUpdate : public Strategy
   IH_Status status_; /**< Termination status */
   //@}
 
-};  // set InverseHessianUpdate
+}; // set InverseHessianUpdate
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTINVERSEHESSIANUPDATE_HPP__ */

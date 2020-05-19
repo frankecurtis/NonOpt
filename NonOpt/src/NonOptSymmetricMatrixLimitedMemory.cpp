@@ -21,7 +21,7 @@ SymmetricMatrixLimitedMemory::~SymmetricMatrixLimitedMemory()
     delete[] values_;
   }
 
-}  // end destructor
+} // end destructor
 
 // Add options
 void SymmetricMatrixLimitedMemory::addOptions(Options* options,
@@ -38,7 +38,7 @@ void SymmetricMatrixLimitedMemory::addOptions(Options* options,
                             "Limited-memory history length.\n"
                             "Default value: 100.");
 
-}  // end addOptions
+} // end addOptions
 
 // Set options
 void SymmetricMatrixLimitedMemory::setOptions(const Options* options,
@@ -50,7 +50,7 @@ void SymmetricMatrixLimitedMemory::setOptions(const Options* options,
   // Read integer options
   options->valueAsInteger(reporter, "SMLM_history", history_);
 
-}  // end setOptions
+} // end setOptions
 
 // Initialize
 void SymmetricMatrixLimitedMemory::initialize(const Options* options,
@@ -61,7 +61,7 @@ void SymmetricMatrixLimitedMemory::initialize(const Options* options,
   // Set as identity
   setAsDiagonal(quantities->numberOfVariables(), 1.0);
 
-}  // end initialize
+} // end initialize
 
 // Column
 void const SymmetricMatrixLimitedMemory::column(int column_index,
@@ -83,8 +83,8 @@ void const SymmetricMatrixLimitedMemory::column(int column_index,
       column_computed = true;
       column_computed_index = i;
       break;
-    }  // end if
-  }    // end for
+    } // end if
+  }   // end for
 
   // Compute column
   if (column_computed) {
@@ -106,9 +106,9 @@ void const SymmetricMatrixLimitedMemory::column(int column_index,
     computed_columns_.push_back(computed_column);
     computed_column_indices_.push_back(column_index);
 
-  }  // end else
+  } // end else
 
-}  // end column
+} // end column
 
 // Column of inverse
 void const SymmetricMatrixLimitedMemory::columnOfInverse(int column_index,
@@ -130,8 +130,8 @@ void const SymmetricMatrixLimitedMemory::columnOfInverse(int column_index,
       column_computed = true;
       column_computed_index = i;
       break;
-    }  // end if
-  }    // end for
+    } // end if
+  }   // end for
 
   // Compute column
   if (column_computed) {
@@ -153,9 +153,9 @@ void const SymmetricMatrixLimitedMemory::columnOfInverse(int column_index,
     computed_columns_of_inverse_.push_back(computed_column);
     computed_column_indices_of_inverse_.push_back(column_index);
 
-  }  // end else
+  } // end else
 
-}  // end columnOfInverse
+} // end columnOfInverse
 
 // Element
 double const SymmetricMatrixLimitedMemory::element(int row_index,
@@ -180,25 +180,25 @@ double const SymmetricMatrixLimitedMemory::element(int row_index,
       element_computed = true;
       element_value = computed_columns_[i]->values()[column_index];
       break;
-    }  // end if
+    } // end if
     if (computed_column_indices_[i] == column_index) {
       element_computed = true;
       element_value = computed_columns_[i]->values()[row_index];
       break;
-    }  // end if
-  }    // end for
+    } // end if
+  }   // end for
 
   // Check if element already computed
   if (!element_computed) {
     Vector column_vector(size_);
     column(column_index, column_vector);
     element_value = column_vector.values()[row_index];
-  }  // end if
+  } // end if
 
   // Return element
   return element_value;
 
-}  // end element
+} // end element
 
 // Element of inverse
 double const SymmetricMatrixLimitedMemory::elementOfInverse(int row_index,
@@ -223,25 +223,25 @@ double const SymmetricMatrixLimitedMemory::elementOfInverse(int row_index,
       element_computed = true;
       element_value = computed_columns_of_inverse_[i]->values()[column_index];
       break;
-    }  // end if
+    } // end if
     if (computed_column_indices_of_inverse_[i] == column_index) {
       element_computed = true;
       element_value = computed_columns_of_inverse_[i]->values()[row_index];
       break;
-    }  // end if
-  }    // end for
+    } // end if
+  }   // end for
 
   // Check of element already computed
   if (!element_computed) {
     Vector column_vector(size_);
     columnOfInverse(column_index, column_vector);
     element_value = column_vector.values()[row_index];
-  }  // end if
+  } // end if
 
   // Return element
   return element_value;
 
-}  // end elementOfInverse
+} // end elementOfInverse
 
 // Inner product
 double SymmetricMatrixLimitedMemory::innerProduct(const Vector& vector)
@@ -259,7 +259,7 @@ double SymmetricMatrixLimitedMemory::innerProduct(const Vector& vector)
   // Return inner product
   return vector.innerProduct(product);
 
-}  // end innerProduct
+} // end innerProduct
 
 // Inner product of inverse
 double SymmetricMatrixLimitedMemory::innerProductOfInverse(const Vector& vector)
@@ -277,7 +277,7 @@ double SymmetricMatrixLimitedMemory::innerProductOfInverse(const Vector& vector)
   // Return inner product
   return vector.innerProduct(product);
 
-}  // end innerProductOfInverse
+} // end innerProductOfInverse
 
 // Matrix-vector product
 void SymmetricMatrixLimitedMemory::matrixVectorProduct(const Vector& vector,
@@ -297,7 +297,7 @@ void SymmetricMatrixLimitedMemory::matrixVectorProduct(const Vector& vector,
   // Compute matrix-vector product
   dsymv_(&upper_lower, &size_, &scale1, values_, &size_, vector.values(), &increment, &scale2, product.valuesModifiable(), &increment);
 
-}  // end matrixVectorProduct
+} // end matrixVectorProduct
 
 // Matrix-vector product
 void SymmetricMatrixLimitedMemory::matrixVectorProductOfInverse(const Vector& vector,
@@ -324,19 +324,19 @@ void SymmetricMatrixLimitedMemory::matrixVectorProductOfInverse(const Vector& ve
     a[i] = rho_[i] * s_[i]->innerProduct(product);
     value = -a[i];
     daxpy_(&size_, &value, y_[i]->values(), &increment, product.valuesModifiable(), &increment);
-  }  // end for
+  } // end for
   product.scale(1.0 / initial_diagonal_value_);
   for (int i = 0; i < (int)s_.size(); i++) {
     b[i] = rho_[i] * y_[i]->innerProduct(product);
     value = a[i] - b[i];
     daxpy_(&size_, &value, s_[i]->values(), &increment, product.valuesModifiable(), &increment);
-  }  // end for
+  } // end for
 
   // Delete intermediate value vectors
   delete[] a;
   delete[] b;
 
-}  // end matrixVectorProductOfInverse
+} // end matrixVectorProductOfInverse
 
 // Set as diagonal matrix
 void SymmetricMatrixLimitedMemory::setAsDiagonal(int size,
@@ -374,7 +374,7 @@ void SymmetricMatrixLimitedMemory::setAsDiagonal(int size,
     // Allocate arrays
     values_ = new double[size_ * size_];
 
-  }  // end if
+  } // end if
 
   // Set inputs for blas
   int length = size_ * size_;
@@ -388,9 +388,9 @@ void SymmetricMatrixLimitedMemory::setAsDiagonal(int size,
   // Set diagonal entries
   for (int i = 0; i < size_ * size_; i = i + size_ + 1) {
     values_[i] = value;
-  }  // end for
+  } // end for
 
-}  // end setAsDiagonal
+} // end setAsDiagonal
 
 // Symmetric update
 void SymmetricMatrixLimitedMemory::updateBFGS(const Vector& s,
@@ -418,7 +418,7 @@ void SymmetricMatrixLimitedMemory::updateBFGS(const Vector& s,
     s_.erase(s_.begin());
     y_.erase(y_.begin());
     rho_.erase(rho_.begin());
-  }  // end while
+  } // end while
 
   // Clear computed columns sets
   computed_columns_.clear();
@@ -438,7 +438,7 @@ void SymmetricMatrixLimitedMemory::updateBFGS(const Vector& s,
   // Set diagonal entries
   for (int i = 0; i < size_ * size_; i = i + size_ + 1) {
     values_[i] = initial_diagonal_value_;
-  }  // end for
+  } // end for
 
   // Loop over pairs to construct matrix
   for (int i = 0; i < (int)s_.size(); i++) {
@@ -476,7 +476,7 @@ void SymmetricMatrixLimitedMemory::updateBFGS(const Vector& s,
       for (int j = 0; j < i; j++) {
         values_[i * size_ + j] = values_[j * size_ + i];
       }
-    }  // end for
+    } // end for
 
     // Delete intermediate vector
     if (Hs != nullptr) {
@@ -484,7 +484,7 @@ void SymmetricMatrixLimitedMemory::updateBFGS(const Vector& s,
     }
   }
 
-}  // end updateBFGS
+} // end updateBFGS
 
 // Print
 void SymmetricMatrixLimitedMemory::print(const Reporter* reporter,
@@ -498,13 +498,13 @@ void SymmetricMatrixLimitedMemory::print(const Reporter* reporter,
     for (int i = 0; i < size_; i++) {
       reporter->printf(R_NL, R_BASIC, "%s %6d-th pair: s[%6d]=%+23.16e, y[%6d]=%+23.16e\n", name.c_str(), j, i, s_[j]->values()[i], i, y_[j]->values()[i]);
       reporter->printf(R_QP, R_BASIC, "%s %6d-th pair: s[%6d]=%+23.16e, y[%6d]=%+23.16e\n", name.c_str(), j, i, s_[j]->values()[i], i, y_[j]->values()[i]);
-    }  // end for
-  }    // end for
+    } // end for
+  }   // end for
   for (int j = 0; j < (int)s_.size(); j++) {
     reporter->printf(R_NL, R_BASIC, "%s rho[%6d]=%+23.16e\n", name.c_str(), j, rho_[j]);
     reporter->printf(R_QP, R_BASIC, "%s rho[%6d]=%+23.16e\n", name.c_str(), j, rho_[j]);
-  }  // end for
+  } // end for
 
-}  // end print
+} // end print
 
-}  // namespace NonOpt
+} // namespace NonOpt

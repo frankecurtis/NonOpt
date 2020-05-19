@@ -36,7 +36,7 @@ int testVectorImplementation(int option)
     // Add stream report to reporter
     reporter.addReport(s);
 
-  }  // end if
+  } // end if
 
   // Declare zero vector
   Vector u(5);
@@ -46,7 +46,7 @@ int testVectorImplementation(int option)
     if (u.values()[i] < -1e-12 || u.values()[i] > 1e-12) {
       result = 1;
     }
-  }  // end for
+  } // end for
 
   // Print ones vector
   u.print(&reporter, "Testing constructor... should be zero vector:");
@@ -86,7 +86,7 @@ int testVectorImplementation(int option)
     if (v.values()[i] < 1.0 - 1e-12 || v.values()[i] > 1.0 + 1e-12) {
       result = 1;
     }
-  }  // end for
+  } // end for
 
   // Print ones vector
   v.print(&reporter, "Testing constructor with default value... should be ones vector:");
@@ -99,7 +99,7 @@ int testVectorImplementation(int option)
     if (w->values()[i] < 1.0 - 1e-12 || w->values()[i] > 1.0 + 1e-12) {
       result = 1;
     }
-  }  // end for
+  } // end for
 
   // Print copy of ones vector
   w->print(&reporter, "Testing copy method... should be copy of ones vector:");
@@ -112,7 +112,7 @@ int testVectorImplementation(int option)
     if (x->values()[i] < 5.0 - 1e-12 || x->values()[i] > 5.0 + 1e-12) {
       result = 1;
     }
-  }  // end for
+  } // end for
 
   // Print linear combination
   x->print(&reporter, "Testing new linear combination method (multiple not 1)... should be vector of fives:");
@@ -128,7 +128,7 @@ int testVectorImplementation(int option)
     if (y->values()[i] < 1.0 - 1e-12 || y->values()[i] > 1.0 + 1e-12) {
       result = 1;
     }
-  }  // end for
+  } // end for
 
   // Print linear combination
   y->print(&reporter, "Testing new linear combination method (multiple is 1)... should be [8,1,...,1]:");
@@ -166,7 +166,7 @@ int testVectorImplementation(int option)
         result = 1;
       }
     }
-  }  // end for
+  } // end for
 
   // Print array
   y->print(&reporter, "Testing copy array method... should be [0.1,0.2,0.3,0.4,0.5]:");
@@ -204,7 +204,7 @@ int testVectorImplementation(int option)
         result = 1;
       }
     }
-  }  // end for
+  } // end for
 
   // Print vector plus scaled vector
   y->print(&reporter, "Testing add scaled vector... should be [0.3,0.4,0.5,0.6,0.7]:");
@@ -217,7 +217,7 @@ int testVectorImplementation(int option)
     if (w->values()[i] < 4.0 - 1e-12 || w->values()[i] > 4.0 + 1e-12) {
       result = 1;
     }
-  }  // end for
+  } // end for
 
   // Print scaled vector
   w->print(&reporter, "Testing scale method... should be vector of fours:");
@@ -250,12 +250,13 @@ int testVectorImplementation(int option)
   }
 
   // Evaluate norms
-  reporter.printf(R_NL, R_BASIC,
-                  "Testing norm methods... for preceding vector:\n"
-                  "1-norm   (should be 20                 ) : %+23.16e\n"
-                  "2-norm   (should be  8.9442719099991592) : %+23.16e\n"
-                  "inf-norm (should be  4                 ) : %+23.16e\n",
-                  w1, w2, wInf);
+  reporter.printf(R_NL, R_BASIC, "Testing norm methods... for preceding vector:\n"
+                                 "1-norm   (should be 20                 ) : %+23.16e\n"
+                                 "2-norm   (should be  8.9442719099991592) : %+23.16e\n"
+                                 "inf-norm (should be  4                 ) : %+23.16e\n",
+                  w1,
+                  w2,
+                  wInf);
 
   // Check option
   if (option == 1) {
@@ -266,11 +267,11 @@ int testVectorImplementation(int option)
     else {
       reporter.printf(R_NL, R_BASIC, "TEST FAILED.\n");
     }
-  }  // end if
+  } // end if
 
   // Return
   return result;
 
-}  // end testVectorImplementation
+} // end testVectorImplementation
 
 #endif /* __TESTVECTOR_HPP__ */

@@ -35,7 +35,7 @@ class Strategy;
 class DirectionComputation : public Strategy
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -130,7 +130,7 @@ class DirectionComputation : public Strategy
                                 Strategies* strategies) = 0;
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -150,8 +150,8 @@ class DirectionComputation : public Strategy
   DC_Status status_; /**< Termination status */
   //@}
 
-};  // end DirectionComputation
+}; // end DirectionComputation
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTDIRECTIONCOMPUTATION_HPP__ */

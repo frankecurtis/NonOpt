@@ -21,7 +21,7 @@ NonOptSolver::NonOptSolver()
 {
 
   // Declare stream report
-  std::shared_ptr<StreamReport> s(new StreamReport("s", R_NL, R_PER_ITERATION));
+  std::shared_ptr<StreamReport> s(new StreamReport("default", R_NL, R_PER_ITERATION));
 
   // Set stream report to standard output
   s->setStream(&std::cout);
@@ -32,7 +32,7 @@ NonOptSolver::NonOptSolver()
   // Add options
   addOptions();
 
-}  // end constructor
+} // end constructor
 
 // Destructor
 NonOptSolver::~NonOptSolver()
@@ -41,7 +41,7 @@ NonOptSolver::~NonOptSolver()
   // Delete reporter
   reporter_.deleteReports();
 
-}  // end destructor
+} // end destructor
 
 // Add options
 void NonOptSolver::addOptions()
@@ -125,7 +125,7 @@ void NonOptSolver::addOptions()
   // Add options for strategies
   strategies_.addOptions(&options_, &reporter_);
 
-}  // end addOptions
+} // end addOptions
 
 // Set options
 void NonOptSolver::setOptions()
@@ -153,7 +153,7 @@ void NonOptSolver::setOptions()
   // Set strategies options
   strategies_.setOptions(&options_, &reporter_);
 
-}  // end setOptions
+} // end setOptions
 
 // Solution
 void NonOptSolver::solution(double vector[])
@@ -166,7 +166,7 @@ void NonOptSolver::solution(double vector[])
   // Copy values
   dcopy_(&length, quantities_.currentIterate()->vector()->values(), &increment, vector, &increment);
 
-}  // end solution
+} // end solution
 
 // Optimize
 void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
@@ -231,7 +231,7 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
 
       // Check derivatives?
       if (check_derivatives_) {
-        derivative_checker_.checkDerivatives(&reporter_,quantities_.currentIterate());
+        derivative_checker_.checkDerivatives(&reporter_, quantities_.currentIterate());
       }
 
       // Print quantities iteration values
@@ -261,7 +261,7 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
 
       // Check termination conditions
       if (quantities_.stationarityRadius() <= stationarity_tolerance_ &&
-    		  strategies_.qpSolver()->combinationTranslatedNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_) {
+          strategies_.qpSolver()->combinationTranslatedNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_) {
         THROW_EXCEPTION(NONOPT_SUCCESS_EXCEPTION, "Stationary point found.");
       }
 
@@ -272,7 +272,6 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
           strategies_.qpSolver()->combinationTranslatedNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_) {
         quantities_.updateRadii(stationarity_tolerance_);
       }
-
 
       // Run line search
       strategies_.lineSearch()->runLineSearch(&options_, &quantities_, &reporter_, &strategies_);
@@ -302,7 +301,7 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
           strategies_.qpSolver()->combinationTranslatedNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_) {
         quantities_.initializeInexactTerminationFactor(&options_, &reporter_);
       }
-      else if (quantities_.stepsize() < 1e-10) {// update sigma
+      else if (quantities_.stepsize() < 1e-10) { // update sigma
         quantities_.updateInexactTerminationFactor();
       }
 
@@ -323,58 +322,43 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
         THROW_EXCEPTION(NONOPT_POINT_SET_UPDATE_FAILURE_EXCEPTION, "Point set update failed.");
       }
 
-
       // Print end of line
       reporter_.printf(R_NL, R_PER_ITERATION, "\n");
 
-    }  // end while
+    } // end while
 
-  }  // end try
+  } // end try
 
   // catch exceptions
   catch (NONOPT_SUCCESS_EXCEPTION& exec) {
     setStatus(NONOPT_SUCCESS);
-  }
-  catch (NONOPT_CPU_TIME_LIMIT_EXCEPTION& exec) {
+  } catch (NONOPT_CPU_TIME_LIMIT_EXCEPTION& exec) {
     setStatus(NONOPT_CPU_TIME_LIMIT);
-  }
-  catch (NONOPT_ITERATE_NORM_LIMIT_EXCEPTION& exec) {
+  } catch (NONOPT_ITERATE_NORM_LIMIT_EXCEPTION& exec) {
     setStatus(NONOPT_ITERATE_NORM_LIMIT);
-  }
-  catch (NONOPT_ITERATION_LIMIT_EXCEPTION& exec) {
+  } catch (NONOPT_ITERATION_LIMIT_EXCEPTION& exec) {
     setStatus(NONOPT_ITERATION_LIMIT);
-  }
-  catch (NONOPT_FUNCTION_EVALUATION_LIMIT_EXCEPTION& exec) {
+  } catch (NONOPT_FUNCTION_EVALUATION_LIMIT_EXCEPTION& exec) {
     setStatus(NONOPT_FUNCTION_EVALUATION_LIMIT);
-  }
-  catch (NONOPT_GRADIENT_EVALUATION_LIMIT_EXCEPTION& exec) {
+  } catch (NONOPT_GRADIENT_EVALUATION_LIMIT_EXCEPTION& exec) {
     setStatus(NONOPT_GRADIENT_EVALUATION_LIMIT);
-  }
-  catch (NONOPT_INITIALIZATION_FAILURE_EXCEPTION& exec) {
+  } catch (NONOPT_INITIALIZATION_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_INITIALIZATION_FAILURE);
-  }
-  catch (NONOPT_FUNCTION_EVALUATION_FAILURE_EXCEPTION& exec) {
+  } catch (NONOPT_FUNCTION_EVALUATION_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_FUNCTION_EVALUATION_FAILURE);
-  }
-  catch (NONOPT_GRADIENT_EVALUATION_FAILURE_EXCEPTION& exec) {
+  } catch (NONOPT_GRADIENT_EVALUATION_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_GRADIENT_EVALUATION_FAILURE);
-  }
-  catch (NONOPT_FUNCTION_EVALUATION_ASSERT_EXCEPTION& exec) {
+  } catch (NONOPT_FUNCTION_EVALUATION_ASSERT_EXCEPTION& exec) {
     setStatus(NONOPT_FUNCTION_EVALUATION_ASSERT);
-  }
-  catch (NONOPT_GRADIENT_EVALUATION_ASSERT_EXCEPTION& exec) {
+  } catch (NONOPT_GRADIENT_EVALUATION_ASSERT_EXCEPTION& exec) {
     setStatus(NONOPT_GRADIENT_EVALUATION_ASSERT);
-  }
-  catch (NONOPT_DIRECTION_COMPUTATION_FAILURE_EXCEPTION& exec) {
+  } catch (NONOPT_DIRECTION_COMPUTATION_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_DIRECTION_COMPUTATION_FAILURE);
-  }
-  catch (NONOPT_LINE_SEARCH_FAILURE_EXCEPTION& exec) {
+  } catch (NONOPT_LINE_SEARCH_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_LINE_SEARCH_FAILURE);
-  }
-  catch (NONOPT_INVERSE_HESSIAN_UPDATE_FAILURE_EXCEPTION& exec) {
+  } catch (NONOPT_INVERSE_HESSIAN_UPDATE_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_INVERSE_HESSIAN_UPDATE_FAILURE);
-  }
-  catch (NONOPT_POINT_SET_UPDATE_FAILURE_EXCEPTION& exec) {
+  } catch (NONOPT_POINT_SET_UPDATE_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_POINT_SET_UPDATE_FAILURE);
   }
 
@@ -399,7 +383,7 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
   // Print footer
   printFooter();
 
-}  // end optimize
+} // end optimize
 
 // Evaluate all functions at current iterate
 void NonOptSolver::evaluateFunctionsAtCurrentIterate()
@@ -421,7 +405,7 @@ void NonOptSolver::evaluateFunctionsAtCurrentIterate()
     THROW_EXCEPTION(NONOPT_GRADIENT_EVALUATION_FAILURE_EXCEPTION, "Initialization failed.");
   }
 
-}  // end evaluateFunctionsAtCurrentIterate
+} // end evaluateFunctionsAtCurrentIterate
 
 // Print footer
 void NonOptSolver::printFooter()
@@ -432,58 +416,58 @@ void NonOptSolver::printFooter()
 
   // Print exit status
   switch (status()) {
-    case NONOPT_UNSET:
-      reporter_.printf(R_NL, R_BASIC, "Exit status wasn't set! This wasn't supposed to happen!");
-      break;
-    case NONOPT_SUCCESS:
-      reporter_.printf(R_NL, R_BASIC, "Stationary point found.");
-      break;
-    case NONOPT_CPU_TIME_LIMIT:
-      reporter_.printf(R_NL, R_BASIC, "CPU time limit reached.");
-      break;
-    case NONOPT_ITERATE_NORM_LIMIT:
-      reporter_.printf(R_NL, R_BASIC, "Iterates seem to be diverging.");
-      break;
-    case NONOPT_ITERATION_LIMIT:
-      reporter_.printf(R_NL, R_BASIC, "Iteration limit reached.");
-      break;
-    case NONOPT_FUNCTION_EVALUATION_LIMIT:
-      reporter_.printf(R_NL, R_BASIC, "Function evaluation limit reached.");
-      break;
-    case NONOPT_GRADIENT_EVALUATION_LIMIT:
-      reporter_.printf(R_NL, R_BASIC, "Gradient evaluation limit reached.");
-      break;
-    case NONOPT_INITIALIZATION_FAILURE:
-      reporter_.printf(R_NL, R_BASIC, "Initialization failure! Check definition of problem.");
-      break;
-    case NONOPT_FUNCTION_EVALUATION_FAILURE:
-      reporter_.printf(R_NL, R_BASIC, "Function evaluation failure! Check definition of problem.");
-      break;
-    case NONOPT_GRADIENT_EVALUATION_FAILURE:
-      reporter_.printf(R_NL, R_BASIC, "Gradient evaluation failure! Check definition of problem.");
-      break;
-    case NONOPT_FUNCTION_EVALUATION_ASSERT:
-      reporter_.printf(R_NL, R_BASIC, "Function evaluation assert failure! This wasn't supposed to happen!");
-      break;
-    case NONOPT_GRADIENT_EVALUATION_ASSERT:
-      reporter_.printf(R_NL, R_BASIC, "Gradient evaluation assert failure! This wasn't supposed to happen!");
-      break;
-    case NONOPT_DIRECTION_COMPUTATION_FAILURE:
-      reporter_.printf(R_NL, R_BASIC, "Direction computation failure.");
-      break;
-    case NONOPT_LINE_SEARCH_FAILURE:
-      reporter_.printf(R_NL, R_BASIC, "Line search failure.");
-      break;
-    case NONOPT_INVERSE_HESSIAN_UPDATE_FAILURE:
-      reporter_.printf(R_NL, R_BASIC, "Inverse Hessian update failure.");
-      break;
-    case NONOPT_POINT_SET_UPDATE_FAILURE:
-      reporter_.printf(R_NL, R_BASIC, "Point set update failure.");
-      break;
-    default:
-      reporter_.printf(R_NL, R_BASIC, "Unknown exit status! This wasn't supposed to happen!");
-      break;
-  }  // end switch
+  case NONOPT_UNSET:
+    reporter_.printf(R_NL, R_BASIC, "Exit status wasn't set! This wasn't supposed to happen!");
+    break;
+  case NONOPT_SUCCESS:
+    reporter_.printf(R_NL, R_BASIC, "Stationary point found.");
+    break;
+  case NONOPT_CPU_TIME_LIMIT:
+    reporter_.printf(R_NL, R_BASIC, "CPU time limit reached.");
+    break;
+  case NONOPT_ITERATE_NORM_LIMIT:
+    reporter_.printf(R_NL, R_BASIC, "Iterates seem to be diverging.");
+    break;
+  case NONOPT_ITERATION_LIMIT:
+    reporter_.printf(R_NL, R_BASIC, "Iteration limit reached.");
+    break;
+  case NONOPT_FUNCTION_EVALUATION_LIMIT:
+    reporter_.printf(R_NL, R_BASIC, "Function evaluation limit reached.");
+    break;
+  case NONOPT_GRADIENT_EVALUATION_LIMIT:
+    reporter_.printf(R_NL, R_BASIC, "Gradient evaluation limit reached.");
+    break;
+  case NONOPT_INITIALIZATION_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Initialization failure! Check definition of problem.");
+    break;
+  case NONOPT_FUNCTION_EVALUATION_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Function evaluation failure! Check definition of problem.");
+    break;
+  case NONOPT_GRADIENT_EVALUATION_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Gradient evaluation failure! Check definition of problem.");
+    break;
+  case NONOPT_FUNCTION_EVALUATION_ASSERT:
+    reporter_.printf(R_NL, R_BASIC, "Function evaluation assert failure! This wasn't supposed to happen!");
+    break;
+  case NONOPT_GRADIENT_EVALUATION_ASSERT:
+    reporter_.printf(R_NL, R_BASIC, "Gradient evaluation assert failure! This wasn't supposed to happen!");
+    break;
+  case NONOPT_DIRECTION_COMPUTATION_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Direction computation failure.");
+    break;
+  case NONOPT_LINE_SEARCH_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Line search failure.");
+    break;
+  case NONOPT_INVERSE_HESSIAN_UPDATE_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Inverse Hessian update failure.");
+    break;
+  case NONOPT_POINT_SET_UPDATE_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Point set update failure.");
+    break;
+  default:
+    reporter_.printf(R_NL, R_BASIC, "Unknown exit status! This wasn't supposed to happen!");
+    break;
+  } // end switch
 
   // Check whether to print final data
   if (status() != NONOPT_INITIALIZATION_FAILURE &&
@@ -495,24 +479,23 @@ void NonOptSolver::printFooter()
     // Print strategies footer
     strategies_.printFooter(&reporter_);
 
-  }  // end if
+  } // end if
 
-}  // end printFooter
+} // end printFooter
 
 // Print header
 void NonOptSolver::printHeader()
 {
 
   // Print header
-  reporter_.printf(R_NL, R_BASIC,
-                   "+--------------------------------------------------------------+\n"
-                   "|            NonOpt = Nonsmooth Optimization Solver            |\n"
-                   "| NonOpt is released as open source code under the MIT License |\n"
-                   "| Please visit http://coral.ise.lehigh.edu/frankecurtis/nonopt |\n"
-                   "+--------------------------------------------------------------+\n"
-                   "\n"
-                   "This is NonOpt version %s\n"
-                   "\n",
+  reporter_.printf(R_NL, R_BASIC, "+--------------------------------------------------------------+\n"
+                                  "|            NonOpt = Nonsmooth Optimization Solver            |\n"
+                                  "| NonOpt is released as open source code under the MIT License |\n"
+                                  "| Please visit http://coral.ise.lehigh.edu/frankecurtis/nonopt |\n"
+                                  "+--------------------------------------------------------------+\n"
+                                  "\n"
+                                  "This is NonOpt version %s\n"
+                                  "\n",
                    NONOPT_VERSION);
 
   // Print quantities header
@@ -521,7 +504,7 @@ void NonOptSolver::printHeader()
   // Print strategies header
   strategies_.printHeader(&reporter_);
 
-}  // end printHeader
+} // end printHeader
 
 // Print iteration header
 void NonOptSolver::printIterationHeader()
@@ -533,8 +516,8 @@ void NonOptSolver::printIterationHeader()
   if (quantities_.iterationCounter() % 20 == 0) {
     std::string b(quantities_.iterationHeader().length() + strategies_.iterationHeader().length(), '-');
     reporter_.printf(R_NL, R_PER_ITERATION, "%s\n", (b + "\n" + quantities_.iterationHeader() + strategies_.iterationHeader() + "\n" + b).c_str());
-  }  // end if
+  } // end if
 
-}  // end printIterationHeader
+} // end printIterationHeader
 
-}  // namespace NonOpt
+} // namespace NonOpt

@@ -15,7 +15,7 @@ namespace NonOpt
 
 // Constructor with given length; values initialized to zero
 Vector::Vector(int length)
-    : length_(length)
+  : length_(length)
 {
 
   // Allocate array
@@ -29,12 +29,12 @@ Vector::Vector(int length)
   // Initialize values
   dcopy_(&length, &value, &increment1, values_, &increment2);
 
-}  // end constructor
+} // end constructor
 
 // Constructor with given length; values initialized to given value
 Vector::Vector(int length,
                double value)
-    : length_(length)
+  : length_(length)
 {
 
   // Allocate array
@@ -47,7 +47,7 @@ Vector::Vector(int length,
   // Initialize values
   dcopy_(&length, &value, &increment1, values_, &increment2);
 
-}  // end constructor
+} // end constructor
 
 // Destructor; values array deleted
 Vector::~Vector()
@@ -58,10 +58,10 @@ Vector::~Vector()
     delete[] values_;
   }
 
-}  // end destructor
+} // end destructor
 
 // Print array with given name
-void Vector::print(const Reporter *reporter,
+void Vector::print(const Reporter* reporter,
                    std::string name) const
 {
 
@@ -70,7 +70,7 @@ void Vector::print(const Reporter *reporter,
     reporter->printf(R_NL, R_BASIC, "%s[%6d]=%+23.16e\n", name.c_str(), i, values_[i]);
   }
 
-}  // end print
+} // end print
 
 // Make new Vector as a copy
 std::shared_ptr<Vector> Vector::makeNewCopy() const
@@ -85,12 +85,12 @@ std::shared_ptr<Vector> Vector::makeNewCopy() const
   // Return
   return vector;
 
-}  // end makeNewCopy
+} // end makeNewCopy
 
 // Make new Vector by adding "scalar1" times this Vector to "scalar2" times other_vector
 std::shared_ptr<Vector> Vector::makeNewLinearCombination(double scalar1,
                                                          double scalar2,
-                                                         const Vector &other_vector) const
+                                                         const Vector& other_vector) const
 {
 
   // Create new vector
@@ -102,7 +102,7 @@ std::shared_ptr<Vector> Vector::makeNewLinearCombination(double scalar1,
   // Return
   return vector;
 
-}  // end makeNewLinearCombination
+} // end makeNewLinearCombination
 
 // Set length and initialize values to zero
 void Vector::setLength(int length)
@@ -127,7 +127,7 @@ void Vector::setLength(int length)
   // Initialize values
   dcopy_(&length, &value, &increment1, values_, &increment2);
 
-}  // end setLength
+} // end setLength
 
 // Set element with given index to given value
 void Vector::set(int index,
@@ -141,10 +141,10 @@ void Vector::set(int index,
   // Set value
   values_[index] = value;
 
-}  // end set
+} // end set
 
 // Copy elements of other_vector
-void Vector::copy(const Vector &other_vector)
+void Vector::copy(const Vector& other_vector)
 {
 
   // Assert
@@ -157,10 +157,10 @@ void Vector::copy(const Vector &other_vector)
   // Copy elements
   dcopy_(&length, other_vector.values(), &increment, values_, &increment);
 
-}  // end copy
+} // end copy
 
 // Copy elements of double array
-void Vector::copyArray(double *array)
+void Vector::copyArray(double* array)
 {
 
   // Set inputs for blas
@@ -170,7 +170,7 @@ void Vector::copyArray(double *array)
   // Copy elements
   dcopy_(&length, array, &increment, values_, &increment);
 
-}  // end copyArray
+} // end copyArray
 
 // Scale elements by given scalar
 void Vector::scale(double scalar)
@@ -187,13 +187,13 @@ void Vector::scale(double scalar)
   else {
     int incrementzero = 0;
     dcopy_(&length, &scalar, &incrementzero, values_, &increment);
-  }  // end else
+  } // end else
 
-}  // end scale
+} // end scale
 
 // Add to this Vector "scalar" times other_vector
 void Vector::addScaledVector(double scalar,
-                             const Vector &other_vector)
+                             const Vector& other_vector)
 {
 
   // Assert
@@ -206,13 +206,13 @@ void Vector::addScaledVector(double scalar,
   // Add a*vector
   daxpy_(&length, &scalar, other_vector.values(), &increment, values_, &increment);
 
-}  // end addScaledVector
+} // end addScaledVector
 
 // Set values as linear combination (scalar1*vector1 + scalar2*vector2)
 void Vector::linearCombination(double scalar1,
-                               const Vector &vector1,
+                               const Vector& vector1,
                                double scalar2,
-                               const Vector &vector2)
+                               const Vector& vector2)
 {
 
   // Asserts
@@ -239,7 +239,7 @@ void Vector::linearCombination(double scalar1,
       daxpy_(&length, &scalar2, vector2.values(), &increment, values_, &increment);
     }
 
-  }  // end if
+  } // end if
 
   // Check scalar2
   else if (scalar2 != 0.0) {
@@ -252,7 +252,7 @@ void Vector::linearCombination(double scalar1,
       dscal_(&length, &scalar2, values_, &increment);
     }
 
-  }  // end else if
+  } // end else if
 
   else {
 
@@ -260,12 +260,12 @@ void Vector::linearCombination(double scalar1,
     int incrementzero = 0;
     dcopy_(&length, &scalar1, &incrementzero, values_, &increment);
 
-  }  // end else
+  } // end else
 
-}  // end linearCombination
+} // end linearCombination
 
 // Inner product with other_vector
-double Vector::innerProduct(const Vector &other_vector) const
+double Vector::innerProduct(const Vector& other_vector) const
 {
 
   // Assert
@@ -278,7 +278,7 @@ double Vector::innerProduct(const Vector &other_vector) const
   // Return
   return ddot_(&length, values_, &increment, other_vector.values(), &increment);
 
-}  // end innerProduct
+} // end innerProduct
 
 // Maximum element
 double Vector::max() const
@@ -295,7 +295,7 @@ double Vector::max() const
   // Return maximum
   return maximum;
 
-}  // end max
+} // end max
 
 // Minimum element
 double Vector::min() const
@@ -312,7 +312,7 @@ double Vector::min() const
   // Return minimum
   return minimum;
 
-}  // end max
+} // end max
 
 // 1-norm
 double Vector::norm1() const
@@ -325,7 +325,7 @@ double Vector::norm1() const
   // Evaluate 1-norm
   return dasum_(&length, values_, &increment);
 
-}  // end norm1
+} // end norm1
 
 // 2-norm
 double Vector::norm2() const
@@ -338,7 +338,7 @@ double Vector::norm2() const
   // Evaluate 2-norm
   return dnrm2_(&length, values_, &increment);
 
-}  // end norm2
+} // end norm2
 
 // inf-norm
 double Vector::normInf() const
@@ -355,6 +355,6 @@ double Vector::normInf() const
   // Evaluate inf-norm
   return fabs(values_[i - 1]);
 
-}  // end normInf
+} // end normInf
 
-}  // namespace NonOpt
+} // namespace NonOpt

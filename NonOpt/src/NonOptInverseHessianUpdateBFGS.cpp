@@ -66,7 +66,7 @@ void InverseHessianUpdateBFGS::addOptions(Options* options,
                            "displacements, then a BFGS update occurs; else, it is skipped.\n"
                            "Default value: 1e-20.");
 
-}  // end addOptions
+} // end addOptions
 
 // Set options
 void InverseHessianUpdateBFGS::setOptions(const Options* options,
@@ -82,7 +82,7 @@ void InverseHessianUpdateBFGS::setOptions(const Options* options,
   options->valueAsDouble(reporter, "BFGS_norm_tolerance", norm_tolerance_);
   options->valueAsDouble(reporter, "BFGS_product_tolerance", product_tolerance_);
 
-}  // end setOptions
+} // end setOptions
 
 // Initialize
 void InverseHessianUpdateBFGS::initialize(const Options* options,
@@ -160,7 +160,7 @@ void InverseHessianUpdateBFGS::updateInverseHessian(const Options* options,
       // Add scaled vector
       gradient_displacement.addScaledVector(correction_scalar, iterate_displacement);
 
-    }  // end if
+    } // end if
 
     // Determine whether inverse Hessian should be updated
     perform_update = (iterate_displacement.innerProduct(gradient_displacement) >= product_tolerance_ * iterate_displacement.norm2() * gradient_displacement.norm2());
@@ -176,23 +176,21 @@ void InverseHessianUpdateBFGS::updateInverseHessian(const Options* options,
     // Terminate
     THROW_EXCEPTION(IH_SUCCESS_EXCEPTION, "Inverse Hessian update successful.");
 
-  }  // end try
+  } // end try
 
   // catch exceptions
   catch (IH_SUCCESS_EXCEPTION& exec) {
     setStatus(IH_SUCCESS);
-  }
-  catch (IH_EVALUATION_FAILURE_EXCEPTION& exec) {
+  } catch (IH_EVALUATION_FAILURE_EXCEPTION& exec) {
     setStatus(IH_EVALUATION_FAILURE);
-  }
-  catch (IH_NORM_TOLERANCE_VIOLATION_EXCEPTION& exec) {
+  } catch (IH_NORM_TOLERANCE_VIOLATION_EXCEPTION& exec) {
     if (fail_on_tolerance_violation_) {
       setStatus(IH_NORM_TOLERANCE_VIOLATION);
     }
     else {
       setStatus(IH_SUCCESS);
     }
-  }  // end catch
+  } // end catch
   catch (IH_PRODUCT_TOLERANCE_VIOLATION_EXCEPTION& exec) {
     if (fail_on_tolerance_violation_) {
       setStatus(IH_PRODUCT_TOLERANCE_VIOLATION);
@@ -200,12 +198,12 @@ void InverseHessianUpdateBFGS::updateInverseHessian(const Options* options,
     else {
       setStatus(IH_SUCCESS);
     }
-  }  // end catch
+  } // end catch
 
   // Print messages
   reporter->printf(R_NL, R_PER_ITERATION, "  %+.4e  %2d", correction_scalar, perform_update);
 
-}  // end updateInverseHessian
+} // end updateInverseHessian
 
 // Evaluate self-correcting BFGS scalar
 void InverseHessianUpdateBFGS::evaluateSelfCorrectingScalar(Vector& s,
@@ -237,7 +235,7 @@ void InverseHessianUpdateBFGS::evaluateSelfCorrectingScalar(Vector& s,
         pow(scalar1, 2.0) * u + scalar1 * (1.0 - scalar1) * v + pow(1.0 - scalar1, 2.0) * w > correction_threshold_1_ * (scalar1 * u + (1 - scalar1) * v)) {
       scalar1 = 1.0;
     }
-  }  // end else
+  } // end else
 
   // Set scalar for upper bound
   double scalar2 = 0.0;
@@ -255,11 +253,11 @@ void InverseHessianUpdateBFGS::evaluateSelfCorrectingScalar(Vector& s,
     else {
       scalar2 = 1.0;
     }
-  }  // end else if
+  } // end else if
 
   // Set scalar
   scalar = fmax(scalar1, scalar2);
 
-}  // end evaluateSelfCorrectingScalar
+} // end evaluateSelfCorrectingScalar
 
-}  // namespace NonOpt
+} // namespace NonOpt

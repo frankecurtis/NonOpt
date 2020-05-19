@@ -24,7 +24,7 @@ class RandomNumberGenerator;
 class DirectionComputationGradientCombination : public DirectionComputation
 {
 
- public:
+public:
   /** @name Constructor */
   //@{
   /**
@@ -105,7 +105,7 @@ class DirectionComputationGradientCombination : public DirectionComputation
                         Strategies* strategies);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -144,8 +144,8 @@ class DirectionComputationGradientCombination : public DirectionComputation
                                Strategies* strategies);
   //@}
 
-};  // end DirectionComputationGradientCombination
+}; // end DirectionComputationGradientCombination
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTDIRECTIONCOMPUTATIONGRADIENTCOMBINATION_HPP__ */

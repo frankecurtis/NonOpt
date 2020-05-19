@@ -18,7 +18,7 @@ namespace NonOpt
 class LineSearchWeakWolfe : public LineSearch
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -99,7 +99,7 @@ class LineSearchWeakWolfe : public LineSearch
                      Strategies* strategies);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -127,8 +127,8 @@ class LineSearchWeakWolfe : public LineSearch
   double stepsize_bound_tolerance_;
   //@}
 
-};  // end LineSearchWeakWolfe
+}; // end LineSearchWeakWolfe
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTLINESEARCHWEAKWOLFE_HPP__ */

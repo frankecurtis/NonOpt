@@ -23,7 +23,7 @@ SymmetricMatrixDense::~SymmetricMatrixDense()
     delete[] values_of_inverse_;
   }
 
-}  // end destructor
+} // end destructor
 
 // Add options
 void SymmetricMatrixDense::addOptions(Options* options,
@@ -34,7 +34,7 @@ void SymmetricMatrixDense::addOptions(Options* options,
 
   // Add integer options
 
-}  // end addOptions
+} // end addOptions
 
 // Set options
 void SymmetricMatrixDense::setOptions(const Options* options,
@@ -45,7 +45,7 @@ void SymmetricMatrixDense::setOptions(const Options* options,
 
   // Read integer options
 
-}  // end setOptions
+} // end setOptions
 
 // Initialize
 void SymmetricMatrixDense::initialize(const Options* options,
@@ -56,7 +56,7 @@ void SymmetricMatrixDense::initialize(const Options* options,
   // Set as identity
   setAsDiagonal(quantities->numberOfVariables(), 1.0);
 
-}  // end initialize
+} // end initialize
 
 // Column
 void const SymmetricMatrixDense::column(int column_index,
@@ -75,7 +75,7 @@ void const SymmetricMatrixDense::column(int column_index,
   // Copy elements
   dcopy_(&size_, &values_[column_index], &increment1, column.valuesModifiable(), &increment2);
 
-}  // end column
+} // end column
 
 // Column of inverse
 void const SymmetricMatrixDense::columnOfInverse(int column_index,
@@ -94,7 +94,7 @@ void const SymmetricMatrixDense::columnOfInverse(int column_index,
   // Copy elements
   dcopy_(&size_, &values_of_inverse_[column_index], &increment1, column.valuesModifiable(), &increment2);
 
-}  // end columnOfInverse
+} // end columnOfInverse
 
 // Element
 double const SymmetricMatrixDense::element(int row_index,
@@ -110,7 +110,7 @@ double const SymmetricMatrixDense::element(int row_index,
   // Return element
   return values_[row_index * size_ + column_index];
 
-}  // end element
+} // end element
 
 // Element of inverse
 double const SymmetricMatrixDense::elementOfInverse(int row_index,
@@ -126,7 +126,7 @@ double const SymmetricMatrixDense::elementOfInverse(int row_index,
   // Return element
   return values_of_inverse_[row_index * size_ + column_index];
 
-}  // end elementOfInverse
+} // end elementOfInverse
 
 // Inner product
 double SymmetricMatrixDense::innerProduct(const Vector& vector)
@@ -150,7 +150,7 @@ double SymmetricMatrixDense::innerProduct(const Vector& vector)
   // Return product
   return ddot_(&size_, product.values(), &increment, vector.values(), &increment);
 
-}  // end innerProduct
+} // end innerProduct
 
 // Inner product
 double SymmetricMatrixDense::innerProductOfInverse(const Vector& vector)
@@ -174,7 +174,7 @@ double SymmetricMatrixDense::innerProductOfInverse(const Vector& vector)
   // Return product
   return ddot_(&size_, product.values(), &increment, vector.values(), &increment);
 
-}  // end innerProductOfInverse
+} // end innerProductOfInverse
 
 // Matrix-vector product
 void SymmetricMatrixDense::matrixVectorProduct(const Vector& vector,
@@ -194,7 +194,7 @@ void SymmetricMatrixDense::matrixVectorProduct(const Vector& vector,
   // Compute matrix-vector product
   dsymv_(&upper_lower, &size_, &scale1, values_, &size_, vector.values(), &increment, &scale2, product.valuesModifiable(), &increment);
 
-}  // end matrixVectorProduct
+} // end matrixVectorProduct
 
 // Matrix-vector product of inverse
 void SymmetricMatrixDense::matrixVectorProductOfInverse(const Vector& vector,
@@ -214,7 +214,7 @@ void SymmetricMatrixDense::matrixVectorProductOfInverse(const Vector& vector,
   // Compute matrix-vector product
   dsymv_(&upper_lower, &size_, &scale1, values_of_inverse_, &size_, vector.values(), &increment, &scale2, product.valuesModifiable(), &increment);
 
-}  // end matrixVectorProductOfInverse
+} // end matrixVectorProductOfInverse
 
 // Set as diagonal matrix
 void SymmetricMatrixDense::setAsDiagonal(int size,
@@ -245,7 +245,7 @@ void SymmetricMatrixDense::setAsDiagonal(int size,
     values_ = new double[length_];
     values_of_inverse_ = new double[length_];
 
-  }  // end if
+  } // end if
 
   // Set inputs for blas
   double zero_value = 0.0;
@@ -260,9 +260,9 @@ void SymmetricMatrixDense::setAsDiagonal(int size,
   for (int i = 0; i < length_; i = i + size_ + 1) {
     values_[i] = value;
     values_of_inverse_[i] = 1.0 / value;
-  }  // end for
+  } // end for
 
-}  // end setAsDiagonal
+} // end setAsDiagonal
 
 // Symmetric update
 void SymmetricMatrixDense::updateBFGS(const Vector& s,
@@ -322,7 +322,7 @@ void SymmetricMatrixDense::updateBFGS(const Vector& s,
       values_[i * size_ + j] = values_[j * size_ + i];
       values_of_inverse_[i * size_ + j] = values_of_inverse_[j * size_ + i];
     }
-  }  // end for
+  } // end for
 
   // Delete intermediate vector
   if (Hs != nullptr) {
@@ -332,7 +332,7 @@ void SymmetricMatrixDense::updateBFGS(const Vector& s,
     delete[] Wy;
   }
 
-}  // end updateBFGS
+} // end updateBFGS
 
 // Print
 void SymmetricMatrixDense::print(const Reporter* reporter,
@@ -345,7 +345,7 @@ void SymmetricMatrixDense::print(const Reporter* reporter,
   for (int i = 0; i < length_; i++) {
     reporter->printf(R_NL, R_BASIC, "%s[%6d][%6d]=%+23.16e\n", name.c_str(), row_(i), col_(i), values_[i]);
     reporter->printf(R_QP, R_BASIC, "%s[%6d][%6d]=%+23.16e\n", name.c_str(), row_(i), col_(i), values_[i]);
-  }  // end for
+  } // end for
 
   // Print elements of symmetric matrix inverse
   reporter->printf(R_NL, R_BASIC, "Matrix inverse:\n");
@@ -353,8 +353,8 @@ void SymmetricMatrixDense::print(const Reporter* reporter,
   for (int i = 0; i < length_; i++) {
     reporter->printf(R_NL, R_BASIC, "%s[%6d][%6d]=%+23.16e\n", name.c_str(), row_(i), col_(i), values_of_inverse_[i]);
     reporter->printf(R_QP, R_BASIC, "%s[%6d][%6d]=%+23.16e\n", name.c_str(), row_(i), col_(i), values_of_inverse_[i]);
-  }  // end for
+  } // end for
 
-}  // end print
+} // end print
 
-}  // namespace NonOpt
+} // namespace NonOpt

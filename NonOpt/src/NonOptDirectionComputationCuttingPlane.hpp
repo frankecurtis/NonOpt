@@ -18,7 +18,7 @@ namespace NonOpt
 class DirectionComputationCuttingPlane : public DirectionComputation
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -99,7 +99,7 @@ class DirectionComputationCuttingPlane : public DirectionComputation
                         Strategies* strategies);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -137,8 +137,8 @@ class DirectionComputationCuttingPlane : public DirectionComputation
                                Strategies* strategies);
   //@}
 
-};  // end DirectionComputationCuttingPlane
+}; // end DirectionComputationCuttingPlane
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTDIRECTIONCOMPUTATIONCUTTINGPLANE_HPP__ */

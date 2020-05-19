@@ -52,7 +52,7 @@ class Vector;
 class QPSolver : public Strategy
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -115,7 +115,7 @@ class QPSolver : public Strategy
    * Get translated combination of vectors' infinity norm
    * \return "||G*omega + gamma||_2^2"
    */
-  virtual double combinationTranslatedNorm2Square()=0;
+  virtual double combinationTranslatedNorm2Square() = 0;
   /**
    * Get dual objective quadratic value
    * \return "(G*omega + gamma)'*W*(G*omega + gamma)"
@@ -127,9 +127,9 @@ class QPSolver : public Strategy
    */
   virtual void dualSolution(double omega[], double gamma[]) = 0;
 
-  virtual int gamma_length()=0;
-  virtual int omega_length()=0;
-  virtual std::vector<double> dualSolution_omega()=0;
+  virtual int gamma_length() = 0;
+  virtual int omega_length() = 0;
+  virtual std::vector<double> dualSolution_omega() = 0;
   /**
    * Get KKT error
    * \return solver's KKT error
@@ -159,7 +159,7 @@ class QPSolver : public Strategy
    * Get primal solution 2-norm square
    * \return "||d||_2^2"
    */
-  virtual double primalSolutionNorm2Square()=0;
+  virtual double primalSolutionNorm2Square() = 0;
   /**
    * Get name of strategy
    * \return string with name of strategy
@@ -191,7 +191,7 @@ class QPSolver : public Strategy
    * Set vector list
    * \param[in] vector_list is vector of pointers to Vectors to be set as QP "G" data
    */
-  virtual void setVectorList(const std::vector<std::shared_ptr<Vector> > vector_list) = 0;
+  virtual void setVectorList(const std::vector<std::shared_ptr<Vector>> vector_list) = 0;
   /**
    * Set vector
    * \param[in] vector is vector of double values to be set as QP "b" data
@@ -216,7 +216,7 @@ class QPSolver : public Strategy
    * \param[in] vector_list is vector of pointers to Vectors to be added to QP "G" data
    * \param[in] vector is vector of double values to be added to QP "b" data
    */
-  virtual void addData(const std::vector<std::shared_ptr<Vector> > vector_list,
+  virtual void addData(const std::vector<std::shared_ptr<Vector>> vector_list,
                        const std::vector<double> vector) = 0;
   //@}
 
@@ -229,7 +229,7 @@ class QPSolver : public Strategy
    */
   virtual void solveQP(const Options* options,
                        const Reporter* reporter,
-					   Quantities* quantities) = 0;
+                       Quantities* quantities) = 0;
   /**
    * Solve QP hot, after new data added, re-using previous solution, factorization, etc.
    * \param[in] options is pointer to Options object from NonOpt
@@ -237,10 +237,10 @@ class QPSolver : public Strategy
    */
   virtual void solveQPHot(const Options* options,
                           const Reporter* reporter,
-						  Quantities* quantities) = 0;
+                          Quantities* quantities) = 0;
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -260,8 +260,8 @@ class QPSolver : public Strategy
   QP_Status status_; /**< Termination status */
   //@}
 
-};  // end QPSolver
+}; // end QPSolver
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTQPSOLVER_HPP__ */

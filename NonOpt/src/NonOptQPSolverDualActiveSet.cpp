@@ -20,12 +20,12 @@ namespace NonOpt
 
 // Constructor
 QPSolverDualActiveSet::QPSolverDualActiveSet()
-    : inexact_solution_tolerance_(0.0),
-      factor_(nullptr),
-      inner_solution_1_(nullptr),
-      inner_solution_2_(nullptr),
-      system_solution_(nullptr),
-      system_solution_best_(nullptr) {}
+  : inexact_solution_tolerance_(0.0),
+    factor_(nullptr),
+    inner_solution_1_(nullptr),
+    inner_solution_2_(nullptr),
+    system_solution_(nullptr),
+    system_solution_best_(nullptr) {}
 
 // Destructor
 QPSolverDualActiveSet::~QPSolverDualActiveSet()
@@ -48,11 +48,11 @@ QPSolverDualActiveSet::~QPSolverDualActiveSet()
     delete[] factor_;
   }
 
-}  // end destructor
+} // end destructor
 
 // Add options
 void QPSolverDualActiveSet::addOptions(Options* options,
-                                   const Reporter* reporter)
+                                       const Reporter* reporter)
 {
 
   // Add bool options
@@ -92,15 +92,15 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                            "the factorization may be re-computed from scratch and/or the\n"
                            "diagonal value may be replaced by this tolerance value.\n"
                            "Default value: 1e-12.");
-//  options->addDoubleOption(reporter,
-//                           "QPAS_inexact_termination_factor",
-//                           1.5,
-//                           0.0,
-//                           4.0,
-//                           "Factor for inexact termination, if allowed.  Factor by which\n"
-//                           "norm of inexact solution needs to be within true norm of true\n"
-//                           "(unknown) projection of origin onto convex hull of gradients.\n"
-//                           "Default value: 1.5.");
+  //  options->addDoubleOption(reporter,
+  //                           "QPAS_inexact_termination_factor",
+  //                           1.5,
+  //                           0.0,
+  //                           4.0,
+  //                           "Factor for inexact termination, if allowed.  Factor by which\n"
+  //                           "norm of inexact solution needs to be within true norm of true\n"
+  //                           "(unknown) projection of origin onto convex hull of gradients.\n"
+  //                           "Default value: 1.5.");
   options->addDoubleOption(reporter,
                            "QPAS_descent_factor",
                            1e-02,
@@ -130,7 +130,7 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Used to determine the how many iterations to skip at first \n"
-						   "before checking the inexact termination condition");
+                           "before checking the inexact termination condition");
 
   // Add integer options
   options->addIntegerOption(reporter,
@@ -148,11 +148,11 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                             "Maximum limit on the number of iterations.\n"
                             "Default value: 1e+04.");
 
-}  // end addOptions
+} // end addOptions
 
 // Set options
 void QPSolverDualActiveSet::setOptions(const Options* options,
-                                   const Reporter* reporter)
+                                       const Reporter* reporter)
 {
 
   // Read bool options
@@ -163,7 +163,7 @@ void QPSolverDualActiveSet::setOptions(const Options* options,
   // Read double options
   options->valueAsDouble(reporter, "QPAS_kkt_tolerance", kkt_tolerance_);
   options->valueAsDouble(reporter, "QPAS_cholesky_tolerance", cholesky_tolerance_);
-//  options->valueAsDouble(reporter, "QPAS_inexact_termination_factor", inexact_termination_factor_);
+  //  options->valueAsDouble(reporter, "QPAS_inexact_termination_factor", inexact_termination_factor_);
   options->valueAsDouble(reporter, "QPAS_descent_factor", kappa_);
   options->valueAsDouble(reporter, "QPAS_inexact_termination_ratio_min", inexact_termination_ratio_min_);
   options->valueAsDouble(reporter, "QPAS_linear_independence_tolerance", linear_independence_tolerance_);
@@ -173,12 +173,12 @@ void QPSolverDualActiveSet::setOptions(const Options* options,
   options->valueAsInteger(reporter, "QPAS_iteration_limit_minimum", iteration_limit_minimum_);
   options->valueAsInteger(reporter, "QPAS_iteration_limit_maximum", iteration_limit_maximum_);
 
-}  // end setOptions
+} // end setOptions
 
 // Initialize
 void QPSolverDualActiveSet::initialize(const Options* options,
-                                   Quantities* quantities,
-                                   const Reporter* reporter)
+                                       Quantities* quantities,
+                                       const Reporter* reporter)
 {
   initializeData(quantities->numberOfVariables());
 }
@@ -240,7 +240,7 @@ void QPSolverDualActiveSet::initializeData(int gamma_length)
   // Set null solution
   setNullSolution();
 
-}  // end initializeData
+} // end initializeData
 
 // Get combination norm
 double QPSolverDualActiveSet::combinationNormInf()
@@ -265,7 +265,7 @@ double QPSolverDualActiveSet::combinationNormInf()
   // Return inf-norm
   return combination_norm_inf;
 
-}  // end combinationNormInf
+} // end combinationNormInf
 
 // Get translated combination norm
 double QPSolverDualActiveSet::combinationTranslatedNormInf()
@@ -290,7 +290,7 @@ double QPSolverDualActiveSet::combinationTranslatedNormInf()
   // Return inf-norm
   return combination_translated_norm_inf;
 
-}  // end combinationTranslatedNormInf
+} // end combinationTranslatedNormInf
 
 // Get translated combination 2-norm square
 double QPSolverDualActiveSet::combinationTranslatedNorm2Square()
@@ -300,19 +300,18 @@ double QPSolverDualActiveSet::combinationTranslatedNorm2Square()
   int length = gamma_length_;
   int increment = 1;
 
-
   // Set norm
   double combination_translated_norm_2 = dnrm2_(&length, combination_translated_.values(), &increment);
 
   // Set maximum
   if (isnan(combination_translated_norm_2) || combination_translated_norm_2 > NONOPT_DOUBLE_INFINITY) {
-	  combination_translated_norm_2 = NONOPT_DOUBLE_INFINITY;
+    combination_translated_norm_2 = NONOPT_DOUBLE_INFINITY;
   }
 
   // Return 2-norm square
-  return combination_translated_norm_2*combination_translated_norm_2;
+  return combination_translated_norm_2 * combination_translated_norm_2;
 
-}  // end combinationTranslatedNorm2Square
+} // end combinationTranslatedNorm2Square
 
 // Get dual objective quadratic value
 double QPSolverDualActiveSet::dualObjectiveQuadraticValue()
@@ -333,7 +332,7 @@ double QPSolverDualActiveSet::dualObjectiveQuadraticValue()
   // Return
   return dual_objective_quadratic_value;
 
-}  // end dualObjectiveQuadraticValue
+} // end dualObjectiveQuadraticValue
 
 // Get objective quadratic value for feasible dual step
 double QPSolverDualActiveSet::dualObjectiveQuadraticValueScaled()
@@ -357,7 +356,7 @@ double QPSolverDualActiveSet::dualObjectiveQuadraticValueScaled()
   // Return
   return dual_objective_quadratic_value_scaled;
 
-}  // end dualObjectiveQuadraticValueScaled
+} // end dualObjectiveQuadraticValueScaled
 
 // Get dual solution
 void QPSolverDualActiveSet::dualSolution(double omega[], double gamma[])
@@ -376,14 +375,15 @@ void QPSolverDualActiveSet::dualSolution(double omega[], double gamma[])
   // Copy values
   dcopy_(&length, gamma_.values(), &increment, gamma, &increment);
 
-}  // end dualSolution
+} // end dualSolution
 
-std::vector<double> QPSolverDualActiveSet::dualSolution_omega(){
-	std::vector<double> vec;
-	int length = (int)vector_.size();
-//	unsigned dataArraySize = sizeof(dataArray) / sizeof(int);
-	vec.insert(vec.end(), &omega_.values()[0], &omega_.values()[length]);
-	return vec;
+std::vector<double> QPSolverDualActiveSet::dualSolution_omega()
+{
+  std::vector<double> vec;
+  int length = (int)vector_.size();
+  //	unsigned dataArraySize = sizeof(dataArray) / sizeof(int);
+  vec.insert(vec.end(), &omega_.values()[0], &omega_.values()[length]);
+  return vec;
 }
 
 // Get KKT error from dual solution
@@ -425,7 +425,7 @@ double QPSolverDualActiveSet::KKTErrorDual()
     if (term > 0.0 && term > kkt_error) {
       kkt_error = term;
     }
-  }  // end for
+  } // end for
   for (int i = 0; i < gamma_length_; i++) {
     double term = -scalar_ + d.values()[i];
     if (term > 0.0 && term > kkt_error) {
@@ -435,13 +435,13 @@ double QPSolverDualActiveSet::KKTErrorDual()
     if (term > 0.0 && term > kkt_error) {
       kkt_error = term;
     }
-  }  // end for
+  } // end for
   for (int j = 0; j < (int)vector_.size(); j++) {
     double term = -omega_.values()[j];
     if (term > 0.0 && term > kkt_error) {
       kkt_error = term;
     }
-  }  // end for
+  } // end for
   double sum = 0.0;
   for (int j = 0; j < (int)vector_.size(); j++) {
     sum = sum + omega_.values()[j];
@@ -460,7 +460,7 @@ double QPSolverDualActiveSet::KKTErrorDual()
     if (term1 > 0.0 && term1 * term2 > kkt_error) {
       kkt_error = term1 * term2;
     }
-  }  // end for
+  } // end for
 
   // Set maximum
   if (isnan(kkt_error) || kkt_error > NONOPT_DOUBLE_INFINITY) {
@@ -470,7 +470,7 @@ double QPSolverDualActiveSet::KKTErrorDual()
   // Return
   return kkt_error;
 
-}  // end KKTErrorDual
+} // end KKTErrorDual
 
 // Get primal solution
 void QPSolverDualActiveSet::primalSolution(double d[])
@@ -483,7 +483,7 @@ void QPSolverDualActiveSet::primalSolution(double d[])
   // Copy values
   dcopy_(&length, primal_solution_.values(), &increment, d, &increment);
 
-}  // end primalSolution
+} // end primalSolution
 
 // Get feasible primal solution
 void QPSolverDualActiveSet::primalSolutionFeasible(double d_feasible[])
@@ -496,7 +496,7 @@ void QPSolverDualActiveSet::primalSolutionFeasible(double d_feasible[])
   // Copy values
   dcopy_(&length, primal_solution_feasible_.values(), &increment, d_feasible, &increment);
 
-}  // end primalSolutionFeasible
+} // end primalSolutionFeasible
 
 // Get primal solution inf-norm
 double QPSolverDualActiveSet::primalSolutionNormInf()
@@ -521,7 +521,7 @@ double QPSolverDualActiveSet::primalSolutionNormInf()
   // Return inf-norm
   return primal_solution_norm_inf;
 
-}  // end primalSolutionNormInf
+} // end primalSolutionNormInf
 
 // Get primal solution 2-norm square
 double QPSolverDualActiveSet::primalSolutionNorm2Square()
@@ -531,19 +531,18 @@ double QPSolverDualActiveSet::primalSolutionNorm2Square()
   int length = gamma_length_;
   int increment = 1;
 
-
   // Set norm
   double primal_solution_norm_2 = dnrm2_(&length, primal_solution_.values(), &increment);
 
   // Set maximum
   if (isnan(primal_solution_norm_2) || primal_solution_norm_2 > NONOPT_DOUBLE_INFINITY) {
-	  primal_solution_norm_2 = NONOPT_DOUBLE_INFINITY;
+    primal_solution_norm_2 = NONOPT_DOUBLE_INFINITY;
   }
 
   // Return 2-norm square
-  return primal_solution_norm_2*primal_solution_norm_2;
+  return primal_solution_norm_2 * primal_solution_norm_2;
 
-}  // end primalSolutionNorm2Square
+} // end primalSolutionNorm2Square
 
 // Get feasible primal solution norm
 double QPSolverDualActiveSet::primalSolutionFeasibleNormInf()
@@ -568,7 +567,7 @@ double QPSolverDualActiveSet::primalSolutionFeasibleNormInf()
   // Return inf-norm
   return primal_solution_feasible_norm_inf;
 
-}  // end primalSolutionFeasibleNormInf
+} // end primalSolutionFeasibleNormInf
 
 // Initialize data
 void QPSolverDualActiveSet::setNullSolution()
@@ -608,11 +607,11 @@ void QPSolverDualActiveSet::setNullSolution()
   primal_solution_simple_.scale(0.0);
   primal_solution_projection_scalar_ = 0.0;
 
-}  // end setNullSolution
+} // end setNullSolution
 
 // Add vectors
-void QPSolverDualActiveSet::addData(const std::vector<std::shared_ptr<Vector> > vector_list,
-                                const std::vector<double> vector)
+void QPSolverDualActiveSet::addData(const std::vector<std::shared_ptr<Vector>> vector_list,
+                                    const std::vector<double> vector)
 {
 
   // Loop through new elements
@@ -621,7 +620,7 @@ void QPSolverDualActiveSet::addData(const std::vector<std::shared_ptr<Vector> > 
     vector_.push_back(vector[i]);
   }
 
-}  // end addData
+} // end addData
 
 // Inexact termination condition
 bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter)
@@ -647,7 +646,7 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
     for (int i = 0; i < gamma_length_; i++) {
       dual_objective -= scalar_ * gamma_.values()[i];
     }
-  }  // end if
+  } // end if
 
   //////////////////////////////////////////////////////////////////////////////////
   // EVALUATE PRIMAL OBJECTIVE CORRESPONDING TO PRIMAL FEASIBLE SOLUTION ESTIMATE //
@@ -663,7 +662,7 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
     if (bgd > bPlusGd_max) {
       bPlusGd_max = bgd;
     }
-  }  // end for
+  } // end for
   primal_objective_feasible += bPlusGd_max;
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -694,16 +693,16 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
       if (bgd > bPlusGd_max) {
         bPlusGd_max = bgd;
       }
-    }  // end for
+    } // end for
     primal_objective_simple_ += bPlusGd_max;
 
     // Check for reversion to zero solution
     if (primal_objective_simple_ > primal_objective_reference_) {
       primal_solution_simple_.scale(0.0);
       primal_objective_simple_ = primal_objective_reference_;
-    }  // end if
+    } // end if
 
-  }  // end if
+  } // end if
 
   ///////////////////////////////////////////////////
   // UPDATE BEST PRIMAL FEASIBLE SOLUTION ESTIMATE //
@@ -717,22 +716,22 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
       primal_solution_feasible_best_.copy(primal_solution_feasible_);
       primal_directional_derivative_feasible_best_ = vector_list_[0]->innerProduct(primal_solution_feasible_best_);
       primal_quadratic_feasible_best_ = matrix_->innerProduct(primal_solution_feasible_best_);
-    }  // end if
+    } // end if
     else {
       primal_objective_feasible_best_ = primal_objective_simple_;
       primal_solution_feasible_best_.copy(primal_solution_simple_);
       primal_directional_derivative_feasible_best_ = vector_list_[0]->innerProduct(primal_solution_feasible_best_);
       primal_quadratic_feasible_best_ = matrix_->innerProduct(primal_solution_feasible_best_);
-    }  // end else
-  }    // end if
+    } // end else
+  }   // end if
   else {
     if (primal_objective_feasible < primal_objective_feasible_best_) {
       primal_objective_feasible_best_ = primal_objective_feasible;
       primal_solution_feasible_best_.copy(primal_solution_feasible_);
       primal_directional_derivative_feasible_best_ = vector_list_[0]->innerProduct(primal_solution_feasible_best_);
       primal_quadratic_feasible_best_ = matrix_->innerProduct(primal_solution_feasible_best_);
-    }  // end if
-  }    // end else
+    } // end if
+  }   // end else
 
   //////////////////////
   // CHECK CONDITIONS //
@@ -751,46 +750,10 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
 
   if (iteration_count_ == 1) {
     reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "===============================================================================================================================================================================\n");
-    reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "%8s %8s %8s %8s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s\n",
-                                                          "tol",
-                                                          "|G*o+g|W",
-                                                          "|G*o|i",
-                                                          "|G*o+g|i",
-                                                          "q_0",
-                                                          "q_k",
-                                                          "p_ref",
-                                                          "p_k",
-                                                          "p_best",
-                                                          "g'*p_b",
-                                                          "p_b*H*p_b",
-                                                          "lhs",
-                                                          "rhs",
-                                                          "p_b-q_0",
-                                                          "p_ref-p_b",
-                                                          "lhs",
-                                                          "rhs",
-                                                          "kkt");
+    reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "%8s %8s %8s %8s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s\n", "tol", "|G*o+g|W", "|G*o|i", "|G*o+g|i", "q_0", "q_k", "p_ref", "p_k", "p_best", "g'*p_b", "p_b*H*p_b", "lhs", "rhs", "p_b-q_0", "p_ref-p_b", "lhs", "rhs", "kkt");
     reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "===============================================================================================================================================================================\n");
-  }  // end if
-  reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "%.2e %.2e %.2e %.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e\n",
-                   inexact_solution_tolerance_,
-                   primalSolutionNormInf(),
-                   combinationNormInf(),
-                   combinationTranslatedNormInf(),
-                   dual_objective_reference_,
-                   dual_objective,
-                   primal_objective_reference_,
-                   primal_objective_feasible,
-                   primal_objective_feasible_best_,
-                   primal_directional_derivative_feasible_best_,
-                   primal_quadratic_feasible_best_,
-                   dual_objective - dual_objective_reference_,
-                   fmax(inexact_termination_ratio, inexact_termination_ratio_min_) * (primal_objective_feasible_best_ - dual_objective_reference_),
-                   primal_objective_feasible_best_ - dual_objective_reference_,
-                   primal_objective_reference_ - primal_objective_feasible_best_,
-                   (pow(inexact_termination_factor_, 2.0) + 2 * inexact_termination_factor_) * (primal_objective_reference_ - primal_objective_feasible_best_),
-                   primal_objective_feasible_best_ - dual_objective,
-                   kkt_error_);
+  } // end if
+  reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "%.2e %.2e %.2e %.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e\n", inexact_solution_tolerance_, primalSolutionNormInf(), combinationNormInf(), combinationTranslatedNormInf(), dual_objective_reference_, dual_objective, primal_objective_reference_, primal_objective_feasible, primal_objective_feasible_best_, primal_directional_derivative_feasible_best_, primal_quadratic_feasible_best_, dual_objective - dual_objective_reference_, fmax(inexact_termination_ratio, inexact_termination_ratio_min_) * (primal_objective_feasible_best_ - dual_objective_reference_), primal_objective_feasible_best_ - dual_objective_reference_, primal_objective_reference_ - primal_objective_feasible_best_, (pow(inexact_termination_factor_, 2.0) + 2 * inexact_termination_factor_) * (primal_objective_reference_ - primal_objective_feasible_best_), primal_objective_feasible_best_ - dual_objective, kkt_error_);
 
   // Initialize return value
   bool condition_bool = false;
@@ -802,20 +765,19 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
     condition_bool = true;
   }
   // Check first "nonzero d" condition
-  else if (vector_list_[0]->innerProduct(primal_solution_feasible_) <= -1.0*kappa_ * dualObjectiveQuadraticValue() ){
-	  if (dual_objective - dual_objective_reference_ >=
-	           fmax(inexact_termination_ratio, inexact_termination_ratio_min_) * (primal_objective_feasible_best_ - dual_objective_reference_)) {
-	    primal_solution_.copy(primal_solution_feasible_best_);
-	    condition_bool = true;
-	  }  // end if
-	  // Check second "nonzero d" condition
-	  else if ((pow(inexact_termination_factor_, 2.0) + 2 * inexact_termination_factor_) * (primal_objective_reference_ - primal_objective_feasible_best_) >=
-	      primal_objective_feasible_best_ - dual_objective) {
-	    primal_solution_.copy(primal_solution_feasible_best_);
-	    condition_bool = true;
-	  }  // end if
+  else if (vector_list_[0]->innerProduct(primal_solution_feasible_) <= -1.0 * kappa_ * dualObjectiveQuadraticValue()) {
+    if (dual_objective - dual_objective_reference_ >=
+        fmax(inexact_termination_ratio, inexact_termination_ratio_min_) * (primal_objective_feasible_best_ - dual_objective_reference_)) {
+      primal_solution_.copy(primal_solution_feasible_best_);
+      condition_bool = true;
+    } // end if
+    // Check second "nonzero d" condition
+    else if ((pow(inexact_termination_factor_, 2.0) + 2 * inexact_termination_factor_) * (primal_objective_reference_ - primal_objective_feasible_best_) >=
+             primal_objective_feasible_best_ - dual_objective) {
+      primal_solution_.copy(primal_solution_feasible_best_);
+      condition_bool = true;
+    } // end if
   }
-
 
   // Return
   return condition_bool;
@@ -823,12 +785,12 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
 
 // Solve
 void QPSolverDualActiveSet::solveQP(const Options* options,
-                                const Reporter* reporter,
-								Quantities* quantities)
+                                    const Reporter* reporter,
+                                    Quantities* quantities)
 {
 
-	inexact_termination_factor_=quantities->inexactTerminationFactor();
-	//std::cout<<"inexact factor 1 is "<<inexact_termination_factor_<<"\n";
+  inexact_termination_factor_ = quantities->inexactTerminationFactor();
+  //std::cout<<"inexact factor 1 is "<<inexact_termination_factor_<<"\n";
   // Initialize values
   setStatus(QP_UNSET);
   setNullSolution();
@@ -858,9 +820,9 @@ void QPSolverDualActiveSet::solveQP(const Options* options,
         index = i;
         value = t;
 
-      }  // end if
+      } // end if
 
-    }  // end for
+    } // end for
 
     // Check for failed index choice
     if (index == -1) {
@@ -885,23 +847,23 @@ void QPSolverDualActiveSet::solveQP(const Options* options,
     // Solve hot
     solveQPHot(options, reporter, quantities);
 
-  }  // end try
+  } // end try
 
   // catch exceptions
   catch (QP_INPUT_ERROR_EXCEPTION& exec) {
     setStatus(QP_INPUT_ERROR);
   }
 
-}  // end solveQP
+} // end solveQP
 
 // Solve hot
 void QPSolverDualActiveSet::solveQPHot(const Options* options,
-                                   const Reporter* reporter,
-								   Quantities* quantities)
+                                       const Reporter* reporter,
+                                       Quantities* quantities)
 {
   // Initialize values
-	inexact_termination_factor_=quantities->inexactTerminationFactor();
-	//std::cout<<"inexact factor 2 is "<<inexact_termination_factor_<<"\n";
+  inexact_termination_factor_ = quantities->inexactTerminationFactor();
+  //std::cout<<"inexact factor 2 is "<<inexact_termination_factor_<<"\n";
   setStatus(QP_UNSET);
   iteration_count_ = 0;
   kkt_error_ = -NONOPT_DOUBLE_INFINITY;
@@ -931,50 +893,34 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
     // Iteration loop
     while (true) {
 
-	  if (iteration_count_ == 0) {
-		reporter->printf(R_QP, R_PER_INNER_ITERATION, "======================================================================================================\n");
-		reporter->printf(R_QP, R_PER_INNER_ITERATION, "Starting iteration %6d and Inner iteration %6d\n",
-				quantities->iterationCounter(),
-				quantities->innerIterationCounter()
-		);
-		reporter->printf(R_QP, R_PER_INNER_ITERATION, "======================================================================================================\n");
-	  }  // end if
+      if (iteration_count_ == 0) {
+        reporter->printf(R_QP, R_PER_INNER_ITERATION, "======================================================================================================\n");
+        reporter->printf(R_QP, R_PER_INNER_ITERATION, "Starting iteration %6d and Inner iteration %6d\n", quantities->iterationCounter(), quantities->innerIterationCounter());
+        reporter->printf(R_QP, R_PER_INNER_ITERATION, "======================================================================================================\n");
+      } // end if
 
       // Print message
       if (iteration_count_ % 20 == 0) {
-        reporter->printf(R_QP, R_PER_ITERATION,
-                         "=======================================================\n"
-                         "  Iter.    |S|     |P|     |N|    min(KKT)  Set changes\n"
-                         "=======================================================\n");
+        reporter->printf(R_QP, R_PER_ITERATION, "=======================================================\n"
+                                                "  Iter.    |S|     |P|     |N|    min(KKT)  Set changes\n"
+                                                "=======================================================\n");
       }
-      reporter->printf(R_QP, R_PER_ITERATION,
-                       " %6d  %6d  %6d  %6d",
-                       iteration_count_,
-                       (int)omega_positive_.size(),
-                       (int)gamma_positive_.size(),
-                       (int)gamma_negative_.size());
-      reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                       "=========================\n"
-                       "Starting iteration %6d\n"
-                       "=========================\n",
+      reporter->printf(R_QP, R_PER_ITERATION, " %6d  %6d  %6d  %6d", iteration_count_, (int)omega_positive_.size(), (int)gamma_positive_.size(), (int)gamma_negative_.size());
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "=========================\n"
+                                                    "Starting iteration %6d\n"
+                                                    "=========================\n",
                        iteration_count_);
-      reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                       "omega_positive (%6d elements):",
-                       (int)omega_positive_.size());
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "omega_positive (%6d elements):", (int)omega_positive_.size());
       for (int i = 0; i < (int)omega_positive_.size(); i++) {
         reporter->printf(R_QP, R_PER_INNER_ITERATION, " %d", omega_positive_[i]);
       }
       reporter->printf(R_QP, R_PER_INNER_ITERATION, "\n");
-      reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                       "gamma_positive (%6d elements):",
-                       (int)gamma_positive_.size());
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "gamma_positive (%6d elements):", (int)gamma_positive_.size());
       for (int i = 0; i < (int)gamma_positive_.size(); i++) {
         reporter->printf(R_QP, R_PER_INNER_ITERATION, " %d", gamma_positive_[i]);
       }
       reporter->printf(R_QP, R_PER_INNER_ITERATION, "\n");
-      reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                       "gamma_negative (%6d elements):",
-                       (int)gamma_negative_.size());
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "gamma_negative (%6d elements):", (int)gamma_negative_.size());
       for (int i = 0; i < (int)gamma_negative_.size(); i++) {
         reporter->printf(R_QP, R_PER_INNER_ITERATION, " %d", gamma_negative_[i]);
       }
@@ -1045,39 +991,38 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
         kkt_error_ = kkt_residual_omega_minimum;
         kkt_residual_minimum_set = 1;
         kkt_residual_minimum_index = kkt_residual_omega_minimum_index;
-      }  // end if
+      } // end if
       else {
         if (kkt_residual_omega_minimum <= kkt_residual_gamma_positive_minimum) {
           if (kkt_residual_omega_minimum <= kkt_residual_gamma_negative_minimum) {
             kkt_error_ = kkt_residual_omega_minimum;
             kkt_residual_minimum_set = 1;
             kkt_residual_minimum_index = kkt_residual_omega_minimum_index;
-          }  // end if
+          } // end if
           else {
             kkt_error_ = kkt_residual_gamma_negative_minimum;
             kkt_residual_minimum_set = 3;
             kkt_residual_minimum_index = kkt_residual_gamma_negative_minimum_index;
-          }  // end else
-        }    // end if
+          } // end else
+        }   // end if
         else {
           if (kkt_residual_gamma_positive_minimum <= kkt_residual_gamma_negative_minimum) {
             kkt_error_ = kkt_residual_gamma_positive_minimum;
             kkt_residual_minimum_set = 2;
             kkt_residual_minimum_index = kkt_residual_gamma_positive_minimum_index;
-          }  // end if
+          } // end if
           else {
             kkt_error_ = kkt_residual_gamma_negative_minimum;
             kkt_residual_minimum_set = 3;
             kkt_residual_minimum_index = kkt_residual_gamma_negative_minimum_index;
-          }  // end else
-        }    // end else
-      }      // end else
+          } // end else
+        }   // end else
+      }     // end else
 
       // Print message
       reporter->printf(R_QP, R_PER_ITERATION, "  %+.2e", kkt_error_);
-      reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                       "Set of minimum KKT element is %d\n"
-                       "Index of minimum KKT element is %d with value %+.16e\n",
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "Set of minimum KKT element is %d\n"
+                                                    "Index of minimum KKT element is %d with value %+.16e\n",
                        kkt_residual_minimum_set,
                        kkt_residual_minimum_index,
                        kkt_error_);
@@ -1091,36 +1036,25 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
       }
 
       // Check for inexact termination
-      if (allow_inexact_termination_){
-    	  if(do_skip_){
-    		  if( (iteration_count_-1==0 || (iteration_count_-1>=skip_factor_*(int)vector_.size()&&(iteration_count_-1)%4==0) )  && inexactTerminationCondition(reporter)){
-    			  THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
-    		  }
-    	  }
-    	  else if(inexactTerminationCondition(reporter)){
-    		  THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
-    	  }
-
-
+      if (allow_inexact_termination_) {
+        if (do_skip_) {
+          if ((iteration_count_ - 1 == 0 || (iteration_count_ - 1 >= skip_factor_ * (int)vector_.size() && (iteration_count_ - 1) % 4 == 0)) && inexactTerminationCondition(reporter)) {
+            THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
+          }
+        }
+        else if (inexactTerminationCondition(reporter)) {
+          THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
+        }
       }
 
-
-
-
-
       // Check for iteration limit
-      if (iteration_count_ -1 >= iteration_limit) {
+      if (iteration_count_ - 1 >= iteration_limit) {
         THROW_EXCEPTION(QP_ITERATION_LIMIT_EXCEPTION, "QP solve unsuccessful. Iteration limit reached.");
       }
 
       // Print message
       reporter->printf(R_QP, R_PER_ITERATION, "  %d", kkt_residual_minimum_set);
-      reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                       "Index %d will be added to index set %d\n",
-                       kkt_residual_minimum_index,
-                       kkt_residual_minimum_set);
-
-
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "Index %d will be added to index set %d\n", kkt_residual_minimum_index, kkt_residual_minimum_set);
 
       // Evaluate new system vector
       evaluateSystemVector(kkt_residual_minimum_set, kkt_residual_minimum_index, new_system_vector);
@@ -1184,12 +1118,10 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
           linear_independence_flag = true;
         }
 
-      }  // end else
+      } // end else
 
       // Print message
-      reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                       "Linear independence check yields %d\n",
-                       linear_independence_flag);
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "Linear independence check yields %d\n", linear_independence_flag);
 
       // Check for column exchange
       if (linear_independence_flag == false) {
@@ -1211,10 +1143,10 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
                 delete_index = i;
                 delete_value = temporary_scalar;
                 delete_set = 1;
-              }  // end if
-            }    // end if
-          }      // end for
-        }        // end if
+              } // end if
+            }   // end if
+          }     // end for
+        }       // end if
         else {
           for (int i = 0; i < (int)gamma_positive_.size(); i++) {
             if (inner_solution_ls[(int)omega_positive_.size() + i] > 0.0) {
@@ -1223,9 +1155,9 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
                 delete_index = i;
                 delete_value = temporary_scalar;
                 delete_set = 2;
-              }  // end if
-            }    // end if
-          }      // end for
+              } // end if
+            }   // end if
+          }     // end for
           for (int i = 0; i < (int)gamma_negative_.size(); i++) {
             if (inner_solution_ls[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] > 0) {
               double temporary_scalar = system_solution_[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] / inner_solution_ls[(int)omega_positive_.size() + (int)gamma_positive_.size() + i];
@@ -1233,10 +1165,10 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
                 delete_index = i;
                 delete_value = temporary_scalar;
                 delete_set = 3;
-              }  // end if
-            }    // end if
-          }      // end for
-        }        // end else
+              } // end if
+            }   // end if
+          }     // end for
+        }       // end else
 
         // Update augmentation value
         augmentation_value = delete_value;
@@ -1244,23 +1176,16 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
         // Print message
         reporter->printf(R_QP, R_PER_ITERATION, "  -%d", delete_set);
         if (delete_set == 1) {
-          reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                           "Index %d will be deleted from omega's positive set\n",
-                           omega_positive_[delete_index]);
+          reporter->printf(R_QP, R_PER_INNER_ITERATION, "Index %d will be deleted from omega's positive set\n", omega_positive_[delete_index]);
         }
         else if (delete_set == 2) {
-          reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                           "Index %d will be deleted from gamma's positive set\n",
-                           gamma_positive_[delete_index]);
+          reporter->printf(R_QP, R_PER_INNER_ITERATION, "Index %d will be deleted from gamma's positive set\n", gamma_positive_[delete_index]);
         }
         else if (delete_set == 3) {
-          reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                           "Index %d will be deleted from gamma's negative set\n",
-                           gamma_negative_[delete_index]);
+          reporter->printf(R_QP, R_PER_INNER_ITERATION, "Index %d will be deleted from gamma's negative set\n", gamma_negative_[delete_index]);
         }
         else {
-          reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                           "Uh oh!  Search for element to delete failed!\n");
+          reporter->printf(R_QP, R_PER_INNER_ITERATION, "Uh oh!  Search for element to delete failed!\n");
         }
 
         // Check if search for element to delete was successful
@@ -1277,32 +1202,26 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
           // Perform set deletion
           setDelete(reporter, delete_set, delete_index, inner_solution_1_, inner_solution_2_);
 
-        }  // end if
+        } // end if
 
         // Print sets
-        reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                         "omega_positive (%6d elements):",
-                         (int)omega_positive_.size());
+        reporter->printf(R_QP, R_PER_INNER_ITERATION, "omega_positive (%6d elements):", (int)omega_positive_.size());
         for (int i = 0; i < (int)omega_positive_.size(); i++) {
           reporter->printf(R_QP, R_PER_INNER_ITERATION, " %d", omega_positive_[i]);
         }
         reporter->printf(R_QP, R_PER_INNER_ITERATION, "\n");
-        reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                         "gamma_positive (%6d elements):",
-                         (int)gamma_positive_.size());
+        reporter->printf(R_QP, R_PER_INNER_ITERATION, "gamma_positive (%6d elements):", (int)gamma_positive_.size());
         for (int i = 0; i < (int)gamma_positive_.size(); i++) {
           reporter->printf(R_QP, R_PER_INNER_ITERATION, " %d", gamma_positive_[i]);
         }
         reporter->printf(R_QP, R_PER_INNER_ITERATION, "\n");
-        reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                         "gamma_negative (%6d elements):",
-                         (int)gamma_negative_.size());
+        reporter->printf(R_QP, R_PER_INNER_ITERATION, "gamma_negative (%6d elements):", (int)gamma_negative_.size());
         for (int i = 0; i < (int)gamma_negative_.size(); i++) {
           reporter->printf(R_QP, R_PER_INNER_ITERATION, " %d", gamma_negative_[i]);
         }
         reporter->printf(R_QP, R_PER_INNER_ITERATION, "\n");
 
-      }  // end if (linear_independence_flag == false)
+      } // end if (linear_independence_flag == false)
 
       // Print message
       reporter->printf(R_QP, R_PER_INNER_ITERATION, "Performing set augmentation\n");
@@ -1311,23 +1230,17 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
       bool augment_success = setAugment(reporter, kkt_residual_minimum_set, kkt_residual_minimum_index, new_system_vector, inner_solution_1_, inner_solution_2_, augmentation_value);
 
       // Print sets
-      reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                       "omega_positive (%6d elements):",
-                       (int)omega_positive_.size());
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "omega_positive (%6d elements):", (int)omega_positive_.size());
       for (int i = 0; i < (int)omega_positive_.size(); i++) {
         reporter->printf(R_QP, R_PER_INNER_ITERATION, " %d", omega_positive_[i]);
       }
       reporter->printf(R_QP, R_PER_INNER_ITERATION, "\n");
-      reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                       "gamma_positive (%6d elements):",
-                       (int)gamma_positive_.size());
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "gamma_positive (%6d elements):", (int)gamma_positive_.size());
       for (int i = 0; i < (int)gamma_positive_.size(); i++) {
         reporter->printf(R_QP, R_PER_INNER_ITERATION, " %d", gamma_positive_[i]);
       }
       reporter->printf(R_QP, R_PER_INNER_ITERATION, "\n");
-      reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                       "gamma_negative (%6d elements):",
-                       (int)gamma_negative_.size());
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "gamma_negative (%6d elements):", (int)gamma_negative_.size());
       for (int i = 0; i < (int)gamma_negative_.size(); i++) {
         reporter->printf(R_QP, R_PER_INNER_ITERATION, " %d", gamma_negative_[i]);
       }
@@ -1342,13 +1255,12 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
         }
 
         // Print message
-        reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                         "Re-doing Cholesky factorization from scratch!\n");
+        reporter->printf(R_QP, R_PER_INNER_ITERATION, "Re-doing Cholesky factorization from scratch!\n");
 
         // Try to compute from scratch
         choleskyFromScratch(reporter);
 
-      }  // end if
+      } // end if
 
       // Compute multiplier
       evaluatePrimalMultiplier(inner_solution_1_, inner_solution_2_);
@@ -1383,24 +1295,23 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
             if (inner_solution_trial[i] <= 0.0) {
               correct_signs = false;
               break;
-            }  // end if
-          }    // end for
-        }      // end if
+            } // end if
+          }   // end for
+        }     // end if
         if (correct_signs) {
           for (int i = 0; i < (int)gamma_negative_.size(); i++) {
             if (inner_solution_trial[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] >= 0.0) {
               correct_signs = false;
               break;
-            }  // end if
-          }    // end for
-        }      // end if
+            } // end if
+          }   // end for
+        }     // end if
 
         // Check feasibility of subproblem solution
         if (correct_signs) {
 
           // Print message
-          reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                           "Feasible subproblem solution! Breaking loop\n");
+          reporter->printf(R_QP, R_PER_INNER_ITERATION, "Feasible subproblem solution! Breaking loop\n");
 
           // Replace current solution
           dcopy_(&length, inner_solution_trial, &increment, system_solution_, &increment);
@@ -1408,12 +1319,11 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
           // Break subproblem solution loop
           break;
 
-        }  // end if
+        } // end if
         else {
 
           // Print message
-          reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                           "Infeasible subproblem solution! Looking for index to delete\n");
+          reporter->printf(R_QP, R_PER_INNER_ITERATION, "Infeasible subproblem solution! Looking for index to delete\n");
 
           // Initialize minimum index and values
           int delete_index = -1;
@@ -1428,9 +1338,9 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
                 delete_index = i;
                 delete_value = temporary_scalar;
                 delete_set = 1;
-              }  // end if
-            }    // end if
-          }      // end for
+              } // end if
+            }   // end if
+          }     // end for
           for (int i = 0; i < (int)gamma_positive_.size(); i++) {
             if (inner_solution_trial[(int)omega_positive_.size() + i] < 0.0) {
               double temporary_scalar = system_solution_[(int)omega_positive_.size() + i] / (system_solution_[(int)omega_positive_.size() + i] - inner_solution_trial[(int)omega_positive_.size() + i]);
@@ -1438,9 +1348,9 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
                 delete_index = i;
                 delete_value = temporary_scalar;
                 delete_set = 2;
-              }  // end if
-            }    // end if
-          }      // end for
+              } // end if
+            }   // end if
+          }     // end for
           for (int i = 0; i < (int)gamma_negative_.size(); i++) {
             if (inner_solution_trial[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] > 0.0) {
               double temporary_scalar = system_solution_[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] / (system_solution_[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] - inner_solution_trial[(int)omega_positive_.size() + (int)gamma_positive_.size() + i]);
@@ -1448,30 +1358,23 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
                 delete_index = i;
                 delete_value = temporary_scalar;
                 delete_set = 3;
-              }  // end if
-            }    // end if
-          }      // end for
+              } // end if
+            }   // end if
+          }     // end for
 
           // Print message
           reporter->printf(R_QP, R_PER_ITERATION, "  %+d", -delete_set);
           if (delete_set == 1) {
-            reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                             "Index %d will be deleted from omega's positive set\n",
-                             omega_positive_[delete_index]);
+            reporter->printf(R_QP, R_PER_INNER_ITERATION, "Index %d will be deleted from omega's positive set\n", omega_positive_[delete_index]);
           }
           else if (delete_set == 2) {
-            reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                             "Index %d will be deleted from gamma's positive set\n",
-                             gamma_positive_[delete_index]);
+            reporter->printf(R_QP, R_PER_INNER_ITERATION, "Index %d will be deleted from gamma's positive set\n", gamma_positive_[delete_index]);
           }
           else if (delete_set == 3) {
-            reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                             "Index %d will be deleted from gamma's negative set\n",
-                             gamma_negative_[delete_index]);
+            reporter->printf(R_QP, R_PER_INNER_ITERATION, "Index %d will be deleted from gamma's negative set\n", gamma_negative_[delete_index]);
           }
           else {
-            reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                             "Uh oh!  Search for element to delete failed!\n");
+            reporter->printf(R_QP, R_PER_INNER_ITERATION, "Uh oh!  Search for element to delete failed!\n");
           }
 
           // Check if search for element to delete was successful
@@ -1497,56 +1400,46 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
             // Evaluate multiplier
             evaluatePrimalMultiplier(inner_solution_1_, inner_solution_2_);
 
-          }  // end if
+          } // end if
 
           // Print sets
-          reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                           "omega_positive (%6d elements):",
-                           (int)omega_positive_.size());
+          reporter->printf(R_QP, R_PER_INNER_ITERATION, "omega_positive (%6d elements):", (int)omega_positive_.size());
           for (int i = 0; i < (int)omega_positive_.size(); i++) {
             reporter->printf(R_QP, R_PER_INNER_ITERATION, " %d", omega_positive_[i]);
           }
           reporter->printf(R_QP, R_PER_INNER_ITERATION, "\n");
-          reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                           "gamma_positive (%6d elements):",
-                           (int)gamma_positive_.size());
+          reporter->printf(R_QP, R_PER_INNER_ITERATION, "gamma_positive (%6d elements):", (int)gamma_positive_.size());
           for (int i = 0; i < (int)gamma_positive_.size(); i++) {
             reporter->printf(R_QP, R_PER_INNER_ITERATION, " %d", gamma_positive_[i]);
           }
           reporter->printf(R_QP, R_PER_INNER_ITERATION, "\n");
-          reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                           "gamma_negative (%6d elements):",
-                           (int)gamma_negative_.size());
+          reporter->printf(R_QP, R_PER_INNER_ITERATION, "gamma_negative (%6d elements):", (int)gamma_negative_.size());
           for (int i = 0; i < (int)gamma_negative_.size(); i++) {
             reporter->printf(R_QP, R_PER_INNER_ITERATION, " %d", gamma_negative_[i]);
           }
           reporter->printf(R_QP, R_PER_INNER_ITERATION, "\n");
 
-        }  // end else (correct_signs)
+        } // end else (correct_signs)
 
-      }  // end for (subproblem solution loop)
+      } // end for (subproblem solution loop)
 
       // Print new line
       reporter->printf(R_QP, R_PER_ITERATION, "\n");
 
-    }  // end of main iteration loop
+    } // end of main iteration loop
 
-  }  // end try
+  } // end try
 
   // catch exceptions
   catch (QP_SUCCESS_EXCEPTION& exec) {
     setStatus(QP_SUCCESS);
-  }
-  catch (QP_FACTORIZATION_ERROR_EXCEPTION& exec) {
+  } catch (QP_FACTORIZATION_ERROR_EXCEPTION& exec) {
     setStatus(QP_FACTORIZATION_ERROR);
-  }
-  catch (QP_INPUT_ERROR_EXCEPTION& exec) {
+  } catch (QP_INPUT_ERROR_EXCEPTION& exec) {
     setStatus(QP_INPUT_ERROR);
-  }
-  catch (QP_ITERATION_LIMIT_EXCEPTION& exec) {
+  } catch (QP_ITERATION_LIMIT_EXCEPTION& exec) {
     setStatus(QP_ITERATION_LIMIT);
-  }
-  catch (QP_NAN_ERROR_EXCEPTION& exec) {
+  } catch (QP_NAN_ERROR_EXCEPTION& exec) {
     setStatus(QP_NAN_ERROR);
   }
 
@@ -1576,7 +1469,7 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
     delete[] right_hand_side;
   }
 
-}  // end solveQPHot
+} // end solveQPHot
 
 // Print method
 void QPSolverDualActiveSet::printData(const Reporter* reporter)
@@ -1588,7 +1481,7 @@ void QPSolverDualActiveSet::printData(const Reporter* reporter)
       reporter->printf(R_QP, R_BASIC, " %+23.16e", matrix_->elementOfInverse(i, j));
     }
     reporter->printf(R_QP, R_BASIC, "\n");
-  }  // end for
+  } // end for
 
   // Print vector list
   reporter->printf(R_QP, R_BASIC, "VECTOR LIST:\n");
@@ -1597,7 +1490,7 @@ void QPSolverDualActiveSet::printData(const Reporter* reporter)
       reporter->printf(R_QP, R_BASIC, " %+23.16e", vector_list_[i]->values()[j]);
     }
     reporter->printf(R_QP, R_BASIC, "\n");
-  }  // end for
+  } // end for
 
   // Print vector
   reporter->printf(R_QP, R_BASIC, "VECTOR:\n");
@@ -1609,7 +1502,7 @@ void QPSolverDualActiveSet::printData(const Reporter* reporter)
   reporter->printf(R_QP, R_BASIC, "SCALAR:\n");
   reporter->printf(R_QP, R_BASIC, " %+23.16e\n", scalar_);
 
-}  // end printData
+} // end printData
 
 // Check quantities
 bool QPSolverDualActiveSet::checkQuantityCompatibility()
@@ -1633,7 +1526,7 @@ bool QPSolverDualActiveSet::checkQuantityCompatibility()
       return false;
     }
 
-  }  // end for
+  } // end for
 
   // Check length of vector list and vector
   if ((int)vector_list_.size() != (int)vector_.size()) {
@@ -1648,7 +1541,7 @@ bool QPSolverDualActiveSet::checkQuantityCompatibility()
   // Return success
   return true;
 
-}  // end checkQuantityCompatibility
+} // end checkQuantityCompatibility
 
 // Update best solution
 bool QPSolverDualActiveSet::updateBestSolution()
@@ -1677,20 +1570,20 @@ bool QPSolverDualActiveSet::updateBestSolution()
       system_solution_best_[i] = system_solution_[i];
     }
 
-  }  // end if
+  } // end if
 
   // Return
   return real_solution;
 
-}  // end updateBestSolution
+} // end updateBestSolution
 
 // Cholesky augmentation
 bool QPSolverDualActiveSet::choleskyAugment(double system_vector[],
-                                        int index,
-                                        double solution1[],
-                                        double value1,
-                                        double solution2[],
-                                        double value2)
+                                            int index,
+                                            double solution1[],
+                                            double value1,
+                                            double solution2[],
+                                            double value2)
 {
 
   // Initialize return value
@@ -1705,19 +1598,19 @@ bool QPSolverDualActiveSet::choleskyAugment(double system_vector[],
       factor_[i * system_solution_length_ + j] = factor_[i * system_solution_length_ + j - 1];
     }
     factor_[i * system_solution_length_ + index] = 0.0;
-  }  // end for
+  } // end for
   for (int j = 0; j < length; j++) {
     for (int i = length - 1; i > index; i--) {
       factor_[i * system_solution_length_ + j] = factor_[(i - 1) * system_solution_length_ + j];
     }
     factor_[index * system_solution_length_ + j] = 0.0;
-  }  // end for
+  } // end for
 
   // "Add" zero values to solutions by shifting values
   for (int i = length - 1; i > index; i--) {
     solution1[i] = solution1[i - 1];
     solution2[i] = solution2[i - 1];
-  }  // end for
+  } // end for
   solution1[index] = 0.0;
   solution2[index] = 0.0;
 
@@ -1727,7 +1620,7 @@ bool QPSolverDualActiveSet::choleskyAugment(double system_vector[],
     for (int j = i + 1; j < index; j++) {
       system_vector[j] = system_vector[j] - factor_[i * system_solution_length_ + j] * factor_[i * system_solution_length_ + index];
     }
-  }  // end for
+  } // end for
 
   // Compute temporary scalar
   double temporary_scalar = 0.0;
@@ -1743,7 +1636,7 @@ bool QPSolverDualActiveSet::choleskyAugment(double system_vector[],
   else {
     factor_[index * system_solution_length_ + index] = sqrt(cholesky_tolerance_);
     success_without_factorization_error = false;
-  }  // end else
+  } // end else
 
   // Update Cholesky factor (third part)
   for (int i = index + 1; i < length; i++) {
@@ -1752,7 +1645,7 @@ bool QPSolverDualActiveSet::choleskyAugment(double system_vector[],
       temporary_scalar = temporary_scalar + factor_[j * system_solution_length_ + i] * factor_[j * system_solution_length_ + index];
     }
     factor_[index * system_solution_length_ + i] = (system_vector[i] - temporary_scalar) / factor_[index * system_solution_length_ + index];
-  }  // end for
+  } // end for
 
   // Update solution1
   temporary_scalar = 0.0;
@@ -1813,7 +1706,7 @@ bool QPSolverDualActiveSet::choleskyAugment(double system_vector[],
     temporary_vector[length - index - 1] = c * temporary_vector[length - index - 1] - s * solution1[i];
     temporary_vector[length - index] = c * temporary_vector[length - index] - s * solution2[i];
 
-  }  // end for
+  } // end for
 
   // Delete temporary vector
   if (temporary_vector != nullptr) {
@@ -1823,12 +1716,12 @@ bool QPSolverDualActiveSet::choleskyAugment(double system_vector[],
   // Return
   return success_without_factorization_error;
 
-}  // end choleskyAugment
+} // end choleskyAugment
 
 // Cholesky deletion
 void QPSolverDualActiveSet::choleskyDelete(int index,
-                                       double solution1[],
-                                       double solution2[])
+                                           double solution1[],
+                                           double solution2[])
 {
 
   // Set new length
@@ -1839,7 +1732,7 @@ void QPSolverDualActiveSet::choleskyDelete(int index,
     for (int j = index; j < length; j++) {
       factor_[i * system_solution_length_ + j] = factor_[i * system_solution_length_ + j + 1];
     }
-  }  // end for
+  } // end for
 
   // Apply Givens rotations
   for (int i = index; i < length; i++) {
@@ -1861,7 +1754,7 @@ void QPSolverDualActiveSet::choleskyDelete(int index,
       factor_[i * system_solution_length_ + j] = y;
       factor_[(i + 1) * system_solution_length_ + j] = z;
 
-    }  // end for
+    } // end for
 
     // Set new zero value
     factor_[(i + 1) * system_solution_length_ + i] = 0.0;
@@ -1882,9 +1775,9 @@ void QPSolverDualActiveSet::choleskyDelete(int index,
     solution2[i] = y;
     solution2[i + 1] = z;
 
-  }  // end for
+  } // end for
 
-}  // end choleskyDelete
+} // end choleskyDelete
 
 // Cholesky factorization from scratch
 void QPSolverDualActiveSet::choleskyFromScratch(const Reporter* reporter)
@@ -1903,59 +1796,59 @@ void QPSolverDualActiveSet::choleskyFromScratch(const Reporter* reporter)
   }
 
   // Declare WG vectors
-  std::vector<std::shared_ptr<Vector> > WG;
+  std::vector<std::shared_ptr<Vector>> WG;
 
   // Compute WG matrix
   for (int i = 0; i < (int)omega_positive_.size(); i++) {
     std::shared_ptr<Vector> product(new Vector(gamma_length_));
     matrix_->matrixVectorProductOfInverse(*vector_list_[omega_positive_[i]], *product);
     WG.push_back(product);
-  }  // end for
+  } // end for
 
   // Compute (1,1)-block (upper triangle)
   for (int i = 0; i < (int)omega_positive_.size(); i++) {
     for (int j = i; j < (int)omega_positive_.size(); j++) {
       matrix[i * size + j] = 1.0 + vector_list_[omega_positive_[i]]->innerProduct(*WG[j]);
     }
-  }  // end for
+  } // end for
 
   // Compute (1,2)-block
   for (int i = 0; i < (int)omega_positive_.size(); i++) {
     for (int j = 0; j < (int)gamma_positive_.size(); j++) {
       matrix[i * size + (int)omega_positive_.size() + j] = WG[i]->values()[gamma_positive_[j]];
     }
-  }  // end for
+  } // end for
 
   // Compute (1,3)-block
   for (int i = 0; i < (int)omega_positive_.size(); i++) {
     for (int j = 0; j < (int)gamma_negative_.size(); j++) {
       matrix[i * size + (int)omega_positive_.size() + (int)gamma_positive_.size() + j] = WG[i]->values()[gamma_negative_[j]];
     }
-  }  // end for
+  } // end for
 
   // Compute (2,2)-block (upper triangle)
   for (int i = 0; i < (int)gamma_positive_.size(); i++) {
     for (int j = i; j < (int)gamma_positive_.size(); j++) {
       matrix[((int)omega_positive_.size() + i) * size + ((int)omega_positive_.size() + j)] = matrix_->elementOfInverse(gamma_positive_[i], gamma_positive_[j]);
     }
-  }  // end for
+  } // end for
 
   // Compute (2,3)-block (upper triangle)
   for (int i = 0; i < (int)gamma_positive_.size(); i++) {
     for (int j = 0; j < (int)gamma_negative_.size(); j++) {
       matrix[((int)omega_positive_.size() + i) * size + ((int)omega_positive_.size() + (int)gamma_positive_.size() + j)] = matrix_->elementOfInverse(gamma_positive_[i], gamma_negative_[j]);
     }
-  }  // end for
+  } // end for
 
   // Compute (3,3)-block (upper triangle)
   for (int i = 0; i < (int)gamma_negative_.size(); i++) {
     for (int j = i; j < (int)gamma_negative_.size(); j++) {
       matrix[((int)omega_positive_.size() + (int)gamma_positive_.size() + i) * size + ((int)omega_positive_.size() + (int)gamma_positive_.size() + j)] = matrix_->elementOfInverse(gamma_negative_[i], gamma_negative_[j]);
     }
-  }  // end for
+  } // end for
 
   // Set inputs for blas
-  char upper_lower = 'L';  // Use "lower" since Fortran uses column-major ordering
+  char upper_lower = 'L'; // Use "lower" since Fortran uses column-major ordering
   int flag = 0;
 
   // Compute factorization
@@ -1964,20 +1857,17 @@ void QPSolverDualActiveSet::choleskyFromScratch(const Reporter* reporter)
   // Check tolerance on diagonal
   for (int i = 0; i < size; i++) {
     if (matrix[i * size + i] < cholesky_tolerance_) {
-      reporter->printf(R_QP, R_PER_INNER_ITERATION,
-                       "ARGH! Replacing Cholesky diagonal of %+23.16e with %+23.16e.\n",
-                       matrix[i * size + i],
-                       cholesky_tolerance_);
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "ARGH! Replacing Cholesky diagonal of %+23.16e with %+23.16e.\n", matrix[i * size + i], cholesky_tolerance_);
       matrix[i * size + i] = cholesky_tolerance_;
-    }  // end if
-  }    // end for
+    } // end if
+  }   // end for
 
   // Reset factorization
   for (int i = 0; i < size; i++) {
     for (int j = 0; j < size; j++) {
       factor_[i * system_solution_length_ + j] = matrix[i * size + j];
     }
-  }  // end for
+  } // end for
 
   // Set right-hand side 1
   double* right_hand_side = new double[size];
@@ -2013,7 +1903,7 @@ void QPSolverDualActiveSet::choleskyFromScratch(const Reporter* reporter)
     delete[] right_hand_side;
   }
 
-}  // end choleskyFromScratch
+} // end choleskyFromScratch
 
 // Evaluate dual vectors
 void QPSolverDualActiveSet::evaluatePrimalVectors()
@@ -2050,7 +1940,7 @@ void QPSolverDualActiveSet::evaluatePrimalVectors()
   primal_solution_projection_scalar_ = fmin(1.0, scalar_ / primal_solution_.normInf());
   primal_solution_feasible_.scale(primal_solution_projection_scalar_);
 
-}  // end evaluatePrimalVectors
+} // end evaluatePrimalVectors
 
 // Evaluate primal multiplier
 void QPSolverDualActiveSet::evaluatePrimalMultiplier(double solution1[],
@@ -2068,7 +1958,7 @@ void QPSolverDualActiveSet::evaluatePrimalMultiplier(double solution1[],
   // Evaluate multiplier
   multiplier_ = (solution1_norm_squared + solution1_solution2 - 1.0) / solution1_norm_squared;
 
-}  // end evaluatePrimalMultiplier
+} // end evaluatePrimalMultiplier
 
 // Evaluate system vector
 void QPSolverDualActiveSet::evaluateSystemVector(int set,
@@ -2096,7 +1986,7 @@ void QPSolverDualActiveSet::evaluateSystemVector(int set,
       Vector col(gamma_length_, 0.0);
       matrix_->columnOfInverse(i, col);
       temporary_vector[i] = vector_list_[index]->innerProduct(col);
-    }  // end for
+    } // end for
 
     // Set "omega" values, i.e.,
     for (int i = 0; i < (int)omega_positive_.size(); i++) {
@@ -2108,21 +1998,21 @@ void QPSolverDualActiveSet::evaluateSystemVector(int set,
       Vector col(gamma_length_, 0.0);
       matrix_->columnOfInverse(gamma_positive_[i], col);
       system_vector[(int)omega_positive_.size() + i] = vector_list_[index]->innerProduct(col);
-    }  // end for
+    } // end for
 
     // Set "gamma negative" values, i.e.,
     for (int i = 0; i < (int)gamma_negative_.size(); i++) {
       Vector col(gamma_length_, 0.0);
       matrix_->columnOfInverse(gamma_negative_[i], col);
       system_vector[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] = vector_list_[index]->innerProduct(col);
-    }  // end for
+    } // end for
 
     // Delete temporary vector
     if (temporary_vector != nullptr) {
       delete[] temporary_vector;
     }
 
-  }  // end if
+  } // end if
 
   else {
 
@@ -2131,7 +2021,7 @@ void QPSolverDualActiveSet::evaluateSystemVector(int set,
       Vector col(gamma_length_, 0.0);
       matrix_->columnOfInverse(index, col);
       system_vector[i] = vector_list_[omega_positive_[i]]->innerProduct(col);
-    }  // end for
+    } // end for
 
     // Set "gamma positive" values, i.e., W(gamma_positive_[i],kkt_residual_minimum_index)
     for (int i = 0; i < (int)gamma_positive_.size(); i++) {
@@ -2143,9 +2033,9 @@ void QPSolverDualActiveSet::evaluateSystemVector(int set,
       system_vector[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] = matrix_->elementOfInverse(gamma_negative_[i], index);
     }
 
-  }  // end else
+  } // end else
 
-}  // end evaluateSystemVector
+} // end evaluateSystemVector
 
 // Finalize solution
 void QPSolverDualActiveSet::finalizeSolution()
@@ -2178,7 +2068,7 @@ void QPSolverDualActiveSet::finalizeSolution()
     system_solution_[i] = system_solution_best_[i];
   }
 
-}  // end finalizeSolution
+} // end finalizeSolution
 
 // Set augment
 bool QPSolverDualActiveSet::setAugment(const Reporter* reporter,
@@ -2214,7 +2104,7 @@ bool QPSolverDualActiveSet::setAugment(const Reporter* reporter,
     // Augment Cholesky factor
     success_without_factorization_error = choleskyAugment(system_vector, (int)omega_positive_.size() - 1, solution1, 1, solution2, vector_[index]);
 
-  }  // end if
+  } // end if
 
   else if (set == 2) {
 
@@ -2236,7 +2126,7 @@ bool QPSolverDualActiveSet::setAugment(const Reporter* reporter,
     // Augment Cholesky factor
     success_without_factorization_error = choleskyAugment(system_vector, (int)omega_positive_.size() + (int)gamma_positive_.size() - 1, solution1, 0, solution2, -scalar_);
 
-  }  // end else if
+  } // end else if
 
   else {
 
@@ -2255,12 +2145,12 @@ bool QPSolverDualActiveSet::setAugment(const Reporter* reporter,
     // Augment Cholesky factor
     success_without_factorization_error = choleskyAugment(system_vector, (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size() - 1, solution1, 0, solution2, scalar_);
 
-  }  // end else
+  } // end else
 
   // Return
   return success_without_factorization_error;
 
-}  // end setAugment
+} // end setAugment
 
 // Set delete
 void QPSolverDualActiveSet::setDelete(const Reporter* reporter,
@@ -2284,7 +2174,7 @@ void QPSolverDualActiveSet::setDelete(const Reporter* reporter,
     // Delete row/column from Cholesky factor
     choleskyDelete(index, solution1, solution2);
 
-  }  // end if
+  } // end if
 
   else if (set == 2) {
 
@@ -2299,7 +2189,7 @@ void QPSolverDualActiveSet::setDelete(const Reporter* reporter,
     // Delete row/column from Cholesky factor
     choleskyDelete((int)omega_positive_.size() + index, solution1, solution2);
 
-  }  // end else if
+  } // end else if
 
   else {
 
@@ -2314,9 +2204,9 @@ void QPSolverDualActiveSet::setDelete(const Reporter* reporter,
     // Delete row/column from Cholesky factor
     choleskyDelete((int)omega_positive_.size() + (int)gamma_positive_.size() + index, solution1, solution2);
 
-  }  // end else
+  } // end else
 
-}  // end setDelete
+} // end setDelete
 
 // Solve linear system
 void QPSolverDualActiveSet::solveSystem(double right_hand_side[],
@@ -2325,8 +2215,8 @@ void QPSolverDualActiveSet::solveSystem(double right_hand_side[],
 
   // Set inputs for blas
   int length = (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size();
-  char upper_lower = 'L';  // Use "lower" since Fortran uses column-major ordering
-  char transpose = 'T';    // Use "transpose" since Fortran uses column-major ordering
+  char upper_lower = 'L'; // Use "lower" since Fortran uses column-major ordering
+  char transpose = 'T';   // Use "transpose" since Fortran uses column-major ordering
   char diagonal = 'N';
   int increment1 = 1;
   int incrementn = system_solution_length_;
@@ -2337,7 +2227,7 @@ void QPSolverDualActiveSet::solveSystem(double right_hand_side[],
   // Solve system
   dtrsv_(&upper_lower, &transpose, &diagonal, &length, factor_, &incrementn, solution, &increment1);
 
-}  // end solveSystem
+} // end solveSystem
 
 // Solve triangular system with transpose
 void QPSolverDualActiveSet::solveSystemTranspose(double right_hand_side[],
@@ -2346,8 +2236,8 @@ void QPSolverDualActiveSet::solveSystemTranspose(double right_hand_side[],
 
   // Set inputs for blas
   int length = (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size();
-  char upper_lower = 'L';  // Use "lower" since Fortran uses column-major ordering
-  char transpose = 'N';    // Use "not transpose" since Fortran uses column-major ordering
+  char upper_lower = 'L'; // Use "lower" since Fortran uses column-major ordering
+  char transpose = 'N';   // Use "not transpose" since Fortran uses column-major ordering
   char diagonal = 'N';
   int increment1 = 1;
   int incrementn = system_solution_length_;
@@ -2358,6 +2248,6 @@ void QPSolverDualActiveSet::solveSystemTranspose(double right_hand_side[],
   // Solve system
   dtrsv_(&upper_lower, &transpose, &diagonal, &length, factor_, &incrementn, solution, &increment1);
 
-}  // end solveSystemTranspose
+} // end solveSystemTranspose
 
-}  // namespace NonOpt
+} // namespace NonOpt

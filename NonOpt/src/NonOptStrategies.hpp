@@ -36,7 +36,7 @@ class SymmetricMatrix;
 class Strategies
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -145,7 +145,7 @@ class Strategies
   void printFooter(const Reporter* reporter);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -171,8 +171,8 @@ class Strategies
   std::string iteration_header_;
   //@}
 
-};  // end Strategies
+}; // end Strategies
 
-}  // namespace NonOpt
+} // namespace NonOpt
 
 #endif /* __NONOPTSTRATEGIES_HPP__ */

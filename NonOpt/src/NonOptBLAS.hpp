@@ -26,6 +26,6 @@ extern "C"
   double dnrm2_(int* n, double* x, int* incx);
   int idamax_(int* n, double* x, int* incx);
 
-}  // end extern "C"
+} // end extern "C"
 
 #endif /* __NONOPTBLAS_HPP__ */

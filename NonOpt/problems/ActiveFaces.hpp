@@ -26,7 +26,7 @@ using namespace NonOpt;
 class ActiveFaces : public Problem
 {
 
- public:
+public:
   /** @name Constructors */
   //@{
   /**
@@ -101,7 +101,7 @@ class ActiveFaces : public Problem
                         const double* g);
   //@}
 
- private:
+private:
   /** @name Default compiler generated methods
    * (Hidden to avoid implicit creation/calling.)
    */
@@ -121,6 +121,6 @@ class ActiveFaces : public Problem
   int number_of_variables_; /**< Number of variables */
   //@}
 
-};  // end ActiveFaces
+}; // end ActiveFaces
 
 #endif /* __ACTIVEFACES_HPP__ */

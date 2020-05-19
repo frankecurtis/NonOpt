@@ -8,7 +8,6 @@
 #define __TESTSYMMETRICMATRIX_HPP__
 
 #include <iostream>
-#include <iterator>
 
 #include "NonOptOptions.hpp"
 #include "NonOptReporter.hpp"
@@ -43,7 +42,7 @@ int testSymmetricMatrixImplementation(int option)
     // Add stream report to reporter
     reporter.addReport(sr);
 
-  }  // end if
+  } // end if
 
   // Declare pointer to symmetric matrix object
   std::shared_ptr<SymmetricMatrix> symmetric_matrix;
@@ -59,11 +58,11 @@ int testSymmetricMatrixImplementation(int option)
     if (symmetric_matrix_number == 0) {
       symmetric_matrix = std::make_shared<SymmetricMatrixDense>();
       reporter.printf(R_NL, R_BASIC, "TESTING SYMMETRIC MATRIX DENSE\n");
-    }  // end if
+    } // end if
     else {
       symmetric_matrix = std::make_shared<SymmetricMatrixLimitedMemory>();
       reporter.printf(R_NL, R_BASIC, "TESTING SYMMETRIC MATRIX LIMITED-MEMORY\n");
-    }  // end else
+    } // end else
 
     // Set options
     symmetric_matrix->setOptions(&options, &reporter);
@@ -89,8 +88,8 @@ int testSymmetricMatrixImplementation(int option)
             result = 1;
           }
         }
-      }  // end for
-    }    // end for
+      } // end for
+    }   // end for
 
     // Print identity matrix
     I->print(&reporter, "Testing constructor with default value... should be identity matrix:");
@@ -248,9 +247,9 @@ int testSymmetricMatrixImplementation(int option)
             result = 1;
           }
         }
-      }  // end for
+      } // end for
       reporter.printf(R_NL, R_BASIC, "\n");
-    }  // end for
+    } // end for
     reporter.printf(R_NL, R_BASIC, "Matrix inverse:\n");
     for (int i = 0; i < 5; i++) {
       for (int j = 0; j < 5; j++) {
@@ -380,9 +379,9 @@ int testSymmetricMatrixImplementation(int option)
             result = 1;
           }
         }
-      }  // end for
+      } // end for
       reporter.printf(R_NL, R_BASIC, "\n");
-    }  // end for
+    } // end for
 
     // Declare vector for column access
     Vector c(5, 0.0);
@@ -417,7 +416,7 @@ int testSymmetricMatrixImplementation(int option)
           result = 1;
         }
       }
-    }  // end for
+    } // end for
 
     // Print column
     c.print(&reporter, "Column... should be vector of elements of column 3 of matrix:");
@@ -452,7 +451,7 @@ int testSymmetricMatrixImplementation(int option)
           result = 1;
         }
       }
-    }  // end for
+    } // end for
 
     // Print column
     c.print(&reporter, "Column... should be vector of elements of column 3 of inverse:");
@@ -490,7 +489,7 @@ int testSymmetricMatrixImplementation(int option)
           result = 1;
         }
       }
-    }  // end for
+    } // end for
 
     // Print matrix-vector product
     p.print(&reporter, "Matrix-vector product... should be vector of sums of rows of matrix:");
@@ -525,7 +524,7 @@ int testSymmetricMatrixImplementation(int option)
           result = 1;
         }
       }
-    }  // end for
+    } // end for
 
     // Print matrix-vector product
     p.print(&reporter, "Matrix-vector product... should be vector of sums of rows of matrix inverse:");
@@ -570,8 +569,8 @@ int testSymmetricMatrixImplementation(int option)
             result = 1;
           }
         }
-      }  // end for
-    }    // end for
+      } // end for
+    }   // end for
 
     // Print diagonal matrix
     I->print(&reporter, "Resetting to diagonal matrix... matrix should be 7*I:");
@@ -594,13 +593,13 @@ int testSymmetricMatrixImplementation(int option)
             result = 1;
           }
         }
-      }  // end for
-    }    // end for
+      } // end for
+    }   // end for
 
     // Print 2x2 matrix
     I->print(&reporter, "Resizing to 2-by-2 matrix... should be identity:");
 
-  }  // end for
+  } // end for
 
   // Check option
   if (option == 1) {
@@ -611,11 +610,11 @@ int testSymmetricMatrixImplementation(int option)
     else {
       reporter.printf(R_NL, R_BASIC, "TEST FAILED.\n");
     }
-  }  // end if
+  } // end if
 
   // Return
   return result;
 
-}  // end testSymmetricMatrixImplementation
+} // end testSymmetricMatrixImplementation
 
 #endif /* __TESTSYMMETRICMATRIX_HPP__ */

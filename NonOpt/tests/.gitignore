@@ -1,11 +1,5 @@
 .DS_Store
-*.d
-*.d.*
-*.dSYM
 *.o
-*.opt
-*.out
-*.txt
 testAll
 testNonOpt
 testOptions
