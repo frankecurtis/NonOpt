@@ -122,6 +122,7 @@ private:
 
   /** @name Private members */
   //@{
+  bool add_far_points_;
   bool fail_on_iteration_limit_;
   bool fail_on_QP_failure_;
   bool try_aggregation_;

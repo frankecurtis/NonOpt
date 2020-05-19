@@ -36,6 +36,11 @@ void DirectionComputationCuttingPlane::addOptions(Options* options,
                          "Determines whether to fail if QP solver ever fails.\n"
                          "Default value: false.");
   options->addBoolOption(reporter,
+                         "DCCP_try_aggregation",
+                         false,
+                         "Determines whether to consider aggregating subgradients.\n"
+                         "Default value: false.");
+  options->addBoolOption(reporter,
                          "DCCP_try_shortened_step",
                          true,
                          "Determines whether to consider shortened step if subproblem\n"
@@ -44,6 +49,13 @@ void DirectionComputationCuttingPlane::addOptions(Options* options,
                          "Default value: true.");
 
   // Add double options
+  options->addDoubleOption(reporter,
+                            "DCCP_aggregation_size_threshold",
+                            1e+01,
+                            0.0,
+                            NONOPT_DOUBLE_INFINITY,
+                            "Threshold for switching from aggregation to full point set.\n"
+                            "Default value: 1e+01.");
   options->addDoubleOption(reporter,
                            "DCCP_downshift_constant",
                            1e-02,
@@ -59,7 +71,7 @@ void DirectionComputationCuttingPlane::addOptions(Options* options,
                            "DCCP_shortened_stepsize",
                            1e+00,
                            0.0,
-                           1.0,
+                           NONOPT_DOUBLE_INFINITY,
                            "Shortened stepsize.  If full QP step does not offer desired\n"
                            "objective reduction, then a shortened step corresponding to\n"
                            "this stepsize is considered if DCCP_try_shortened_step == true.\n"
@@ -94,9 +106,11 @@ void DirectionComputationCuttingPlane::setOptions(const Options* options,
   options->valueAsBool(reporter, "DCCP_add_far_points", add_far_points_);
   options->valueAsBool(reporter, "DCCP_fail_on_iteration_limit", fail_on_iteration_limit_);
   options->valueAsBool(reporter, "DCCP_fail_on_QP_failure", fail_on_QP_failure_);
+  options->valueAsBool(reporter, "DCCP_try_aggregation", try_aggregation_);
   options->valueAsBool(reporter, "DCCP_try_shortened_step", try_shortened_step_);
 
   // Read double options
+  options->valueAsDouble(reporter, "DCCP_aggregation_size_threshold", aggregation_size_threshold_);
   options->valueAsDouble(reporter, "DCCP_downshift_constant", downshift_constant_);
   options->valueAsDouble(reporter, "DCCP_shortened_stepsize", shortened_stepsize_);
   options->valueAsDouble(reporter, "DCCP_step_acceptance_tolerance", step_acceptance_tolerance_);
@@ -181,7 +195,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
         // Evaluate gradient
         evaluation_success = (*quantities->pointSet())[point_count]->evaluateGradient(*quantities);
 
-        // Check for evaluation success
+        // Check for successful evaluation
         if (evaluation_success) {
 
           // Add pointer to gradient in point set to list
@@ -242,10 +256,17 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
     } // end if
 
+    // Declare and set bool for switch from aggregated to full
+    bool switched_to_full = false;
+
+    // Declare aggregated QP quantities
+    std::vector<std::shared_ptr<Vector>> QP_gradient_list_aggregated = QP_gradient_list;
+    std::vector<double> QP_vector_aggregated = QP_vector;
+
     // Inner loop
     while (true) {
 
-      // Flush buffer
+      // Flush reporter buffer
       reporter->flushBuffer();
 
       // Evaluate trial iterate objective
@@ -263,11 +284,49 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
       // Check for inner iteration limit
       if (quantities->innerIterationCounter() > inner_iteration_limit_) {
         if (fail_on_iteration_limit_) {
-          THROW_EXCEPTION(DC_ITERATION_LIMIT_EXCEPTION, "Direction computation unsuccessful. Iterate limit exceeded.");
+          THROW_EXCEPTION(DC_ITERATION_LIMIT_EXCEPTION, "Direction computation unsuccessful. Iteration limit exceeded.");
         }
         else {
           THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
         }
+      } // end if
+
+      // Set aggregated data
+      if (try_aggregation_ && !switched_to_full) {
+
+        // Declare omega part of dual solution
+        double* omega = new double[strategies->qpSolver()->dualSolutionOmegaLength()];
+
+        // Get omega part of dual solution
+        strategies->qpSolver()->dualSolutionOmega(omega);
+
+        // Declare aggregation vector
+        std::shared_ptr<Vector> aggregation_vector(new Vector(quantities->numberOfVariables()));
+
+        // Declare aggregation scalar
+        double aggregation_scalar = 0.0;
+
+        // Set aggregation vector and scalar values
+        for (int i = 0; i < strategies->qpSolver()->dualSolutionOmegaLength(); i++) {
+          aggregation_vector->addScaledVector(omega[i], *QP_gradient_list_aggregated[i]);
+          aggregation_scalar += omega[i] * (QP_vector_aggregated[i]);
+        } // end for
+
+        // Delete omega
+        delete[] omega;
+
+        // Clear data
+        QP_gradient_list_aggregated.clear();
+        QP_vector_aggregated.clear();
+
+        // Add current iterate term
+        QP_gradient_list_aggregated.push_back(quantities->currentIterate()->gradient());
+        QP_vector_aggregated.push_back(quantities->currentIterate()->objective());
+
+        // Add aggregation vector and scalar
+        QP_gradient_list_aggregated.push_back(aggregation_vector);
+        QP_vector_aggregated.push_back(aggregation_scalar);
+
       } // end if
 
       // Declare new QP data
@@ -275,15 +334,15 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
       std::vector<double> QP_vector_new;
 
       // Check if adding far points
-      if (add_far_points_) {
+      if (add_far_points_ || strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius()) {
 
-        // Check for objective evaluation success
+        // Check for objective successful evaluation
         if (evaluation_success) {
 
           // Evaluate trial iterate gradient
           evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
 
-          // Check for gradient evaluation success
+          // Check for gradient successful evaluation
           if (evaluation_success) {
 
             // Add trial iterate to point set
@@ -291,6 +350,10 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
             // Add pointer to gradient in point set to list
             QP_gradient_list_new.push_back(quantities->trialIterate()->gradient());
+            if (try_aggregation_ && !switched_to_full) {
+              QP_gradient_list.push_back(quantities->trialIterate()->gradient());
+              QP_gradient_list_aggregated.push_back(quantities->trialIterate()->gradient());
+            } // end if
 
             // Create difference vector
             std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *quantities->trialIterate()->vector());
@@ -301,6 +364,10 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
             // Add linear term value based on cutting plane
             QP_vector_new.push_back(fmin(linearization_value, downshifting_value));
+            if (try_aggregation_ && !switched_to_full) {
+              QP_vector.push_back(fmin(linearization_value, downshifting_value));
+              QP_vector_aggregated.push_back(fmin(linearization_value, downshifting_value));
+            } // end if
 
           } // end if
 
@@ -329,13 +396,13 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
           THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
         }
 
-        // Check for objective evaluation success
+        // Check for objective successful evaluation
         if (evaluation_success) {
 
           // Evaluate trial gradient
           evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
 
-          // Check for gradient evaluation success
+          // Check for gradient successful evaluation
           if (evaluation_success) {
 
             // Add trial iterate to point set
@@ -343,6 +410,10 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
             // Add pointer to gradient in point set to list
             QP_gradient_list_new.push_back(quantities->trialIterate()->gradient());
+            if (try_aggregation_ && !switched_to_full) {
+              QP_gradient_list.push_back(quantities->trialIterate()->gradient());
+              QP_gradient_list_aggregated.push_back(quantities->trialIterate()->gradient());
+            } // end if
 
             // Create difference vector
             std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *quantities->trialIterate()->vector());
@@ -353,6 +424,10 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
             // Add linear term value based on cutting plane
             QP_vector_new.push_back(fmin(linearization_value, downshifting_value));
+            if (try_aggregation_ && !switched_to_full) {
+              QP_vector.push_back(fmin(linearization_value, downshifting_value));
+              QP_vector_aggregated.push_back(fmin(linearization_value, downshifting_value));
+            } // end if
 
           } // end if
 
@@ -368,24 +443,35 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
       if (strategies->lineSearch()->iterationNullValues().length() > 0) {
         blank_solve += "  ";
         blank_solve += strategies->lineSearch()->iterationNullValues();
-      }
+      } // end if
       if (strategies->inverseHessianUpdate()->iterationNullValues().length() > 0) {
         blank_solve += "  ";
         blank_solve += strategies->inverseHessianUpdate()->iterationNullValues();
-      }
+      } // end if
       if (strategies->pointSetUpdate()->iterationNullValues().length() > 0) {
         blank_solve += "  ";
         blank_solve += strategies->pointSetUpdate()->iterationNullValues();
-      }
+      } // end if
 
       // Print blank solve information
       reporter->printf(R_NL, R_PER_INNER_ITERATION, "%s\n%s", blank_solve.c_str(), quantities->iterationNullValues().c_str());
 
-      // Add QP data
-      strategies->qpSolver()->addData(QP_gradient_list_new, QP_vector_new);
-
-      // Solve QP hot
-      strategies->qpSolver()->solveQPHot(options, reporter, quantities);
+      // Set QP data and solve
+      if (try_aggregation_ && !switched_to_full && (int)quantities->pointSet()->size() < (int)(aggregation_size_threshold_ * (double)quantities->numberOfVariables())) {
+        strategies->qpSolver()->setVectorList(QP_gradient_list_aggregated);
+        strategies->qpSolver()->setVector(QP_vector_aggregated);
+        strategies->qpSolver()->solveQP(options, reporter, quantities);
+      } // end if
+      else if (try_aggregation_ && !switched_to_full) {
+        strategies->qpSolver()->setVectorList(QP_gradient_list);
+        strategies->qpSolver()->setVector(QP_vector);
+        strategies->qpSolver()->solveQP(options, reporter, quantities);
+        switched_to_full = true;
+      } // end else if
+      else {
+        strategies->qpSolver()->addData(QP_gradient_list_new, QP_vector_new);
+        strategies->qpSolver()->solveQPHot(options, reporter, quantities);
+      } // end else
 
       // Convert QP solution to step
       convertQPSolutionToStep(quantities, strategies);
@@ -417,6 +503,10 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
         // Convert QP solution to step
         convertQPSolutionToStep(quantities, strategies);
+
+        // Copy to aggregated values
+        QP_gradient_list_aggregated = QP_gradient_list;
+        QP_vector_aggregated = QP_vector;
 
       } // end if
 

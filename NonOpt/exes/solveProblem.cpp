@@ -7,8 +7,6 @@
 #include <cstdio>
 #include <string>
 
-#include "NonOptProblem.hpp"
-#include "NonOptSolver.hpp"
 #include "ActiveFaces.hpp"
 #include "BrownFunction_2.hpp"
 #include "ChainedCB3_1.hpp"
@@ -19,6 +17,8 @@
 #include "ChainedMifflin_2.hpp"
 #include "MaxQ.hpp"
 #include "MxHilb.hpp"
+#include "NonOptProblem.hpp"
+#include "NonOptSolver.hpp"
 #include "QuadPoly.hpp"
 #include "Test29_11.hpp"
 #include "Test29_13.hpp"
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
   // Check number of input arguments
   if (argc < 2) {
     printf("Too few arguments. Quitting.\n");
-    printf("%s",usage.c_str());
+    printf("%s", usage.c_str());
     return 1;
   }
 
@@ -118,12 +118,15 @@ int main(int argc, char* argv[])
   }
   else {
     printf("Invalid problem name. Quitting.\n");
-    printf("%s",usage.c_str());
+    printf("%s", usage.c_str());
     return 1;
   }
 
   // Declare algorithm
   NonOptSolver nonopt;
+
+  // Modify options from file
+  nonopt.options()->modifyOptionsFromFile(nonopt.reporter(), "nonopt.opt");
 
   // Optimize
   nonopt.optimize(problem);

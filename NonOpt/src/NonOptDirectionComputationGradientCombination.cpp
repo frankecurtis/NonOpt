@@ -20,6 +20,12 @@ void DirectionComputationGradientCombination::addOptions(Options* options,
 
   // Add bool options
   options->addBoolOption(reporter,
+                         "DCGC_add_far_points",
+                         false,
+                         "Determines whether to add points far outside stationarity\n"
+                         "radius to point set during subproblem solve.\n"
+                         "Default value: false.");
+  options->addBoolOption(reporter,
                          "DCGC_fail_on_iteration_limit",
                          false,
                          "Determines whether to fail if iteration limit exceeded.\n"
@@ -38,7 +44,7 @@ void DirectionComputationGradientCombination::addOptions(Options* options,
                          "DCGC_try_shortened_step",
                          true,
                          "Determines whether to consider shortened step if subproblem\n"
-                         "solver does not fail after considering full QP step.\n"
+                         "solver does not terminate after considering full QP step.\n"
                          "Shortened stepsize set by DCGC_shortened_stepsize parameter.\n"
                          "Default value: true.");
 
@@ -106,6 +112,7 @@ void DirectionComputationGradientCombination::setOptions(const Options* options,
 {
 
   // Read bool options
+  options->valueAsBool(reporter, "DCGC_add_far_points", add_far_points_);
   options->valueAsBool(reporter, "DCGC_fail_on_iteration_limit", fail_on_iteration_limit_);
   options->valueAsBool(reporter, "DCGC_fail_on_QP_failure", fail_on_QP_failure_);
   options->valueAsBool(reporter, "DCGC_try_aggregation", try_aggregation_);
@@ -233,7 +240,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       THROW_EXCEPTION(DC_QP_FAILURE_EXCEPTION, "Direction computation unsuccessful. QP solver failed.");
     }
 
-    // Clear data on QP failure
+    // Check for QP failure
     if (strategies->qpSolver()->status() != QP_SUCCESS) {
 
       // Clear data
@@ -335,6 +342,42 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       std::vector<std::shared_ptr<Vector>> QP_gradient_list_new;
       std::vector<double> QP_vector_new;
 
+      // Check if adding far points
+      if (add_far_points_ || strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius()) {
+
+        // Evaluate trial point gradient
+        evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
+
+        // Check for successful evaluation
+        if (evaluation_success) {
+
+          // Add trial iterate to point set
+          quantities->pointSet()->push_back(quantities->trialIterate());
+
+          // Add pointer to gradient in point set to list
+          QP_gradient_list_new.push_back(quantities->trialIterate()->gradient());
+          if (try_aggregation_ && !switched_to_full) {
+            QP_gradient_list.push_back(quantities->trialIterate()->gradient());
+            QP_gradient_list_aggregated.push_back(quantities->trialIterate()->gradient());
+          } // end if
+
+          // Create difference vector
+          std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *quantities->trialIterate()->vector());
+
+          // Evaluate downshifting value
+          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * pow(difference->norm2(), 2.0);
+
+          // Add linear term value
+          QP_vector_new.push_back(downshifting_value);
+          if (try_aggregation_ && !switched_to_full) {
+            QP_vector.push_back(downshifting_value);
+            QP_vector_aggregated.push_back(downshifting_value);
+          } // end if
+
+        } // end if
+
+      } // end if
+
       // Try shortened step?
       if (try_shortened_step_) {
 
@@ -359,7 +402,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
         // Evaluate trial gradient
         evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
 
-        // Check for objective evaluation success
+        // Check for objective successful evaluation
         if (evaluation_success) {
 
           // Add trial iterate to point set
@@ -370,7 +413,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
           if (try_aggregation_ && !switched_to_full) {
             QP_gradient_list.push_back(quantities->trialIterate()->gradient());
             QP_gradient_list_aggregated.push_back(quantities->trialIterate()->gradient());
-          }
+          } // end if
 
           // Create difference vector
           std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *quantities->trialIterate()->vector());
@@ -383,47 +426,11 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
           if (try_aggregation_ && !switched_to_full) {
             QP_vector.push_back(downshifting_value);
             QP_vector_aggregated.push_back(downshifting_value);
-          }
+          } // end if
 
         } // end if
 
       } // end if (try_shortened_step_)
-
-      // Add trial point, if inside stationarity radius
-      if (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius()) {
-
-        // Evaluate trial point gradient
-        evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
-
-        // Check for successful evaluation
-        if (evaluation_success) {
-
-          // Add trial iterate to point set
-          quantities->pointSet()->push_back(quantities->trialIterate());
-
-          // Add pointer to gradient in point set to list
-          QP_gradient_list_new.push_back(quantities->trialIterate()->gradient());
-          if (try_aggregation_ && !switched_to_full) {
-            QP_gradient_list.push_back(quantities->trialIterate()->gradient());
-            QP_gradient_list_aggregated.push_back(quantities->trialIterate()->gradient());
-          }
-
-          // Create difference vector
-          std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *quantities->trialIterate()->vector());
-
-          // Evaluate downshifting value
-          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * pow(difference->norm2(), 2.0);
-
-          // Add linear term value
-          QP_vector_new.push_back(downshifting_value);
-          if (try_aggregation_ && !switched_to_full) {
-            QP_vector.push_back(downshifting_value);
-            QP_vector_aggregated.push_back(downshifting_value);
-          }
-
-        } // end if
-
-      } // end if
 
       // Set number of points to sample
       int points_to_sample = 0;
@@ -443,7 +450,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
         // Evaluate gradient at random point
         evaluation_success = random_point->evaluateGradient(*quantities);
 
-        // Check for gradient evaluation success
+        // Check for gradient successful evaluation
         if (evaluation_success) {
 
           // Add random point to point set
@@ -454,7 +461,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
           if (try_aggregation_ && !switched_to_full) {
             QP_gradient_list.push_back(random_point->gradient());
             QP_gradient_list_aggregated.push_back(random_point->gradient());
-          }
+          } // end if
 
           // Create difference vector
           std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *random_point->vector());
@@ -467,7 +474,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
           if (try_aggregation_ && !switched_to_full) {
             QP_vector.push_back(downshifting_value);
             QP_vector_aggregated.push_back(downshifting_value);
-          }
+          } // end if
 
         } // end if
 

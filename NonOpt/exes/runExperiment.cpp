@@ -37,6 +37,9 @@ int main()
   // Declare NonOptSolver
   NonOptSolver nonopt;
 
+  // Modify options from file
+  nonopt.options()->modifyOptionsFromFile(nonopt.reporter(), "nonopt.opt");
+
   // Delete reports
   nonopt.reporter()->deleteReports();
 
