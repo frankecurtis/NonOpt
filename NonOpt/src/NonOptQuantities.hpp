@@ -84,6 +84,16 @@ public:
    */
   void initializeRadii(const Options* options,
                        const Reporter* reporter);
+  /**
+   * Initialize inexact termination factor
+   * \param[in] options is pointer to Options object from NonOpt
+   * \param[in] reporter is pointer to Reporter object from NonOpt
+   */
+  inline void initializeInexactTerminationFactor(const Options* options,
+                                                 const Reporter* reporter)
+  {
+    inexact_termination_factor_ = inexact_termination_factor_initial_;
+  };
   //@}
 
   /** @name Get methods */
@@ -102,6 +112,31 @@ public:
    * \return problem function evaluation time that was set
    */
   inline clock_t const evaluationTime() const { return evaluation_time_; };
+  /**
+   * Get inexact termination factor
+   * \return current inexact termination factor
+   */
+  inline double const inexactTerminationFactor() const { return inexact_termination_factor_; };
+  /**
+   * Get scaling threshold
+   * \return scaling threshold
+   */
+  inline double const scalingThreshold() const { return scaling_threshold_; };
+  /**
+   * Get stationarity radius
+   * \return current stationarity radius
+   */
+  inline double const stationarityRadius() const { return stationarity_radius_; };
+  /**
+   * Get stepsize
+   * \return current stepsize
+   */
+  inline double const stepsize() const { return stepsize_; };
+  /**
+   * Get trust region radius
+   * \return current trust region radius
+   */
+  inline double const trustRegionRadius() const { return trust_region_radius_; };
   /**
    * Function evaluation counter
    * \return function evaluations performed so far
@@ -172,26 +207,6 @@ public:
    * \return pointer to vector of pointers to Points representing current point set
    */
   inline std::shared_ptr<std::vector<std::shared_ptr<Point>>> pointSet() { return point_set_; };
-  /**
-   * Get scaling threshold
-   * \return scaling threshold
-   */
-  inline double const scalingThreshold() const { return scaling_threshold_; };
-  /**
-   * Get stationarity radius
-   * \return current stationarity radius
-   */
-  inline double const stationarityRadius() const { return stationarity_radius_; };
-  /**
-   * Get trust region radius
-   * \return current trust region radius
-   */
-  inline double const trustRegionRadius() const { return trust_region_radius_; };
-  /**
-   * Get stepsize
-   * \return current stepsize
-   */
-  inline double const stepsize() const { return stepsize_; };
   //@}
 
   /** @name Set methods */
@@ -221,21 +236,12 @@ public:
    */
   void updateRadii(double stationarity_tolerance);
   /**
-   * Update inexact_termination_factor
+   * Update inexact termination factor
    */
-  inline void updateInexactTerminationFactor() { inexact_termination_factor_ = inexact_termination_factor_ * inexact_termination_update_factor_; };
-  /**
-   * Initialize inexact termination factor
-   * \param[in] options is pointer to Options object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
-   */
-  inline void initializeInexactTerminationFactor(const Options* options,
-                                                 const Reporter* reporter) { inexact_termination_factor_ = inexact_termination_factor_initial_; };
-  /**
-   * Get trust inexact termination factor
-   * \return current inexact termination factor
-   */
-  inline double const inexactTerminationFactor() const { return inexact_termination_factor_; };
+  inline void updateInexactTerminationFactor()
+  {
+    inexact_termination_factor_ = inexact_termination_factor_ * inexact_termination_update_factor_;
+  };
   //@}
 
   /** @name Increment methods */
@@ -347,37 +353,37 @@ private:
 
   /** @name Private members */
   //@{
-  clock_t start_time_;
   clock_t end_time_;
   clock_t evaluation_time_;
+  clock_t start_time_;
+  double inexact_termination_factor_;
+  double stationarity_radius_;
+  double stepsize_;
+  double trust_region_radius_;
   int function_counter_;
   int gradient_counter_;
   int iteration_counter_;
   int inner_iteration_counter_;
+  int number_of_variables_;
   int qp_iteration_counter_;
   int total_inner_iteration_counter_;
   int total_qp_iteration_counter_;
-  int number_of_variables_;
   std::shared_ptr<Point> current_iterate_;
   std::shared_ptr<Point> trial_iterate_;
   std::shared_ptr<Vector> direction_;
   std::shared_ptr<std::vector<std::shared_ptr<Point>>> point_set_;
-  double stationarity_radius_;
-  double trust_region_radius_;
-  double stepsize_;
-  double inexact_termination_factor_;
-  double inexact_termination_factor_initial_;
-  double inexact_termination_update_factor_;
   //@}
 
   /** @name Private members (options) */
   //@{
+  double inexact_termination_factor_initial_;
+  double inexact_termination_update_factor_;
   double scaling_threshold_;
-  double stationarity_radius_initialization_minimum_;
   double stationarity_radius_initialization_factor_;
+  double stationarity_radius_initialization_minimum_;
   double stationarity_radius_update_factor_;
-  double trust_region_radius_initialization_minimum_;
   double trust_region_radius_initialization_factor_;
+  double trust_region_radius_initialization_minimum_;
   double trust_region_radius_update_factor_;
   int function_evaluation_limit_;
   int gradient_evaluation_limit_;

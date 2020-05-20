@@ -13,7 +13,6 @@
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
 #include "NonOptQPSolverDualActiveSet.hpp"
-#include <iostream>
 
 namespace NonOpt
 {
@@ -66,11 +65,6 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                          true,
                          "Indicator for whether to allow early termination.\n"
                          "Default value: true.");
-  options->addBoolOption(reporter,
-                         "QPAS_allow_skip_inexact",
-                         false,
-                         "Indicator for whether to allow skipping checking inexact termination.\n"
-                         "Default value: true.");
   // Add double options
   options->addDoubleOption(reporter,
                            "QPAS_kkt_tolerance",
@@ -92,21 +86,21 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                            "the factorization may be re-computed from scratch and/or the\n"
                            "diagonal value may be replaced by this tolerance value.\n"
                            "Default value: 1e-12.");
-  //  options->addDoubleOption(reporter,
-  //                           "QPAS_inexact_termination_factor",
-  //                           1.5,
-  //                           0.0,
-  //                           4.0,
-  //                           "Factor for inexact termination, if allowed.  Factor by which\n"
-  //                           "norm of inexact solution needs to be within true norm of true\n"
-  //                           "(unknown) projection of origin onto convex hull of gradients.\n"
-  //                           "Default value: 1.5.");
   options->addDoubleOption(reporter,
-                           "QPAS_descent_factor",
-                           1e-02,
+                           "QPAS_inexact_termination_descent_tolerance",
+                           1e-04,
                            0.0,
                            1.0,
-                           "Factor for checking if the direction is indeed a descent direction");
+                           "Descent direction tolerance for inexactness conditions.\n"
+                           "Default value: 1e-04.");
+  options->addDoubleOption(reporter,
+                           "QPAS_inexact_termination_initialization_factor",
+                           2.5e-01,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Determines number of iterations (fraction of gradient list size)\n"
+                           "to perform before inexact termination conditions are checked.\n"
+                           "Default value: 2.5e-01.");
   options->addDoubleOption(reporter,
                            "QPAS_inexact_termination_ratio_min",
                            1e-02,
@@ -124,15 +118,16 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                            "below this tolerance, then indices are exchanged to maintain\n"
                            "linear independence of the augmented matrix.\n"
                            "Default value: 1e-12.");
-  options->addDoubleOption(reporter,
-                           "QPAS_skip_factor",
-                           2.5e-1,
-                           0.0,
-                           NONOPT_DOUBLE_INFINITY,
-                           "Used to determine the how many iterations to skip at first \n"
-                           "before checking the inexact termination condition");
 
   // Add integer options
+  options->addIntegerOption(reporter,
+                            "QPAS_inexact_termination_check_interval",
+                            4,
+                            1,
+                            NONOPT_INT_INFINITY,
+                            "Number of iterations to perform between checks of inexact\n"
+                            "termination conditions.\n"
+                            "Default value: 4.");
   options->addIntegerOption(reporter,
                             "QPAS_iteration_limit_minimum",
                             1e+02,
@@ -158,18 +153,17 @@ void QPSolverDualActiveSet::setOptions(const Options* options,
   // Read bool options
   options->valueAsBool(reporter, "QPAS_fail_on_factorization_error", fail_on_factorization_error_);
   options->valueAsBool(reporter, "QPAS_allow_inexact_termination", allow_inexact_termination_);
-  options->valueAsBool(reporter, "QPAS_allow_skip_inexact", do_skip_);
 
   // Read double options
   options->valueAsDouble(reporter, "QPAS_kkt_tolerance", kkt_tolerance_);
   options->valueAsDouble(reporter, "QPAS_cholesky_tolerance", cholesky_tolerance_);
-  //  options->valueAsDouble(reporter, "QPAS_inexact_termination_factor", inexact_termination_factor_);
-  options->valueAsDouble(reporter, "QPAS_descent_factor", kappa_);
+  options->valueAsDouble(reporter, "QPAS_inexact_termination_descent_tolerance", inexact_termination_descent_tolerance_);
+  options->valueAsDouble(reporter, "QPAS_inexact_termination_initialization_factor", inexact_termination_initialization_factor_);
   options->valueAsDouble(reporter, "QPAS_inexact_termination_ratio_min", inexact_termination_ratio_min_);
   options->valueAsDouble(reporter, "QPAS_linear_independence_tolerance", linear_independence_tolerance_);
-  options->valueAsDouble(reporter, "QPAS_skip_factor", skip_factor_);
 
   // Read integer options
+  options->valueAsInteger(reporter, "QPAS_inexact_termination_check_interval", inexact_termination_check_interval_);
   options->valueAsInteger(reporter, "QPAS_iteration_limit_minimum", iteration_limit_minimum_);
   options->valueAsInteger(reporter, "QPAS_iteration_limit_maximum", iteration_limit_maximum_);
 
@@ -627,7 +621,8 @@ void QPSolverDualActiveSet::addData(const std::vector<std::shared_ptr<Vector>> v
 } // end addData
 
 // Inexact termination condition
-bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter)
+bool QPSolverDualActiveSet::inexactTerminationCondition(const Quantities* quantities,
+                                                        const Reporter* reporter)
 {
 
   // Finalize solution to set omega and gamma
@@ -748,7 +743,7 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
   }
 
   // Set inexact termination ratio value
-  double inexact_termination_ratio = 1.0 - (pow(inexact_termination_factor_, 2.0) + 2 * inexact_termination_factor_) / (objective_ratio - 1.0);
+  double inexact_termination_ratio = 1.0 - (pow(quantities->inexactTerminationFactor(), 2.0) + 2 * quantities->inexactTerminationFactor()) / (objective_ratio - 1.0);
 
   // Print information
 
@@ -757,7 +752,7 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
     reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "%8s %8s %8s %8s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s\n", "tol", "|G*o+g|W", "|G*o|i", "|G*o+g|i", "q_0", "q_k", "p_ref", "p_k", "p_best", "g'*p_b", "p_b*H*p_b", "lhs", "rhs", "p_b-q_0", "p_ref-p_b", "lhs", "rhs", "kkt");
     reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "===============================================================================================================================================================================\n");
   } // end if
-  reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "%.2e %.2e %.2e %.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e\n", inexact_solution_tolerance_, primalSolutionNormInf(), combinationNormInf(), combinationTranslatedNormInf(), dual_objective_reference_, dual_objective, primal_objective_reference_, primal_objective_feasible, primal_objective_feasible_best_, primal_directional_derivative_feasible_best_, primal_quadratic_feasible_best_, dual_objective - dual_objective_reference_, fmax(inexact_termination_ratio, inexact_termination_ratio_min_) * (primal_objective_feasible_best_ - dual_objective_reference_), primal_objective_feasible_best_ - dual_objective_reference_, primal_objective_reference_ - primal_objective_feasible_best_, (pow(inexact_termination_factor_, 2.0) + 2 * inexact_termination_factor_) * (primal_objective_reference_ - primal_objective_feasible_best_), primal_objective_feasible_best_ - dual_objective, kkt_error_);
+  reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "%.2e %.2e %.2e %.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e\n", inexact_solution_tolerance_, primalSolutionNormInf(), combinationNormInf(), combinationTranslatedNormInf(), dual_objective_reference_, dual_objective, primal_objective_reference_, primal_objective_feasible, primal_objective_feasible_best_, primal_directional_derivative_feasible_best_, primal_quadratic_feasible_best_, dual_objective - dual_objective_reference_, fmax(inexact_termination_ratio, inexact_termination_ratio_min_) * (primal_objective_feasible_best_ - dual_objective_reference_), primal_objective_feasible_best_ - dual_objective_reference_, primal_objective_reference_ - primal_objective_feasible_best_, (pow(quantities->inexactTerminationFactor(), 2.0) + 2 * quantities->inexactTerminationFactor()) * (primal_objective_reference_ - primal_objective_feasible_best_), primal_objective_feasible_best_ - dual_objective, kkt_error_);
 
   // Initialize return value
   bool condition_bool = false;
@@ -769,14 +764,14 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Reporter* reporter
     condition_bool = true;
   }
   // Check first "nonzero d" condition
-  else if (vector_list_[0]->innerProduct(primal_solution_feasible_) <= -1.0 * kappa_ * dualObjectiveQuadraticValue()) {
+  else if (vector_list_[0]->innerProduct(primal_solution_feasible_) <= -1.0 * inexact_termination_descent_tolerance_ * dualObjectiveQuadraticValue()) {
     if (dual_objective - dual_objective_reference_ >=
         fmax(inexact_termination_ratio, inexact_termination_ratio_min_) * (primal_objective_feasible_best_ - dual_objective_reference_)) {
       primal_solution_.copy(primal_solution_feasible_best_);
       condition_bool = true;
     } // end if
     // Check second "nonzero d" condition
-    else if ((pow(inexact_termination_factor_, 2.0) + 2 * inexact_termination_factor_) * (primal_objective_reference_ - primal_objective_feasible_best_) >=
+    else if ((pow(quantities->inexactTerminationFactor(), 2.0) + 2 * quantities->inexactTerminationFactor()) * (primal_objective_reference_ - primal_objective_feasible_best_) >=
              primal_objective_feasible_best_ - dual_objective) {
       primal_solution_.copy(primal_solution_feasible_best_);
       condition_bool = true;
@@ -793,8 +788,6 @@ void QPSolverDualActiveSet::solveQP(const Options* options,
                                     Quantities* quantities)
 {
 
-  inexact_termination_factor_ = quantities->inexactTerminationFactor();
-  //std::cout<<"inexact factor 1 is "<<inexact_termination_factor_<<"\n";
   // Initialize values
   setStatus(QP_UNSET);
   setNullSolution();
@@ -866,8 +859,6 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
                                        Quantities* quantities)
 {
   // Initialize values
-  inexact_termination_factor_ = quantities->inexactTerminationFactor();
-  //std::cout<<"inexact factor 2 is "<<inexact_termination_factor_<<"\n";
   setStatus(QP_UNSET);
   iteration_count_ = 0;
   kkt_error_ = -NONOPT_DOUBLE_INFINITY;
@@ -1040,19 +1031,15 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
       }
 
       // Check for inexact termination
-      if (allow_inexact_termination_) {
-        if (do_skip_) {
-          if ((iteration_count_ - 1 == 0 || (iteration_count_ - 1 >= skip_factor_ * (int)vector_.size() && (iteration_count_ - 1) % 4 == 0)) && inexactTerminationCondition(reporter)) {
-            THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
-          }
-        }
-        else if (inexactTerminationCondition(reporter)) {
-          THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
-        }
+      if (allow_inexact_termination_ &&
+          iteration_count_ >= (int)ceil(inexact_termination_initialization_factor_ * (double)vector_.size()) &&
+          (iteration_count_ - (int)ceil(inexact_termination_initialization_factor_ * (double)vector_.size())) % inexact_termination_check_interval_ == 0 &&
+          inexactTerminationCondition(quantities,reporter)) {
+        THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
       }
 
       // Check for iteration limit
-      if (iteration_count_ - 1 >= iteration_limit) {
+      if (iteration_count_ >= iteration_limit) {
         THROW_EXCEPTION(QP_ITERATION_LIMIT_EXCEPTION, "QP solve unsuccessful. Iteration limit reached.");
       }
 

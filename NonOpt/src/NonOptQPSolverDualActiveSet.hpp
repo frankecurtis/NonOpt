@@ -131,7 +131,6 @@ public:
    * \return number of iterations performed
    */
   int numberOfIterations() { return iteration_count_; };
-
   /**
    * Get primal solution
    * \param[out] "d" (equal to "-W*(G*omega + gamma)" if solution is exact)
@@ -273,13 +272,14 @@ private:
    */
   bool fail_on_factorization_error_;
   bool allow_inexact_termination_;
-  bool do_skip_;
   double cholesky_tolerance_;
   double kkt_tolerance_;
   double inexact_solution_tolerance_;
-  double inexact_termination_factor_;
+  double inexact_termination_descent_tolerance_;
+  double inexact_termination_initialization_factor_;
   double inexact_termination_ratio_min_;
   double linear_independence_tolerance_;
+  int inexact_termination_check_interval_;
   int iteration_limit_minimum_;
   int iteration_limit_maximum_;
   /**
@@ -301,8 +301,6 @@ private:
   double primal_objective_simple_;
   double primal_quadratic_feasible_best_;
   double primal_solution_feasible_best_norm_inf_;
-  double skip_factor_;
-  double kappa_;
   /**
    * Algorithm quantities
    */
@@ -346,7 +344,8 @@ private:
   /**
    * Termination condition for inexact solution
    */
-  bool inexactTerminationCondition(const Reporter* reporter);
+  bool inexactTerminationCondition(const Quantities* quantities,
+                                   const Reporter* reporter);
   /**
    * Internal solve methods
    */
