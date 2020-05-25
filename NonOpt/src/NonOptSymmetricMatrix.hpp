@@ -7,7 +7,9 @@
 #ifndef __NONOPTSYMMETRICMATRIX_HPP__
 #define __NONOPTSYMMETRICMATRIX_HPP__
 
+#include <memory>
 #include <string>
+#include <vector>
 
 #include "NonOptEnumerations.hpp"
 #include "NonOptOptions.hpp"

@@ -5,6 +5,7 @@
 // Author(s) : Frank E. Curtis
 
 #include <cmath>
+#include <cstdio>
 
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
@@ -80,11 +81,11 @@ void DirectionComputationCuttingPlane::addOptions(Options* options,
                            "Default value: 1e+00.");
   options->addDoubleOption(reporter,
                            "DCCP_step_acceptance_tolerance",
-                           1e-12,
+                           1e-08,
                            0.0,
                            1.0,
                            "Tolerance for step acceptance.\n"
-                           "Default value: 1e-12.");
+                           "Default value: 1e-08.");
 
   // Add integer options
   options->addIntegerOption(reporter,

@@ -7,6 +7,7 @@
 #ifndef __NONOPTVECTOR_HPP__
 #define __NONOPTVECTOR_HPP__
 
+#include <memory>
 #include <string>
 
 #include "NonOptReporter.hpp"

@@ -306,7 +306,7 @@ double Vector::min() const
 
   // Determine minimum
   for (int i = 1; i < length_; i++) {
-    minimum = fmax(minimum, values_[i]);
+    minimum = fmin(minimum, values_[i]);
   }
 
   // Return minimum

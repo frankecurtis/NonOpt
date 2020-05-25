@@ -121,7 +121,9 @@ private:
   double stepsize_minimum_;
   double stepsize_maximum_;
   double stepsize_sufficient_decrease_threshold_;
+  double stepsize_sufficient_decrease_fudge_factor_;
   double stepsize_curvature_threshold_;
+  double stepsize_curvature_fudge_factor_;
   double stepsize_decrease_factor_;
   double stepsize_increase_factor_;
   double stepsize_bound_tolerance_;

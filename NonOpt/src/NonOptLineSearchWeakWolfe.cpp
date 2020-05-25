@@ -60,12 +60,26 @@ void LineSearchWeakWolfe::addOptions(Options* options,
                            "Sufficient decrease constant for the weak Wolfe line search.\n"
                            "Default value: 1e-10.");
   options->addDoubleOption(reporter,
+                           "LSWW_stepsize_sufficient_decrease_fudge_factor",
+                           1e-10,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Sufficient decrease fudge factor.\n"
+                           "Default value: 1e-10.");
+  options->addDoubleOption(reporter,
                            "LSWW_stepsize_curvature_threshold",
                            9e-01,
                            0.0,
                            1.0,
                            "Curvature condition constant for the weak Wolfe line search.\n"
                            "Default value: 9e-01.");
+  options->addDoubleOption(reporter,
+                           "LSWW_stepsize_curvature_fudge_factor",
+                           1e-10,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Curvature condition fudge factor.\n"
+                           "Default value: 1e-10.");
   options->addDoubleOption(reporter,
                            "LSWW_stepsize_decrease_factor",
                            5e-01,
@@ -105,7 +119,9 @@ void LineSearchWeakWolfe::setOptions(const Options* options,
   options->valueAsDouble(reporter, "LSWW_stepsize_minimum", stepsize_minimum_);
   options->valueAsDouble(reporter, "LSWW_stepsize_maximum", stepsize_maximum_);
   options->valueAsDouble(reporter, "LSWW_stepsize_sufficient_decrease_threshold", stepsize_sufficient_decrease_threshold_);
+  options->valueAsDouble(reporter, "LSWW_stepsize_sufficient_decrease_fudge_factor", stepsize_sufficient_decrease_fudge_factor_);
   options->valueAsDouble(reporter, "LSWW_stepsize_curvature_threshold", stepsize_curvature_threshold_);
+  options->valueAsDouble(reporter, "LSWW_stepsize_curvature_fudge_factor", stepsize_curvature_fudge_factor_);
   options->valueAsDouble(reporter, "LSWW_stepsize_decrease_factor", stepsize_decrease_factor_);
   options->valueAsDouble(reporter, "LSWW_stepsize_increase_factor", stepsize_increase_factor_);
   options->valueAsDouble(reporter, "LSWW_stepsize_bound_tolerance", stepsize_bound_tolerance_);
@@ -163,11 +179,7 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
     double stepsize_maximum = stepsize_maximum_;
 
     // Initialize stepsize
-    quantities->setStepsize(fmin(stepsize_increase_factor_ * quantities->stepsize(), fmin(stepsize_initial_, stepsize_maximum_)));
-    if (quantities->stepsize() == 0.0) {
-      //printf("meet zero initial step\n");
-      quantities->setStepsize(stepsize_initial_);
-    }
+    quantities->setStepsize(fmax(stepsize_minimum_,fmin(stepsize_increase_factor_ * quantities->stepsize(), fmin(stepsize_initial_, stepsize_maximum_))));
 
     // Loop
     while (true) {
@@ -186,8 +198,7 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
       if (evaluation_success) {
 
         // Check for sufficient decrease
-        //sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * strategies->qpSolver()->dualObjectiveQuadraticValue());
-        sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(), strategies->qpSolver()->primalSolutionNorm2Square()));
+        sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * strategies->qpSolver()->dualObjectiveQuadraticValue() + stepsize_sufficient_decrease_fudge_factor_);
 
         // Check Armijo condition
         if (sufficient_decrease) {
@@ -199,7 +210,7 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
           if (evaluation_success) {
 
             // Check for curvature condition
-            curvature_condition = (quantities->trialIterate()->gradient()->innerProduct(*quantities->direction()) >= stepsize_curvature_threshold_ * directional_derivative);
+            curvature_condition = (quantities->trialIterate()->gradient()->innerProduct(*quantities->direction()) >= stepsize_curvature_threshold_ * directional_derivative - stepsize_curvature_fudge_factor_);
 
             // Check curvature condition
             if (curvature_condition) {

@@ -7,6 +7,7 @@
 #ifndef __NONOPTOPTIONS_HPP__
 #define __NONOPTOPTIONS_HPP__
 
+#include <memory>
 #include <string>
 #include <vector>
 

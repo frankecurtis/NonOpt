@@ -4,6 +4,7 @@
 //
 // Author(s) : Frank E. Curtis
 
+#include <cstring>
 #include <string>
 
 #include "ActiveFaces.hpp"
@@ -34,7 +35,7 @@
 int main()
 {
 
-  // Declare NonOptSolver
+  // Declare solver object
   NonOptSolver nonopt;
 
   // Modify options from file
@@ -143,7 +144,7 @@ int main()
                 std::shared_ptr<FileReport> r(new FileReport("f", R_NL, R_PER_INNER_ITERATION));
 
                 // Declare output file name
-                char out_file[100];
+                char out_file[200];
 
                 // Declare problem dimension
                 int const dimension = 10;
@@ -196,7 +197,7 @@ int main()
                   problem = std::make_shared<ChainedMifflin_2>(dimension);
                   printf("ChainedMifflin_2   ");
                   strcpy(out_file, (char*)"output/ChainedMifflin_2");
-                  optimal_value = -6.51;
+                  optimal_value = -6.5146;
                   break;
                 case 8:
                   problem = std::make_shared<MaxQ>(dimension);
@@ -220,7 +221,7 @@ int main()
                   problem = std::make_shared<Test29_11>(dimension);
                   printf("Test29_11          ");
                   strcpy(out_file, (char*)"output/Test29_11");
-                  optimal_value = 49.838;
+                  optimal_value = 9.7289;
                   break;
                 case 12:
                   problem = std::make_shared<Test29_13>(dimension);
@@ -279,7 +280,7 @@ int main()
                 } // end switch
 
                 // Set rest of output file name
-                sprintf(out_file, "%s_%d_%d_%d_%d_%d_%d.out", out_file, direction_computation_number, inverse_hessian_update_number, line_search_number, point_set_update_number, qp_solver_number, symmetric_matrix_number);
+                sprintf(out_file, "%s_%s_%s_%s_%s_%s_%s.out", out_file, direction_computation_name.c_str(), inverse_hessian_update_name.c_str(), line_search_name.c_str(), point_set_update_name.c_str(), qp_solver_name.c_str(), symmetric_matrix_name.c_str());
 
                 // Open output file
                 r->open(out_file);

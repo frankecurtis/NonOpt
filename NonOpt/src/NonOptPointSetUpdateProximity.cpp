@@ -6,7 +6,6 @@
 
 #include "NonOptPointSetUpdateProximity.hpp"
 #include "NonOptDefinitions.hpp"
-#include <iostream>
 
 namespace NonOpt
 {
@@ -15,6 +14,8 @@ namespace NonOpt
 void PointSetUpdateProximity::addOptions(Options* options,
                                          const Reporter* reporter)
 {
+
+  // Add bool options
 
   // Add double options
   options->addDoubleOption(reporter,
@@ -38,22 +39,6 @@ void PointSetUpdateProximity::addOptions(Options* options,
                            "then the oldest members are removed.\n"
                            "Default value: 1e+02.");
 
-  options->addDoubleOption(reporter,
-                           "PSP_lower_size",
-                           5e-01,
-                           0.0,
-                           NONOPT_DOUBLE_INFINITY,
-                           "Lower size factor for determine unadulterated BFGS, alpha_lower will be "
-                           "PSP_lower_size*radius ");
-
-  options->addDoubleOption(reporter,
-                           "PSP_lower_epsilon",
-                           1e-01,
-                           0.0,
-                           NONOPT_DOUBLE_INFINITY,
-                           "Lower size factor for determine unadulterated BFGS, alpha_lower will be "
-                           "PSP_lower_size*radius ");
-
   // Add integer options
 
 } // end addOptions
@@ -63,11 +48,11 @@ void PointSetUpdateProximity::setOptions(const Options* options,
                                          const Reporter* reporter)
 {
 
+  // Read bool options
+
   // Read double options
   options->valueAsDouble(reporter, "PSP_envelope_factor", envelope_factor_);
   options->valueAsDouble(reporter, "PSP_size_factor", size_factor_);
-  options->valueAsDouble(reporter, "PSP_lower_size", lower_size_);
-  options->valueAsDouble(reporter, "PSP_lower_epsilon", lower_epsilon_);
 
   // Read integer options
 
@@ -88,15 +73,8 @@ void PointSetUpdateProximity::updatePointSet(const Options* options,
   // Initialize status
   setStatus(PS_UNSET);
 
-  // Check if Unadulterated BFGS, if is, then keep only current iterate in point set
-  //  if(quantities->stepsize()> lower_size_*quantities->stationarityRadius() && lower_epsilon_*strategies->qpSolver()->primalSolutionNormInf()*strategies->qpSolver()->primalSolutionNormInf()<= strategies->qpSolver()->dualObjectiveQuadraticValue()){
-  //	  quantities->pointSet()->clear();
-  //	  quantities->pointSet()->push_back(quantities->currentIterate());
-  //
-  //  }
-
   // Remove old points
-  while ((double)quantities->pointSet()->size() > std::min(5000.0, size_factor_ * (double)quantities->numberOfVariables())) {
+  while ((double)quantities->pointSet()->size() > size_factor_ * (double)quantities->numberOfVariables()) {
     quantities->pointSet()->erase(quantities->pointSet()->begin());
   }
 
@@ -107,7 +85,7 @@ void PointSetUpdateProximity::updatePointSet(const Options* options,
     std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *(*quantities->pointSet())[i]->vector());
 
     // Check distance between point and current iterate
-    if (difference->normInf() > std::max(2.0, envelope_factor_ / (double)quantities->numberOfVariables()) * quantities->stationarityRadius()) {
+    if (difference->norm2() > envelope_factor_ * quantities->stationarityRadius()) {
 
       // Erase element
       quantities->pointSet()->erase(quantities->pointSet()->begin() + i);

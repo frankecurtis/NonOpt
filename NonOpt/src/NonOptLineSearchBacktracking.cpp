@@ -53,6 +53,13 @@ void LineSearchBacktracking::addOptions(Options* options,
                            "Sufficient decrease constant for the weak Wolfe line search.\n"
                            "Default value: 1e-10.");
   options->addDoubleOption(reporter,
+                           "LSB_stepsize_sufficient_decrease_fudge_factor",
+                           1e-10,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Sufficient decrease fudge factor.\n"
+                           "Default value: 1e-10.");
+  options->addDoubleOption(reporter,
                            "LSB_stepsize_decrease_factor",
                            9e-01,
                            0.0,
@@ -81,6 +88,7 @@ void LineSearchBacktracking::setOptions(const Options* options,
   options->valueAsDouble(reporter, "LSB_stepsize_initial", stepsize_initial_);
   options->valueAsDouble(reporter, "LSB_stepsize_minimum", stepsize_minimum_);
   options->valueAsDouble(reporter, "LSB_stepsize_sufficient_decrease_threshold", stepsize_sufficient_decrease_threshold_);
+  options->valueAsDouble(reporter, "LSB_stepsize_sufficient_decrease_fudge_factor", stepsize_sufficient_decrease_fudge_factor_);
   options->valueAsDouble(reporter, "LSB_stepsize_decrease_factor", stepsize_decrease_factor_);
   options->valueAsDouble(reporter, "LSB_stepsize_increase_factor", stepsize_increase_factor_);
 
@@ -118,7 +126,7 @@ void LineSearchBacktracking::runLineSearch(const Options* options,
     }
 
     // Initialize stepsize
-    quantities->setStepsize(fmin(stepsize_increase_factor_ * quantities->stepsize(), stepsize_initial_));
+    quantities->setStepsize(fmax(stepsize_minimum_,fmin(stepsize_increase_factor_ * quantities->stepsize(), stepsize_initial_)));
 
     // Loop
     while (true) {
@@ -133,7 +141,7 @@ void LineSearchBacktracking::runLineSearch(const Options* options,
       if (evaluation_success) {
 
         // Check for sufficient decrease
-        bool sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * strategies->qpSolver()->dualObjectiveQuadraticValue());
+        bool sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * strategies->qpSolver()->dualObjectiveQuadraticValue() + stepsize_sufficient_decrease_fudge_factor_);
 
         // Check Armijo condition
         if (sufficient_decrease) {

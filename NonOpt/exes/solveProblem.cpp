@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  // Declare algorithm
+  // Declare solver object
   NonOptSolver nonopt;
 
   // Modify options from file

@@ -7,7 +7,6 @@
 #ifndef __NONOPTINVERSEHESSIANUPDATE_HPP__
 #define __NONOPTINVERSEHESSIANUPDATE_HPP__
 
-#include <memory>
 #include <string>
 
 #include "NonOptEnumerations.hpp"
