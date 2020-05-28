@@ -29,32 +29,32 @@ void Strategies::addOptions(Options* options,
                            "direction_computation",
                            "CuttingPlane",
                            "Direction computation strategy to use.\n"
-                           "Default value: CuttingPlane.");
+                           "Default     : CuttingPlane.");
   options->addStringOption(reporter,
                            "inverse_hessian_update",
                            "BFGS",
                            "Inverse Hessian update strategy to use.\n"
-                           "Default value: BFGS.");
+                           "Default     : BFGS.");
   options->addStringOption(reporter,
                            "line_search",
                            "WeakWolfe",
                            "Line search strategy to use.\n"
-                           "Default value: WeakWolfe.");
+                           "Default     : WeakWolfe.");
   options->addStringOption(reporter,
                            "point_set_update",
                            "Proximity",
                            "Point set update strategy to use.\n"
-                           "Default value: Proximity.");
+                           "Default     : Proximity.");
   options->addStringOption(reporter,
                            "qp_solver",
                            "DualActiveSet",
                            "QP solver strategy to use.\n"
-                           "Default value: DualActiveSet.");
+                           "Default     : DualActiveSet.");
   options->addStringOption(reporter,
                            "symmetric_matrix",
                            "Dense",
                            "Symmetric matrix strategy to use.\n"
-                           "Default value: Dense.");
+                           "Default     : Dense.");
 
   // Add options for direction computation strategies
   std::shared_ptr<DirectionComputation> direction_computation;
@@ -239,19 +239,19 @@ void Strategies::setIterationHeader()
   // Set iteration header string based on strategy objects
   iteration_header_ = "";
   if (direction_computation_->iterationHeader().length() > 0) {
-    iteration_header_ += "  ";
+    iteration_header_ += " ";
     iteration_header_ += direction_computation_->iterationHeader();
   } // end if
   if (line_search_->iterationHeader().length() > 0) {
-    iteration_header_ += "  ";
+    iteration_header_ += " ";
     iteration_header_ += line_search_->iterationHeader();
   } // end if
   if (inverse_hessian_update_->iterationHeader().length() > 0) {
-    iteration_header_ += "  ";
+    iteration_header_ += " ";
     iteration_header_ += inverse_hessian_update_->iterationHeader();
   } // end if
   if (point_set_update_->iterationHeader().length() > 0) {
-    iteration_header_ += "  ";
+    iteration_header_ += " ";
     iteration_header_ += point_set_update_->iterationHeader();
   } // end if
 

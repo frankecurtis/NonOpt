@@ -55,7 +55,7 @@ public:
                   const Reporter* reporter);
   //@}
 
-  /** @name Initialize method */
+  /** @name Initialization method */
   //@{
   /**
    * Initialize strategy
@@ -89,17 +89,12 @@ public:
    * Get translated combination of vectors' infinity norm
    * \return "||G*omega + gamma||_2^2"
    */
-  double combinationTranslatedNorm2Square();
+  double combinationTranslatedNorm2Squared();
   /**
    * Get dual objective quadratic value
    * \return "(G*omega + gamma)'*W*(G*omega + gamma)"
    */
   double dualObjectiveQuadraticValue();
-  /**
-   * Get dual objective quadratic value, scaled to correspond to feasible "d"
-   * \return scaled "(G*omega + gamma)'*W*(G*omega + gamma)"
-   */
-  double dualObjectiveQuadraticValueScaled();
   /**
    * Get dual solution
    * \param[out] omega is dual solution, omega part
@@ -150,7 +145,7 @@ public:
    * Get primal solution 2-norm square
    * \return "||d||_2^2"
    */
-  double primalSolutionNorm2Square();
+  double primalSolutionNorm2Squared();
   /**
    * Get feasible primal solution infinity norm
    * \return inf-norm of feasible primal solution
@@ -277,7 +272,7 @@ private:
   double inexact_solution_tolerance_;
   double inexact_termination_descent_tolerance_;
   double inexact_termination_initialization_factor_;
-  double inexact_termination_ratio_min_;
+  double inexact_termination_ratio_minimum_;
   double linear_independence_tolerance_;
   int inexact_termination_check_interval_;
   int iteration_limit_minimum_;
@@ -337,6 +332,10 @@ private:
    * Sanity check
    */
   bool checkQuantityCompatibility();
+  /**
+   * Dual objective quadratic value, scaled to correspond to feasible "d"
+   */
+  double dualObjectiveQuadraticValueScaled();
   /**
    * Update best solution
    */

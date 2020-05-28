@@ -23,7 +23,7 @@ void LineSearchBacktracking::addOptions(Options* options,
                          "LSB_fail_on_small_stepsize",
                          false,
                          "Indicator for whether to indicate failure on small stepsize.\n"
-                         "Default value: false.");
+                         "Default     : false.");
 
   // Add double options
   options->addDoubleOption(reporter,
@@ -32,47 +32,47 @@ void LineSearchBacktracking::addOptions(Options* options,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Initial stepsize to be used in the first iteration.  Note that\n"
-                           "the initial stepsize used in the line search in subsequent\n"
-                           "iterations is set the minimum of this value and a factor times\n"
-                           "the stepsize accepted in the previous iteration."
-                           "Default value: 1.0.");
+                           "              the initial stepsize used in the line search in subsequent\n"
+                           "              iterations is set the minimum of this value and a factor times\n"
+                           "              the stepsize accepted in the previous iteration.\n"
+                           "Default     : 1.0.");
   options->addDoubleOption(reporter,
                            "LSB_stepsize_minimum",
                            1e-20,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Tolerance for determining an insufficient stepsize.  If the\n"
-                           "line search yields a stepsize below this tolerance, then the\n"
-                           "algorithm may terminate with a message of a small stepsize.\n"
-                           "Default value: 1e-20.");
+                           "              line search yields a stepsize below this tolerance, then the\n"
+                           "              algorithm may terminate with a message of a small stepsize.\n"
+                           "Default     : 1e-20.");
   options->addDoubleOption(reporter,
                            "LSB_stepsize_sufficient_decrease_threshold",
                            1e-10,
                            0.0,
                            1.0,
                            "Sufficient decrease constant for the weak Wolfe line search.\n"
-                           "Default value: 1e-10.");
+                           "Default     : 1e-10.");
   options->addDoubleOption(reporter,
                            "LSB_stepsize_sufficient_decrease_fudge_factor",
                            1e-10,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Sufficient decrease fudge factor.\n"
-                           "Default value: 1e-10.");
+                           "Default     : 1e-10.");
   options->addDoubleOption(reporter,
                            "LSB_stepsize_decrease_factor",
                            9e-01,
                            0.0,
                            1.0,
                            "Factor for updating the stepsize during the line search.\n"
-                           "Default value: 9e-01.");
+                           "Default     : 9e-01.");
   options->addDoubleOption(reporter,
                            "LSB_stepsize_increase_factor",
-                           1e+02,
+                           1e+01,
                            1.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Factor for updating the stepsize before the line search.\n"
-                           "Default value: 1e+02.");
+                           "Default     : 1e+01.");
 
 } // end addOptions
 
@@ -126,7 +126,7 @@ void LineSearchBacktracking::runLineSearch(const Options* options,
     }
 
     // Initialize stepsize
-    quantities->setStepsize(fmax(stepsize_minimum_,fmin(stepsize_increase_factor_ * quantities->stepsize(), stepsize_initial_)));
+    quantities->setStepsize(fmax(stepsize_minimum_, fmin(stepsize_increase_factor_ * quantities->stepsize(), stepsize_initial_)));
 
     // Loop
     while (true) {
@@ -141,7 +141,7 @@ void LineSearchBacktracking::runLineSearch(const Options* options,
       if (evaluation_success) {
 
         // Check for sufficient decrease
-        bool sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * strategies->qpSolver()->dualObjectiveQuadraticValue() + stepsize_sufficient_decrease_fudge_factor_);
+        bool sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) + stepsize_sufficient_decrease_fudge_factor_);
 
         // Check Armijo condition
         if (sufficient_decrease) {
@@ -215,7 +215,7 @@ void LineSearchBacktracking::runLineSearch(const Options* options,
   } // end catch
 
   // Print iteration information
-  reporter->printf(R_NL, R_PER_ITERATION, "  %+.4e", quantities->stepsize());
+  reporter->printf(R_NL, R_PER_ITERATION, " %+.2e", quantities->stepsize());
 
 } // end runLineSearch
 

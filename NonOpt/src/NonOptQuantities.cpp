@@ -15,7 +15,8 @@ namespace NonOpt
 // Constructor
 Quantities::Quantities()
   : evaluation_time_(0),
-    inexact_termination_factor_(sqrt(2.0)-1.0),
+    cpu_time_limit_(NONOPT_DOUBLE_INFINITY),
+    inexact_termination_factor_(sqrt(2.0) - 1.0),
     stationarity_radius_(0.0),
     stepsize_(0.0),
     trust_region_radius_(0.0),
@@ -57,84 +58,101 @@ void Quantities::addOptions(Options* options,
 
   // Add double options
   options->addDoubleOption(reporter,
-                           "inexact_termination_factor_initial",
-                           sqrt(2.0)-1.0,
+                           "cpu_time_limit",
+                           1e+04,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
-                           "Initial inexact termination, if allowed.  Factor by which\n"
-                           "norm of inexact solution needs to be within true norm of true\n"
-                           "(unknown) projection of origin onto convex hull of gradients.\n"
-                           "Default value: sqrt(2.0)-1.0.");
+                           "Limit on the number of CPU seconds.  This limit is only checked\n"
+                           "              at the beginning of an iteration, so the true CPU time limit\n"
+                           "              also depends on the time required to a complete an iteration.\n"
+                           "Default     : 1e+04.");
+  options->addDoubleOption(reporter,
+                           "inexact_termination_factor_initial",
+                           sqrt(2.0) - 1.0,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Initial inexact termination factor.  Factor by which norm of\n"
+                           "              inexact subproblem solution needs to be within norm of true\n"
+                           "              (unknown) projection of origin onto convex hull of gradients.\n"
+                           "Default     : sqrt(2.0)-1.0.");
   options->addDoubleOption(reporter,
                            "inexact_termination_update_factor",
                            0.9999,
                            0.0,
                            1.0,
                            "Factor for updating the inexact termination factor.  If the\n"
-                           "conditions for updating the inexact termination factor are met,\n"
-                           "then the inexact termination factor is multiplied by this fraction.\n"
-                           "Default value: 0.9999.");
+                           "              conditions for updating the inexact termination factor are met,\n"
+                           "              then the inexact termination factor is multiplied by this fraction.\n"
+                           "Default     : 0.9999.");
+  options->addDoubleOption(reporter,
+                           "inexact_termination_update_stepsize_threshold",
+                           1e-10,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Stepsize threshold for determining whether to reduce the\n"
+                           "              inexact termination factor.\n"
+                           "Default     : 1e-10.");
   options->addDoubleOption(reporter,
                            "scaling_threshold",
                            1e+02,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Threshold for determining objective scaling.  If norm of gradient\n"
-                           "at the initial point is greater than this value, then the objective\n"
-                           "is scaled so that the initial gradient norm is at this value.\n"
-                           "Default value: 1e+02.");
+                           "              at the initial point is greater than this value, then the objective\n"
+                           "              is scaled so that the initial gradient norm is at this value.\n"
+                           "Default     : 1e+02.");
   options->addDoubleOption(reporter,
                            "stationarity_radius_initialization_factor",
                            1e-01,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Factor for initializing the stationarity radius.  The initial\n"
-                           "stationarity radius is the maximum of this value times the\n"
-                           "inf-norm of the gradient at the initial point and\n"
-                           "stationarity_radius_initialization_minimum.\n"
-                           "Default value: 1e-01.");
+                           "              stationarity radius is the maximum of this value times the\n"
+                           "              inf-norm of the gradient at the initial point and\n"
+                           "              stationarity_radius_initialization_minimum.\n"
+                           "Default     : 1e-01.");
   options->addDoubleOption(reporter,
                            "stationarity_radius_initialization_minimum",
                            1e-02,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Minimum initial value for stationarity radius.\n"
-                           "Default value: 1e-02.");
+                           "Default     : 1e-02.");
   options->addDoubleOption(reporter,
                            "stationarity_radius_update_factor",
                            1e-01,
                            0.0,
                            1.0,
                            "Factor for updating the stationarity radius.  If the conditions\n"
-                           "for updating the stationarity and trust region radii are met,\n"
-                           "then the stationarity radius is multiplied by this fraction.\n"
-                           "Default value: 1e-01.");
+                           "              for updating the stationarity and trust region radii are met,\n"
+                           "              then the stationarity radius is multiplied by this fraction.\n"
+                           "Default     : 1e-01.");
   options->addDoubleOption(reporter,
                            "trust_region_radius_initialization_factor",
                            1e+04,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Factor for initializing the trust region radius.  The initial\n"
-                           "trust region radius is the maximum of this value times the\n"
-                           "inf-norm of the gradient at the initial point and\n"
-                           "trust_region_radius_initialization_minimum.\n"
-                           "Default value: 1e+04.");
+                           "              trust region radius is the maximum of this value times the\n"
+                           "              inf-norm of the gradient at the initial point and\n"
+                           "              trust_region_radius_initialization_minimum.\n"
+                           "Default     : 1e+04.");
   options->addDoubleOption(reporter,
                            "trust_region_radius_initialization_minimum",
                            1e-01,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Minimum initial value for trust region radius.\n"
-                           "Default value: 1e-01.");
+                           "Default     : 1e-01.");
   options->addDoubleOption(reporter,
                            "trust_region_radius_update_factor",
                            1e-01,
                            0.0,
                            1.0,
                            "Factor for updating the trust region radius.  If the conditions\n"
-                           "for updating the stationarity and trust region radii are met,\n"
-                           "then the trust region radius is multiplied by this fraction.\n"
-                           "Default value: 1e-01.");
+                           "              for updating the stationarity and trust region radii are met,\n"
+                           "              then the trust region radius is multiplied by this fraction.\n"
+                           "Default     : 1e-01.");
 
   // Add integer options
   options->addIntegerOption(reporter,
@@ -142,17 +160,15 @@ void Quantities::addOptions(Options* options,
                             1e+05,
                             0,
                             NONOPT_INT_INFINITY,
-                            "Limit on the number of function evaluations that will be.\n"
-                            "performed.\n"
-                            "Default value: 1e+04.");
+                            "Limit on the number of function evaluations performed.\n"
+                            "Default     : 1e+05.");
   options->addIntegerOption(reporter,
                             "gradient_evaluation_limit",
-                            5e+04,
+                            1e+05,
                             0,
                             NONOPT_INT_INFINITY,
-                            "Limit on the number of gradient evaluations that will be.\n"
-                            "performed.\n"
-                            "Default value: 1e+04.");
+                            "Limit on the number of gradient evaluations performed.\n"
+                            "Default     : 1e+05.");
 
 } // end addOptions
 
@@ -162,8 +178,10 @@ void Quantities::setOptions(const Options* options,
 {
 
   // Read double options
+  options->valueAsDouble(reporter, "cpu_time_limit", cpu_time_limit_);
   options->valueAsDouble(reporter, "inexact_termination_factor_initial", inexact_termination_factor_initial_);
   options->valueAsDouble(reporter, "inexact_termination_update_factor", inexact_termination_update_factor_);
+  options->valueAsDouble(reporter, "inexact_termination_update_stepsize_threshold", inexact_termination_update_stepsize_threshold_);
   options->valueAsDouble(reporter, "scaling_threshold", scaling_threshold_);
   options->valueAsDouble(reporter, "stationarity_radius_initialization_factor", stationarity_radius_initialization_factor_);
   options->valueAsDouble(reporter, "stationarity_radius_initialization_minimum", stationarity_radius_initialization_minimum_);
@@ -254,14 +272,21 @@ bool Quantities::initialize(const std::shared_ptr<Problem> problem)
 // Iteration header string
 std::string Quantities::iterationHeader()
 {
-  return "  Iter.   Objective    Stat. Rad.   Trust Rad.  |Points|";
+  return "  Iter.  Objective   St. Rad.  Tr. Rad.  |Pts|";
 }
 
 // Iteration null values
 std::string Quantities::iterationNullValues()
 {
-  return " ------  -----------  -----------  -----------  --------";
+  return " ------ ----------- --------- --------- ------";
 }
+
+// Initialize inexact termination factor
+void Quantities::initializeInexactTerminationFactor(const Options* options,
+                                                    const Reporter* reporter)
+{
+  inexact_termination_factor_ = inexact_termination_factor_initial_;
+} // end initializeInexactTerminationFactor
 
 // Initialization of radii
 void Quantities::initializeRadii(const Options* options,
@@ -276,6 +301,17 @@ void Quantities::initializeRadii(const Options* options,
 
 } // end initializeRadii
 
+// Update inexact termination factor
+void Quantities::updateInexactTerminationFactor()
+{
+
+  // Update inexact termination factor if stepsize is small
+  if (stepsize_ < inexact_termination_update_stepsize_threshold_) {
+    inexact_termination_factor_ = inexact_termination_factor_ * inexact_termination_update_factor_;
+  }
+
+} // end updateInexactTerminationFactor
+
 // Update radii
 void Quantities::updateRadii(double stationarity_tolerance)
 {
@@ -286,6 +322,7 @@ void Quantities::updateRadii(double stationarity_tolerance)
 
   // reset step size
   stepsize_ = 1.0;
+
 } // end updateRadii
 
 // Print header
@@ -302,7 +339,7 @@ void Quantities::printIterationValues(const Reporter* reporter)
 {
 
   // Print iteration values
-  reporter->printf(R_NL, R_PER_ITERATION, " %6d  %+.4e  %+.4e  %+.4e  %8d", iteration_counter_, current_iterate_->objective(), stationarity_radius_, trust_region_radius_, (int)point_set_->size());
+  reporter->printf(R_NL, R_PER_ITERATION, " %6d %+.4e %+.2e %+.2e %6d", iteration_counter_, current_iterate_->objective(), stationarity_radius_, trust_region_radius_, (int)point_set_->size());
 
 } // end printIterationValues
 

@@ -167,7 +167,6 @@ private:
   /** @name Private members */
   //@{
   bool check_derivatives_;
-  double cpu_time_limit_;
   double derivative_checker_increment_;
   double derivative_checker_tolerance_;
   double iterate_norm_tolerance_;

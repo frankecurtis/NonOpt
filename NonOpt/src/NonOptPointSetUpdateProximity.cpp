@@ -24,20 +24,20 @@ void PointSetUpdateProximity::addOptions(Options* options,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Magnitude of envelope to include around stationarity radius\n"
-                           "when updating set.  If the difference between a point in the\n"
-                           "set and the current iterate is larger in norm than this\n"
-                           "radius times this envelope, then the point is removed;\n"
-                           "otherwise, it is kept in the point set.\n"
-                           "Default value: 1e+02.");
+                           "              when updating set.  If the difference between a point in the\n"
+                           "              set and the current iterate is larger in norm than this\n"
+                           "              radius times this envelope, then the point is removed;\n"
+                           "              otherwise, it is kept in the point set.\n"
+                           "Default     : 1e+02.");
   options->addDoubleOption(reporter,
                            "PSP_size_factor",
-                           1e+02,
+                           2e+00,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Size factor for removing points from point set.  If size of\n"
-                           "point set exceeds this factor times the number of variables,\n"
-                           "then the oldest members are removed.\n"
-                           "Default value: 1e+02.");
+                           "              point set exceeds this factor times the number of variables,\n"
+                           "              then the oldest members are removed.\n"
+                           "Default     : 2e+00.");
 
   // Add integer options
 

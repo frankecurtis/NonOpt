@@ -52,7 +52,7 @@ public:
                   const Reporter* reporter);
   //@}
 
-  /** @name Initialize method */
+  /** @name Initialization method */
   //@{
   /**
    * Initialize strategy
@@ -71,12 +71,12 @@ public:
    * Get iteration header values
    * \return string of header values
    */
-  std::string iterationHeader() { return " Correction  U?"; };
+  std::string iterationHeader() { return "Up. Fact. U?"; };
   /**
    * Get iteration null values string
    * \return string of null values
    */
-  std::string iterationNullValues() { return "-----------  --"; };
+  std::string iterationNullValues() { return "--------- --"; };
   /**
    * Get name of strategy
    * \return string with name of strategy

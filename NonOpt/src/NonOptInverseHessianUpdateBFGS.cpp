@@ -24,7 +24,7 @@ void InverseHessianUpdateBFGS::addOptions(Options* options,
                          "BFGS_fail_on_tolerance_violation",
                          false,
                          "Indicator for whether to indicate failure on violated tolerance.\n"
-                         "Default value: false.");
+                         "Default     : false.");
 
   // Add double options
   options->addDoubleOption(reporter,
@@ -33,38 +33,38 @@ void InverseHessianUpdateBFGS::addOptions(Options* options,
                            0.0,
                            1.0,
                            "BFGS correction threshold.  If BFGS update is corrected, then\n"
-                           "gradient displacement v is set so that inner product with step,\n"
-                           "call it s, is such that <s,v>/<s,s> is at least this threshold.\n"
-                           "Default value: 1e-20.");
+                           "              gradient displacement v is set so that inner product with step,\n"
+                           "              call it s, is such that <s,v>/<s,s> is at least this threshold.\n"
+                           "Default     : 1e-20.");
   options->addDoubleOption(reporter,
                            "BFGS_correction_threshold_2",
                            1e+02,
                            1.0,
                            NONOPT_DOUBLE_INFINITY,
                            "BFGS correction threshold.  If BFGS update is corrected, then\n"
-                           "gradient displacement v is set so that inner product with step,\n"
-                           "call it s, is such that <v,v>/<s,v> is at most this threshold.\n"
-                           "Default value: 1e+02.");
+                           "              gradient displacement v is set so that inner product with step,\n"
+                           "              call it s, is such that <v,v>/<s,v> is at most this threshold.\n"
+                           "Default     : 1e+02.");
   options->addDoubleOption(reporter,
                            "BFGS_norm_tolerance",
                            1e-20,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Tolerance for allowing a BFGS update to occur.  If the norm\n"
-                           "of the iterate displacement or the gradient displacement is\n"
-                           "greater than this tolerance, then the BFGS update may occur;\n"
-                           "else, it is skipped.\n"
-                           "Default value: 1e-20.");
+                           "              of the iterate displacement or the gradient displacement is\n"
+                           "              greater than this tolerance, then the BFGS update may occur;\n"
+                           "              else, it is skipped.\n"
+                           "Default     : 1e-20.");
   options->addDoubleOption(reporter,
                            "BFGS_product_tolerance",
                            1e-20,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Tolerance for allowing a BFGS update to occur.  If the inner\n"
-                           "product between the iterate and gradient displacements is at\n"
-                           "least this tolerance times the product of the 2-norms of the\n"
-                           "displacements, then a BFGS update occurs; else, it is skipped.\n"
-                           "Default value: 1e-20.");
+                           "              product between the iterate and gradient displacements is at\n"
+                           "              least this tolerance times the product of the 2-norms of the\n"
+                           "              displacements, then a BFGS update occurs; else, it is skipped.\n"
+                           "Default     : 1e-20.");
 
 } // end addOptions
 
@@ -201,7 +201,7 @@ void InverseHessianUpdateBFGS::updateInverseHessian(const Options* options,
   } // end catch
 
   // Print messages
-  reporter->printf(R_NL, R_PER_ITERATION, "  %+.4e  %2d", correction_scalar, perform_update);
+  reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %2d", correction_scalar, perform_update);
 
 } // end updateInverseHessian
 

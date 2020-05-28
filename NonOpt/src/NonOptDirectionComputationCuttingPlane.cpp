@@ -5,7 +5,7 @@
 // Author(s) : Frank E. Curtis
 
 #include <cmath>
-#include <cstdio>
+#include <ctime>
 
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
@@ -24,77 +24,77 @@ void DirectionComputationCuttingPlane::addOptions(Options* options,
                          "DCCP_add_far_points",
                          false,
                          "Determines whether to add points far outside stationarity\n"
-                         "radius to point set during subproblem solve.\n"
-                         "Default value: false.");
+                         "              radius to point set during subproblem solve.\n"
+                         "Default     : false.");
   options->addBoolOption(reporter,
                          "DCCP_fail_on_iteration_limit",
                          false,
                          "Determines whether to fail if iteration limit exceeded.\n"
-                         "Default value: false.");
+                         "Default     : false.");
   options->addBoolOption(reporter,
                          "DCCP_fail_on_QP_failure",
                          false,
                          "Determines whether to fail if QP solver ever fails.\n"
-                         "Default value: false.");
+                         "Default     : false.");
   options->addBoolOption(reporter,
                          "DCCP_try_aggregation",
                          false,
                          "Determines whether to consider aggregating subgradients.\n"
-                         "Default value: false.");
+                         "Default     : false.");
   options->addBoolOption(reporter,
                          "DCCP_try_shortened_step",
                          true,
                          "Determines whether to consider shortened step if subproblem\n"
-                         "solver does not terminate after considering full QP step.\n"
-                         "Shortened stepsize set by DCCP_shortened_stepsize parameter.\n"
-                         "Default value: true.");
+                         "              solver does not terminate after considering full QP step.\n"
+                         "              Shortened stepsize set by DCCP_shortened_stepsize parameter.\n"
+                         "Default     : true.");
 
   // Add double options
   options->addDoubleOption(reporter,
-                            "DCCP_aggregation_size_threshold",
-                            1e+01,
-                            0.0,
-                            NONOPT_DOUBLE_INFINITY,
-                            "Threshold for switching from aggregation to full point set.\n"
-                            "Default value: 1e+01.");
+                           "DCCP_aggregation_size_threshold",
+                           1e+01,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Threshold for switching from aggregation to full point set.\n"
+                           "Default     : 1e+01.");
   options->addDoubleOption(reporter,
                            "DCCP_downshift_constant",
                            1e-02,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Downshifting constant.  The linear term corresponding to an\n"
-                           "added cut is set as the minimum of the linearization value\n"
-                           "corresponding to the bundle point and the negative of this value\n"
-                           "times the squared norm difference between the bundle point and\n"
-                           "the current iterate.\n"
-                           "Default value: 1e-02.");
+                           "              added cut is set as the minimum of the linearization value\n"
+                           "              corresponding to the bundle point and the negative of this value\n"
+                           "              times the squared norm difference between the bundle point and\n"
+                           "              the current iterate.\n"
+                           "Default     : 1e-02.");
   options->addDoubleOption(reporter,
                            "DCCP_shortened_stepsize",
                            1e+00,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Shortened stepsize.  If full QP step does not offer desired\n"
-                           "objective reduction, then a shortened step corresponding to\n"
-                           "this stepsize is considered if DCCP_try_shortened_step == true.\n"
-                           "In particular, the shortened stepsize that is considered is\n"
-                           "DCCP_shortened_stepsize*min(stat. rad.,||qp_step||_inf)/||qp_step||_inf.\n"
-                           "Default value: 1e+00.");
+                           "              objective reduction, then a shortened step corresponding to\n"
+                           "              this stepsize is considered if DCCP_try_shortened_step == true.\n"
+                           "              In particular, the shortened stepsize that is considered is\n"
+                           "              DCCP_shortened_stepsize*min(stat. rad.,||qp_step||_inf)/||qp_step||_inf.\n"
+                           "Default     : 1e+00.");
   options->addDoubleOption(reporter,
                            "DCCP_step_acceptance_tolerance",
                            1e-08,
                            0.0,
                            1.0,
                            "Tolerance for step acceptance.\n"
-                           "Default value: 1e-08.");
+                           "Default     : 1e-08.");
 
   // Add integer options
   options->addIntegerOption(reporter,
                             "DCCP_inner_iteration_limit",
-                            2e+01,
+                            20,
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of inner iterations that will be performed.\n"
-                            "Default value: 2e+01.");
+                            "Default     : 20.");
 
 } // end addOptions
 
@@ -129,13 +129,13 @@ void DirectionComputationCuttingPlane::initialize(const Options* options,
 // Iteration header
 std::string DirectionComputationCuttingPlane::iterationHeader()
 {
-  return "In.-Iters.   QP-Iters.  QP   KKT Error   |G. Combo.|     |Step|      |Step|_H ";
+  return "In. Its.  QP Its. QP   QP KKT  |G. Cmb.|   |Step|   |Step|_H";
 }
 
 // Iteration null values string
 std::string DirectionComputationCuttingPlane::iterationNullValues()
 {
-  return "----------  ----------  --  -----------  -----------  -----------  -----------";
+  return "-------- -------- -- --------- --------- --------- ---------";
 }
 
 // Compute direction
@@ -275,7 +275,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
       // Check for sufficient decrease
       if (evaluation_success &&
-          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(), strategies->qpSolver()->primalSolutionNorm2Square()) ||
+          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
            (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
             strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
@@ -291,6 +291,11 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
           THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
         }
       } // end if
+
+      // Check for CPU time limit
+      if ((clock() - quantities->startTime()) / (double)CLOCKS_PER_SEC >= quantities->cpuTimeLimit()) {
+        THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
+      }
 
       // Set aggregated data
       if (try_aggregation_ && !switched_to_full) {
@@ -390,7 +395,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
         // Check for sufficient decrease
         if (evaluation_success &&
-            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * std::max(strategies->qpSolver()->combinationTranslatedNorm2Square(), strategies->qpSolver()->primalSolutionNorm2Square()) ||
+            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
              (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
               strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
               strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
@@ -437,20 +442,20 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
       } // end if (try_shortened_step_)
 
       // Print QP solve / step information
-      reporter->printf(R_NL, R_PER_INNER_ITERATION, "  %10d  %10d  %2d  %+.4e  %+.4e  %+.4e  %+.4e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
+      reporter->printf(R_NL, R_PER_INNER_ITERATION, " %8d %8d %2d %+.2e %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
       // Set blank solve string
       std::string blank_solve = "";
       if (strategies->lineSearch()->iterationNullValues().length() > 0) {
-        blank_solve += "  ";
+        blank_solve += " ";
         blank_solve += strategies->lineSearch()->iterationNullValues();
       } // end if
       if (strategies->inverseHessianUpdate()->iterationNullValues().length() > 0) {
-        blank_solve += "  ";
+        blank_solve += " ";
         blank_solve += strategies->inverseHessianUpdate()->iterationNullValues();
       } // end if
       if (strategies->pointSetUpdate()->iterationNullValues().length() > 0) {
-        blank_solve += "  ";
+        blank_solve += " ";
         blank_solve += strategies->pointSetUpdate()->iterationNullValues();
       } // end if
 
@@ -527,7 +532,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
   }
 
   // Print iteration information
-  reporter->printf(R_NL, R_PER_ITERATION, "  %10d  %10d  %2d  %+.4e  %+.4e  %+.4e  %+.4e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
+  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %2d %+.2e %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
   // Increment total inner iteration counter
   quantities->incrementTotalInnerIterationCounter();

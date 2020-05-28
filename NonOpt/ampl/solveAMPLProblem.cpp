@@ -4,12 +4,12 @@
 //
 // Author(s) : Frank E. Curtis
 
-#include "AMPLProblem.hpp"
-#include "NonOptSolver.hpp"
-
 #include <cstdio>
 #include <cstring>
 #include <memory>
+
+#include "AMPLProblem.hpp"
+#include "NonOptSolver.hpp"
 
 using namespace NonOpt;
 
@@ -37,6 +37,9 @@ int main(int argc, char* argv[])
 
   // Declare algorithm
   NonOptSolver nonopt;
+
+  // Modify options from file
+  nonopt.options()->modifyOptionsFromFile(nonopt.reporter(), "nonopt.opt");
 
   // Optimize
   nonopt.optimize(problem);

@@ -4,6 +4,7 @@
 //
 // Author(s) : Frank E. Curtis
 
+#include <cmath>
 #include <iostream>
 
 #include "NonOptBLAS.hpp"
@@ -52,62 +53,53 @@ void NonOptSolver::addOptions()
                          "check_derivatives",
                          false,
                          "Determines whether to check derivatives at iterates.\n"
-                         "Default value: false.");
+                         "Default     : false.");
 
   // Add double options
-  options_.addDoubleOption(&reporter_,
-                           "cpu_time_limit",
-                           1e+04,
-                           0.0,
-                           NONOPT_DOUBLE_INFINITY,
-                           "Limit on the number of CPU seconds.  This limit is only checked\n"
-                           "at the beginning of an iteration, so the true CPU time limit\n"
-                           "also depends on the time required to a complete an iteration.\n"
-                           "Default value: 1e+04.");
   options_.addDoubleOption(&reporter_,
                            "derivative_checker_increment",
                            1e-08,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Increment for derivative checker.\n"
-                           "Default value: 1e-08.");
+                           "Default     : 1e-08.");
   options_.addDoubleOption(&reporter_,
                            "derivative_checker_tolerance",
                            1e-04,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Tolerance for derivative checker.\n"
-                           "Default value: 1e-04.");
+                           "Default     : 1e-04.");
   options_.addDoubleOption(&reporter_,
                            "iterate_norm_tolerance",
                            1e+20,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Tolerance for determining divergence of the algorithm iterates.\n"
-                           "If the norm of an iterate is larger than this tolerance times\n"
-                           "the maximum of 1.0 and the norm of the initial iterate, then\n"
-                           "the algorithm terminates with a message of divergence.\n"
-                           "Default value: 1e+20.");
+                           "              If the norm of an iterate is larger than this tolerance times\n"
+                           "              the maximum of 1.0 and the norm of the initial iterate, then\n"
+                           "              the algorithm terminates with a message of divergence.\n"
+                           "Default     : 1e+20.");
   options_.addDoubleOption(&reporter_,
                            "stationarity_tolerance",
                            1e-04,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Tolerance for determining stationarity.  If the stationarity\n"
-                           "radius falls below this tolerance and a computed convex\n"
-                           "combination of gradients has norm below this tolerance times\n"
-                           "the parameter stationarity_tolerance_factor, then the algorithm\n"
-                           "terminates with a message of stationarity.\n"
-                           "Default value: 1e-04.");
+                           "              radius falls below this tolerance and a computed convex\n"
+                           "              combination of gradients has norm below this tolerance times\n"
+                           "              the parameter stationarity_tolerance_factor, then the algorithm\n"
+                           "              terminates with a message of stationarity.\n"
+                           "Default     : 1e-04.");
   options_.addDoubleOption(&reporter_,
                            "stationarity_tolerance_factor",
                            1e+00,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Factor for checking termination with respect to stationarity.\n"
-                           "For further explanation, see description for the parameter\n"
-                           "stationarity_tolerance.\n"
-                           "Default value: 1e+00.");
+                           "              For further explanation, see description for the parameter\n"
+                           "              stationarity_tolerance.\n"
+                           "Default     : 1e+00.");
 
   // Add integer options
   options_.addIntegerOption(&reporter_,
@@ -116,8 +108,8 @@ void NonOptSolver::addOptions()
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of iterations that will be performed.\n"
-                            "Note that each iteration might involve inner iterations.\n"
-                            "Default value: 1e+04.");
+                            "              Note that each iteration might involve inner iterations.\n"
+                            "Default     : 1e+04.");
 
   // Add options for quantities
   quantities_.addOptions(&options_, &reporter_);
@@ -135,7 +127,6 @@ void NonOptSolver::setOptions()
   options_.valueAsBool(&reporter_, "check_derivatives", check_derivatives_);
 
   // Set double options
-  options_.valueAsDouble(&reporter_, "cpu_time_limit", cpu_time_limit_);
   options_.valueAsDouble(&reporter_, "derivative_checker_increment", derivative_checker_increment_);
   options_.valueAsDouble(&reporter_, "derivative_checker_tolerance", derivative_checker_tolerance_);
   options_.valueAsDouble(&reporter_, "iterate_norm_tolerance", iterate_norm_tolerance_);
@@ -244,7 +235,7 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
       if (quantities_.iterationCounter() >= iteration_limit_) {
         THROW_EXCEPTION(NONOPT_ITERATION_LIMIT_EXCEPTION, "Iteration limit has been reached.");
       }
-      if ((clock() - quantities_.startTime()) / (double)CLOCKS_PER_SEC >= cpu_time_limit_) {
+      if ((clock() - quantities_.startTime()) / (double)CLOCKS_PER_SEC >= quantities_.cpuTimeLimit()) {
         THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
       }
       if (quantities_.currentIterate()->vector()->norm2() >= iterate_norm_tolerance_ * fmax(1.0, initial_iterate_norm)) {
@@ -271,6 +262,7 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
           strategies_.qpSolver()->combinationNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
           strategies_.qpSolver()->combinationTranslatedNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_) {
         quantities_.updateRadii(stationarity_tolerance_);
+        quantities_.initializeInexactTerminationFactor(&options_, &reporter_);
       }
 
       // Run line search
@@ -280,6 +272,9 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
       if (strategies_.lineSearch()->status() != LS_SUCCESS) {
         THROW_EXCEPTION(NONOPT_LINE_SEARCH_FAILURE_EXCEPTION, "Line search failed.");
       }
+
+      // Update inexact termination factor (depends on stepsize from line search)
+      quantities_.updateInexactTerminationFactor();
 
       // Update inverse Hessian
       strategies_.inverseHessianUpdate()->updateInverseHessian(&options_, &quantities_, &reporter_, &strategies_);
@@ -292,17 +287,6 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
       // Add current iterate to point set
       if (quantities_.stepsize() > 0.0) {
         quantities_.pointSet()->push_back(quantities_.currentIterate());
-      }
-
-      // update inexact termination factor
-      if (stationarity_tolerance_ < quantities_.stationarityRadius() &&
-          strategies_.qpSolver()->primalSolutionNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
-          strategies_.qpSolver()->combinationNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
-          strategies_.qpSolver()->combinationTranslatedNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_) {
-        quantities_.initializeInexactTerminationFactor(&options_, &reporter_);
-      }
-      else if (quantities_.stepsize() < 1e-10) { // update sigma
-        quantities_.updateInexactTerminationFactor();
       }
 
       // Update iterate
@@ -489,7 +473,7 @@ void NonOptSolver::printHeader()
 
   // Print header
   reporter_.printf(R_NL, R_BASIC, "+--------------------------------------------------------------+\n"
-                                  "|            NonOpt = Nonsmooth Optimization Solver            |\n"
+                                  "|       NonOpt = Nonlinear/Nonconvex/Nonsmooth Optimizer       |\n"
                                   "| NonOpt is released as open source code under the MIT License |\n"
                                   "| Please visit http://coral.ise.lehigh.edu/frankecurtis/nonopt |\n"
                                   "+--------------------------------------------------------------+\n"

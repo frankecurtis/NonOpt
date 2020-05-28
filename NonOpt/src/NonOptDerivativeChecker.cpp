@@ -4,6 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
+#include <cmath>
+
 #include "NonOptDerivativeChecker.hpp"
 #include "NonOptEnumerations.hpp"
 

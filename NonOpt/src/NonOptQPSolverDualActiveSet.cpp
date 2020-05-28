@@ -20,6 +20,7 @@ namespace NonOpt
 // Constructor
 QPSolverDualActiveSet::QPSolverDualActiveSet()
   : inexact_solution_tolerance_(0.0),
+    scalar_(0.0),
     factor_(nullptr),
     inner_solution_1_(nullptr),
     inner_solution_2_(nullptr),
@@ -59,65 +60,65 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                          "QPAS_fail_on_factorization_error",
                          false,
                          "Indicator for whether to indicate failure on factorization error.\n"
-                         "Default value: false.");
+                         "Default     : false.");
   options->addBoolOption(reporter,
                          "QPAS_allow_inexact_termination",
-                         true,
+                         false,
                          "Indicator for whether to allow early termination.\n"
-                         "Default value: true.");
+                         "Default     : false.");
   // Add double options
   options->addDoubleOption(reporter,
                            "QPAS_kkt_tolerance",
-                           1e-12,
+                           1e-08,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Tolerance for determining optimality.  If the KKT error\n"
-                           "computed by the algorithm falls below this tolerance, then\n"
-                           "the algorithm terminates with a message of success.\n"
-                           "Default value: 1e-12.");
+                           "              computed by the algorithm falls below this tolerance, then\n"
+                           "              the algorithm terminates with a message of success.\n"
+                           "Default     : 1e-08.");
   options->addDoubleOption(reporter,
                            "QPAS_cholesky_tolerance",
                            1e-12,
                            0.0,
                            1.0,
                            "Tolerance for small (or negative values) when updating the\n"
-                           "Cholesky factorization of an augmented matrix.  If a diagonal\n"
-                           "value in the factorization falls below this tolerance, then\n"
-                           "the factorization may be re-computed from scratch and/or the\n"
-                           "diagonal value may be replaced by this tolerance value.\n"
-                           "Default value: 1e-12.");
+                           "              Cholesky factorization of an augmented matrix.  If a diagonal\n"
+                           "              value in the factorization falls below this tolerance, then\n"
+                           "              the factorization may be re-computed from scratch and/or the\n"
+                           "              diagonal value may be replaced by this tolerance value.\n"
+                           "Default     : 1e-12.");
   options->addDoubleOption(reporter,
                            "QPAS_inexact_termination_descent_tolerance",
                            1e-04,
                            0.0,
                            1.0,
                            "Descent direction tolerance for inexactness conditions.\n"
-                           "Default value: 1e-04.");
+                           "Default     : 1e-04.");
   options->addDoubleOption(reporter,
                            "QPAS_inexact_termination_initialization_factor",
                            2.5e-01,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Determines number of iterations (fraction of gradient list size)\n"
-                           "to perform before inexact termination conditions are checked.\n"
-                           "Default value: 2.5e-01.");
+                           "              to perform before inexact termination conditions are checked.\n"
+                           "Default     : 2.5e-01.");
   options->addDoubleOption(reporter,
-                           "QPAS_inexact_termination_ratio_min",
+                           "QPAS_inexact_termination_ratio_minimum",
                            1e-02,
                            0.0,
                            1.0,
                            "Minimum value for ratio used in inexact termination condition.\n"
-                           "Default value: 1e-02.");
+                           "Default     : 1e-02.");
   options->addDoubleOption(reporter,
                            "QPAS_linear_independence_tolerance",
                            1e-12,
                            0.0,
                            1.0,
                            "Tolerance for a linear independence check when adding a new\n"
-                           "vector to an augmented matrix.  If a residual value falls\n"
-                           "below this tolerance, then indices are exchanged to maintain\n"
-                           "linear independence of the augmented matrix.\n"
-                           "Default value: 1e-12.");
+                           "              vector to an augmented matrix.  If a residual value falls\n"
+                           "              below this tolerance, then indices are exchanged to maintain\n"
+                           "              linear independence of the augmented matrix.\n"
+                           "Default     : 1e-12.");
 
   // Add integer options
   options->addIntegerOption(reporter,
@@ -126,22 +127,22 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                             1,
                             NONOPT_INT_INFINITY,
                             "Number of iterations to perform between checks of inexact\n"
-                            "termination conditions.\n"
-                            "Default value: 4.");
+                            "              termination conditions.\n"
+                            "Default     : 4.");
   options->addIntegerOption(reporter,
                             "QPAS_iteration_limit_minimum",
-                            1e+02,
+                            1e+00,
                             0.0,
                             NONOPT_INT_INFINITY,
                             "Minimum limit on the number of iterations.\n"
-                            "Default value: 1e+02.");
+                            "Default     : 1e+00.");
   options->addIntegerOption(reporter,
                             "QPAS_iteration_limit_maximum",
-                            1e+04,
+                            1e+06,
                             0.0,
                             NONOPT_INT_INFINITY,
                             "Maximum limit on the number of iterations.\n"
-                            "Default value: 1e+04.");
+                            "Default     : 1e+06.");
 
 } // end addOptions
 
@@ -159,7 +160,7 @@ void QPSolverDualActiveSet::setOptions(const Options* options,
   options->valueAsDouble(reporter, "QPAS_cholesky_tolerance", cholesky_tolerance_);
   options->valueAsDouble(reporter, "QPAS_inexact_termination_descent_tolerance", inexact_termination_descent_tolerance_);
   options->valueAsDouble(reporter, "QPAS_inexact_termination_initialization_factor", inexact_termination_initialization_factor_);
-  options->valueAsDouble(reporter, "QPAS_inexact_termination_ratio_min", inexact_termination_ratio_min_);
+  options->valueAsDouble(reporter, "QPAS_inexact_termination_ratio_minimum", inexact_termination_ratio_minimum_);
   options->valueAsDouble(reporter, "QPAS_linear_independence_tolerance", linear_independence_tolerance_);
 
   // Read integer options
@@ -287,7 +288,7 @@ double QPSolverDualActiveSet::combinationTranslatedNormInf()
 } // end combinationTranslatedNormInf
 
 // Get translated combination 2-norm square
-double QPSolverDualActiveSet::combinationTranslatedNorm2Square()
+double QPSolverDualActiveSet::combinationTranslatedNorm2Squared()
 {
 
   // Set inputs for blas
@@ -305,7 +306,7 @@ double QPSolverDualActiveSet::combinationTranslatedNorm2Square()
   // Return 2-norm square
   return combination_translated_norm_2 * combination_translated_norm_2;
 
-} // end combinationTranslatedNorm2Square
+} // end combinationTranslatedNorm2Squared
 
 // Get dual objective quadratic value
 double QPSolverDualActiveSet::dualObjectiveQuadraticValue()
@@ -522,7 +523,7 @@ double QPSolverDualActiveSet::primalSolutionNormInf()
 } // end primalSolutionNormInf
 
 // Get primal solution 2-norm square
-double QPSolverDualActiveSet::primalSolutionNorm2Square()
+double QPSolverDualActiveSet::primalSolutionNorm2Squared()
 {
 
   // Set inputs for blas
@@ -540,7 +541,7 @@ double QPSolverDualActiveSet::primalSolutionNorm2Square()
   // Return 2-norm square
   return primal_solution_norm_2 * primal_solution_norm_2;
 
-} // end primalSolutionNorm2Square
+} // end primalSolutionNorm2Squared
 
 // Get feasible primal solution norm
 double QPSolverDualActiveSet::primalSolutionFeasibleNormInf()
@@ -745,15 +746,6 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Quantities* quanti
   // Set inexact termination ratio value
   double inexact_termination_ratio = 1.0 - (pow(quantities->inexactTerminationFactor(), 2.0) + 2 * quantities->inexactTerminationFactor()) / (objective_ratio - 1.0);
 
-  // Print information
-
-  if (iteration_count_ == 1) {
-    reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "===============================================================================================================================================================================\n");
-    reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "%8s %8s %8s %8s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s %9s\n", "tol", "|G*o+g|W", "|G*o|i", "|G*o+g|i", "q_0", "q_k", "p_ref", "p_k", "p_best", "g'*p_b", "p_b*H*p_b", "lhs", "rhs", "p_b-q_0", "p_ref-p_b", "lhs", "rhs", "kkt");
-    reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "===============================================================================================================================================================================\n");
-  } // end if
-  reporter->printf(R_QP, R_PER_INNER_ITERATION_INEXACT, "%.2e %.2e %.2e %.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e %+.2e\n", inexact_solution_tolerance_, primalSolutionNormInf(), combinationNormInf(), combinationTranslatedNormInf(), dual_objective_reference_, dual_objective, primal_objective_reference_, primal_objective_feasible, primal_objective_feasible_best_, primal_directional_derivative_feasible_best_, primal_quadratic_feasible_best_, dual_objective - dual_objective_reference_, fmax(inexact_termination_ratio, inexact_termination_ratio_min_) * (primal_objective_feasible_best_ - dual_objective_reference_), primal_objective_feasible_best_ - dual_objective_reference_, primal_objective_reference_ - primal_objective_feasible_best_, (pow(quantities->inexactTerminationFactor(), 2.0) + 2 * quantities->inexactTerminationFactor()) * (primal_objective_reference_ - primal_objective_feasible_best_), primal_objective_feasible_best_ - dual_objective, kkt_error_);
-
   // Initialize return value
   bool condition_bool = false;
 
@@ -764,15 +756,15 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Quantities* quanti
     condition_bool = true;
   }
   // Check first "nonzero d" condition
-  else if (vector_list_[0]->innerProduct(primal_solution_feasible_) <= -1.0 * inexact_termination_descent_tolerance_ * dualObjectiveQuadraticValue()) {
-    if (dual_objective - dual_objective_reference_ >=
-        fmax(inexact_termination_ratio, inexact_termination_ratio_min_) * (primal_objective_feasible_best_ - dual_objective_reference_)) {
+  else if (vector_list_[0]->innerProduct(primal_solution_feasible_) <= -inexact_termination_descent_tolerance_ * dualObjectiveQuadraticValue()) {
+    if ((pow(quantities->inexactTerminationFactor(), 2.0) + 2 * quantities->inexactTerminationFactor()) * (primal_objective_reference_ - primal_objective_feasible_best_) >=
+        primal_objective_feasible_best_ - dual_objective) {
       primal_solution_.copy(primal_solution_feasible_best_);
       condition_bool = true;
     } // end if
     // Check second "nonzero d" condition
-    else if ((pow(quantities->inexactTerminationFactor(), 2.0) + 2 * quantities->inexactTerminationFactor()) * (primal_objective_reference_ - primal_objective_feasible_best_) >=
-             primal_objective_feasible_best_ - dual_objective) {
+    else if (dual_objective - dual_objective_reference_ >=
+             fmax(inexact_termination_ratio, inexact_termination_ratio_minimum_) * (primal_objective_feasible_best_ - dual_objective_reference_)) {
       primal_solution_.copy(primal_solution_feasible_best_);
       condition_bool = true;
     } // end if
@@ -883,11 +875,12 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
     reporter->printf(R_QP, R_PER_INNER_ITERATION, "Entering main iteration loop\n");
 
     // Set iteration limit
-    int iteration_limit = fmax(iteration_limit_minimum_, fmin(pow((int)vector_list_.size(), 2) + pow(gamma_length_, 3), iteration_limit_maximum_));
+    int iteration_limit = fmax(iteration_limit_minimum_, fmin(pow((int)vector_list_.size(), 2), iteration_limit_maximum_));
 
     // Iteration loop
     while (true) {
 
+      // Print header information
       if (iteration_count_ == 0) {
         reporter->printf(R_QP, R_PER_INNER_ITERATION, "======================================================================================================\n");
         reporter->printf(R_QP, R_PER_INNER_ITERATION, "Starting iteration %6d and Inner iteration %6d\n", quantities->iterationCounter(), quantities->innerIterationCounter());
@@ -901,10 +894,11 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
                                                 "=======================================================\n");
       }
       reporter->printf(R_QP, R_PER_ITERATION, " %6d  %6d  %6d  %6d", iteration_count_, (int)omega_positive_.size(), (int)gamma_positive_.size(), (int)gamma_negative_.size());
-      reporter->printf(R_QP, R_PER_INNER_ITERATION, "=========================\n"
-                                                    "Starting iteration %6d\n"
-                                                    "=========================\n",
-                       iteration_count_);
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "=======================================\n"
+                                                    "Starting iteration %8d of %8d\n"
+                                                    "=======================================\n",
+                       iteration_count_,
+                       iteration_limit);
       reporter->printf(R_QP, R_PER_INNER_ITERATION, "omega_positive (%6d elements):", (int)omega_positive_.size());
       for (int i = 0; i < (int)omega_positive_.size(); i++) {
         reporter->printf(R_QP, R_PER_INNER_ITERATION, " %d", omega_positive_[i]);
@@ -1034,13 +1028,18 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
       if (allow_inexact_termination_ &&
           iteration_count_ >= (int)ceil(inexact_termination_initialization_factor_ * (double)vector_.size()) &&
           (iteration_count_ - (int)ceil(inexact_termination_initialization_factor_ * (double)vector_.size())) % inexact_termination_check_interval_ == 0 &&
-          inexactTerminationCondition(quantities,reporter)) {
+          inexactTerminationCondition(quantities, reporter)) {
         THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
       }
 
       // Check for iteration limit
       if (iteration_count_ >= iteration_limit) {
         THROW_EXCEPTION(QP_ITERATION_LIMIT_EXCEPTION, "QP solve unsuccessful. Iteration limit reached.");
+      }
+
+      // Check for CPU time limit
+      if ((clock() - quantities->startTime()) / (double)CLOCKS_PER_SEC >= quantities->cpuTimeLimit()) {
+        THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
       }
 
       // Print message

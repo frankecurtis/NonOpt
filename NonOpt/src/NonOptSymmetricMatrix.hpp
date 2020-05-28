@@ -71,7 +71,7 @@ public:
                           const Reporter* reporter) = 0;
   //@}
 
-  /** @name Initialize method */
+  /** @name Initialization method */
   //@{
   /**
    * Initialize strategy

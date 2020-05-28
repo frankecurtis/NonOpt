@@ -57,6 +57,9 @@ void Options::print(const Reporter* reporter) const
   // Print all options in list
   for (int i = 0; i < (int)option_list_.size(); i++) {
     option_list_[i]->print(reporter);
+    if (i < (int)option_list_.size() - 1) {
+      reporter->printf(R_NL, R_BASIC, "\n");
+    }
   }
 
 } // end print

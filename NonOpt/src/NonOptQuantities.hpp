@@ -79,22 +79,19 @@ public:
    */
   bool initialize(const std::shared_ptr<Problem> problem);
   /**
+   * Initialize inexact termination factor
+   * \param[in] options is pointer to Options object from NonOpt
+   * \param[in] reporter is pointer to Reporter object from NonOpt
+   */
+  void initializeInexactTerminationFactor(const Options* options,
+                                          const Reporter* reporter);
+  /**
    * Initialize radii
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    */
   void initializeRadii(const Options* options,
                        const Reporter* reporter);
-  /**
-   * Initialize inexact termination factor
-   * \param[in] options is pointer to Options object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
-   */
-  inline void initializeInexactTerminationFactor(const Options* options,
-                                                 const Reporter* reporter)
-  {
-    inexact_termination_factor_ = inexact_termination_factor_initial_;
-  };
   //@}
 
   /** @name Get methods */
@@ -113,6 +110,11 @@ public:
    * \return problem function evaluation time that was set
    */
   inline clock_t const evaluationTime() const { return evaluation_time_; };
+  /**
+   * Get CPU time limit
+   * \return CPU time limit
+   */
+  inline double const cpuTimeLimit() const { return cpu_time_limit_; };
   /**
    * Get inexact termination factor
    * \return current inexact termination factor
@@ -232,17 +234,14 @@ public:
    */
   inline void setStepsize(double stepsize) { stepsize_ = stepsize; };
   /**
+   * Update inexact termination factor
+   */
+  void updateInexactTerminationFactor();
+  /**
    * Update radii
    * \param[in] stationarity_tolerance is stationarity tolerance for reference
    */
   void updateRadii(double stationarity_tolerance);
-  /**
-   * Update inexact termination factor
-   */
-  inline void updateInexactTerminationFactor()
-  {
-    inexact_termination_factor_ = inexact_termination_factor_ * inexact_termination_update_factor_;
-  };
   //@}
 
   /** @name Increment methods */
@@ -357,6 +356,7 @@ private:
   clock_t end_time_;
   clock_t evaluation_time_;
   clock_t start_time_;
+  double cpu_time_limit_;
   double inexact_termination_factor_;
   double stationarity_radius_;
   double stepsize_;
@@ -379,6 +379,7 @@ private:
   //@{
   double inexact_termination_factor_initial_;
   double inexact_termination_update_factor_;
+  double inexact_termination_update_stepsize_threshold_;
   double scaling_threshold_;
   double stationarity_radius_initialization_factor_;
   double stationarity_radius_initialization_minimum_;

@@ -86,7 +86,7 @@ public:
                           const Reporter* reporter) = 0;
   //@}
 
-  /** @name Initialize method */
+  /** @name Initialization method */
   //@{
   /**
    * Initialize strategy
@@ -115,7 +115,7 @@ public:
    * Get translated combination of vectors' infinity norm
    * \return "||G*omega + gamma||_2^2"
    */
-  virtual double combinationTranslatedNorm2Square() = 0;
+  virtual double combinationTranslatedNorm2Squared() = 0;
   /**
    * Get dual objective quadratic value
    * \return "(G*omega + gamma)'*W*(G*omega + gamma)"
@@ -166,7 +166,7 @@ public:
    * Get primal solution 2-norm square
    * \return "||d||_2^2"
    */
-  virtual double primalSolutionNorm2Square() = 0;
+  virtual double primalSolutionNorm2Squared() = 0;
   /**
    * Get name of strategy
    * \return string with name of strategy

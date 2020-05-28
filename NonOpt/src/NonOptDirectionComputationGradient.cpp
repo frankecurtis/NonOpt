@@ -21,7 +21,7 @@ void DirectionComputationGradient::addOptions(Options* options,
                          "DCG_fail_on_QP_failure",
                          false,
                          "Determines whether to fail if QP solver ever fails.\n"
-                         "Default value: false.");
+                         "Default     : false.");
 
 } // end addOptions
 
@@ -43,13 +43,13 @@ void DirectionComputationGradient::initialize(const Options* options,
 // Iteration header
 std::string DirectionComputationGradient::iterationHeader()
 {
-  return "In.-Iters.   QP-Iters.  QP   KKT Error   |G. Combo.|     |Step|      |Step|_H ";
+  return "In. Its.  QP Its. QP   QP KKT  |G. Cmb.|   |Step|   |Step|_H";
 }
 
 // Iteration null values string
 std::string DirectionComputationGradient::iterationNullValues()
 {
-  return "----------  ----------  --  -----------  -----------  -----------  -----------";
+  return "-------- -------- -- --------- --------- --------- ---------";
 }
 
 // Compute direction
@@ -130,7 +130,7 @@ void DirectionComputationGradient::computeDirection(const Options* options,
   }
 
   // Print iteration information
-  reporter->printf(R_NL, R_PER_ITERATION, "  %10d  %10d  %2d  %+.4e  %+.4e  %+.4e  %+.4e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
+  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %2d %+.2e %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
   // Increment total inner iteration counter
   quantities->incrementTotalInnerIterationCounter();
