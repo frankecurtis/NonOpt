@@ -306,6 +306,11 @@ private:
   std::deque<int> gamma_positive_best_;
   double* inner_solution_1_;
   double* inner_solution_2_;
+  double* inner_solution_3_;
+  double* inner_solution_ls_;
+  double* inner_solution_trial_;
+  double* new_system_vector_;
+  double* right_hand_side_;
   std::deque<int> omega_positive_;
   std::deque<int> omega_positive_best_;
   double* system_solution_;
@@ -365,6 +370,7 @@ private:
                             int index,
                             double system_vector[]);
   void finalizeSolution();
+  void resizeSystemSolution();
   bool setAugment(const Reporter* reporter,
                   int set,
                   int index,
