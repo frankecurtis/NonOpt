@@ -68,37 +68,37 @@ int main()
   symmetric_matrix_names.push_back("LimitedMemory");
 
   // Loop through direction computations
-  for (int direction_computation_number = 0; direction_computation_number < direction_computation_names.size(); direction_computation_number++) {
+  for (int direction_computation_number = 0; direction_computation_number < (int)direction_computation_names.size(); direction_computation_number++) {
 
     // Set direction computation strategy
     nonopt.options()->modifyStringValue(nonopt.reporter(), "direction_computation", direction_computation_names[direction_computation_number]);
 
     // Loop through inverse Hessian update strategies
-    for (int inverse_hessian_update_number = 0; inverse_hessian_update_number < inverse_hessian_update_names.size(); inverse_hessian_update_number++) {
+    for (int inverse_hessian_update_number = 0; inverse_hessian_update_number < (int)inverse_hessian_update_names.size(); inverse_hessian_update_number++) {
 
       // Set inverse Hessian update strategy
       nonopt.options()->modifyStringValue(nonopt.reporter(), "inverse_hessian_update", inverse_hessian_update_names[inverse_hessian_update_number]);
 
       // Loop through line searches
-      for (int line_search_number = 0; line_search_number < line_search_names.size(); line_search_number++) {
+      for (int line_search_number = 0; line_search_number < (int)line_search_names.size(); line_search_number++) {
 
         // Set line search strategy
         nonopt.options()->modifyStringValue(nonopt.reporter(), "line_search", line_search_names[line_search_number]);
 
         // Loop through point set updates
-        for (int point_set_update_number = 0; point_set_update_number < point_set_update_names.size(); point_set_update_number++) {
+        for (int point_set_update_number = 0; point_set_update_number < (int)point_set_update_names.size(); point_set_update_number++) {
 
           // Set point set update strategy
           nonopt.options()->modifyStringValue(nonopt.reporter(), "point_set_update", point_set_update_names[point_set_update_number]);
 
           // Loop through qp solvers
-          for (int qp_solver_number = 0; qp_solver_number < qp_solver_names.size(); qp_solver_number++) {
+          for (int qp_solver_number = 0; qp_solver_number < (int)qp_solver_names.size(); qp_solver_number++) {
 
             // Set qp solver strategy
             nonopt.options()->modifyStringValue(nonopt.reporter(), "qp_solver", qp_solver_names[qp_solver_number]);
 
             // Loop through symmetric matrices
-            for (int symmetric_matrix_number = 0; symmetric_matrix_number < symmetric_matrix_names.size(); symmetric_matrix_number++) {
+            for (int symmetric_matrix_number = 0; symmetric_matrix_number < (int)symmetric_matrix_names.size(); symmetric_matrix_number++) {
 
               // Set symmetric matrix strategy
               nonopt.options()->modifyStringValue(nonopt.reporter(), "symmetric_matrix", symmetric_matrix_names[symmetric_matrix_number]);
