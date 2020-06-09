@@ -5,6 +5,7 @@
 // Author(s) : Frank E. Curtis
 
 #include <cstdio>
+#include <cstring>
 #include <string>
 
 #include "ActiveFaces.hpp"
