@@ -9,7 +9,7 @@
 #include <cstdio>
 #include <iterator>
 
-#include "NonOptBLAS.hpp"
+#include "NonOptBLASLAPACK.hpp"
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
 #include "NonOptQPSolverDualActiveSet.hpp"
@@ -38,35 +38,45 @@ QPSolverDualActiveSet::~QPSolverDualActiveSet()
 
   // Delete arrays
   if (inner_solution_1_ != nullptr) {
-    delete [] inner_solution_1_;
-  }
+    delete[] inner_solution_1_;
+    inner_solution_1_ = nullptr;
+  } // end if
   if (inner_solution_2_ != nullptr) {
-    delete [] inner_solution_2_;
-  }
+    delete[] inner_solution_2_;
+    inner_solution_2_ = nullptr;
+  } // end if
   if (inner_solution_3_ != nullptr) {
-    delete [] inner_solution_3_;
-  }
+    delete[] inner_solution_3_;
+    inner_solution_3_ = nullptr;
+  } // end if
   if (inner_solution_ls_ != nullptr) {
-    delete [] inner_solution_ls_;
-  }
+    delete[] inner_solution_ls_;
+    inner_solution_ls_ = nullptr;
+  } // end if
   if (inner_solution_trial_ != nullptr) {
-    delete [] inner_solution_trial_;
-  }
+    delete[] inner_solution_trial_;
+    inner_solution_trial_ = nullptr;
+  } // end if
   if (new_system_vector_ != nullptr) {
-    delete [] new_system_vector_;
-  }
+    delete[] new_system_vector_;
+    new_system_vector_ = nullptr;
+  } // end if
   if (right_hand_side_ != nullptr) {
-    delete [] right_hand_side_;
-  }
+    delete[] right_hand_side_;
+    right_hand_side_ = nullptr;
+  } // end if
   if (system_solution_ != nullptr) {
-    delete [] system_solution_;
-  }
+    delete[] system_solution_;
+    system_solution_ = nullptr;
+  } // end if
   if (system_solution_best_ != nullptr) {
-    delete [] system_solution_best_;
-  }
+    delete[] system_solution_best_;
+    system_solution_best_ = nullptr;
+  } // end if
   if (factor_ != nullptr) {
-    delete [] factor_;
-  }
+    delete[] factor_;
+    factor_ = nullptr;
+  } // end if
 
 } // end destructor
 
@@ -77,18 +87,18 @@ void QPSolverDualActiveSet::addOptions(Options* options,
 
   // Add bool options
   options->addBoolOption(reporter,
-                         "QPAS_fail_on_factorization_error",
+                         "QPDAS_fail_on_factorization_error",
                          false,
                          "Indicator for whether to indicate failure on factorization error.\n"
                          "Default     : false.");
   options->addBoolOption(reporter,
-                         "QPAS_allow_inexact_termination",
+                         "QPDAS_allow_inexact_termination",
                          false,
                          "Indicator for whether to allow early termination.\n"
                          "Default     : false.");
   // Add double options
   options->addDoubleOption(reporter,
-                           "QPAS_kkt_tolerance",
+                           "QPDAS_kkt_tolerance",
                            1e-08,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -97,7 +107,7 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                            "              the algorithm terminates with a message of success.\n"
                            "Default     : 1e-08.");
   options->addDoubleOption(reporter,
-                           "QPAS_cholesky_tolerance",
+                           "QPDAS_cholesky_tolerance",
                            1e-12,
                            0.0,
                            1.0,
@@ -108,14 +118,14 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                            "              diagonal value may be replaced by this tolerance value.\n"
                            "Default     : 1e-12.");
   options->addDoubleOption(reporter,
-                           "QPAS_inexact_termination_descent_tolerance",
+                           "QPDAS_inexact_termination_descent_tolerance",
                            1e-04,
                            0.0,
                            1.0,
                            "Descent direction tolerance for inexactness conditions.\n"
                            "Default     : 1e-04.");
   options->addDoubleOption(reporter,
-                           "QPAS_inexact_termination_initialization_factor",
+                           "QPDAS_inexact_termination_initialization_factor",
                            2.5e-01,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -123,14 +133,14 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                            "              to perform before inexact termination conditions are checked.\n"
                            "Default     : 2.5e-01.");
   options->addDoubleOption(reporter,
-                           "QPAS_inexact_termination_ratio_minimum",
+                           "QPDAS_inexact_termination_ratio_minimum",
                            1e-02,
                            0.0,
                            1.0,
                            "Minimum value for ratio used in inexact termination condition.\n"
                            "Default     : 1e-02.");
   options->addDoubleOption(reporter,
-                           "QPAS_linear_independence_tolerance",
+                           "QPDAS_linear_independence_tolerance",
                            1e-12,
                            0.0,
                            1.0,
@@ -142,7 +152,7 @@ void QPSolverDualActiveSet::addOptions(Options* options,
 
   // Add integer options
   options->addIntegerOption(reporter,
-                            "QPAS_inexact_termination_check_interval",
+                            "QPDAS_inexact_termination_check_interval",
                             4,
                             1,
                             NONOPT_INT_INFINITY,
@@ -150,14 +160,14 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                             "              termination conditions.\n"
                             "Default     : 4.");
   options->addIntegerOption(reporter,
-                            "QPAS_iteration_limit_minimum",
+                            "QPDAS_iteration_limit_minimum",
                             1e+00,
                             0.0,
                             NONOPT_INT_INFINITY,
                             "Minimum limit on the number of iterations.\n"
                             "Default     : 1e+00.");
   options->addIntegerOption(reporter,
-                            "QPAS_iteration_limit_maximum",
+                            "QPDAS_iteration_limit_maximum",
                             1e+06,
                             0.0,
                             NONOPT_INT_INFINITY,
@@ -172,21 +182,21 @@ void QPSolverDualActiveSet::setOptions(const Options* options,
 {
 
   // Read bool options
-  options->valueAsBool(reporter, "QPAS_fail_on_factorization_error", fail_on_factorization_error_);
-  options->valueAsBool(reporter, "QPAS_allow_inexact_termination", allow_inexact_termination_);
+  options->valueAsBool(reporter, "QPDAS_fail_on_factorization_error", fail_on_factorization_error_);
+  options->valueAsBool(reporter, "QPDAS_allow_inexact_termination", allow_inexact_termination_);
 
   // Read double options
-  options->valueAsDouble(reporter, "QPAS_kkt_tolerance", kkt_tolerance_);
-  options->valueAsDouble(reporter, "QPAS_cholesky_tolerance", cholesky_tolerance_);
-  options->valueAsDouble(reporter, "QPAS_inexact_termination_descent_tolerance", inexact_termination_descent_tolerance_);
-  options->valueAsDouble(reporter, "QPAS_inexact_termination_initialization_factor", inexact_termination_initialization_factor_);
-  options->valueAsDouble(reporter, "QPAS_inexact_termination_ratio_minimum", inexact_termination_ratio_minimum_);
-  options->valueAsDouble(reporter, "QPAS_linear_independence_tolerance", linear_independence_tolerance_);
+  options->valueAsDouble(reporter, "QPDAS_kkt_tolerance", kkt_tolerance_);
+  options->valueAsDouble(reporter, "QPDAS_cholesky_tolerance", cholesky_tolerance_);
+  options->valueAsDouble(reporter, "QPDAS_inexact_termination_descent_tolerance", inexact_termination_descent_tolerance_);
+  options->valueAsDouble(reporter, "QPDAS_inexact_termination_initialization_factor", inexact_termination_initialization_factor_);
+  options->valueAsDouble(reporter, "QPDAS_inexact_termination_ratio_minimum", inexact_termination_ratio_minimum_);
+  options->valueAsDouble(reporter, "QPDAS_linear_independence_tolerance", linear_independence_tolerance_);
 
   // Read integer options
-  options->valueAsInteger(reporter, "QPAS_inexact_termination_check_interval", inexact_termination_check_interval_);
-  options->valueAsInteger(reporter, "QPAS_iteration_limit_minimum", iteration_limit_minimum_);
-  options->valueAsInteger(reporter, "QPAS_iteration_limit_maximum", iteration_limit_maximum_);
+  options->valueAsInteger(reporter, "QPDAS_inexact_termination_check_interval", inexact_termination_check_interval_);
+  options->valueAsInteger(reporter, "QPDAS_iteration_limit_minimum", iteration_limit_minimum_);
+  options->valueAsInteger(reporter, "QPDAS_iteration_limit_maximum", iteration_limit_maximum_);
 
 } // end setOptions
 
@@ -215,35 +225,45 @@ void QPSolverDualActiveSet::initializeData(int gamma_length)
 
   // Delete arrays (in case they exist)
   if (inner_solution_1_ != nullptr) {
-    delete [] inner_solution_1_;
-  }
+    delete[] inner_solution_1_;
+    inner_solution_1_ = nullptr;
+  } // end if
   if (inner_solution_2_ != nullptr) {
-    delete [] inner_solution_2_;
-  }
+    delete[] inner_solution_2_;
+    inner_solution_2_ = nullptr;
+  } // end if
   if (inner_solution_3_ != nullptr) {
-    delete [] inner_solution_3_;
-  }
+    delete[] inner_solution_3_;
+    inner_solution_3_ = nullptr;
+  } // end if
   if (inner_solution_ls_ != nullptr) {
-    delete [] inner_solution_ls_;
-  }
+    delete[] inner_solution_ls_;
+    inner_solution_ls_ = nullptr;
+  } // end if
   if (inner_solution_trial_ != nullptr) {
-    delete [] inner_solution_trial_;
-  }
+    delete[] inner_solution_trial_;
+    inner_solution_trial_ = nullptr;
+  } // end if
   if (new_system_vector_ != nullptr) {
-    delete [] new_system_vector_;
-  }
+    delete[] new_system_vector_;
+    new_system_vector_ = nullptr;
+  } // end if
   if (right_hand_side_ != nullptr) {
-    delete [] right_hand_side_;
-  }
+    delete[] right_hand_side_;
+    right_hand_side_ = nullptr;
+  } // end if
   if (system_solution_ != nullptr) {
-    delete [] system_solution_;
-  }
+    delete[] system_solution_;
+    system_solution_ = nullptr;
+  } // end if
   if (system_solution_best_ != nullptr) {
-    delete [] system_solution_best_;
-  }
+    delete[] system_solution_best_;
+    system_solution_best_ = nullptr;
+  } // end if
   if (factor_ != nullptr) {
-    delete [] factor_;
-  }
+    delete[] factor_;
+    factor_ = nullptr;
+  } // end if
 
   // Allocate arrays
   inner_solution_1_ = new double[system_solution_length_];
@@ -1722,8 +1742,9 @@ bool QPSolverDualActiveSet::choleskyAugment(double system_vector[],
 
   // Delete temporary vector
   if (temporary_vector != nullptr) {
-    delete [] temporary_vector;
-  }
+    delete[] temporary_vector;
+    temporary_vector = nullptr;
+  } // end if
 
   // Return
   return success_without_factorization_error;
@@ -1909,11 +1930,13 @@ void QPSolverDualActiveSet::choleskyFromScratch(const Reporter* reporter)
 
   // Delete temporary matrices
   if (matrix != nullptr) {
-    delete [] matrix;
-  }
+    delete[] matrix;
+    matrix = nullptr;
+  } // end if
   if (right_hand_side != nullptr) {
-    delete [] right_hand_side;
-  }
+    delete[] right_hand_side;
+    right_hand_side = nullptr;
+  } // end if
 
 } // end choleskyFromScratch
 
@@ -2021,8 +2044,9 @@ void QPSolverDualActiveSet::evaluateSystemVector(int set,
 
     // Delete temporary vector
     if (temporary_vector != nullptr) {
-      delete [] temporary_vector;
-    }
+      delete[] temporary_vector;
+      temporary_vector = nullptr;
+    } // end if
 
   } // end if
 
@@ -2115,35 +2139,45 @@ void QPSolverDualActiveSet::resizeSystemSolution()
 
   // Delete arrays (in case they exist)
   if (inner_solution_1_ != nullptr) {
-    delete [] inner_solution_1_;
-  }
+    delete[] inner_solution_1_;
+    inner_solution_1_ = nullptr;
+  } // end if
   if (inner_solution_2_ != nullptr) {
-    delete [] inner_solution_2_;
-  }
+    delete[] inner_solution_2_;
+    inner_solution_2_ = nullptr;
+  } // end if
   if (inner_solution_3_ != nullptr) {
-    delete [] inner_solution_3_;
-  }
+    delete[] inner_solution_3_;
+    inner_solution_3_ = nullptr;
+  } // end if
   if (inner_solution_ls_ != nullptr) {
-    delete [] inner_solution_ls_;
-  }
+    delete[] inner_solution_ls_;
+    inner_solution_ls_ = nullptr;
+  } // end if
   if (inner_solution_trial_ != nullptr) {
-    delete [] inner_solution_trial_;
-  }
+    delete[] inner_solution_trial_;
+    inner_solution_trial_ = nullptr;
+  } // end if
   if (new_system_vector_ != nullptr) {
-    delete [] new_system_vector_;
-  }
+    delete[] new_system_vector_;
+    new_system_vector_ = nullptr;
+  } // end if
   if (right_hand_side_ != nullptr) {
-    delete [] right_hand_side_;
-  }
+    delete[] right_hand_side_;
+    right_hand_side_ = nullptr;
+  } // end if
   if (system_solution_ != nullptr) {
-    delete [] system_solution_;
-  }
+    delete[] system_solution_;
+    system_solution_ = nullptr;
+  } // end if
   if (system_solution_best_ != nullptr) {
-    delete [] system_solution_best_;
-  }
+    delete[] system_solution_best_;
+    system_solution_best_ = nullptr;
+  } // end if
   if (factor_ != nullptr) {
-    delete [] factor_;
-  }
+    delete[] factor_;
+    factor_ = nullptr;
+  } // end if
 
   // Set new system solution length
   int system_solution_length_new = 2 * system_solution_length_;
@@ -2175,35 +2209,45 @@ void QPSolverDualActiveSet::resizeSystemSolution()
 
   // Delete arrays (in case they exist)
   if (inner_solution_1_temp != nullptr) {
-    delete [] inner_solution_1_temp;
-  }
+    delete[] inner_solution_1_temp;
+    inner_solution_1_temp = nullptr;
+  } // end if
   if (inner_solution_2_temp != nullptr) {
     delete [] inner_solution_2_temp;
-  }
+    inner_solution_2_temp = nullptr;
+  } // end if
   if (inner_solution_3_temp != nullptr) {
     delete [] inner_solution_3_temp;
-  }
+    inner_solution_3_temp = nullptr;
+  } // end if
   if (inner_solution_ls_temp != nullptr) {
     delete [] inner_solution_ls_temp;
-  }
+    inner_solution_ls_temp = nullptr;
+  } // end if
   if (inner_solution_trial_temp != nullptr) {
     delete [] inner_solution_trial_temp;
-  }
+    inner_solution_trial_temp = nullptr;
+  } // end if
   if (new_system_vector_temp != nullptr) {
     delete [] new_system_vector_temp;
-  }
+    new_system_vector_temp = nullptr;
+  } // end if
   if (right_hand_side_temp != nullptr) {
     delete [] right_hand_side_temp;
-  }
+    right_hand_side_temp = nullptr;
+  } // end if
   if (system_solution_temp != nullptr) {
     delete [] system_solution_temp;
-  }
+    system_solution_temp = nullptr;
+  } // end if
   if (system_solution_best_temp != nullptr) {
     delete [] system_solution_best_temp;
-  }
+    system_solution_best_temp = nullptr;
+  } // end if
   if (factor_temp != nullptr) {
     delete [] factor_temp;
-  }
+    factor_temp = nullptr;
+  } // end if
 
   // Update lengths
   system_solution_length_ = system_solution_length_new;

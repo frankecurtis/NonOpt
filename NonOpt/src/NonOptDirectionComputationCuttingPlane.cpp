@@ -319,7 +319,10 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
         } // end for
 
         // Delete omega
-        delete[] omega;
+        if (omega != nullptr) {
+          delete[] omega;
+          omega = nullptr;
+        } // end if
 
         // Clear data
         QP_gradient_list_aggregated.clear();

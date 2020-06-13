@@ -5,7 +5,7 @@
 // Author(s) : Frank E. Curtis
 
 #include "NonOptSymmetricMatrixLimitedMemory.hpp"
-#include "NonOptBLAS.hpp"
+#include "NonOptBLASLAPACK.hpp"
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
 
@@ -17,9 +17,10 @@ SymmetricMatrixLimitedMemory::~SymmetricMatrixLimitedMemory()
 {
 
   // Delete array
-  if (values_ != nullptr) {
-    delete[] values_;
-  }
+  if (compact_form_factorization_ != nullptr) {
+    delete[] compact_form_factorization_;
+    compact_form_factorization_ = nullptr;
+  } // end if
 
 } // end destructor
 
@@ -288,14 +289,125 @@ void SymmetricMatrixLimitedMemory::matrixVectorProduct(const Vector& vector,
   ASSERT_EXCEPTION(size_ == vector.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Vector has incorrect length.");
   ASSERT_EXCEPTION(size_ == product.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Product has incorrect length.");
 
-  // Set inputs for blas
-  char upper_lower = 'L';
-  double scale1 = 1.0;
-  int increment = 1;
-  double scale2 = 0.0;
+  // Check if no pairs in storage
+  if ((int)s_.size() == 0) {
 
-  // Compute matrix-vector product
-  dsymv_(&upper_lower, &size_, &scale1, values_, &size_, vector.values(), &increment, &scale2, product.valuesModifiable(), &increment);
+    // Compute product as multiple of vector
+    product.copy(vector);
+    product.scale(initial_diagonal_value_);
+
+  } // end if
+  else {
+
+    // Declare factorization size
+    int factor_size = 2 * (int)s_.size();
+    int factor_length = factor_size * factor_size;
+
+    // Set inputs for LAPACK
+    char u = 'U';
+    int* v = new int[factor_size];
+    int flag = 0;
+
+    // Delete factorization array, if exists
+    if (compact_form_factorization_ != nullptr) {
+      delete[] compact_form_factorization_;
+      compact_form_factorization_ = nullptr;
+    } // end if
+
+    // Declare array (matrix size = (2*number of pairs)^2)
+    compact_form_factorization_ = new double[factor_length];
+
+    // Fill (1,1) block
+    for (int i = 0; i < (int)s_.size(); i++) {
+      for (int j = i; j < (int)s_.size(); j++) {
+        compact_form_factorization_[i + j * factor_size] = initial_diagonal_value_ * s_[i]->innerProduct(*s_[j]);
+      }
+    } // end for
+
+    // Fill (1,2) block
+    int shift_over = 2 * (int)s_.size() * (int)s_.size();
+    for (int i = 0; i < (int)s_.size(); i++) {
+      for (int j = 0; j < (int)s_.size(); j++) {
+        if (i > j) {
+          compact_form_factorization_[shift_over + i + j * factor_size] = s_[i]->innerProduct(*y_[j]);
+        }
+        else {
+          compact_form_factorization_[shift_over + i + j * factor_size] = 0.0;
+        }
+      } // end for
+    }   // end for
+
+    // Fill (2,2) block
+    int shift_down = (int)s_.size();
+    for (int i = 0; i < (int)s_.size(); i++) {
+      for (int j = 0; j < (int)s_.size(); j++) {
+        if (i == j) {
+          compact_form_factorization_[shift_over + shift_down + i + j * factor_size] = -s_[i]->innerProduct(*y_[i]);
+        }
+        else {
+          compact_form_factorization_[shift_over + shift_down + i + j * factor_size] = 0.0;
+        }
+      } // end for
+    }   // end for
+
+    // Set inputs for LAPACK
+    double* w = new double[factor_length];
+    int l = factor_length;
+
+    // Compute factorization
+    dsytrf_(&u, &factor_size, compact_form_factorization_, &factor_size, v, w, &l, &flag);
+
+    // Indicate factorization done
+    compact_form_factorized_ = true;
+
+    // Delete temporary array
+    if (w != nullptr) {
+      delete[] w;
+      w = nullptr;
+    } // end if
+
+    // Compute product with initial matrix
+    product.copy(vector);
+    product.scale(initial_diagonal_value_);
+
+    // Compute right product
+    Vector right_product(factor_size);
+    for (int i = 0; i < factor_size; i++) {
+      if (i < factor_size / 2) {
+        right_product.set(i, s_[i]->innerProduct(product));
+      }
+      else {
+        right_product.set(i, y_[i - factor_size / 2]->innerProduct(vector));
+      }
+    } // end for
+
+    // Set inputs for LAPACK
+    int rhs = 1;
+
+    // Compute solve with factorization
+    dsytrs_(&u, &factor_size, &rhs, compact_form_factorization_, &factor_size, v, right_product.valuesModifiable(), &factor_size, &flag);
+
+    // Complete outer product
+    Vector outer_product(size_);
+    for (int i = 0; i < factor_size; i++) {
+      if (i < factor_size / 2) {
+        outer_product.addScaledVector(initial_diagonal_value_ * right_product.values()[i], *s_[i]);
+      }
+      else {
+        outer_product.addScaledVector(right_product.values()[i], *y_[i - factor_size / 2]);
+      }
+    } // end for
+
+    // Compute matrix-vector product
+    product.addScaledVector(-1.0, outer_product);
+
+    // Delete temporary array
+    if (v != nullptr) {
+      delete[] v;
+      v = nullptr;
+    } // end if
+
+  } // end if
 
 } // end matrixVectorProduct
 
@@ -333,8 +445,14 @@ void SymmetricMatrixLimitedMemory::matrixVectorProductOfInverse(const Vector& ve
   } // end for
 
   // Delete intermediate value vectors
-  delete[] a;
-  delete[] b;
+  if (a != nullptr) {
+    delete[] a;
+    a = nullptr;
+  } // end if
+  if (b != nullptr) {
+    delete[] b;
+    b = nullptr;
+  } // end if
 
 } // end matrixVectorProductOfInverse
 
@@ -360,35 +478,17 @@ void SymmetricMatrixLimitedMemory::setAsDiagonal(int size,
   computed_column_indices_.clear();
   computed_column_indices_of_inverse_.clear();
 
-  // Check current size
-  if (size_ != size) {
+  // Reset factorization indicator
+  compact_form_factorized_ = false;
 
-    // Set size
-    size_ = size;
-
-    // Delete previous array, if exists
-    if (values_ != nullptr) {
-      delete[] values_;
-    }
-
-    // Allocate arrays
-    values_ = new double[size_ * size_];
-
+  // Delete factorization array, if exists
+  if (compact_form_factorization_ != nullptr) {
+    delete[] compact_form_factorization_;
+    compact_form_factorization_ = nullptr;
   } // end if
 
-  // Set inputs for blas
-  int length = size_ * size_;
-  double zero_value = 0.0;
-  int increment1 = 0;
-  int increment2 = 1;
-
-  // Initialize values
-  dcopy_(&length, &zero_value, &increment1, values_, &increment2);
-
-  // Set diagonal entries
-  for (int i = 0; i < size_ * size_; i = i + size_ + 1) {
-    values_[i] = value;
-  } // end for
+  // Set size
+  size_ = size;
 
 } // end setAsDiagonal
 
@@ -426,63 +526,14 @@ void SymmetricMatrixLimitedMemory::updateBFGS(const Vector& s,
   computed_column_indices_.clear();
   computed_column_indices_of_inverse_.clear();
 
-  // Set inputs for blas
-  int length = size_ * size_;
-  double zero_value = 0.0;
-  int increment1 = 0;
-  int increment2 = 1;
+  // Reset factorization indicator
+  compact_form_factorized_ = false;
 
-  // Initialize values
-  dcopy_(&length, &zero_value, &increment1, values_, &increment2);
-
-  // Set diagonal entries
-  for (int i = 0; i < size_ * size_; i = i + size_ + 1) {
-    values_[i] = initial_diagonal_value_;
-  } // end for
-
-  // Loop over pairs to construct matrix
-  for (int i = 0; i < (int)s_.size(); i++) {
-
-    // Declare temporary vector
-    double* Hs = new double[size_];
-
-    // Set inputs for blas
-    char upper_lower = 'L';
-    double scale1 = 1.0;
-    int increment = 1;
-    double scale2 = 0.0;
-
-    // Compute matrix-vector product
-    dsymv_(&upper_lower, &size_, &scale1, values_, &size_, s_[i]->values(), &increment, &scale2, Hs, &increment);
-
-    // Declare scalars
-    double sHs = ddot_(&size_, s_[i]->values(), &increment, Hs, &increment);
-    double sy = ddot_(&size_, y_[i]->values(), &increment, s_[i]->values(), &increment);
-
-    // Set scale
-    double scale = -1.0 / sHs;
-
-    // Perform symmetric rank-1 update (to add -H*s*s'*H/(s'*H*s))
-    dsyr_(&upper_lower, &size_, &scale, Hs, &increment, values_, &size_);
-
-    // Set scale
-    scale = 1.0 / sy;
-
-    // Perform symmetric rank-1 update (to add y*y'/(s'*y))
-    dsyr_(&upper_lower, &size_, &scale, y_[i]->values(), &increment, values_, &size_);
-
-    // Complete matrix
-    for (int i = 1; i < size_; i++) {
-      for (int j = 0; j < i; j++) {
-        values_[i * size_ + j] = values_[j * size_ + i];
-      }
-    } // end for
-
-    // Delete intermediate vector
-    if (Hs != nullptr) {
-      delete[] Hs;
-    }
-  }
+  // Delete factorization array, if exists
+  if (compact_form_factorization_ != nullptr) {
+    delete[] compact_form_factorization_;
+    compact_form_factorization_ = nullptr;
+  } // end if
 
 } // end updateBFGS
 

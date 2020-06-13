@@ -329,7 +329,10 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
         } // end for
 
         // Delete omega
-        delete[] omega;
+        if (omega != nullptr) {
+          delete[] omega;
+          omega = nullptr;
+        } // end if
 
         // Clear data
         QP_gradient_list_aggregated.clear();

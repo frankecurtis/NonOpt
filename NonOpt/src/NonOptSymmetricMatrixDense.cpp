@@ -5,7 +5,7 @@
 // Author(s) : Frank E. Curtis
 
 #include "NonOptSymmetricMatrixDense.hpp"
-#include "NonOptBLAS.hpp"
+#include "NonOptBLASLAPACK.hpp"
 #include "NonOptDeclarations.hpp"
 
 namespace NonOpt
@@ -18,10 +18,12 @@ SymmetricMatrixDense::~SymmetricMatrixDense()
   // Delete arrays
   if (values_ != nullptr) {
     delete[] values_;
-  }
+    values_ = nullptr;
+  } // end if
   if (values_of_inverse_ != nullptr) {
     delete[] values_of_inverse_;
-  }
+    values_of_inverse_ = nullptr;
+  } // end if
 
 } // end destructor
 
@@ -230,10 +232,12 @@ void SymmetricMatrixDense::setAsDiagonal(int size,
     // Delete previous array, if exists
     if (values_ != nullptr) {
       delete[] values_;
-    }
+      values_ = nullptr;
+    } // end if
     if (values_of_inverse_ != nullptr) {
       delete[] values_of_inverse_;
-    }
+      values_of_inverse_ = nullptr;
+    } // end if
 
     // Set size
     size_ = size;
@@ -327,10 +331,12 @@ void SymmetricMatrixDense::updateBFGS(const Vector& s,
   // Delete intermediate vector
   if (Hs != nullptr) {
     delete[] Hs;
-  }
+    Hs = nullptr;
+  } // end if
   if (Wy != nullptr) {
     delete[] Wy;
-  }
+    Wy = nullptr;
+  } // end if
 
 } // end updateBFGS
 

@@ -79,7 +79,8 @@ std::shared_ptr<Point> Point::makeNewRandom(double epsilon,
   // Delete array
   if (random_direction_array != nullptr) {
     delete[] random_direction_array;
-  }
+    random_direction_array = nullptr;
+  } // end if
 
   // Compute scalar
   double scalar = epsilon * pow(rand() / double(RAND_MAX), 1.0 / ((double)vector_->length())) * (1.0 / random_direction.norm2());
@@ -182,7 +183,8 @@ bool Point::evaluateGradient(Quantities& quantities)
     // Delete temporary array
     if (g != nullptr) {
       delete[] g;
-    }
+      g = nullptr;
+    } // end if
 
     // Check for nan
     for (int i = 0; i < gradient_->length(); i++) {

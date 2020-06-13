@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTBLAS_HPP__
-#define __NONOPTBLAS_HPP__
+#ifndef __NONOPTBLASLAPACK_HPP__
+#define __NONOPTBLASLAPACK_HPP__
 
 extern "C"
 {
@@ -17,6 +17,8 @@ extern "C"
   void dsymv_(char* u, int* n, double* a, double* A, int* m, double* x, int* incx, double* b, double* y, int* incy);
   void dsyr_(char* u, int* n, double* a, double* x, int* incx, double* A, int* m);
   void dsyr2_(char* u, int* n, double* a, double* x, int* incx, double* y, int* incy, double* A, int* m);
+  void dsytrf_(char* u, int* n, double* a, int* m, int* o, double* w, int* l, int* f);
+  void dsytrs_(char* u, int* n, int* r, double* a, int* m, int* o, double* b, int* d, int* f);
   void dtrsv_(char* u, char* t, char* d, int* n, double* A, int* m, double* x, int* incx);
   void dpotf2_(char* u, int* n, double* A, int* m, int* o);
 
@@ -28,4 +30,4 @@ extern "C"
 
 } // end extern "C"
 
-#endif /* __NONOPTBLAS_HPP__ */
+#endif /* __NONOPTBLASLAPACK_HPP__ */

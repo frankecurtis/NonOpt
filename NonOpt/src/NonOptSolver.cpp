@@ -7,7 +7,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "NonOptBLAS.hpp"
+#include "NonOptBLASLAPACK.hpp"
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
 #include "NonOptException.hpp"

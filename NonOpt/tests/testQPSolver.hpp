@@ -66,7 +66,7 @@ int testQPSolverImplementation(int option)
   q.addOptions(&options, &reporter);
 
   // Use exact solves
-  options.modifyBoolValue(&reporter, "QPAS_allow_inexact_termination", false);
+  options.modifyBoolValue(&reporter, "QPDAS_allow_inexact_termination", false);
 
   // Set options
   q.setOptions(&options, &reporter);

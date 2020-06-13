@@ -25,10 +25,11 @@ public:
     * Construct SymmetricMatrixLimitedMemory
     */
   SymmetricMatrixLimitedMemory()
-    : size_(-1),
+    : compact_form_factorized_(false),
+      size_(-1),
       history_(-1),
       initial_diagonal_value_(1.0),
-      values_(nullptr)
+      compact_form_factorization_(nullptr)
   {
     s_.clear();
     y_.clear();
@@ -195,10 +196,11 @@ private:
 
   /** @name Private members */
   //@{
+  bool compact_form_factorized_;                                     /**< Bool indicating if factorization has been performed */
   int size_;                                                         /**< Number of rows and number of columns */
   int history_;                                                      /**< Limited memory history length */
   double initial_diagonal_value_;                                    /**< Diagonal value of "initial" matrix */
-  double* values_;                                                   /**< Double array, values of matrix (TEMPORARY) */
+  double* compact_form_factorization_;                               /**< Double array, values of compact form factorization */
   std::vector<std::shared_ptr<Vector>> s_;                           /**< Vector vector, "s" values */
   std::vector<std::shared_ptr<Vector>> y_;                           /**< Vector vector, "y" values */
   std::vector<double> rho_;                                          /**< Double vector, "rho" values */

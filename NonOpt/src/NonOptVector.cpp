@@ -6,7 +6,7 @@
 
 #include <cmath>
 
-#include "NonOptBLAS.hpp"
+#include "NonOptBLASLAPACK.hpp"
 #include "NonOptDeclarations.hpp"
 #include "NonOptVector.hpp"
 
@@ -56,7 +56,8 @@ Vector::~Vector()
   // Delete array
   if (values_ != nullptr) {
     delete[] values_;
-  }
+    values_ = nullptr;
+  } // end if
 
 } // end destructor
 
@@ -114,7 +115,8 @@ void Vector::setLength(int length)
   // Delete previous array, if exists
   if (values_ != nullptr) {
     delete[] values_;
-  }
+    values_ = nullptr;
+  } // end if
 
   // Allocate array
   values_ = new double[length];
