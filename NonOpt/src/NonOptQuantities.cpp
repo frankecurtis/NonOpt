@@ -56,6 +56,13 @@ void Quantities::addOptions(Options* options,
                             const Reporter* reporter)
 {
 
+  // Add bool options
+  options->addBoolOption(reporter,
+                         "approximate_hessian_initial_scaling",
+                         false,
+                         "Indicator of whether to scale initial matrix for approximate Hessian.\n"
+                         "Default     : false.");
+
   // Add double options
   options->addDoubleOption(reporter,
                            "cpu_time_limit",
@@ -176,6 +183,9 @@ void Quantities::addOptions(Options* options,
 void Quantities::setOptions(const Options* options,
                             const Reporter* reporter)
 {
+
+  // Read bool options
+  options->valueAsBool(reporter, "approximate_hessian_initial_scaling", approximate_hessian_initial_scaling_);
 
   // Read double options
   options->valueAsDouble(reporter, "cpu_time_limit", cpu_time_limit_);
@@ -330,7 +340,7 @@ void Quantities::printHeader(const Reporter* reporter)
 {
 
   // Print header
-  reporter->printf(R_NL, R_BASIC, "Number of variables.............. : %d\n", number_of_variables_);
+  reporter->printf(R_NL, R_BASIC, "Number of variables................ : %d\n", number_of_variables_);
 
 } // end printHeader
 
@@ -349,18 +359,18 @@ void Quantities::printFooter(const Reporter* reporter)
 
   // Print quantities footer
   reporter->printf(R_NL, R_BASIC, "\n\n"
-                                  "Objective........................ : %e\n"
-                                  "Objective (unscaled)............. : %e\n"
+                                  "Objective.......................... : %e\n"
+                                  "Objective (unscaled)............... : %e\n"
                                   "\n"
-                                  "Number of iterations............. : %d\n"
-                                  "Number of inner iterations....... : %d\n"
-                                  "Number of QP iterations.......... : %d\n"
-                                  "Number of function evaluations... : %d\n"
-                                  "Number of gradient evaluations... : %d\n"
+                                  "Number of iterations............... : %d\n"
+                                  "Number of inner iterations......... : %d\n"
+                                  "Number of QP iterations............ : %d\n"
+                                  "Number of function evaluations..... : %d\n"
+                                  "Number of gradient evaluations..... : %d\n"
                                   "\n"
-                                  "CPU seconds...................... : %f\n"
-                                  "CPU seconds in NonOpt............ : %f\n"
-                                  "CPU seconds in evaluations....... : %f\n",
+                                  "CPU seconds........................ : %f\n"
+                                  "CPU seconds in NonOpt.............. : %f\n"
+                                  "CPU seconds in evaluations......... : %f\n",
                    current_iterate_->objective(),
                    current_iterate_->objectiveUnscaled(),
                    iteration_counter_,

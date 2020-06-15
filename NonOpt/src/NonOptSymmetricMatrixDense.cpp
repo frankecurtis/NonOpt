@@ -4,6 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
+#include <iostream>
+
 #include "NonOptSymmetricMatrixDense.hpp"
 #include "NonOptBLASLAPACK.hpp"
 #include "NonOptDeclarations.hpp"
@@ -58,6 +60,12 @@ void SymmetricMatrixDense::initialize(const Options* options,
   // Set as identity
   setAsDiagonal(quantities->numberOfVariables(), 1.0);
 
+  // Get approximation type
+  options->valueAsString(reporter, "approximate_hessian_update", type_);
+
+  // Get indicator of initial scaling
+  options->valueAsBool(reporter, "approximate_hessian_initial_scaling", initial_scaling_);
+
 } // end initialize
 
 // Column
@@ -70,7 +78,7 @@ void const SymmetricMatrixDense::column(int column_index,
   ASSERT_EXCEPTION(column_index < size_, NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Column index is too large.");
   ASSERT_EXCEPTION(size_ == column.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Column has incorrect length.");
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int increment1 = size_;
   int increment2 = 1;
 
@@ -89,7 +97,7 @@ void const SymmetricMatrixDense::columnOfInverse(int column_index,
   ASSERT_EXCEPTION(column_index < size_, NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Column index is too large.");
   ASSERT_EXCEPTION(size_ == column.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Column has incorrect length.");
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int increment1 = size_;
   int increment2 = 1;
 
@@ -140,7 +148,7 @@ double SymmetricMatrixDense::innerProduct(const Vector& vector)
   // Create new vector
   Vector product(size_);
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   char upper_lower = 'L';
   double scale1 = 1.0;
   int increment = 1;
@@ -164,7 +172,7 @@ double SymmetricMatrixDense::innerProductOfInverse(const Vector& vector)
   // Create new vector
   Vector product(size_);
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   char upper_lower = 'L';
   double scale1 = 1.0;
   int increment = 1;
@@ -187,7 +195,7 @@ void SymmetricMatrixDense::matrixVectorProduct(const Vector& vector,
   ASSERT_EXCEPTION(size_ == vector.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Vector has incorrect length.");
   ASSERT_EXCEPTION(size_ == product.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Product has incorrect length.");
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   char upper_lower = 'L';
   double scale1 = 1.0;
   int increment = 1;
@@ -207,7 +215,7 @@ void SymmetricMatrixDense::matrixVectorProductOfInverse(const Vector& vector,
   ASSERT_EXCEPTION(size_ == vector.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Vector has incorrect length.");
   ASSERT_EXCEPTION(size_ == product.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Product has incorrect length.");
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   char upper_lower = 'L';
   double scale1 = 1.0;
   int increment = 1;
@@ -251,7 +259,7 @@ void SymmetricMatrixDense::setAsDiagonal(int size,
 
   } // end if
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   double zero_value = 0.0;
   int increment1 = 0;
   int increment2 = 1;
@@ -269,6 +277,25 @@ void SymmetricMatrixDense::setAsDiagonal(int size,
 } // end setAsDiagonal
 
 // Symmetric update
+void SymmetricMatrixDense::update(const Vector& s,
+                                  const Vector& y)
+{
+
+  // Asserts
+  ASSERT_EXCEPTION(size_ == s.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Vector s has incorrect length.");
+  ASSERT_EXCEPTION(size_ == y.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Vector y has incorrect length.");
+
+  // Call appropriate update method
+  if (type_.compare("BFGS") == 0) {
+    updateBFGS(s,y);
+  }
+  else if (type_.compare("DFP") == 0) {
+    updateDFP(s,y);
+  }
+
+} // end update
+
+// Symmetric update
 void SymmetricMatrixDense::updateBFGS(const Vector& s,
                                       const Vector& y)
 {
@@ -281,7 +308,7 @@ void SymmetricMatrixDense::updateBFGS(const Vector& s,
   double* Hs = new double[size_];
   double* Wy = new double[size_];
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   char upper_lower = 'L';
   double scale1 = 1.0;
   int increment = 1;
@@ -311,13 +338,13 @@ void SymmetricMatrixDense::updateBFGS(const Vector& s,
   // Set scale
   scale = (1.0 + yWy / sy) / sy;
 
-  // Perform symmetric rank-1 update (to add (1+yMy/sy)*s*s')
+  // Perform symmetric rank-1 update (to add (1+yWy/sy)/sy*s*s')
   dsyr_(&upper_lower, &size_, &scale, s.values(), &increment, values_of_inverse_, &size_);
 
-  // Set input for lapack
+  // Set input for BLASLAPACK
   scale = -(1.0 / sy);
 
-  // Perform symmetric rank-2 update (to add -(1/sy)*s*My'-(1/sy)*My*s')
+  // Perform symmetric rank-2 update (to add -(1/sy)*s*Wy'-(1/sy)*Wy*s')
   dsyr2_(&upper_lower, &size_, &scale, s.values(), &increment, Wy, &increment, values_of_inverse_, &size_);
 
   // Complete matrix
@@ -339,6 +366,78 @@ void SymmetricMatrixDense::updateBFGS(const Vector& s,
   } // end if
 
 } // end updateBFGS
+
+// Symmetric update
+void SymmetricMatrixDense::updateDFP(const Vector& s,
+                                     const Vector& y)
+{
+
+  // Asserts
+  ASSERT_EXCEPTION(size_ == s.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Vector s has incorrect length.");
+  ASSERT_EXCEPTION(size_ == y.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Vector y has incorrect length.");
+
+  // Declare temporary vector
+  double* Hs = new double[size_];
+  double* Wy = new double[size_];
+
+  // Set inputs for BLASLAPACK
+  char upper_lower = 'L';
+  double scale1 = 1.0;
+  int increment = 1;
+  double scale2 = 0.0;
+
+  // Compute matrix-vector product
+  dsymv_(&upper_lower, &size_, &scale1, values_, &size_, s.values(), &increment, &scale2, Hs, &increment);
+  dsymv_(&upper_lower, &size_, &scale1, values_of_inverse_, &size_, y.values(), &increment, &scale2, Wy, &increment);
+
+  // Declare scalars
+  double sHs = ddot_(&size_, s.values(), &increment, Hs, &increment);
+  double yWy = ddot_(&size_, y.values(), &increment, Wy, &increment);
+  double sy = ddot_(&size_, y.values(), &increment, s.values(), &increment);
+
+  // Set scale
+  double scale = -1.0 / yWy;
+
+  // Perform symmetric rank-1 update (to add -W*y*y'*W/(y'*W*y))
+  dsyr_(&upper_lower, &size_, &scale, Wy, &increment, values_of_inverse_, &size_);
+
+  // Set scale
+  scale = 1.0 / sy;
+
+  // Perform symmetric rank-1 update (to add s*s'/(s'*y))
+  dsyr_(&upper_lower, &size_, &scale, s.values(), &increment, values_of_inverse_, &size_);
+
+  // Set scale
+  scale = (1.0 + sHs / sy) / sy;
+
+  // Perform symmetric rank-1 update (to add (1+sHs/sy)/sy*s*s')
+  dsyr_(&upper_lower, &size_, &scale, y.values(), &increment, values_, &size_);
+
+  // Set input for BLASLAPACK
+  scale = -(1.0 / sy);
+
+  // Perform symmetric rank-2 update (to add -(1/sy)*y*Hs'-(1/sy)*Hs*y')
+  dsyr2_(&upper_lower, &size_, &scale, y.values(), &increment, Hs, &increment, values_, &size_);
+
+  // Complete matrix
+  for (int i = 1; i < size_; i++) {
+    for (int j = 0; j < i; j++) {
+      values_[i * size_ + j] = values_[j * size_ + i];
+      values_of_inverse_[i * size_ + j] = values_of_inverse_[j * size_ + i];
+    }
+  } // end for
+
+  // Delete intermediate vector
+  if (Hs != nullptr) {
+    delete[] Hs;
+    Hs = nullptr;
+  } // end if
+  if (Wy != nullptr) {
+    delete[] Wy;
+    Wy = nullptr;
+  } // end if
+
+} // end updateDFP
 
 // Print
 void SymmetricMatrixDense::print(const Reporter* reporter,

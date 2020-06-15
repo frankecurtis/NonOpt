@@ -150,7 +150,7 @@ void NonOptSolver::setOptions()
 void NonOptSolver::solution(double vector[])
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = (int)quantities_.numberOfVariables();
   int increment = 1;
 
@@ -276,12 +276,12 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
       // Update inexact termination factor (depends on stepsize from line search)
       quantities_.updateInexactTerminationFactor();
 
-      // Update inverse Hessian
-      strategies_.inverseHessianUpdate()->updateInverseHessian(&options_, &quantities_, &reporter_, &strategies_);
+      // Update approximate Hessian
+      strategies_.approximateHessianUpdate()->updateApproximateHessian(&options_, &quantities_, &reporter_, &strategies_);
 
       // Check status
-      if (strategies_.inverseHessianUpdate()->status() != IH_SUCCESS) {
-        THROW_EXCEPTION(NONOPT_INVERSE_HESSIAN_UPDATE_FAILURE_EXCEPTION, "Inverse Hessian update failed.");
+      if (strategies_.approximateHessianUpdate()->status() != AH_SUCCESS) {
+        THROW_EXCEPTION(NONOPT_APPROXIMATE_HESSIAN_UPDATE_FAILURE_EXCEPTION, "Approximate Hessian update failed.");
       }
 
       // Add current iterate to point set
@@ -340,8 +340,8 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
     setStatus(NONOPT_DIRECTION_COMPUTATION_FAILURE);
   } catch (NONOPT_LINE_SEARCH_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_LINE_SEARCH_FAILURE);
-  } catch (NONOPT_INVERSE_HESSIAN_UPDATE_FAILURE_EXCEPTION& exec) {
-    setStatus(NONOPT_INVERSE_HESSIAN_UPDATE_FAILURE);
+  } catch (NONOPT_APPROXIMATE_HESSIAN_UPDATE_FAILURE_EXCEPTION& exec) {
+    setStatus(NONOPT_APPROXIMATE_HESSIAN_UPDATE_FAILURE);
   } catch (NONOPT_POINT_SET_UPDATE_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_POINT_SET_UPDATE_FAILURE);
   }
@@ -442,8 +442,8 @@ void NonOptSolver::printFooter()
   case NONOPT_LINE_SEARCH_FAILURE:
     reporter_.printf(R_NL, R_BASIC, "Line search failure.");
     break;
-  case NONOPT_INVERSE_HESSIAN_UPDATE_FAILURE:
-    reporter_.printf(R_NL, R_BASIC, "Inverse Hessian update failure.");
+  case NONOPT_APPROXIMATE_HESSIAN_UPDATE_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Approximate Hessian update failure.");
     break;
   case NONOPT_POINT_SET_UPDATE_FAILURE:
     reporter_.printf(R_NL, R_BASIC, "Point set update failure.");

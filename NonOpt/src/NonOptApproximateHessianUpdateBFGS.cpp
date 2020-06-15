@@ -6,17 +6,17 @@
 
 #include <cmath>
 
+#include "NonOptApproximateHessianUpdateBFGS.hpp"
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
-#include "NonOptInverseHessianUpdateBFGS.hpp"
 #include "NonOptVector.hpp"
 
 namespace NonOpt
 {
 
 // Add options
-void InverseHessianUpdateBFGS::addOptions(Options* options,
-                                          const Reporter* reporter)
+void ApproximateHessianUpdateBFGS::addOptions(Options* options,
+                                              const Reporter* reporter)
 {
 
   // Add bool options
@@ -69,8 +69,8 @@ void InverseHessianUpdateBFGS::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void InverseHessianUpdateBFGS::setOptions(const Options* options,
-                                          const Reporter* reporter)
+void ApproximateHessianUpdateBFGS::setOptions(const Options* options,
+                                              const Reporter* reporter)
 {
 
   // Read bool options
@@ -85,19 +85,25 @@ void InverseHessianUpdateBFGS::setOptions(const Options* options,
 } // end setOptions
 
 // Initialize
-void InverseHessianUpdateBFGS::initialize(const Options* options,
-                                          Quantities* quantities,
-                                          const Reporter* reporter) {}
+void ApproximateHessianUpdateBFGS::initialize(const Options* options,
+                                              Quantities* quantities,
+                                              const Reporter* reporter)
+{
 
-// Update inverse Hessian
-void InverseHessianUpdateBFGS::updateInverseHessian(const Options* options,
-                                                    Quantities* quantities,
-                                                    const Reporter* reporter,
-                                                    Strategies* strategies)
+  // Indicate that initial update has not yet been performed
+  initial_update_performed_ = false;
+
+} // end initialize
+
+// Update approximate Hessian
+void ApproximateHessianUpdateBFGS::updateApproximateHessian(const Options* options,
+                                                            Quantities* quantities,
+                                                            const Reporter* reporter,
+                                                            Strategies* strategies)
 {
 
   // Initialize values
-  setStatus(IH_UNSET);
+  setStatus(AH_UNSET);
   double correction_scalar = 0.0;
   bool perform_update = false;
 
@@ -114,8 +120,8 @@ void InverseHessianUpdateBFGS::updateInverseHessian(const Options* options,
                                            *quantities->currentIterate()->vector());
 
     // Check for iterate displacement norm tolerance violation
-    if (iterate_displacement.norm2() <= 0.0) {
-      THROW_EXCEPTION(IH_NORM_TOLERANCE_VIOLATION_EXCEPTION, "Inverse Hessian update unsuccessful. Norm tolerance violated.");
+    if (iterate_displacement.norm2() <= norm_tolerance_) {
+      THROW_EXCEPTION(AH_NORM_TOLERANCE_VIOLATION_EXCEPTION, "Approximate Hessian update unsuccessful. Norm tolerance violated.");
     }
 
     // Declare gradient displacement
@@ -126,7 +132,7 @@ void InverseHessianUpdateBFGS::updateInverseHessian(const Options* options,
 
     // Check for successful evaluation
     if (!evaluation_success) {
-      THROW_EXCEPTION(IH_EVALUATION_FAILURE_EXCEPTION, "Inverse Hessian update unsuccessful. Evaluation failed.");
+      THROW_EXCEPTION(AH_EVALUATION_FAILURE_EXCEPTION, "Approximate Hessian update unsuccessful. Evaluation failed.");
     }
 
     // Evaluate trial iterate gradient
@@ -134,7 +140,7 @@ void InverseHessianUpdateBFGS::updateInverseHessian(const Options* options,
 
     // Check for successful evaluation
     if (!evaluation_success) {
-      THROW_EXCEPTION(IH_EVALUATION_FAILURE_EXCEPTION, "Inverse Hessian update unsuccessful. Evaluation failed.");
+      THROW_EXCEPTION(AH_EVALUATION_FAILURE_EXCEPTION, "Approximate Hessian update unsuccessful. Evaluation failed.");
     }
 
     // Set gradient displacement
@@ -144,8 +150,8 @@ void InverseHessianUpdateBFGS::updateInverseHessian(const Options* options,
                                             *quantities->currentIterate()->gradient());
 
     // Check for gradient displacement norm tolerance violation
-    if (gradient_displacement.norm2() <= 0.0) {
-      THROW_EXCEPTION(IH_NORM_TOLERANCE_VIOLATION_EXCEPTION, "Inverse Hessian update unsuccessful. Norm tolerance violated.");
+    if (gradient_displacement.norm2() <= norm_tolerance_) {
+      THROW_EXCEPTION(AH_NORM_TOLERANCE_VIOLATION_EXCEPTION, "Approximate Hessian update unsuccessful. Norm tolerance violated.");
     }
 
     // Evaluate correction scalar
@@ -162,53 +168,59 @@ void InverseHessianUpdateBFGS::updateInverseHessian(const Options* options,
 
     } // end if
 
-    // Determine whether inverse Hessian should be updated
+    // Determine whether approximate Hessian should be updated
     perform_update = (iterate_displacement.innerProduct(gradient_displacement) >= product_tolerance_ * iterate_displacement.norm2() * gradient_displacement.norm2());
 
     // Check for inner product violation
     if (!perform_update) {
-      THROW_EXCEPTION(IH_PRODUCT_TOLERANCE_VIOLATION_EXCEPTION, "Inverse Hessian update unsuccessful. Product tolerance violated.");
+      THROW_EXCEPTION(AH_PRODUCT_TOLERANCE_VIOLATION_EXCEPTION, "Approximate Hessian update unsuccessful. Product tolerance violated.");
     }
 
-    // Update inverse Hessian
-    strategies->symmetricMatrix()->updateBFGS(iterate_displacement, gradient_displacement);
+    // Check for initial scaling
+    if (!initial_update_performed_ && quantities->approximateHessianInitialScaling()) {
+      strategies->symmetricMatrix()->setAsDiagonal(quantities->numberOfVariables(), iterate_displacement.innerProduct(gradient_displacement) / pow(gradient_displacement.norm2(), 2.0));
+      initial_update_performed_ = true;
+    } // end if
+
+    // Update approximate Hessian
+    strategies->symmetricMatrix()->update(iterate_displacement, gradient_displacement);
 
     // Terminate
-    THROW_EXCEPTION(IH_SUCCESS_EXCEPTION, "Inverse Hessian update successful.");
+    THROW_EXCEPTION(AH_SUCCESS_EXCEPTION, "Approximate Hessian update successful.");
 
   } // end try
 
   // catch exceptions
-  catch (IH_SUCCESS_EXCEPTION& exec) {
-    setStatus(IH_SUCCESS);
-  } catch (IH_EVALUATION_FAILURE_EXCEPTION& exec) {
-    setStatus(IH_EVALUATION_FAILURE);
-  } catch (IH_NORM_TOLERANCE_VIOLATION_EXCEPTION& exec) {
+  catch (AH_SUCCESS_EXCEPTION& exec) {
+    setStatus(AH_SUCCESS);
+  } catch (AH_EVALUATION_FAILURE_EXCEPTION& exec) {
+    setStatus(AH_EVALUATION_FAILURE);
+  } catch (AH_NORM_TOLERANCE_VIOLATION_EXCEPTION& exec) {
     if (fail_on_tolerance_violation_) {
-      setStatus(IH_NORM_TOLERANCE_VIOLATION);
+      setStatus(AH_NORM_TOLERANCE_VIOLATION);
     }
     else {
-      setStatus(IH_SUCCESS);
+      setStatus(AH_SUCCESS);
     }
   } // end catch
-  catch (IH_PRODUCT_TOLERANCE_VIOLATION_EXCEPTION& exec) {
+  catch (AH_PRODUCT_TOLERANCE_VIOLATION_EXCEPTION& exec) {
     if (fail_on_tolerance_violation_) {
-      setStatus(IH_PRODUCT_TOLERANCE_VIOLATION);
+      setStatus(AH_PRODUCT_TOLERANCE_VIOLATION);
     }
     else {
-      setStatus(IH_SUCCESS);
+      setStatus(AH_SUCCESS);
     }
   } // end catch
 
   // Print messages
   reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %2d", correction_scalar, perform_update);
 
-} // end updateInverseHessian
+} // end updateApproximateHessian
 
 // Evaluate self-correcting BFGS scalar
-void InverseHessianUpdateBFGS::evaluateSelfCorrectingScalar(Vector& s,
-                                                            Vector& y,
-                                                            double& scalar)
+void ApproximateHessianUpdateBFGS::evaluateSelfCorrectingScalar(Vector& s,
+                                                                Vector& y,
+                                                                double& scalar)
 {
 
   // Compute products

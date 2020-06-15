@@ -10,8 +10,8 @@
 #include <memory>
 #include <string>
 
+#include "NonOptApproximateHessianUpdate.hpp"
 #include "NonOptDirectionComputation.hpp"
-#include "NonOptInverseHessianUpdate.hpp"
 #include "NonOptLineSearch.hpp"
 #include "NonOptPointSetUpdate.hpp"
 #include "NonOptQPSolver.hpp"
@@ -24,7 +24,7 @@ namespace NonOpt
  * Forward declarations
  */
 class DirectionComputation;
-class InverseHessianUpdate;
+class ApproximateHessianUpdate;
 class LineSearch;
 class PointSetUpdate;
 class QPSolver;
@@ -92,10 +92,10 @@ public:
    */
   inline std::shared_ptr<DirectionComputation> directionComputation() { return direction_computation_; }
   /**
-   * Get pointer to InverseHessianUpdate
-   * \return pointer to InverseHessianUpdate object
+   * Get pointer to ApproximateHessianUpdate
+   * \return pointer to ApproximateHessianUpdate object
    */
-  inline std::shared_ptr<InverseHessianUpdate> inverseHessianUpdate() { return inverse_hessian_update_; }
+  inline std::shared_ptr<ApproximateHessianUpdate> approximateHessianUpdate() { return approximate_hessian_update_; }
   /**
    * Get pointer to LineSearch
    * \return pointer to LineSearch object
@@ -163,7 +163,7 @@ private:
   /** @name * Private members */
   //@{
   std::shared_ptr<DirectionComputation> direction_computation_;
-  std::shared_ptr<InverseHessianUpdate> inverse_hessian_update_;
+  std::shared_ptr<ApproximateHessianUpdate> approximate_hessian_update_;
   std::shared_ptr<LineSearch> line_search_;
   std::shared_ptr<PointSetUpdate> point_set_update_;
   std::shared_ptr<QPSolver> qp_solver_;

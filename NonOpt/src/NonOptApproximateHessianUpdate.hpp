@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTINVERSEHESSIANUPDATE_HPP__
-#define __NONOPTINVERSEHESSIANUPDATE_HPP__
+#ifndef __NONOPTAPPROXIMATEHESSIANUPDATE_HPP__
+#define __NONOPTAPPROXIMATEHESSIANUPDATE_HPP__
 
 #include <string>
 
@@ -29,9 +29,9 @@ class Strategies;
 class Strategy;
 
 /**
- * InverseHessianUpdate class
+ * ApproximateHessianUpdate class
  */
-class InverseHessianUpdate : public Strategy
+class ApproximateHessianUpdate : public Strategy
 {
 
 public:
@@ -40,7 +40,7 @@ public:
   /**
    * Constructor
    */
-  InverseHessianUpdate(){};
+  ApproximateHessianUpdate(){};
   //@}
 
   /** @name Destructor */
@@ -48,7 +48,7 @@ public:
   /**
    * Destructor
    */
-  virtual ~InverseHessianUpdate(){};
+  virtual ~ApproximateHessianUpdate(){};
 
   /** @name Options handling methods */
   //@{
@@ -102,7 +102,7 @@ public:
    * Get status
    * \return current status of strategy
    */
-  inline IH_Status status() { return status_; };
+  inline AH_Status status() { return status_; };
   //@}
 
   /** @name Set method */
@@ -111,22 +111,28 @@ public:
    * Set status
    * \param[in] status is new status to be set
    */
-  inline void setStatus(IH_Status status) { status_ = status; };
+  inline void setStatus(AH_Status status) { status_ = status; };
   //@}
 
-  /** @name Inverse Hessian update method */
+  /** @name Update method */
   //@{
   /**
-   * Run inverse Hessian update
+   * Run approximate Hessian update
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in,out] quantities is pointer to Quantities object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    * \param[in,out] strategies is pointer to Strategies object from NonOpt
    */
-  virtual void updateInverseHessian(const Options* options,
-                                    Quantities* quantities,
-                                    const Reporter* reporter,
-                                    Strategies* strategies) = 0;
+  virtual void updateApproximateHessian(const Options* options,
+                                        Quantities* quantities,
+                                        const Reporter* reporter,
+                                        Strategies* strategies) = 0;
+  //@}
+
+protected:
+  /** @name Protected members */
+  //@{
+  bool initial_update_performed_; /**< Indicates initial update has been performed */
   //@}
 
 private:
@@ -137,20 +143,20 @@ private:
   /**
    * Copy constructor
    */
-  InverseHessianUpdate(const InverseHessianUpdate&);
+  ApproximateHessianUpdate(const ApproximateHessianUpdate&);
   /**
    * Overloaded equals operator
    */
-  void operator=(const InverseHessianUpdate&);
+  void operator=(const ApproximateHessianUpdate&);
   //@}
 
   /** @name Private members */
   //@{
-  IH_Status status_; /**< Termination status */
+  AH_Status status_; /**< Termination status */
   //@}
 
-}; // set InverseHessianUpdate
+}; // set ApproximateHessianUpdate
 
 } // namespace NonOpt
 
-#endif /* __NONOPTINVERSEHESSIANUPDATE_HPP__ */
+#endif /* __NONOPTAPPROXIMATEHESSIANUPDATE_HPP__ */

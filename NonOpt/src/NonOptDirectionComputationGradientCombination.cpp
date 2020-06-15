@@ -499,9 +499,9 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
         blank_solve += " ";
         blank_solve += strategies->lineSearch()->iterationNullValues();
       } // end if
-      if (strategies->inverseHessianUpdate()->iterationNullValues().length() > 0) {
+      if (strategies->approximateHessianUpdate()->iterationNullValues().length() > 0) {
         blank_solve += " ";
-        blank_solve += strategies->inverseHessianUpdate()->iterationNullValues();
+        blank_solve += strategies->approximateHessianUpdate()->iterationNullValues();
       } // end if
       if (strategies->pointSetUpdate()->iterationNullValues().length() > 0) {
         blank_solve += " ";

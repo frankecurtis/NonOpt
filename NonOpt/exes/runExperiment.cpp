@@ -49,7 +49,7 @@ int main()
 
   // Declare vectors of strings for strategies
   std::vector<std::string> direction_computation_names;
-  std::vector<std::string> inverse_hessian_update_names;
+  std::vector<std::string> approximate_hessian_update_names;
   std::vector<std::string> line_search_names;
   std::vector<std::string> point_set_update_names;
   std::vector<std::string> qp_solver_names;
@@ -59,7 +59,8 @@ int main()
   direction_computation_names.push_back("CuttingPlane");
   direction_computation_names.push_back("GradientCombination");
   direction_computation_names.push_back("Gradient");
-  inverse_hessian_update_names.push_back("BFGS");
+  approximate_hessian_update_names.push_back("BFGS");
+  approximate_hessian_update_names.push_back("DFP");
   line_search_names.push_back("WeakWolfe");
   line_search_names.push_back("Backtracking");
   point_set_update_names.push_back("Proximity");
@@ -73,11 +74,11 @@ int main()
     // Set direction computation strategy
     nonopt.options()->modifyStringValue(nonopt.reporter(), "direction_computation", direction_computation_names[direction_computation_number]);
 
-    // Loop through inverse Hessian update strategies
-    for (int inverse_hessian_update_number = 0; inverse_hessian_update_number < (int)inverse_hessian_update_names.size(); inverse_hessian_update_number++) {
+    // Loop through approximate Hessian update strategies
+    for (int approximate_hessian_update_number = 0; approximate_hessian_update_number < (int)approximate_hessian_update_names.size(); approximate_hessian_update_number++) {
 
-      // Set inverse Hessian update strategy
-      nonopt.options()->modifyStringValue(nonopt.reporter(), "inverse_hessian_update", inverse_hessian_update_names[inverse_hessian_update_number]);
+      // Set approximate Hessian update strategy
+      nonopt.options()->modifyStringValue(nonopt.reporter(), "approximate_hessian_update", approximate_hessian_update_names[approximate_hessian_update_number]);
 
       // Loop through line searches
       for (int line_search_number = 0; line_search_number < (int)line_search_names.size(); line_search_number++) {
@@ -105,7 +106,7 @@ int main()
 
               // Declare strategy names
               std::string direction_computation_name;
-              std::string inverse_hessian_update_name;
+              std::string approximate_hessian_update_name;
               std::string line_search_name;
               std::string point_set_update_name;
               std::string qp_solver_name;
@@ -113,7 +114,7 @@ int main()
 
               // Read integer options
               nonopt.options()->valueAsString(nonopt.reporter(), "direction_computation", direction_computation_name);
-              nonopt.options()->valueAsString(nonopt.reporter(), "inverse_hessian_update", inverse_hessian_update_name);
+              nonopt.options()->valueAsString(nonopt.reporter(), "approximate_hessian_update", approximate_hessian_update_name);
               nonopt.options()->valueAsString(nonopt.reporter(), "line_search", line_search_name);
               nonopt.options()->valueAsString(nonopt.reporter(), "point_set_update", point_set_update_name);
               nonopt.options()->valueAsString(nonopt.reporter(), "qp_solver", qp_solver_name);
@@ -122,7 +123,7 @@ int main()
               // Print header
               printf("%s, %s, %s, %s, %s, %s\n",
                      direction_computation_name.c_str(),
-                     inverse_hessian_update_name.c_str(),
+                     approximate_hessian_update_name.c_str(),
                      line_search_name.c_str(),
                      point_set_update_name.c_str(),
                      qp_solver_name.c_str(),
@@ -280,7 +281,7 @@ int main()
                 } // end switch
 
                 // Set rest of output file name
-                sprintf(out_file, "%s_%s_%s_%s_%s_%s_%s.out", out_file, direction_computation_name.c_str(), inverse_hessian_update_name.c_str(), line_search_name.c_str(), point_set_update_name.c_str(), qp_solver_name.c_str(), symmetric_matrix_name.c_str());
+                sprintf(out_file, "%s_%s_%s_%s_%s_%s_%s.out", out_file, direction_computation_name.c_str(), approximate_hessian_update_name.c_str(), line_search_name.c_str(), point_set_update_name.c_str(), qp_solver_name.c_str(), symmetric_matrix_name.c_str());
 
                 // Open output file
                 r->open(out_file);

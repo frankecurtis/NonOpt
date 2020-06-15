@@ -169,12 +169,12 @@ public:
   void setAsDiagonal(int size,
                      double value);
   /**
-    * BFGS update
+    * Update approximation
     * \param[in] s is reference to Vector representing iteration displacement
     * \param[in] y is reference to Vector representing gradient displacement
     */
-  void updateBFGS(const Vector& s,
-                  const Vector& y);
+  void update(const Vector& s,
+              const Vector& y);
   //@}
 
   /** @name Print methods */
@@ -209,6 +209,14 @@ private:
   int length_;                /**< Number of rows *   number of columns */
   double* values_;            /**< Double array */
   double* values_of_inverse_; /**< Double array */
+  //@}
+
+  /** @name Private methods */
+  //@{
+  void updateBFGS(const Vector& s,
+                  const Vector& y);
+  void updateDFP(const Vector& s,
+                 const Vector& y);
   //@}
 
   /** @name Indexing methods */

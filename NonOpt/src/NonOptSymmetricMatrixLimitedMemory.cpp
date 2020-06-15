@@ -21,6 +21,10 @@ SymmetricMatrixLimitedMemory::~SymmetricMatrixLimitedMemory()
     delete[] compact_form_factorization_;
     compact_form_factorization_ = nullptr;
   } // end if
+  if (compact_form_factorization_of_inverse_ != nullptr) {
+    delete[] compact_form_factorization_of_inverse_;
+    compact_form_factorization_of_inverse_ = nullptr;
+  } // end if
 
 } // end destructor
 
@@ -59,8 +63,17 @@ void SymmetricMatrixLimitedMemory::initialize(const Options* options,
                                               const Reporter* reporter)
 {
 
+  // Reduce history to at most number of variables
+  history_ = fmin(history_,quantities->numberOfVariables());
+
   // Set as identity
   setAsDiagonal(quantities->numberOfVariables(), 1.0);
+
+  // Get approximation type
+  options->valueAsString(reporter, "approximate_hessian_update", type_);
+
+  // Get indicator of initial scaling
+  options->valueAsBool(reporter, "approximate_hessian_initial_scaling", initial_scaling_);
 
 } // end initialize
 
@@ -289,6 +302,21 @@ void SymmetricMatrixLimitedMemory::matrixVectorProduct(const Vector& vector,
   ASSERT_EXCEPTION(size_ == vector.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Vector has incorrect length.");
   ASSERT_EXCEPTION(size_ == product.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Product has incorrect length.");
 
+  // Call appropriate update method
+  if (type_.compare("BFGS") == 0) {
+    matrixVectorProductBFGS(vector,product);
+  }
+  else if (type_.compare("DFP") == 0) {
+    matrixVectorProductDFP(vector,product);
+  }
+
+} // end matrixVectorProduct
+
+// Matrix-vector product BFGS
+void SymmetricMatrixLimitedMemory::matrixVectorProductBFGS(const Vector& vector,
+                                                           Vector& product)
+{
+
   // Check if no pairs in storage
   if ((int)s_.size() == 0) {
 
@@ -303,7 +331,7 @@ void SymmetricMatrixLimitedMemory::matrixVectorProduct(const Vector& vector,
     int factor_size = 2 * (int)s_.size();
     int factor_length = factor_size * factor_size;
 
-    // Set inputs for LAPACK
+    // Set inputs for BLASLAPACK
     char u = 'U';
     int* v = new int[factor_size];
     int flag = 0;
@@ -350,7 +378,7 @@ void SymmetricMatrixLimitedMemory::matrixVectorProduct(const Vector& vector,
       } // end for
     }   // end for
 
-    // Set inputs for LAPACK
+    // Set inputs for BLASLAPACK
     double* w = new double[factor_length];
     int l = factor_length;
 
@@ -381,7 +409,7 @@ void SymmetricMatrixLimitedMemory::matrixVectorProduct(const Vector& vector,
       }
     } // end for
 
-    // Set inputs for LAPACK
+    // Set inputs for BLASLAPACK
     int rhs = 1;
 
     // Compute solve with factorization
@@ -409,7 +437,48 @@ void SymmetricMatrixLimitedMemory::matrixVectorProduct(const Vector& vector,
 
   } // end if
 
-} // end matrixVectorProduct
+} // end matrixVectorProductBFGS
+
+// Matrix-vector product DFP
+void SymmetricMatrixLimitedMemory::matrixVectorProductDFP(const Vector& vector,
+                                                          Vector& product)
+{
+
+  // Create intermediate value vectors
+  double* a = new double[(int)s_.size()];
+  double* b = new double[(int)s_.size()];
+
+  // Initialize product
+  product.copy(vector);
+
+  // Set parameters for daxpy
+  double value = 0.0;
+  int increment = 1;
+
+  // Two-loop
+  for (int i = (int)s_.size() - 1; i >= 0; i--) {
+    a[i] = rho_[i] * y_[i]->innerProduct(product);
+    value = -a[i];
+    daxpy_(&size_, &value, s_[i]->values(), &increment, product.valuesModifiable(), &increment);
+  } // end for
+  product.scale(initial_diagonal_value_);
+  for (int i = 0; i < (int)s_.size(); i++) {
+    b[i] = rho_[i] * s_[i]->innerProduct(product);
+    value = a[i] - b[i];
+    daxpy_(&size_, &value, y_[i]->values(), &increment, product.valuesModifiable(), &increment);
+  } // end for
+
+  // Delete intermediate value vectors
+  if (a != nullptr) {
+    delete[] a;
+    a = nullptr;
+  } // end if
+  if (b != nullptr) {
+    delete[] b;
+    b = nullptr;
+  } // end if
+
+} // end matrixVectorProductDFP
 
 // Matrix-vector product
 void SymmetricMatrixLimitedMemory::matrixVectorProductOfInverse(const Vector& vector,
@@ -419,6 +488,21 @@ void SymmetricMatrixLimitedMemory::matrixVectorProductOfInverse(const Vector& ve
   // Asserts
   ASSERT_EXCEPTION(size_ == vector.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Vector has incorrect length.");
   ASSERT_EXCEPTION(size_ == product.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Product has incorrect length.");
+
+  // Call appropriate update method
+  if (type_.compare("BFGS") == 0) {
+    matrixVectorProductOfInverseBFGS(vector,product);
+  }
+  else if (type_.compare("DFP") == 0) {
+    matrixVectorProductOfInverseDFP(vector,product);
+  }
+
+} // end matrixVectorProductOfInverse
+
+// Matrix-vector product BFGS
+void SymmetricMatrixLimitedMemory::matrixVectorProductOfInverseBFGS(const Vector& vector,
+                                                                    Vector& product)
+{
 
   // Create intermediate value vectors
   double* a = new double[(int)s_.size()];
@@ -454,7 +538,134 @@ void SymmetricMatrixLimitedMemory::matrixVectorProductOfInverse(const Vector& ve
     b = nullptr;
   } // end if
 
-} // end matrixVectorProductOfInverse
+} // end matrixVectorProductOfInverseBFGS
+
+// Matrix-vector product DFP
+void SymmetricMatrixLimitedMemory::matrixVectorProductOfInverseDFP(const Vector& vector,
+                                                                   Vector& product)
+{
+
+  // Check if no pairs in storage
+  if ((int)s_.size() == 0) {
+
+    // Compute product as multiple of vector
+    product.copy(vector);
+    product.scale(1.0 / initial_diagonal_value_);
+
+  } // end if
+  else {
+
+    // Declare factorization size
+    int factor_size = 2 * (int)s_.size();
+    int factor_length = factor_size * factor_size;
+
+    // Set inputs for BLASLAPACK
+    char u = 'U';
+    int* v = new int[factor_size];
+    int flag = 0;
+
+    // Delete factorization array, if exists
+    if (compact_form_factorization_of_inverse_ != nullptr) {
+      delete[] compact_form_factorization_of_inverse_;
+      compact_form_factorization_of_inverse_ = nullptr;
+    } // end if
+
+    // Declare array (matrix size = (2*number of pairs)^2)
+    compact_form_factorization_of_inverse_ = new double[factor_length];
+
+    // Fill (1,1) block
+    for (int i = 0; i < (int)s_.size(); i++) {
+      for (int j = i; j < (int)s_.size(); j++) {
+        compact_form_factorization_of_inverse_[i + j * factor_size] = (1.0 / initial_diagonal_value_) * y_[i]->innerProduct(*y_[j]);
+      }
+    } // end for
+
+    // Fill (1,2) block
+    int shift_over = 2 * (int)s_.size() * (int)s_.size();
+    for (int i = 0; i < (int)s_.size(); i++) {
+      for (int j = 0; j < (int)s_.size(); j++) {
+        if (i > j) {
+          compact_form_factorization_of_inverse_[shift_over + i + j * factor_size] = y_[i]->innerProduct(*s_[j]);
+        }
+        else {
+          compact_form_factorization_of_inverse_[shift_over + i + j * factor_size] = 0.0;
+        }
+      } // end for
+    }   // end for
+
+    // Fill (2,2) block
+    int shift_down = (int)s_.size();
+    for (int i = 0; i < (int)s_.size(); i++) {
+      for (int j = 0; j < (int)s_.size(); j++) {
+        if (i == j) {
+          compact_form_factorization_of_inverse_[shift_over + shift_down + i + j * factor_size] = -s_[i]->innerProduct(*y_[i]);
+        }
+        else {
+          compact_form_factorization_of_inverse_[shift_over + shift_down + i + j * factor_size] = 0.0;
+        }
+      } // end for
+    }   // end for
+
+    // Set inputs for BLASLAPACK
+    double* w = new double[factor_length];
+    int l = factor_length;
+
+    // Compute factorization
+    dsytrf_(&u, &factor_size, compact_form_factorization_of_inverse_, &factor_size, v, w, &l, &flag);
+
+    // Indicate factorization done
+    compact_form_factorized_of_inverse_ = true;
+
+    // Delete temporary array
+    if (w != nullptr) {
+      delete[] w;
+      w = nullptr;
+    } // end if
+
+    // Compute product with initial matrix
+    product.copy(vector);
+    product.scale(1.0 / initial_diagonal_value_);
+
+    // Compute right product
+    Vector right_product(factor_size);
+    for (int i = 0; i < factor_size; i++) {
+      if (i < factor_size / 2) {
+        right_product.set(i, y_[i]->innerProduct(product));
+      }
+      else {
+        right_product.set(i, s_[i - factor_size / 2]->innerProduct(vector));
+      }
+    } // end for
+
+    // Set inputs for BLASLAPACK
+    int rhs = 1;
+
+    // Compute solve with factorization
+    dsytrs_(&u, &factor_size, &rhs, compact_form_factorization_of_inverse_, &factor_size, v, right_product.valuesModifiable(), &factor_size, &flag);
+
+    // Complete outer product
+    Vector outer_product(size_);
+    for (int i = 0; i < factor_size; i++) {
+      if (i < factor_size / 2) {
+        outer_product.addScaledVector((1.0 / initial_diagonal_value_) * right_product.values()[i], *y_[i]);
+      }
+      else {
+        outer_product.addScaledVector(right_product.values()[i], *s_[i - factor_size / 2]);
+      }
+    } // end for
+
+    // Compute matrix-vector product
+    product.addScaledVector(-1.0, outer_product);
+
+    // Delete temporary array
+    if (v != nullptr) {
+      delete[] v;
+      v = nullptr;
+    } // end if
+
+  } // end if
+
+} // end matrixVectorProductOfInverseDFP
 
 // Set as diagonal matrix
 void SymmetricMatrixLimitedMemory::setAsDiagonal(int size,
@@ -480,11 +691,16 @@ void SymmetricMatrixLimitedMemory::setAsDiagonal(int size,
 
   // Reset factorization indicator
   compact_form_factorized_ = false;
+  compact_form_factorized_of_inverse_ = false;
 
   // Delete factorization array, if exists
   if (compact_form_factorization_ != nullptr) {
     delete[] compact_form_factorization_;
     compact_form_factorization_ = nullptr;
+  } // end if
+  if (compact_form_factorization_of_inverse_ != nullptr) {
+    delete[] compact_form_factorization_of_inverse_;
+    compact_form_factorization_of_inverse_ = nullptr;
   } // end if
 
   // Set size
@@ -493,8 +709,8 @@ void SymmetricMatrixLimitedMemory::setAsDiagonal(int size,
 } // end setAsDiagonal
 
 // Symmetric update
-void SymmetricMatrixLimitedMemory::updateBFGS(const Vector& s,
-                                              const Vector& y)
+void SymmetricMatrixLimitedMemory::update(const Vector& s,
+                                          const Vector& y)
 {
 
   // Asserts
@@ -528,14 +744,19 @@ void SymmetricMatrixLimitedMemory::updateBFGS(const Vector& s,
 
   // Reset factorization indicator
   compact_form_factorized_ = false;
+  compact_form_factorized_of_inverse_ = false;
 
   // Delete factorization array, if exists
   if (compact_form_factorization_ != nullptr) {
     delete[] compact_form_factorization_;
     compact_form_factorization_ = nullptr;
   } // end if
+  if (compact_form_factorization_of_inverse_ != nullptr) {
+    delete[] compact_form_factorization_of_inverse_;
+    compact_form_factorization_of_inverse_ = nullptr;
+  } // end if
 
-} // end updateBFGS
+} // end update
 
 // Print
 void SymmetricMatrixLimitedMemory::print(const Reporter* reporter,

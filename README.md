@@ -1,6 +1,8 @@
 NonOpt
 ======
 
+This is a RELEASE CANDIDATE of NonOpt (version 1.0rc1), meaning that it may still contain significant bugs that have yet to emerge through testing.  If you encounter any significant bug(s), then please contact [Frank E. Curtis](mailto:frank.e.curtis@gmail.com).
+
 Overview
 --------
 

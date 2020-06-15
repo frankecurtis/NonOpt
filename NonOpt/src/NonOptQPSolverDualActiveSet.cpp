@@ -277,7 +277,7 @@ void QPSolverDualActiveSet::initializeData(int gamma_length)
   system_solution_best_ = new double[system_solution_length_];
   factor_ = new double[factor_length_];
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   double value = 0.0;
   int increment1 = 0;
   int increment2 = 1;
@@ -306,7 +306,7 @@ void QPSolverDualActiveSet::initializeData(int gamma_length)
 double QPSolverDualActiveSet::combinationNormInf()
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = gamma_length_;
   int increment = 1;
 
@@ -331,7 +331,7 @@ double QPSolverDualActiveSet::combinationNormInf()
 double QPSolverDualActiveSet::combinationTranslatedNormInf()
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = gamma_length_;
   int increment = 1;
 
@@ -356,7 +356,7 @@ double QPSolverDualActiveSet::combinationTranslatedNormInf()
 double QPSolverDualActiveSet::combinationTranslatedNorm2Squared()
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = gamma_length_;
   int increment = 1;
 
@@ -377,7 +377,7 @@ double QPSolverDualActiveSet::combinationTranslatedNorm2Squared()
 double QPSolverDualActiveSet::dualObjectiveQuadraticValue()
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = gamma_length_;
   int increment = 1;
 
@@ -398,7 +398,7 @@ double QPSolverDualActiveSet::dualObjectiveQuadraticValue()
 double QPSolverDualActiveSet::dualObjectiveQuadraticValueScaled()
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = gamma_length_;
   int increment = 1;
 
@@ -422,14 +422,14 @@ double QPSolverDualActiveSet::dualObjectiveQuadraticValueScaled()
 void QPSolverDualActiveSet::dualSolution(double omega[], double gamma[])
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = (int)vector_.size();
   int increment = 1;
 
   // Copy values
   dcopy_(&length, omega_.values(), &increment, omega, &increment);
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   length = gamma_length_;
 
   // Copy values
@@ -441,7 +441,7 @@ void QPSolverDualActiveSet::dualSolution(double omega[], double gamma[])
 void QPSolverDualActiveSet::dualSolutionOmega(double omega[])
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = (int)vector_.size();
   int increment = 1;
 
@@ -540,7 +540,7 @@ double QPSolverDualActiveSet::KKTErrorDual()
 void QPSolverDualActiveSet::primalSolution(double d[])
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = gamma_length_;
   int increment = 1;
 
@@ -553,7 +553,7 @@ void QPSolverDualActiveSet::primalSolution(double d[])
 void QPSolverDualActiveSet::primalSolutionFeasible(double d_feasible[])
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = gamma_length_;
   int increment = 1;
 
@@ -566,7 +566,7 @@ void QPSolverDualActiveSet::primalSolutionFeasible(double d_feasible[])
 double QPSolverDualActiveSet::primalSolutionNormInf()
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = gamma_length_;
   int increment = 1;
 
@@ -591,7 +591,7 @@ double QPSolverDualActiveSet::primalSolutionNormInf()
 double QPSolverDualActiveSet::primalSolutionNorm2Squared()
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = gamma_length_;
   int increment = 1;
 
@@ -612,7 +612,7 @@ double QPSolverDualActiveSet::primalSolutionNorm2Squared()
 double QPSolverDualActiveSet::primalSolutionFeasibleNormInf()
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = gamma_length_;
   int increment = 1;
 
@@ -1125,7 +1125,7 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
         new_diagonal_squared = matrix_->elementOfInverse(kkt_residual_minimum_index, kkt_residual_minimum_index);
       }
 
-      // Set inputs for blas
+      // Set inputs for BLASLAPACK
       int length = (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size();
       int increment1 = 1;
 
@@ -1153,7 +1153,7 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
         // Solve intermediate system for least squares
         solveSystem(inner_solution_3_, inner_solution_ls_);
 
-        // Set inputs for blas
+        // Set inputs for BLASLAPACK
         int length = (int)omega_positive_.size();
         int increment0 = 0;
         int increment1 = 1;
@@ -1240,7 +1240,7 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
         // Check if search for element to delete was successful
         if (delete_set > 0) {
 
-          // Set inputs for blas
+          // Set inputs for BLASLAPACK
           int length = (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size();
           double value = -delete_value;
           int increment = 1;
@@ -1323,7 +1323,7 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
         // Print message
         reporter->printf(R_QP, R_PER_INNER_ITERATION, "Solving subproblem\n");
 
-        // Set inputs for blas
+        // Set inputs for BLASLAPACK
         int length = (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size();
         int increment = 1;
         double value = 1.0 - multiplier_;
@@ -1432,7 +1432,7 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
             // Update value
             delete_value = fmin(1.0, delete_value);
 
-            // Set inputs for blas
+            // Set inputs for BLASLAPACK
             int length = (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size();
             double value = 1.0 - delete_value;
             int increment = 1;
@@ -1880,7 +1880,7 @@ void QPSolverDualActiveSet::choleskyFromScratch(const Reporter* reporter)
     }
   } // end for
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   char upper_lower = 'L'; // Use "lower" since Fortran uses column-major ordering
   int flag = 0;
 
@@ -1982,7 +1982,7 @@ void QPSolverDualActiveSet::evaluatePrimalMultiplier(double solution1[],
                                                      double solution2[])
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size();
   int increment = 1;
 
@@ -2001,7 +2001,7 @@ void QPSolverDualActiveSet::evaluateSystemVector(int set,
                                                  double system_vector[])
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size();
   double value = 0.0;
   int increment0 = 0;
@@ -2122,20 +2122,20 @@ void QPSolverDualActiveSet::resizeSystemSolution()
   double* system_solution_best_temp = new double[system_solution_length_];
   double* factor_temp = new double[factor_length_];
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int increment = 1;
 
   // Initialize values
-  dcopy_(&system_solution_length_, inner_solution_1_    , &increment, inner_solution_1_temp    , &increment);
-  dcopy_(&system_solution_length_, inner_solution_2_    , &increment, inner_solution_2_temp    , &increment);
-  dcopy_(&system_solution_length_, inner_solution_3_    , &increment, inner_solution_3_temp    , &increment);
-  dcopy_(&system_solution_length_, inner_solution_ls_   , &increment, inner_solution_ls_temp   , &increment);
+  dcopy_(&system_solution_length_, inner_solution_1_, &increment, inner_solution_1_temp, &increment);
+  dcopy_(&system_solution_length_, inner_solution_2_, &increment, inner_solution_2_temp, &increment);
+  dcopy_(&system_solution_length_, inner_solution_3_, &increment, inner_solution_3_temp, &increment);
+  dcopy_(&system_solution_length_, inner_solution_ls_, &increment, inner_solution_ls_temp, &increment);
   dcopy_(&system_solution_length_, inner_solution_trial_, &increment, inner_solution_trial_temp, &increment);
-  dcopy_(&system_solution_length_, new_system_vector_   , &increment, new_system_vector_temp   , &increment);
-  dcopy_(&system_solution_length_, right_hand_side_     , &increment, right_hand_side_temp     , &increment);
-  dcopy_(&system_solution_length_, system_solution_     , &increment, system_solution_temp     , &increment);
+  dcopy_(&system_solution_length_, new_system_vector_, &increment, new_system_vector_temp, &increment);
+  dcopy_(&system_solution_length_, right_hand_side_, &increment, right_hand_side_temp, &increment);
+  dcopy_(&system_solution_length_, system_solution_, &increment, system_solution_temp, &increment);
   dcopy_(&system_solution_length_, system_solution_best_, &increment, system_solution_best_temp, &increment);
-  dcopy_(&factor_length_         , factor_              , &increment, factor_temp              , &increment);
+  dcopy_(&factor_length_, factor_, &increment, factor_temp, &increment);
 
   // Delete arrays (in case they exist)
   if (inner_solution_1_ != nullptr) {
@@ -2196,16 +2196,16 @@ void QPSolverDualActiveSet::resizeSystemSolution()
   factor_ = new double[factor_length_new];
 
   // Initialize values
-  dcopy_(&system_solution_length_, inner_solution_1_temp    , &increment, inner_solution_1_    , &increment);
-  dcopy_(&system_solution_length_, inner_solution_2_temp    , &increment, inner_solution_2_    , &increment);
-  dcopy_(&system_solution_length_, inner_solution_3_temp    , &increment, inner_solution_3_    , &increment);
-  dcopy_(&system_solution_length_, inner_solution_ls_temp   , &increment, inner_solution_ls_   , &increment);
+  dcopy_(&system_solution_length_, inner_solution_1_temp, &increment, inner_solution_1_, &increment);
+  dcopy_(&system_solution_length_, inner_solution_2_temp, &increment, inner_solution_2_, &increment);
+  dcopy_(&system_solution_length_, inner_solution_3_temp, &increment, inner_solution_3_, &increment);
+  dcopy_(&system_solution_length_, inner_solution_ls_temp, &increment, inner_solution_ls_, &increment);
   dcopy_(&system_solution_length_, inner_solution_trial_temp, &increment, inner_solution_trial_, &increment);
-  dcopy_(&system_solution_length_, new_system_vector_temp   , &increment, new_system_vector_   , &increment);
-  dcopy_(&system_solution_length_, right_hand_side_temp     , &increment, right_hand_side_     , &increment);
-  dcopy_(&system_solution_length_, system_solution_temp     , &increment, system_solution_     , &increment);
+  dcopy_(&system_solution_length_, new_system_vector_temp, &increment, new_system_vector_, &increment);
+  dcopy_(&system_solution_length_, right_hand_side_temp, &increment, right_hand_side_, &increment);
+  dcopy_(&system_solution_length_, system_solution_temp, &increment, system_solution_, &increment);
   dcopy_(&system_solution_length_, system_solution_best_temp, &increment, system_solution_best_, &increment);
-  dcopy_(&factor_length_         , factor_temp              , &increment, factor_              , &increment);
+  dcopy_(&factor_length_, factor_temp, &increment, factor_, &increment);
 
   // Delete arrays (in case they exist)
   if (inner_solution_1_temp != nullptr) {
@@ -2213,39 +2213,39 @@ void QPSolverDualActiveSet::resizeSystemSolution()
     inner_solution_1_temp = nullptr;
   } // end if
   if (inner_solution_2_temp != nullptr) {
-    delete [] inner_solution_2_temp;
+    delete[] inner_solution_2_temp;
     inner_solution_2_temp = nullptr;
   } // end if
   if (inner_solution_3_temp != nullptr) {
-    delete [] inner_solution_3_temp;
+    delete[] inner_solution_3_temp;
     inner_solution_3_temp = nullptr;
   } // end if
   if (inner_solution_ls_temp != nullptr) {
-    delete [] inner_solution_ls_temp;
+    delete[] inner_solution_ls_temp;
     inner_solution_ls_temp = nullptr;
   } // end if
   if (inner_solution_trial_temp != nullptr) {
-    delete [] inner_solution_trial_temp;
+    delete[] inner_solution_trial_temp;
     inner_solution_trial_temp = nullptr;
   } // end if
   if (new_system_vector_temp != nullptr) {
-    delete [] new_system_vector_temp;
+    delete[] new_system_vector_temp;
     new_system_vector_temp = nullptr;
   } // end if
   if (right_hand_side_temp != nullptr) {
-    delete [] right_hand_side_temp;
+    delete[] right_hand_side_temp;
     right_hand_side_temp = nullptr;
   } // end if
   if (system_solution_temp != nullptr) {
-    delete [] system_solution_temp;
+    delete[] system_solution_temp;
     system_solution_temp = nullptr;
   } // end if
   if (system_solution_best_temp != nullptr) {
-    delete [] system_solution_best_temp;
+    delete[] system_solution_best_temp;
     system_solution_best_temp = nullptr;
   } // end if
   if (factor_temp != nullptr) {
-    delete [] factor_temp;
+    delete[] factor_temp;
     factor_temp = nullptr;
   } // end if
 
@@ -2403,7 +2403,7 @@ void QPSolverDualActiveSet::solveSystem(double right_hand_side[],
     resizeSystemSolution();
   }
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size();
   char upper_lower = 'L'; // Use "lower" since Fortran uses column-major ordering
   char transpose = 'T';   // Use "transpose" since Fortran uses column-major ordering
@@ -2429,7 +2429,7 @@ void QPSolverDualActiveSet::solveSystemTranspose(double right_hand_side[],
     resizeSystemSolution();
   }
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size();
   char upper_lower = 'L'; // Use "lower" since Fortran uses column-major ordering
   char transpose = 'N';   // Use "not transpose" since Fortran uses column-major ordering

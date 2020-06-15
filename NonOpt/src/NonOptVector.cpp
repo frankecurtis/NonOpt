@@ -21,7 +21,7 @@ Vector::Vector(int length)
   // Allocate array
   values_ = new double[length];
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   double value = 0.0;
   int increment1 = 0;
   int increment2 = 1;
@@ -40,7 +40,7 @@ Vector::Vector(int length,
   // Allocate array
   values_ = new double[length];
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int increment1 = 0;
   int increment2 = 1;
 
@@ -121,7 +121,7 @@ void Vector::setLength(int length)
   // Allocate array
   values_ = new double[length];
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   double value = 0.0;
   int increment1 = 0;
   int increment2 = 1;
@@ -152,7 +152,7 @@ void Vector::copy(const Vector& other_vector)
   // Assert
   ASSERT_EXCEPTION(length_ == other_vector.length(), NONOPT_VECTOR_ASSERT_EXCEPTION, "Vector assert failed.  Vector length is incorrect.");
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = length_;
   int increment = 1;
 
@@ -165,7 +165,7 @@ void Vector::copy(const Vector& other_vector)
 void Vector::copyArray(double* array)
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = length_;
   int increment = 1;
 
@@ -178,7 +178,7 @@ void Vector::copyArray(double* array)
 void Vector::scale(double scalar)
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = length_;
   int increment = 1;
 
@@ -201,7 +201,7 @@ void Vector::addScaledVector(double scalar,
   // Assert
   ASSERT_EXCEPTION(length_ == other_vector.length(), NONOPT_VECTOR_ASSERT_EXCEPTION, "Vector assert failed.  Vector length is incorrect.");
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = length_;
   int increment = 1;
 
@@ -221,7 +221,7 @@ void Vector::linearCombination(double scalar1,
   ASSERT_EXCEPTION(length_ == vector1.length(), NONOPT_VECTOR_ASSERT_EXCEPTION, "Vector assert failed.  Vector length is incorrect.");
   ASSERT_EXCEPTION(length_ == vector2.length(), NONOPT_VECTOR_ASSERT_EXCEPTION, "Vector assert failed.  Vector length is incorrect.");
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = length_;
   int increment = 1;
 
@@ -273,7 +273,7 @@ double Vector::innerProduct(const Vector& other_vector) const
   // Assert
   ASSERT_EXCEPTION(length_ == other_vector.length(), NONOPT_VECTOR_ASSERT_EXCEPTION, "Vector assert failed.  Vector length is incorrect.");
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = length_;
   int increment = 1;
 
@@ -320,7 +320,7 @@ double Vector::min() const
 double Vector::norm1() const
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = length_;
   int increment = 1;
 
@@ -333,7 +333,7 @@ double Vector::norm1() const
 double Vector::norm2() const
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = length_;
   int increment = 1;
 
@@ -346,7 +346,7 @@ double Vector::norm2() const
 double Vector::normInf() const
 {
 
-  // Set inputs for blas
+  // Set inputs for BLASLAPACK
   int length = length_;
   int increment = 1;
 

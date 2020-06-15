@@ -26,10 +26,12 @@ public:
     */
   SymmetricMatrixLimitedMemory()
     : compact_form_factorized_(false),
+      compact_form_factorized_of_inverse_(false),
       size_(-1),
       history_(-1),
       initial_diagonal_value_(1.0),
-      compact_form_factorization_(nullptr)
+      compact_form_factorization_(nullptr),
+      compact_form_factorization_of_inverse_(nullptr)
   {
     s_.clear();
     y_.clear();
@@ -160,12 +162,12 @@ public:
   void setAsDiagonal(int size,
                      double value);
   /**
-    * BFGS update
+    * Update approximation
     * \param[in] s is reference to Vector representing iteration displacement
     * \param[in] y is reference to Vector representing gradient displacement
     */
-  void updateBFGS(const Vector& s,
-                  const Vector& y);
+  void update(const Vector& s,
+              const Vector& y);
   //@}
 
   /** @name Print methods */
@@ -197,10 +199,12 @@ private:
   /** @name Private members */
   //@{
   bool compact_form_factorized_;                                     /**< Bool indicating if factorization has been performed */
+  bool compact_form_factorized_of_inverse_;                          /**< Bool indicating if factorization has been performed */
   int size_;                                                         /**< Number of rows and number of columns */
   int history_;                                                      /**< Limited memory history length */
   double initial_diagonal_value_;                                    /**< Diagonal value of "initial" matrix */
   double* compact_form_factorization_;                               /**< Double array, values of compact form factorization */
+  double* compact_form_factorization_of_inverse_;                    /**< Double array, values of compact form factorization */
   std::vector<std::shared_ptr<Vector>> s_;                           /**< Vector vector, "s" values */
   std::vector<std::shared_ptr<Vector>> y_;                           /**< Vector vector, "y" values */
   std::vector<double> rho_;                                          /**< Double vector, "rho" values */
@@ -208,6 +212,18 @@ private:
   std::vector<std::shared_ptr<Vector>> computed_columns_of_inverse_; /**< Vector vector, computed columns of inverse */
   std::vector<int> computed_column_indices_;                         /**< Integer vector, computed column indices */
   std::vector<int> computed_column_indices_of_inverse_;              /**< Integer vector, computed column indices of inverse */
+  //@}
+
+  /** @name Private methods */
+  //@{
+  void matrixVectorProductBFGS(const Vector& vector,
+                               Vector& product);
+  void matrixVectorProductDFP(const Vector& vector,
+                              Vector& product);
+  void matrixVectorProductOfInverseBFGS(const Vector& vector,
+                                        Vector& product);
+  void matrixVectorProductOfInverseDFP(const Vector& vector,
+                                       Vector& product);
   //@}
 
 }; // end SymmetricMatrixLimitedMemory

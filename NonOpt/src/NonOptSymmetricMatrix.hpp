@@ -174,12 +174,12 @@ public:
    */
   inline void setStatus(SM_Status status) { status_ = status; };
   /**
-    * BFGS update
+    * Update approximation
     * \param[in] s is reference to Vector representing iteration displacement
     * \param[in] y is reference to Vector representing gradient displacement
     */
-  virtual void updateBFGS(const Vector& s,
-                          const Vector& y) = 0;
+  virtual void update(const Vector& s,
+                      const Vector& y) = 0;
   //@}
 
   /** @name Print methods */
@@ -191,6 +191,13 @@ public:
     */
   virtual void print(const Reporter* reporter,
                      std::string name) const = 0;
+  //@}
+
+protected:
+  /** @name Protected members */
+  //@{
+  bool initial_scaling_; /**< Indicator of initial scaling */
+  std::string type_;     /**< Type of update */
   //@}
 
 private:

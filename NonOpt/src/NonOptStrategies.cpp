@@ -5,10 +5,11 @@
 // Author(s) : Frank E. Curtis
 
 #include "NonOptStrategies.hpp"
+#include "NonOptApproximateHessianUpdateBFGS.hpp"
+#include "NonOptApproximateHessianUpdateDFP.hpp"
 #include "NonOptDirectionComputationCuttingPlane.hpp"
 #include "NonOptDirectionComputationGradient.hpp"
 #include "NonOptDirectionComputationGradientCombination.hpp"
-#include "NonOptInverseHessianUpdateBFGS.hpp"
 #include "NonOptLineSearchBacktracking.hpp"
 #include "NonOptLineSearchWeakWolfe.hpp"
 #include "NonOptPointSetUpdateProximity.hpp"
@@ -31,9 +32,9 @@ void Strategies::addOptions(Options* options,
                            "Direction computation strategy to use.\n"
                            "Default     : CuttingPlane.");
   options->addStringOption(reporter,
-                           "inverse_hessian_update",
+                           "approximate_hessian_update",
                            "BFGS",
-                           "Inverse Hessian update strategy to use.\n"
+                           "Approximate Hessian update strategy to use.\n"
                            "Default     : BFGS.");
   options->addStringOption(reporter,
                            "line_search",
@@ -66,11 +67,13 @@ void Strategies::addOptions(Options* options,
   direction_computation->addOptions(options, reporter);
   // ADD NEW DIRECTION COMPUTATION STRATEGIES HERE AND IN SWITCH BELOW //
 
-  // Add options for inverse Hessian update strategies
-  std::shared_ptr<InverseHessianUpdate> inverse_hessian_update;
-  inverse_hessian_update = std::make_shared<InverseHessianUpdateBFGS>();
-  inverse_hessian_update->addOptions(options, reporter);
-  // ADD NEW INVERSE HESSIAN UPDATE STRATEGIES HERE AND IN SWITCH BELOW //
+  // Add options for approximate Hessian update strategies
+  std::shared_ptr<ApproximateHessianUpdate> approximate_hessian_update;
+  approximate_hessian_update = std::make_shared<ApproximateHessianUpdateBFGS>();
+  approximate_hessian_update->addOptions(options, reporter);
+  approximate_hessian_update = std::make_shared<ApproximateHessianUpdateDFP>();
+  approximate_hessian_update->addOptions(options, reporter);
+  // ADD NEW APPROXIMATE HESSIAN UPDATE STRATEGIES HERE AND IN SWITCH BELOW //
 
   // Add options for line search strategies
   std::shared_ptr<LineSearch> line_search;
@@ -109,7 +112,7 @@ void Strategies::setOptions(const Options* options,
 
   // Declare strategy names
   std::string direction_computation_name;
-  std::string inverse_hessian_update_name;
+  std::string approximate_hessian_update_name;
   std::string line_search_name;
   std::string point_set_update_name;
   std::string qp_solver_name;
@@ -117,7 +120,7 @@ void Strategies::setOptions(const Options* options,
 
   // Read integer options
   options->valueAsString(reporter, "direction_computation", direction_computation_name);
-  options->valueAsString(reporter, "inverse_hessian_update", inverse_hessian_update_name);
+  options->valueAsString(reporter, "approximate_hessian_update", approximate_hessian_update_name);
   options->valueAsString(reporter, "line_search", line_search_name);
   options->valueAsString(reporter, "point_set_update", point_set_update_name);
   options->valueAsString(reporter, "qp_solver", qp_solver_name);
@@ -137,12 +140,15 @@ void Strategies::setOptions(const Options* options,
     direction_computation_ = std::make_shared<DirectionComputationCuttingPlane>();
   }
 
-  // Set inverse Hessian update strategy
-  if (inverse_hessian_update_name.compare("BFGS") == 0) {
-    inverse_hessian_update_ = std::make_shared<InverseHessianUpdateBFGS>();
+  // Set approximate Hessian update strategy
+  if (approximate_hessian_update_name.compare("BFGS") == 0) {
+    approximate_hessian_update_ = std::make_shared<ApproximateHessianUpdateBFGS>();
+  }
+  else if (approximate_hessian_update_name.compare("DFP") == 0) {
+    approximate_hessian_update_ = std::make_shared<ApproximateHessianUpdateDFP>();
   }
   else {
-    inverse_hessian_update_ = std::make_shared<InverseHessianUpdateBFGS>();
+    approximate_hessian_update_ = std::make_shared<ApproximateHessianUpdateBFGS>();
   }
 
   // Set line search strategy
@@ -186,8 +192,8 @@ void Strategies::setOptions(const Options* options,
   // Set direction computation options
   direction_computation_->setOptions(options, reporter);
 
-  // Set inverse Hessian update options
-  inverse_hessian_update_->setOptions(options, reporter);
+  // Set approximate Hessian update options
+  approximate_hessian_update_->setOptions(options, reporter);
 
   // Set line search options
   line_search_->setOptions(options, reporter);
@@ -212,8 +218,8 @@ void Strategies::initialize(const Options* options,
   // Initialize direction computation
   direction_computation_->initialize(options, quantities, reporter);
 
-  // Initialize inverse Hessian update
-  inverse_hessian_update_->initialize(options, quantities, reporter);
+  // Initialize approximate Hessian update
+  approximate_hessian_update_->initialize(options, quantities, reporter);
 
   // Initialize line search
   line_search_->initialize(options, quantities, reporter);
@@ -227,7 +233,7 @@ void Strategies::initialize(const Options* options,
   // Initialize symmetric matrix
   symmetric_matrix_->initialize(options, quantities, reporter);
 
-  // Set QP matrix as pointer to inverse Hessian
+  // Set QP matrix as pointer to approximate Hessian
   qp_solver_->setMatrix(symmetric_matrix_);
 
 } // end initialize
@@ -246,9 +252,9 @@ void Strategies::setIterationHeader()
     iteration_header_ += " ";
     iteration_header_ += line_search_->iterationHeader();
   } // end if
-  if (inverse_hessian_update_->iterationHeader().length() > 0) {
+  if (approximate_hessian_update_->iterationHeader().length() > 0) {
     iteration_header_ += " ";
-    iteration_header_ += inverse_hessian_update_->iterationHeader();
+    iteration_header_ += approximate_hessian_update_->iterationHeader();
   } // end if
   if (point_set_update_->iterationHeader().length() > 0) {
     iteration_header_ += " ";
@@ -262,14 +268,14 @@ void Strategies::printHeader(const Reporter* reporter)
 {
 
   // Print header
-  reporter->printf(R_NL, R_BASIC, "Direction computation strategy... : %s\n"
-                                  "Inverse Hessian update strategy.. : %s\n"
-                                  "Line search strategy............. : %s\n"
-                                  "Point set update strategy........ : %s\n"
-                                  "QP solver strategy............... : %s\n"
-                                  "Symmetric matrix strategy........ : %s\n",
+  reporter->printf(R_NL, R_BASIC, "Direction computation strategy..... : %s\n"
+                                  "Approximate Hessian update strategy : %s\n"
+                                  "Line search strategy............... : %s\n"
+                                  "Point set update strategy.......... : %s\n"
+                                  "QP solver strategy................. : %s\n"
+                                  "Symmetric matrix strategy.......... : %s\n",
                    direction_computation_->name().c_str(),
-                   inverse_hessian_update_->name().c_str(),
+                   approximate_hessian_update_->name().c_str(),
                    line_search_->name().c_str(),
                    point_set_update_->name().c_str(),
                    qp_solver_->name().c_str(),

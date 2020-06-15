@@ -62,6 +62,12 @@ Description : Limit on the number of iterations that will be performed.
               Note that each iteration might involve inner iterations.
 Default     : 1e+04.
 
+Name        : approximate_hessian_initial_scaling
+Type        : bool
+Value       : false
+Description : Indicator of whether to scale initial matrix for approximate Hessian.
+Default     : false.
+
 Name        : cpu_time_limit
 Type        : double
 Value       : +1.000000e+04
@@ -191,10 +197,10 @@ Value       : CuttingPlane
 Description : Direction computation strategy to use.
 Default     : CuttingPlane.
 
-Name        : inverse_hessian_update
+Name        : approximate_hessian_update
 Type        : string
 Value       : BFGS
-Description : Inverse Hessian update strategy to use.
+Description : Approximate Hessian update strategy to use.
 Default     : BFGS.
 
 Name        : line_search
@@ -447,6 +453,54 @@ Description : Tolerance for allowing a BFGS update to occur.  If the inner
               displacements, then a BFGS update occurs; else, it is skipped.
 Default     : 1e-20.
 
+Name        : DFP_fail_on_tolerance_violation
+Type        : bool
+Value       : false
+Description : Indicator for whether to indicate failure on violated tolerance.
+Default     : false.
+
+Name        : DFP_correction_threshold_1
+Type        : double
+Value       : +1.000000e-20
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+00
+Description : DFP correction threshold.  If DFP update is corrected, then
+              gradient displacement v is set so that inner product with step,
+              call it s, is such that <s,v>/<s,s> is at least this threshold.
+Default     : 1e-20.
+
+Name        : DFP_correction_threshold_2
+Type        : double
+Value       : +1.000000e+02
+Lower bound : +1.000000e+00
+Upper bound : +1.000000e+50
+Description : DFP correction threshold.  If DFP update is corrected, then
+              gradient displacement v is set so that inner product with step,
+              call it s, is such that <v,v>/<s,v> is at most this threshold.
+Default     : 1e+02.
+
+Name        : DFP_norm_tolerance
+Type        : double
+Value       : +1.000000e-20
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Tolerance for allowing a DFP update to occur.  If the norm
+              of the iterate displacement or the gradient displacement is
+              greater than this tolerance, then the DFP update may occur;
+              else, it is skipped.
+Default     : 1e-20.
+
+Name        : DFP_product_tolerance
+Type        : double
+Value       : +1.000000e-20
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Tolerance for allowing a DFP update to occur.  If the inner
+              product between the iterate and gradient displacements is at
+              least this tolerance times the product of the 2-norms of the
+              displacements, then a DFP update occurs; else, it is skipped.
+Default     : 1e-20.
+
 Name        : LSB_fail_on_small_stepsize
 Type        : bool
 Value       : false
@@ -621,19 +675,19 @@ Description : Size factor for removing points from point set.  If size of
               then the oldest members are removed.
 Default     : 2e+00.
 
-Name        : QPAS_fail_on_factorization_error
+Name        : QPDAS_fail_on_factorization_error
 Type        : bool
 Value       : false
 Description : Indicator for whether to indicate failure on factorization error.
 Default     : false.
 
-Name        : QPAS_allow_inexact_termination
+Name        : QPDAS_allow_inexact_termination
 Type        : bool
 Value       : false
 Description : Indicator for whether to allow early termination.
 Default     : false.
 
-Name        : QPAS_kkt_tolerance
+Name        : QPDAS_kkt_tolerance
 Type        : double
 Value       : +1.000000e-08
 Lower bound : +0.000000e+00
@@ -643,7 +697,7 @@ Description : Tolerance for determining optimality.  If the KKT error
               the algorithm terminates with a message of success.
 Default     : 1e-08.
 
-Name        : QPAS_cholesky_tolerance
+Name        : QPDAS_cholesky_tolerance
 Type        : double
 Value       : +1.000000e-12
 Lower bound : +0.000000e+00
@@ -655,7 +709,7 @@ Description : Tolerance for small (or negative values) when updating the
               diagonal value may be replaced by this tolerance value.
 Default     : 1e-12.
 
-Name        : QPAS_inexact_termination_descent_tolerance
+Name        : QPDAS_inexact_termination_descent_tolerance
 Type        : double
 Value       : +1.000000e-04
 Lower bound : +0.000000e+00
@@ -663,7 +717,7 @@ Upper bound : +1.000000e+00
 Description : Descent direction tolerance for inexactness conditions.
 Default     : 1e-04.
 
-Name        : QPAS_inexact_termination_initialization_factor
+Name        : QPDAS_inexact_termination_initialization_factor
 Type        : double
 Value       : +2.500000e-01
 Lower bound : +0.000000e+00
@@ -672,7 +726,7 @@ Description : Determines number of iterations (fraction of gradient list size)
               to perform before inexact termination conditions are checked.
 Default     : 2.5e-01.
 
-Name        : QPAS_inexact_termination_ratio_minimum
+Name        : QPDAS_inexact_termination_ratio_minimum
 Type        : double
 Value       : +1.000000e-02
 Lower bound : +0.000000e+00
@@ -680,7 +734,7 @@ Upper bound : +1.000000e+00
 Description : Minimum value for ratio used in inexact termination condition.
 Default     : 1e-02.
 
-Name        : QPAS_linear_independence_tolerance
+Name        : QPDAS_linear_independence_tolerance
 Type        : double
 Value       : +1.000000e-12
 Lower bound : +0.000000e+00
@@ -691,7 +745,7 @@ Description : Tolerance for a linear independence check when adding a new
               linear independence of the augmented matrix.
 Default     : 1e-12.
 
-Name        : QPAS_inexact_termination_check_interval
+Name        : QPDAS_inexact_termination_check_interval
 Type        : integer
 Value       : 4
 Lower bound : 1
@@ -700,7 +754,7 @@ Description : Number of iterations to perform between checks of inexact
               termination conditions.
 Default     : 4.
 
-Name        : QPAS_iteration_limit_minimum
+Name        : QPDAS_iteration_limit_minimum
 Type        : integer
 Value       : 1
 Lower bound : 0
@@ -708,7 +762,7 @@ Upper bound : 2147483647
 Description : Minimum limit on the number of iterations.
 Default     : 1e+00.
 
-Name        : QPAS_iteration_limit_maximum
+Name        : QPDAS_iteration_limit_maximum
 Type        : integer
 Value       : 1000000
 Lower bound : 0

@@ -97,6 +97,11 @@ public:
   /** @name Get methods */
   //@{
   /**
+   * Approximate Hessian inverse scaling indicator
+   * \return indicator of whether to use initial scaling
+   */
+  inline bool const approximateHessianInitialScaling() const { return approximate_hessian_initial_scaling_; };
+  /**
    * Start time
    * \return start time that was set
    */
@@ -377,6 +382,7 @@ private:
 
   /** @name Private members (options) */
   //@{
+  bool approximate_hessian_initial_scaling_;
   double inexact_termination_factor_initial_;
   double inexact_termination_update_factor_;
   double inexact_termination_update_stepsize_threshold_;
