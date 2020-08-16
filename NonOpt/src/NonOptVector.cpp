@@ -15,7 +15,17 @@ namespace NonOpt
 
 // Constructor with given length; values initialized to zero
 Vector::Vector(int length)
-  : length_(length)
+  : length_(length),
+    max_computed_(true),
+    min_computed_(true),
+    norm1_computed_(true),
+    norm2_computed_(true),
+    normInf_computed_(true),
+    max_value_(0.0),
+    min_value_(0.0),
+    norm1_value_(0.0),
+    norm2_value_(0.0),
+    normInf_value_(0.0)
 {
 
   // Allocate array
@@ -34,7 +44,14 @@ Vector::Vector(int length)
 // Constructor with given length; values initialized to given value
 Vector::Vector(int length,
                double value)
-  : length_(length)
+  : length_(length),
+    max_computed_(true),
+    min_computed_(true),
+    norm1_computed_(true),
+    norm2_computed_(true),
+    normInf_computed_(true),
+    max_value_(value),
+    min_value_(value)
 {
 
   // Allocate array
@@ -46,6 +63,11 @@ Vector::Vector(int length,
 
   // Initialize values
   dcopy_(&length, &value, &increment1, values_, &increment2);
+
+  // Compute norms
+  norm1_value_ = (double)length * fabs(value);
+  norm2_value_ = sqrt((double)length * pow(value,2.0));
+  normInf_value_ = fabs(value);
 
 } // end constructor
 
@@ -129,6 +151,18 @@ void Vector::setLength(int length)
   // Initialize values
   dcopy_(&length, &value, &increment1, values_, &increment2);
 
+  // Compute scalar values
+  max_computed_ = true;
+  min_computed_ = true;
+  norm1_computed_ = true;
+  norm2_computed_ = true;
+  normInf_computed_ = true;
+  max_value_ = 0.0;
+  min_value_ = 0.0;
+  norm1_value_ = 0.0;
+  norm2_value_ = 0.0;
+  normInf_value_ = 0.0;
+
 } // end setLength
 
 // Set element with given index to given value
@@ -142,6 +176,13 @@ void Vector::set(int index,
 
   // Set value
   values_[index] = value;
+
+  // Reset scalar value bools
+  max_computed_ = false;
+  min_computed_ = false;
+  norm1_computed_ = false;
+  norm2_computed_ = false;
+  normInf_computed_ = false;
 
 } // end set
 
@@ -159,6 +200,13 @@ void Vector::copy(const Vector& other_vector)
   // Copy elements
   dcopy_(&length, other_vector.values(), &increment, values_, &increment);
 
+  // Reset scalar value bools
+  max_computed_ = false;
+  min_computed_ = false;
+  norm1_computed_ = false;
+  norm2_computed_ = false;
+  normInf_computed_ = false;
+
 } // end copy
 
 // Copy elements of double array
@@ -171,6 +219,13 @@ void Vector::copyArray(double* array)
 
   // Copy elements
   dcopy_(&length, array, &increment, values_, &increment);
+
+  // Reset scalar value bools
+  max_computed_ = false;
+  min_computed_ = false;
+  norm1_computed_ = false;
+  norm2_computed_ = false;
+  normInf_computed_ = false;
 
 } // end copyArray
 
@@ -191,6 +246,43 @@ void Vector::scale(double scalar)
     dcopy_(&length, &scalar, &incrementzero, values_, &increment);
   } // end else
 
+  // Compute scalar values
+  if (max_computed_) {
+    if (scalar >= 0.0) {
+      max_value_ = scalar*max_value_;
+    }
+    else {
+      if (min_computed_) {
+        max_value_ = scalar*min_value_;
+      }
+      else {
+        max_computed_ = false;
+      }
+    }
+  } // end if
+  if (min_computed_) {
+    if (scalar >= 0.0) {
+      min_value_ = scalar*min_value_;
+    }
+    else {
+      if (max_computed_) {
+        min_value_ = scalar*max_value_;
+      }
+      else {
+        min_computed_ = false;
+      }
+    }
+  } // end if
+  if (norm1_computed_) {
+    norm1_value_ = fabs(scalar)*norm1_value_;
+  }
+  if (norm2_computed_) {
+    norm2_value_ = fabs(scalar)*norm2_value_;
+  }
+  if (normInf_computed_) {
+    normInf_value_ = fabs(scalar)*normInf_value_;
+  }
+
 } // end scale
 
 // Add to this Vector "scalar" times other_vector
@@ -207,6 +299,13 @@ void Vector::addScaledVector(double scalar,
 
   // Add a*vector
   daxpy_(&length, &scalar, other_vector.values(), &increment, values_, &increment);
+
+  // Reset scalar value bools
+  max_computed_ = false;
+  min_computed_ = false;
+  norm1_computed_ = false;
+  norm2_computed_ = false;
+  normInf_computed_ = false;
 
 } // end addScaledVector
 
@@ -264,6 +363,15 @@ void Vector::linearCombination(double scalar1,
 
   } // end else
 
+  // Reset scalar value bools
+  if (scalar1 != 1.0 || scalar2 != 0.0) {
+    max_computed_ = false;
+    min_computed_ = false;
+    norm1_computed_ = false;
+    norm2_computed_ = false;
+    normInf_computed_ = false;
+  }
+
 } // end linearCombination
 
 // Inner product with other_vector
@@ -283,79 +391,128 @@ double Vector::innerProduct(const Vector& other_vector) const
 } // end innerProduct
 
 // Maximum element
-double Vector::max() const
+double Vector::max()
 {
 
-  // Initialize maximum
-  double maximum = values_[0];
+  // Check if computed
+  if (!max_computed_) {
 
-  // Determine maximum
-  for (int i = 1; i < length_; i++) {
-    maximum = fmax(maximum, values_[i]);
-  }
+    // Initialize maximum
+    max_value_ = values_[0];
+
+    // Determine maximum
+    for (int i = 1; i < length_; i++) {
+      max_value_ = fmax(max_value_, values_[i]);
+    }
+
+    // Set to computed
+    max_computed_ = true;
+
+  } // end if
 
   // Return maximum
-  return maximum;
+  return max_value_;
 
 } // end max
 
 // Minimum element
-double Vector::min() const
+double Vector::min()
 {
 
-  // Initialize minimum
-  double minimum = values_[0];
+  // Check if computed
+  if (!min_computed_) {
 
-  // Determine minimum
-  for (int i = 1; i < length_; i++) {
-    minimum = fmin(minimum, values_[i]);
-  }
+    // Initialize minimum
+    min_value_ = values_[0];
+
+    // Determine minimum
+    for (int i = 1; i < length_; i++) {
+      min_value_ = fmin(min_value_, values_[i]);
+    }
+
+    // Set to computed
+    min_computed_ = true;
+
+  } // end if
 
   // Return minimum
-  return minimum;
+  return min_value_;
 
 } // end max
 
 // 1-norm
-double Vector::norm1() const
+double Vector::norm1()
 {
 
-  // Set inputs for BLASLAPACK
-  int length = length_;
-  int increment = 1;
+  // Check if computed
+  if (!norm1_computed_) {
 
-  // Evaluate 1-norm
-  return dasum_(&length, values_, &increment);
+    // Set inputs for BLASLAPACK
+    int length = length_;
+    int increment = 1;
+
+    // Evaluate 1-norm
+    norm1_value_ = dasum_(&length, values_, &increment);
+
+    // Set to computed
+    norm1_computed_ = true;
+
+  } // end if
+
+  // Return 1-norm
+  return norm1_value_;
 
 } // end norm1
 
 // 2-norm
-double Vector::norm2() const
+double Vector::norm2()
 {
 
-  // Set inputs for BLASLAPACK
-  int length = length_;
-  int increment = 1;
+  // Check if computed
+  if (!norm2_computed_) {
 
-  // Evaluate 2-norm
-  return dnrm2_(&length, values_, &increment);
+    // Set inputs for BLASLAPACK
+    int length = length_;
+    int increment = 1;
+
+    // Evaluate 2-norm
+    norm2_value_ = dnrm2_(&length, values_, &increment);
+
+    // Set to computed
+    norm2_computed_ = true;
+
+  } // end if
+
+  // Return 2-norm
+  return norm2_value_;
 
 } // end norm2
 
 // inf-norm
-double Vector::normInf() const
+double Vector::normInf()
 {
 
-  // Set inputs for BLASLAPACK
-  int length = length_;
-  int increment = 1;
+  // Check if computed
+  if (!normInf_computed_) {
 
-  // Find index of element with maximum absolute value
-  // (returns index from 1,...,length_)
-  int i = idamax_(&length, values_, &increment);
+    // Set inputs for BLASLAPACK
+    int length = length_;
+    int increment = 1;
 
-  // Evaluate inf-norm
-  return fabs(values_[i - 1]);
+    // Find index of element with maximum absolute value
+    // (returns index from 1,...,length_)
+    int i = idamax_(&length, values_, &increment);
+
+    // Evaluate inf-norm
+    normInf_value_ = fabs(values_[i - 1]);
+
+    // Set to computed
+    normInf_computed_ = true;
+
+  } // end if
+
+  // Return inf-norm
+  return normInf_value_;
 
 } // end normInf
 

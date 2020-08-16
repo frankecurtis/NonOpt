@@ -34,7 +34,12 @@ public:
    */
   Vector()
     : values_(nullptr),
-      length_(-1){};
+      length_(-1),
+      max_computed_(false),
+      min_computed_(false),
+      norm1_computed_(false),
+      norm2_computed_(false),
+      normInf_computed_(false){};
   /**
    * Constructor with given length; values initialized to zero
    * \param[in] length is length of Vector to construct
@@ -103,7 +108,14 @@ public:
    * Get values (modifiable)
    * \return is pointer to array of Vector values (to allow modification of array)
    */
-  inline double* valuesModifiable() { return values_; };
+  inline double* valuesModifiable() {
+    max_computed_ = false;
+    min_computed_ = false;
+    norm1_computed_ = false;
+    norm2_computed_ = false;
+    normInf_computed_ = false;
+    return values_;
+  };
   //@}
 
   /** @name Modify methods */
@@ -165,23 +177,23 @@ public:
   /**
    * maximum value
    */
-  double min() const;
+  double max();
   /**
    * minimum value
    */
-  double max() const;
+  double min();
   /**
    * 1-norm
    */
-  double norm1() const;
+  double norm1();
   /**
    * 2-norm
    */
-  double norm2() const;
+  double norm2();
   /**
    * inf-norm
    */
-  double normInf() const;
+  double normInf();
   //@}
 
 private:
@@ -203,6 +215,20 @@ private:
   //@{
   double* values_; /**< Double array */
   int length_;     /**< Length of array */
+  //@}
+
+  /** @name Private computed members */
+  //@{
+  bool max_computed_;
+  bool min_computed_;
+  bool norm1_computed_;
+  bool norm2_computed_;
+  bool normInf_computed_;
+  double max_value_;
+  double min_value_;
+  double norm1_value_;
+  double norm2_value_;
+  double normInf_value_;
   //@}
 
 }; // end Vector
