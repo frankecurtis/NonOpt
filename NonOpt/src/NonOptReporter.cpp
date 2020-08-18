@@ -12,6 +12,10 @@
 namespace NonOpt
 {
 
+//////////////
+// Reporter //
+//////////////
+
 // Constructor
 Reporter::Reporter() {}
 
@@ -111,23 +115,6 @@ std::shared_ptr<Report> Reporter::report(std::string name)
 
 } // end report
 
-// Check accepted
-bool Reporter::isAccepted(ReportType type,
-                          ReportLevel level) const
-{
-
-  // Look for acceptance
-  for (int i = 0; i < (int)reports_.size(); i++) {
-    if (reports_[i]->isAccepted(type, level)) {
-      return true;
-    }
-  } // end for
-
-  // Return
-  return false;
-
-} // end isAccepted
-
 // Flush buffer
 void Reporter::flushBuffer() const
 {
@@ -154,40 +141,9 @@ void Reporter::deleteReports()
 
 } // end deleteReports
 
-//////////////////
-// Report class //
-//////////////////
-
-// Constructor
-Report::Report(std::string name,
-               ReportType type,
-               ReportLevel level)
-  : name_(name),
-    type_(type),
-    level_(level) {}
-
-// Destructor
-Report::~Report() {}
-
-// Get name
-std::string Report::name()
-{
-
-  // Return
-  return name_;
-
-} // end name
-
-// Set type and level
-void Report::setTypeAndLevel(ReportType type,
-                             ReportLevel level)
-{
-
-  // Set type and level
-  type_ = type;
-  level_ = level;
-
-} // end setTypeAndLevel
+////////////
+// Report //
+////////////
 
 // Check accepted
 bool Report::isAccepted(ReportType type,
@@ -211,16 +167,9 @@ bool Report::isAccepted(ReportType type,
 
 } // end isAccepted
 
-//////////////////////
-// FileReport class //
-//////////////////////
-
-// Constructor
-FileReport::FileReport(std::string name,
-                       ReportType type,
-                       ReportLevel level)
-  : Report(name, type, level),
-    file_(nullptr) {}
+////////////////
+// FileReport //
+////////////////
 
 // Destructor
 FileReport::~FileReport()
@@ -271,8 +220,33 @@ bool FileReport::open(const char* name)
 
 } // end open
 
+// Print list
+void FileReport::printList(ReportType type,
+                           ReportLevel level,
+                           const char* format,
+                           va_list lst)
+{
+
+  // Print string list
+  if (file_) {
+    vfprintf(file_, format, lst);
+  }
+
+} // end printList
+
+// Flush buffer
+void FileReport::flushBuffer()
+{
+
+  // Flush buffer
+  if (file_) {
+    fflush(file_);
+  }
+
+} // end flushBuffer
+
 // Close
-void FileReport::closeImplementation()
+void FileReport::close()
 {
 
   // Close file
@@ -283,58 +257,17 @@ void FileReport::closeImplementation()
   // Set pointer to null
   file_ = nullptr;
 
-} // end closeImplementation
+} // end close
 
-// Print list implementation
-void FileReport::printListImplementation(ReportType type,
-                                         ReportLevel level,
-                                         const char* format,
-                                         va_list lst)
-{
+//////////////////
+// StreamReport //
+//////////////////
 
-  // Print string list
-  if (file_) {
-    vfprintf(file_, format, lst);
-  }
-
-} // end printListImplementation
-
-// Flush buffer
-void FileReport::flushBufferImplementation()
-{
-
-  // Flush buffer
-  if (file_) {
-    fflush(file_);
-  }
-
-} // end flushBufferImplementation
-
-////////////////////////
-// StreamReport class //
-////////////////////////
-
-// Constructor
-StreamReport::StreamReport(std::string name,
-                           ReportType type,
-                           ReportLevel level)
-  : Report(name, type, level),
-    os_(nullptr) {}
-
-// Set stream
-void StreamReport::setStream(std::ostream* os)
-{
-
-  // Set stream
-  os_ = os;
-
-} // end setStream
-
-// Print list implementation
-void StreamReport::printListImplementation(ReportType type,
-                                           ReportLevel level,
-                                           const char* format,
-                                           va_list lst)
+// Print list
+void StreamReport::printList(ReportType type,
+                             ReportLevel level,
+                             const char* format,
+                             va_list lst)
 {
 
   // Print string list
@@ -343,10 +276,10 @@ void StreamReport::printListImplementation(ReportType type,
     *os_ << buffer_;
   }
 
-} // end printListImplementation
+} // end printList
 
 // Flush buffer
-void StreamReport::flushBufferImplementation()
+void StreamReport::flushBuffer()
 {
 
   // Flush buffer
@@ -354,6 +287,6 @@ void StreamReport::flushBufferImplementation()
     *os_ << std::flush;
   }
 
-} // end flushBufferImplementation
+} // end flushBuffer
 
 } // namespace NonOpt

@@ -17,220 +17,9 @@ namespace NonOpt
 {
 
 /**
- * Option class
+ * Forward declarations
  */
-class Option
-{
-
-public:
-  /** @name Constructors */
-  //@{
-  /**
-   * Constructor of bool option
-   * \param[in] name is name of option
-   * \param[in] type is type of option
-   * \param[in] value is default value of option
-   * \param[in] description is description of option
-   */
-  Option(std::string name,
-         std::string type,
-         bool value,
-         std::string description)
-    : description_(description),
-      name_(name),
-      type_(type),
-      value_bool_(value){};
-  /**
-   * Constructor of double option
-   * \param[in] name is name of option
-   * \param[in] type is type of option
-   * \param[in] value is default value of option
-   * \param[in] lower_bound is lower bound for option values
-   * \param[in] upper_bound is upper bound for option values
-   * \param[in] description is description of option
-   */
-  Option(std::string name,
-         std::string type,
-         double value,
-         double lower_bound,
-         double upper_bound,
-         std::string description)
-    : description_(description),
-      lower_bound_double_(lower_bound),
-      name_(name),
-      type_(type),
-      upper_bound_double_(upper_bound),
-      value_double_(value){};
-  /**
-   * Constructor of integer option
-   * \param[in] name is name of option
-   * \param[in] type is type of option
-   * \param[in] value is default value of option
-   * \param[in] lower_bound is lower bound for option values
-   * \param[in] upper_bound is upper bound for option values
-   * \param[in] description is description of option
-   */
-  Option(std::string name,
-         std::string type,
-         int value,
-         int lower_bound,
-         int upper_bound,
-         std::string description)
-    : description_(description),
-      lower_bound_int_(lower_bound),
-      name_(name),
-      type_(type),
-      upper_bound_int_(upper_bound),
-      value_int_(value){};
-  /**
-   * Constructor of string option
-   * \param[in] name is name of option
-   * \param[in] type is type of option
-   * \param[in] value is default value of option
-   * \param[in] description is description of option
-   */
-  Option(std::string name,
-         std::string type,
-         std::string value,
-         std::string description)
-    : description_(description),
-      name_(name),
-      type_(type),
-      value_string_(value){};
-  //@}
-
-  /** @name Destructor */
-  //@{
-  /**
-   * Destructor
-   */
-  ~Option(){};
-  //@}
-
-  /** @name Print methods */
-  //@{
-  /**
-   * Print option information
-   * \param[in] reporter is pointer to Reporter object from NonOpt
-   */
-  void print(const Reporter* reporter) const;
-  //@}
-
-  /** @name Get methods */
-  //@{
-  /**
-   * Get lower bound as a double
-   * \return lower bound for option as double value
-   */
-  inline double lowerBoundAsDouble() const { return lower_bound_double_; };
-  /**
-   * Get lower bound as an integer
-   * \return lower bound for option as integer value
-   */
-  inline int lowerBoundAsInteger() const { return lower_bound_int_; };
-  /**
-   * Get name
-   * \return name of option as string
-   */
-  inline std::string name() const { return name_; };
-  /**
-   * Get type
-   * \return type of option as string
-   */
-  inline std::string type() const { return type_; };
-  /**
-   * Get upper bound as a double
-   * \return upper bound for option as double value
-   */
-  inline double upperBoundAsDouble() const { return upper_bound_double_; };
-  /**
-   * Get upper bound as an integer
-   * \return upper bound for option as integer value
-   */
-  inline int upperBoundAsInteger() const { return upper_bound_int_; };
-  /**
-   * Get value as a bool
-   * \return current value of option as bool
-   */
-  inline bool valueAsBool() const { return value_bool_; };
-  /**
-   * Get value as a double
-   * \return current value of option as double value
-   */
-  inline double valueAsDouble() const { return value_double_; };
-  /**
-   * Get value as an integer
-   * \return current value of option as integer value
-   */
-  inline int valueAsInteger() const { return value_int_; };
-  /**
-   * Get value as a string
-   * \return current value of option as string
-   */
-  inline std::string valueAsString() const { return value_string_; };
-  //@}
-
-  /** @name Modify methods */
-  //@{
-  /**
-   * Modify bool value
-   * \param[in] value is new bool value of option to be set
-   */
-  inline void modifyBoolValue(bool value) { value_bool_ = value; };
-  /**
-   * Modify double value
-   * \param[in] value is new double value of option to be set
-   */
-  inline void modifyDoubleValue(double value) { value_double_ = value; };
-  /**
-   * Modify integer value
-   * \param[in] value is new integer value of option to be set
-   */
-  inline void modifyIntegerValue(int value) { value_int_ = value; };
-  /**
-   * Modify string value
-   * \param[in] value is new string value of option to be set
-   */
-  inline void modifyStringValue(std::string value) { value_string_ = value; };
-  //@}
-
-private:
-  /** @name Default compiler generated methods
-   * (Hidden to avoid implicit creation/calling.)
-   */
-  //@{
-  /**
-   * Constructor (no arguments)
-   */
-  Option();
-  /**
-   * Copy constructor
-   */
-  Option(const Option&);
-  /**
-   * Overloaded equals operator
-   */
-  void operator=(const Option&);
-  //@}
-
-  /**
-   * Private members
-   */
-  //@{
-  std::string description_;   /**< Description of option */
-  double lower_bound_double_; /**< Lower bound for value as double */
-  int lower_bound_int_;       /**< Lower bound for value as int */
-  std::string name_;          /**< Name of option */
-  std::string type_;          /**< Type of option */
-  double upper_bound_double_; /**< Upper bound for value as double */
-  int upper_bound_int_;       /**< Upper bound for value as int */
-  bool value_bool_;           /**< Value as bool */
-  double value_double_;       /**< Value as double */
-  int value_int_;             /**< Value as int */
-  std::string value_string_;  /**< Value as string */
-  //@}
-
-}; // end Option
+class Option;
 
 /**
  * Options class
@@ -460,10 +249,226 @@ private:
 
   /** @name Private members */
   //@{
-  std::vector<std::shared_ptr<Option>> option_list_; /**< Vector of options */
+  std::vector<std::shared_ptr<Option>> option_list_; /**< Vector of (pointers to) options */
   //@}
 
 }; // end Options
+
+/**
+ * Option class
+ */
+class Option
+{
+
+public:
+  /** @name Constructors */
+  //@{
+  /**
+   * Constructor of bool option
+   * \param[in] name is name of option
+   * \param[in] type is type of option
+   * \param[in] value is default value of option
+   * \param[in] description is description of option
+   */
+  Option(std::string name,
+         std::string type,
+         bool value,
+         std::string description)
+    : description_(description),
+      name_(name),
+      type_(type),
+      value_bool_(value){};
+  /**
+   * Constructor of double option
+   * \param[in] name is name of option
+   * \param[in] type is type of option
+   * \param[in] value is default value of option
+   * \param[in] lower_bound is lower bound for option values
+   * \param[in] upper_bound is upper bound for option values
+   * \param[in] description is description of option
+   */
+  Option(std::string name,
+         std::string type,
+         double value,
+         double lower_bound,
+         double upper_bound,
+         std::string description)
+    : description_(description),
+      lower_bound_double_(lower_bound),
+      name_(name),
+      type_(type),
+      upper_bound_double_(upper_bound),
+      value_double_(value){};
+  /**
+   * Constructor of integer option
+   * \param[in] name is name of option
+   * \param[in] type is type of option
+   * \param[in] value is default value of option
+   * \param[in] lower_bound is lower bound for option values
+   * \param[in] upper_bound is upper bound for option values
+   * \param[in] description is description of option
+   */
+  Option(std::string name,
+         std::string type,
+         int value,
+         int lower_bound,
+         int upper_bound,
+         std::string description)
+    : description_(description),
+      lower_bound_int_(lower_bound),
+      name_(name),
+      type_(type),
+      upper_bound_int_(upper_bound),
+      value_int_(value){};
+  /**
+   * Constructor of string option
+   * \param[in] name is name of option
+   * \param[in] type is type of option
+   * \param[in] value is default value of option
+   * \param[in] description is description of option
+   */
+  Option(std::string name,
+         std::string type,
+         std::string value,
+         std::string description)
+    : description_(description),
+      name_(name),
+      type_(type),
+      value_string_(value){};
+  //@}
+
+  /** @name Destructor */
+  //@{
+  /**
+   * Destructor
+   */
+  ~Option(){};
+  //@}
+
+  /** @name Print methods */
+  //@{
+  /**
+   * Print option information
+   * \param[in] reporter is pointer to Reporter object from NonOpt
+   */
+  void print(const Reporter* reporter) const;
+  //@}
+
+  /** @name Get methods */
+  //@{
+  /**
+   * Get lower bound as a double
+   * \return lower bound for option as double value
+   */
+  inline double lowerBoundAsDouble() const { return lower_bound_double_; };
+  /**
+   * Get lower bound as an integer
+   * \return lower bound for option as integer value
+   */
+  inline int lowerBoundAsInteger() const { return lower_bound_int_; };
+  /**
+   * Get name
+   * \return name of option as string
+   */
+  inline std::string name() const { return name_; };
+  /**
+   * Get type
+   * \return type of option as string
+   */
+  inline std::string type() const { return type_; };
+  /**
+   * Get upper bound as a double
+   * \return upper bound for option as double value
+   */
+  inline double upperBoundAsDouble() const { return upper_bound_double_; };
+  /**
+   * Get upper bound as an integer
+   * \return upper bound for option as integer value
+   */
+  inline int upperBoundAsInteger() const { return upper_bound_int_; };
+  /**
+   * Get value as a bool
+   * \return current value of option as bool
+   */
+  inline bool valueAsBool() const { return value_bool_; };
+  /**
+   * Get value as a double
+   * \return current value of option as double value
+   */
+  inline double valueAsDouble() const { return value_double_; };
+  /**
+   * Get value as an integer
+   * \return current value of option as integer value
+   */
+  inline int valueAsInteger() const { return value_int_; };
+  /**
+   * Get value as a string
+   * \return current value of option as string
+   */
+  inline std::string valueAsString() const { return value_string_; };
+  //@}
+
+  /** @name Modify methods */
+  //@{
+  /**
+   * Modify bool value
+   * \param[in] value is new bool value of option to be set
+   */
+  inline void modifyBoolValue(bool value) { value_bool_ = value; };
+  /**
+   * Modify double value
+   * \param[in] value is new double value of option to be set
+   */
+  inline void modifyDoubleValue(double value) { value_double_ = value; };
+  /**
+   * Modify integer value
+   * \param[in] value is new integer value of option to be set
+   */
+  inline void modifyIntegerValue(int value) { value_int_ = value; };
+  /**
+   * Modify string value
+   * \param[in] value is new string value of option to be set
+   */
+  inline void modifyStringValue(std::string value) { value_string_ = value; };
+  //@}
+
+private:
+  /** @name Default compiler generated methods
+   * (Hidden to avoid implicit creation/calling.)
+   */
+  //@{
+  /**
+   * Constructor (no arguments)
+   */
+  Option();
+  /**
+   * Copy constructor
+   */
+  Option(const Option&);
+  /**
+   * Overloaded equals operator
+   */
+  void operator=(const Option&);
+  //@}
+
+  /**
+   * Private members
+   */
+  //@{
+  std::string description_;   /**< Description of option */
+  double lower_bound_double_; /**< Lower bound for value as double */
+  int lower_bound_int_;       /**< Lower bound for value as int */
+  std::string name_;          /**< Name of option */
+  std::string type_;          /**< Type of option */
+  double upper_bound_double_; /**< Upper bound for value as double */
+  int upper_bound_int_;       /**< Upper bound for value as int */
+  bool value_bool_;           /**< Value as bool */
+  double value_double_;       /**< Value as double */
+  int value_int_;             /**< Value as int */
+  std::string value_string_;  /**< Value as string */
+  //@}
+
+}; // end Option
 
 } // namespace NonOpt
 

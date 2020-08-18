@@ -4,7 +4,6 @@
 //
 // Author(s) : Frank E. Curtis
 
-#include <cstdio>
 #include <fstream>
 #include <sstream>
 
@@ -12,33 +11,6 @@
 
 namespace NonOpt
 {
-
-// Option: Print
-void Option::print(const Reporter* reporter) const
-{
-
-  // Print information
-  reporter->printf(R_NL, R_BASIC, "Name        : %s\n", name_.c_str());
-  reporter->printf(R_NL, R_BASIC, "Type        : %s\n", type_.c_str());
-  if (type_.compare("bool") == 0) {
-    reporter->printf(R_NL, R_BASIC, "Value       : %s\n", (value_bool_) ? "true" : "false");
-  }
-  else if (type_.compare("double") == 0) {
-    reporter->printf(R_NL, R_BASIC, "Value       : %+e\n", value_double_);
-    reporter->printf(R_NL, R_BASIC, "Lower bound : %+e\n", lower_bound_double_);
-    reporter->printf(R_NL, R_BASIC, "Upper bound : %+e\n", upper_bound_double_);
-  } // end if
-  else if (type_.compare("integer") == 0) {
-    reporter->printf(R_NL, R_BASIC, "Value       : %d\n", value_int_);
-    reporter->printf(R_NL, R_BASIC, "Lower bound : %d\n", lower_bound_int_);
-    reporter->printf(R_NL, R_BASIC, "Upper bound : %d\n", upper_bound_int_);
-  } // end else if
-  else {
-    reporter->printf(R_NL, R_BASIC, "Value       : %s\n", value_string_.c_str());
-  }
-  reporter->printf(R_NL, R_BASIC, "Description : %s\n", description_.c_str());
-
-} // end print
 
 /////////////
 // Options //
@@ -579,5 +551,36 @@ bool Options::modifyStringValue(const Reporter* reporter,
   return false;
 
 } // end modifyStringValue
+
+////////////
+// Option //
+////////////
+
+// Print
+void Option::print(const Reporter* reporter) const
+{
+
+  // Print information
+  reporter->printf(R_NL, R_BASIC, "Name        : %s\n", name_.c_str());
+  reporter->printf(R_NL, R_BASIC, "Type        : %s\n", type_.c_str());
+  if (type_.compare("bool") == 0) {
+    reporter->printf(R_NL, R_BASIC, "Value       : %s\n", (value_bool_) ? "true" : "false");
+  }
+  else if (type_.compare("double") == 0) {
+    reporter->printf(R_NL, R_BASIC, "Value       : %+e\n", value_double_);
+    reporter->printf(R_NL, R_BASIC, "Lower bound : %+e\n", lower_bound_double_);
+    reporter->printf(R_NL, R_BASIC, "Upper bound : %+e\n", upper_bound_double_);
+  } // end if
+  else if (type_.compare("integer") == 0) {
+    reporter->printf(R_NL, R_BASIC, "Value       : %d\n", value_int_);
+    reporter->printf(R_NL, R_BASIC, "Lower bound : %d\n", lower_bound_int_);
+    reporter->printf(R_NL, R_BASIC, "Upper bound : %d\n", upper_bound_int_);
+  } // end else if
+  else {
+    reporter->printf(R_NL, R_BASIC, "Value       : %s\n", value_string_.c_str());
+  }
+  reporter->printf(R_NL, R_BASIC, "Description : %s\n", description_.c_str());
+
+} // end print
 
 } // namespace NonOpt

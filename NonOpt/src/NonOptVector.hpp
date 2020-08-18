@@ -98,12 +98,12 @@ public:
    * Get length
    * \return is length of Vector
    */
-  inline int const length() const { return length_; };
+  inline int length() const { return length_; };
   /**
    * Get values (const)
    * \return is pointer to array of Vector values
    */
-  inline double* const values() const { return values_; };
+  inline double* values() const { return values_; };
   /**
    * Get values (modifiable)
    * \return is pointer to array of Vector values (to allow modification of array)

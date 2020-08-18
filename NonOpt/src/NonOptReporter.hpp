@@ -45,7 +45,7 @@ public:
   /**
     * Delete Reporter
     */
-  virtual ~Reporter();
+  ~Reporter();
   //@}
 
   /** @name Print methods */
@@ -56,21 +56,10 @@ public:
     * \param[in] level is ReportLevel at which to print
     * \param[in] format is formatting string
     */
-  virtual void printf(ReportType type,
-                      ReportLevel level,
-                      const char* format,
-                      ...) const;
-  /**
-    * Print list
-    * \param[in] type is ReportType at which to print
-    * \param[in] level is ReportLevel at which to print
-    * \param[in] format is formatting string
-    * \param[in] lst is list of strings to print
-    */
-  virtual void printList(ReportType type,
-                         ReportLevel level,
-                         const char* format,
-                         va_list lst) const;
+  void printf(ReportType type,
+              ReportLevel level,
+              const char* format,
+              ...) const;
   //@}
 
   /** @name Add methods */
@@ -80,7 +69,7 @@ public:
     * \param[in] report is pointer to Report to add
     * \return indicator of success (true) or failure (false)
     */
-  virtual bool addReport(const std::shared_ptr<Report> report);
+  bool addReport(const std::shared_ptr<Report> report);
   /**
     * Add FileReport
     * \param[in] report_name is name of FileReport to add
@@ -89,10 +78,10 @@ public:
     * \param[in] default_level is ReportLevel to set for FileReport
     * \return indicator of success (true) or failure (false)
     */
-  virtual bool addFileReport(std::string report_name,
-                             std::string file_name,
-                             ReportType type,
-                             ReportLevel level);
+  bool addFileReport(std::string report_name,
+                     std::string file_name,
+                     ReportType type,
+                     ReportLevel level);
   //@}
 
   /** @name Get methods */
@@ -102,19 +91,7 @@ public:
     * \param[in] name is name of report to get
     * \return pointer to Report with report_name, if it exists; else, it is null
     */
-  virtual std::shared_ptr<Report> report(std::string name);
-  //@}
-
-  /** @name Acceptance method */
-  //@{
-  /**
-    * Checks if (type,level) pair is accepted by some report
-    * \param[in] type is ReportType of query
-    * \param[in] level is ReportLevel of query
-    * \return indicator of acceptable (true) or not (false)
-    */
-  virtual bool isAccepted(ReportType type,
-                          ReportLevel level) const;
+  std::shared_ptr<Report> report(std::string name);
   //@}
 
   /** @name Flush buffer method */
@@ -122,7 +99,7 @@ public:
   /**
     * Flush buffer
     */
-  virtual void flushBuffer() const;
+  void flushBuffer() const;
   //@}
 
   /** @name Delete method */
@@ -130,7 +107,7 @@ public:
   /**
     * Delete Reports
     */
-  virtual void deleteReports();
+  void deleteReports();
   //@}
 
 private:
@@ -150,7 +127,22 @@ private:
 
   /** @name Private members */
   //@{
-  std::vector<std::shared_ptr<Report>> reports_; /**< List (vector) of reports */
+  std::vector<std::shared_ptr<Report>> reports_; /**< vector of (pointers to) Reports */
+  //@}
+
+  /** @name Private methods */
+  //@{
+  /**
+    * Print list
+    * \param[in] type is ReportType at which to print
+    * \param[in] level is ReportLevel at which to print
+    * \param[in] format is formatting string
+    * \param[in] lst is list of strings to print
+    */
+  void printList(ReportType type,
+                 ReportLevel level,
+                 const char* format,
+                 va_list lst) const;
   //@}
 
 }; // end Reporter
@@ -172,7 +164,10 @@ public:
     */
   Report(std::string name,
          ReportType type,
-         ReportLevel level);
+         ReportLevel level)
+    : name_(name),
+      type_(type),
+      level_(level){};
   //@}
 
   /** @name Destructor */
@@ -180,7 +175,7 @@ public:
   /**
     * Delete Report
     */
-  virtual ~Report();
+  virtual ~Report(){};
   //@}
 
   /** @name Get methods */
@@ -189,7 +184,7 @@ public:
     * Get name
     * \return is name of Report as string
     */
-  virtual std::string name();
+  inline std::string name() { return name_; };
   //@}
 
   /** @name Set methods */
@@ -199,8 +194,12 @@ public:
     * \param[in] type is ReportType of print level to set
     * \param[in] level is ReportLevel of print level to set
     */
-  virtual void setTypeAndLevel(ReportType type,
-                               ReportLevel level);
+  inline void setTypeAndLevel(ReportType type,
+                              ReportLevel level)
+  {
+    type_ = type;
+    level_ = level;
+  };
   //@}
 
   /** @name Acceptance method */
@@ -211,11 +210,11 @@ public:
     * \param[in] level is ReportLevel of query
     * \return indicator of success (true) or failure (false)
     */
-  virtual bool isAccepted(ReportType type,
-                          ReportLevel level) const;
+  bool isAccepted(ReportType type,
+                  ReportLevel level) const;
   //@}
 
-  /** @name Print methods */
+  /** @name Print method */
   //@{
   /**
     * Print list
@@ -227,10 +226,7 @@ public:
   virtual void printList(ReportType type,
                          ReportLevel level,
                          const char* format,
-                         va_list lst)
-  {
-    printListImplementation(type, level, format, lst);
-  }
+                         va_list lst) = 0;
   //@}
 
   /** @name Flush buffer method */
@@ -238,7 +234,7 @@ public:
   /**
     * Flush buffer
     */
-  virtual void flushBuffer() { flushBufferImplementation(); }
+  virtual void flushBuffer() = 0;
   //@}
 
   /** @name Close report method */
@@ -246,31 +242,7 @@ public:
   /**
     * Close report
     */
-  virtual void close() { closeImplementation(); }
-  //@}
-
-protected:
-  /** @name Implementation methods */
-  //@{
-  /**
-    * Print list implementation
-    * \param[in] type is ReportType at which to print
-    * \param[in] level is ReportLevel at which to print
-    * \param[in] format is formatting string
-    * \param[in] lst is list of strings to print
-    */
-  virtual void printListImplementation(ReportType type,
-                                       ReportLevel level,
-                                       const char* format,
-                                       va_list lst) = 0;
-  /**
-    * Flush buffer implementation
-    */
-  virtual void flushBufferImplementation() = 0;
-  /**
-    * Close implementation
-    */
-  virtual void closeImplementation() = 0;
+  virtual void close() = 0;
   //@}
 
 private:
@@ -320,7 +292,9 @@ public:
     */
   FileReport(std::string name,
              ReportType type,
-             ReportLevel level);
+             ReportLevel level)
+    : Report(name, type, level),
+      file_(nullptr) {};
   //@}
 
   /** @name Destructor */
@@ -328,7 +302,7 @@ public:
   /**
     * Delete FileReport
     */
-  virtual ~FileReport();
+  ~FileReport();
   //@}
 
   /** @name Open methods */
@@ -338,31 +312,39 @@ public:
     * \param[in] name is name of file to open
     * \return indicator of success (true) or failure (false)
     */
-  virtual bool open(const char* name);
+  bool open(const char* name);
   //@}
 
-protected:
-  /** @name Implementation methods */
+  /** @name Print method */
   //@{
   /**
-    * Print list implementation
+    * Print list
     * \param[in] type is ReportType at which to print
     * \param[in] level is ReportLevel at which to print
     * \param[in] format is formatting string
     * \param[in] lst is list of strings to print
     */
-  virtual void printListImplementation(ReportType type,
-                                       ReportLevel level,
-                                       const char* format,
-                                       va_list lst);
+  void printList(ReportType type,
+                 ReportLevel level,
+                 const char* format,
+                 va_list lst);
+  //@}
+
+  /** @name Flush buffer methods */
+  //@{
   /**
-    * Flush buffer implementation
+    * Flush buffer
     */
-  virtual void flushBufferImplementation();
+  void flushBuffer();
+  //@}
+
+  /** @name Close report methods */
+  //@{
   /**
-    * Close implementation
+    * Close report
     */
-  virtual void closeImplementation();
+  void close();
+  //@}
 
 private:
   /** @name Default compiler generated methods
@@ -409,7 +391,9 @@ public:
     */
   StreamReport(std::string name,
                ReportType type,
-               ReportLevel level);
+               ReportLevel level)
+    : Report(name, type, level),
+      os_(nullptr) {};
   //@}
 
   /** @name Destructor */
@@ -417,7 +401,7 @@ public:
   /**
     * Delete StreamReport
     */
-  virtual ~StreamReport() {}
+  ~StreamReport() {};
   //@}
 
   /** @name Set methods */
@@ -426,31 +410,39 @@ public:
     * Set stream
     * \param[in] os is ostream at which to set stream for report
     */
-  void setStream(std::ostream* os);
+  inline void setStream(std::ostream* os) { os_ = os; };
   //@}
 
-protected:
-  /** @name Implementation methods */
+  /** @name Print method */
   //@{
   /**
-    * Print list implementation
+    * Print list
     * \param[in] type is ReportType at which to print
     * \param[in] level is ReportLevel at which to print
     * \param[in] format is formatting string
     * \param[in] lst is list of strings to print
     */
-  virtual void printListImplementation(ReportType type,
-                                       ReportLevel level,
-                                       const char* format,
-                                       va_list lst);
+  void printList(ReportType type,
+                 ReportLevel level,
+                 const char* format,
+                 va_list lst);
+  //@}
+
+  /** @name Flush buffer methods */
+  //@{
   /**
-    * Flush buffer implementation
+    * Flush buffer
     */
-  virtual void flushBufferImplementation();
+  void flushBuffer();
+  //@}
+
+  /** @name Close report methods */
+  //@{
   /**
-    * Close implementation
+    * Close report
     */
-  virtual void closeImplementation(){};
+  void close() {};
+  //@}
 
 private:
   /** @name Default compiler generated methods

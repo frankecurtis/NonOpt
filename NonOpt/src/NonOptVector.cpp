@@ -364,7 +364,19 @@ void Vector::linearCombination(double scalar1,
   } // end else
 
   // Reset scalar value bools
-  if (scalar1 != 1.0 || scalar2 != 0.0) {
+  if (scalar1 == 0.0 && scalar2 == 0.0) {
+    max_computed_ = true;
+    min_computed_ = true;
+    norm1_computed_ = true;
+    norm2_computed_ = true;
+    normInf_computed_ = true;
+    max_value_ = 0.0;
+    min_value_ = 0.0;
+    norm1_value_ = 0.0;
+    norm2_value_ = 0.0;
+    normInf_value_ = 0.0;
+  }
+  else {
     max_computed_ = false;
     min_computed_ = false;
     norm1_computed_ = false;
