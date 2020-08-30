@@ -16,6 +16,7 @@
 #include "NonOptPointSetUpdate.hpp"
 #include "NonOptQPSolver.hpp"
 #include "NonOptSymmetricMatrix.hpp"
+#include "NonOptTermination.hpp"
 
 namespace NonOpt
 {
@@ -29,6 +30,7 @@ class LineSearch;
 class PointSetUpdate;
 class QPSolver;
 class SymmetricMatrix;
+class Termination;
 
 /**
  * Strategies class
@@ -117,6 +119,11 @@ public:
    */
   inline std::shared_ptr<SymmetricMatrix> symmetricMatrix() { return symmetric_matrix_; }
   /**
+   * Get pointer to Termination
+   * \return pointer to Termination object
+   */
+  inline std::shared_ptr<Termination> termination() { return termination_; }
+  /**
    * Get iteration header
    * \return iteration header as string
    */
@@ -168,6 +175,7 @@ private:
   std::shared_ptr<PointSetUpdate> point_set_update_;
   std::shared_ptr<QPSolver> qp_solver_;
   std::shared_ptr<SymmetricMatrix> symmetric_matrix_;
+  std::shared_ptr<Termination> termination_;
   std::string iteration_header_;
   //@}
 

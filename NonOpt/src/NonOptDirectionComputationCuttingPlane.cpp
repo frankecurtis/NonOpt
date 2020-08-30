@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include <ctime>
+#include <vector>
 
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
@@ -42,6 +43,13 @@ void DirectionComputationCuttingPlane::addOptions(Options* options,
                          "Determines whether to consider aggregating subgradients.\n"
                          "Default     : false.");
   options->addBoolOption(reporter,
+                         "DCCP_try_gradient_step",
+                         true,
+                         "Determines whether to consider gradient step before solving\n"
+                         "              cutting plane subproblem.\n"
+                         "              Gradient step stepsize set by DCCP_gradient_stepsize parameter.\n"
+                         "Default     : true.");
+  options->addBoolOption(reporter,
                          "DCCP_try_shortened_step",
                          true,
                          "Determines whether to consider shortened step if subproblem\n"
@@ -69,8 +77,18 @@ void DirectionComputationCuttingPlane::addOptions(Options* options,
                            "              the current iterate.\n"
                            "Default     : 1e-02.");
   options->addDoubleOption(reporter,
+                           "DCCP_gradient_stepsize",
+                           1e-04,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Gradient stepsize.  If step computed using only the gradient\n"
+                           "              at the current iterate and this stepsize is acceptable,\n"
+                           "              then full cutting plane subproblem is avoided.  This scheme\n"
+                           "              is only considered if DCCP_try_gradient_step == true.\n"
+                           "Default     : 1e-04.");
+  options->addDoubleOption(reporter,
                            "DCCP_shortened_stepsize",
-                           1e+00,
+                           1e-02,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Shortened stepsize.  If full QP step does not offer desired\n"
@@ -78,7 +96,7 @@ void DirectionComputationCuttingPlane::addOptions(Options* options,
                            "              this stepsize is considered if DCCP_try_shortened_step == true.\n"
                            "              In particular, the shortened stepsize that is considered is\n"
                            "              DCCP_shortened_stepsize*min(stat. rad.,||qp_step||_inf)/||qp_step||_inf.\n"
-                           "Default     : 1e+00.");
+                           "Default     : 1e-02.");
   options->addDoubleOption(reporter,
                            "DCCP_step_acceptance_tolerance",
                            1e-08,
@@ -108,11 +126,13 @@ void DirectionComputationCuttingPlane::setOptions(const Options* options,
   options->valueAsBool(reporter, "DCCP_fail_on_iteration_limit", fail_on_iteration_limit_);
   options->valueAsBool(reporter, "DCCP_fail_on_QP_failure", fail_on_QP_failure_);
   options->valueAsBool(reporter, "DCCP_try_aggregation", try_aggregation_);
+  options->valueAsBool(reporter, "DCCP_try_gradient_step", try_gradient_step_);
   options->valueAsBool(reporter, "DCCP_try_shortened_step", try_shortened_step_);
 
   // Read double options
   options->valueAsDouble(reporter, "DCCP_aggregation_size_threshold", aggregation_size_threshold_);
   options->valueAsDouble(reporter, "DCCP_downshift_constant", downshift_constant_);
+  options->valueAsDouble(reporter, "DCCP_gradient_stepsize", gradient_stepsize_);
   options->valueAsDouble(reporter, "DCCP_shortened_stepsize", shortened_stepsize_);
   options->valueAsDouble(reporter, "DCCP_step_acceptance_tolerance", step_acceptance_tolerance_);
 
@@ -151,6 +171,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
   quantities->resetInnerIterationCounter();
   quantities->resetQPIterationCounter();
   quantities->setTrialIterateToCurrentIterate();
+  clock_t start_time = clock();
 
   // try direction computation, terminate on any exception
   try {
@@ -184,6 +205,36 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
     // Add linear term value
     QP_vector.push_back(quantities->currentIterate()->objective());
 
+    // Set QP data
+    strategies->qpSolver()->setVectorList(QP_gradient_list);
+    strategies->qpSolver()->setVector(QP_vector);
+    strategies->qpSolver()->setScalar(quantities->trustRegionRadius());
+    strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
+
+    // Try gradient step?
+    if (try_gradient_step_) {
+
+      // Solve QP
+      strategies->qpSolver()->solveQP(options, reporter, quantities);
+
+      // Convert QP solution to step
+      convertQPSolutionToStep(quantities, strategies);
+
+      // Compute shortened trial iterate
+      quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, gradient_stepsize_, *quantities->direction()));
+
+      // Evaluate trial objective
+      evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+
+      // Check for sufficient decrease
+      if (evaluation_success &&
+          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * gradient_stepsize_ * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
+           strategies->termination()->checkRadiiUpdate(options, quantities, reporter, strategies))) {
+        THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
+      }
+
+    } // end if (try gradient step)
+
     // Loop through point set
     for (int point_count = 0; point_count < (int)quantities->pointSet()->size(); point_count++) {
 
@@ -214,12 +265,6 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
       } // end if
 
     } // end for
-
-    // Set QP data
-    strategies->qpSolver()->setVectorList(QP_gradient_list);
-    strategies->qpSolver()->setVector(QP_vector);
-    strategies->qpSolver()->setScalar(quantities->trustRegionRadius());
-    strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
 
     // Solve QP
     strategies->qpSolver()->solveQP(options, reporter, quantities);
@@ -276,9 +321,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
       // Check for sufficient decrease
       if (evaluation_success &&
           (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
-           (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
-            strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
-            strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
+           strategies->termination()->checkRadiiUpdate(options, quantities, reporter, strategies))) {
         THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
       }
 
@@ -294,6 +337,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
       // Check for CPU time limit
       if ((clock() - quantities->startTime()) / (double)CLOCKS_PER_SEC >= quantities->cpuTimeLimit()) {
+        quantities->incrementDirectionComputationTime(clock() - start_time);
         THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
       }
 
@@ -399,9 +443,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
         // Check for sufficient decrease
         if (evaluation_success &&
             (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
-             (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() &&
-              strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() &&
-              strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius()))) {
+             strategies->termination()->checkRadiiUpdate(options, quantities, reporter, strategies))) {
           THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
         }
 
@@ -449,6 +491,10 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
       // Set blank solve string
       std::string blank_solve = "";
+      if (strategies->termination()->iterationNullValues().length() > 0) {
+        blank_solve += " ";
+        blank_solve += strategies->termination()->iterationNullValues();
+      } // end if
       if (strategies->lineSearch()->iterationNullValues().length() > 0) {
         blank_solve += " ";
         blank_solve += strategies->lineSearch()->iterationNullValues();
@@ -526,6 +572,10 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
   // catch exceptions
   catch (DC_SUCCESS_EXCEPTION& exec) {
     setStatus(DC_SUCCESS);
+  } catch (DC_CPU_TIME_LIMIT_EXCEPTION& exec) {
+    setStatus(DC_CPU_TIME_LIMIT);
+    quantities->incrementDirectionComputationTime(clock() - start_time);
+    THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
   } catch (DC_EVALUATION_FAILURE_EXCEPTION& exec) {
     setStatus(DC_EVALUATION_FAILURE);
   } catch (DC_ITERATION_LIMIT_EXCEPTION& exec) {
@@ -542,6 +592,9 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
   // Increment total QP iteration counter
   quantities->incrementTotalQPIterationCounter();
+
+  // Increment direction computation time
+  quantities->incrementDirectionComputationTime(clock() - start_time);
 
 } // end computeDirection
 

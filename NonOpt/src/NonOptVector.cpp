@@ -66,7 +66,7 @@ Vector::Vector(int length,
 
   // Compute norms
   norm1_value_ = (double)length * fabs(value);
-  norm2_value_ = sqrt((double)length * pow(value,2.0));
+  norm2_value_ = sqrt((double)length * pow(value, 2.0));
   normInf_value_ = fabs(value);
 
 } // end constructor
@@ -249,11 +249,11 @@ void Vector::scale(double scalar)
   // Compute scalar values
   if (max_computed_) {
     if (scalar >= 0.0) {
-      max_value_ = scalar*max_value_;
+      max_value_ = scalar * max_value_;
     }
     else {
       if (min_computed_) {
-        max_value_ = scalar*min_value_;
+        max_value_ = scalar * min_value_;
       }
       else {
         max_computed_ = false;
@@ -262,11 +262,11 @@ void Vector::scale(double scalar)
   } // end if
   if (min_computed_) {
     if (scalar >= 0.0) {
-      min_value_ = scalar*min_value_;
+      min_value_ = scalar * min_value_;
     }
     else {
       if (max_computed_) {
-        min_value_ = scalar*max_value_;
+        min_value_ = scalar * max_value_;
       }
       else {
         min_computed_ = false;
@@ -274,13 +274,13 @@ void Vector::scale(double scalar)
     }
   } // end if
   if (norm1_computed_) {
-    norm1_value_ = fabs(scalar)*norm1_value_;
+    norm1_value_ = fabs(scalar) * norm1_value_;
   }
   if (norm2_computed_) {
-    norm2_value_ = fabs(scalar)*norm2_value_;
+    norm2_value_ = fabs(scalar) * norm2_value_;
   }
   if (normInf_computed_) {
-    normInf_value_ = fabs(scalar)*normInf_value_;
+    normInf_value_ = fabs(scalar) * normInf_value_;
   }
 
 } // end scale

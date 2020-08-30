@@ -120,9 +120,11 @@ private:
   bool fail_on_iteration_limit_;
   bool fail_on_QP_failure_;
   bool try_aggregation_;
+  bool try_gradient_step_;
   bool try_shortened_step_;
   double aggregation_size_threshold_;
   double downshift_constant_;
+  double gradient_stepsize_;
   double shortened_stepsize_;
   double step_acceptance_tolerance_;
   int inner_iteration_limit_;

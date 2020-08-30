@@ -16,6 +16,7 @@
 #include "NonOptQPSolverDualActiveSet.hpp"
 #include "NonOptSymmetricMatrixDense.hpp"
 #include "NonOptSymmetricMatrixLimitedMemory.hpp"
+#include "NonOptTerminationGradientCombination.hpp"
 
 namespace NonOpt
 {
@@ -56,6 +57,11 @@ void Strategies::addOptions(Options* options,
                            "Dense",
                            "Symmetric matrix strategy to use.\n"
                            "Default     : Dense.");
+  options->addStringOption(reporter,
+                           "termination",
+                           "GradientCombination",
+                           "Termination strategy to use.\n"
+                           "Default     : GradientCombination.");
 
   // Add options for direction computation strategies
   std::shared_ptr<DirectionComputation> direction_computation;
@@ -103,6 +109,12 @@ void Strategies::addOptions(Options* options,
   symmetric_matrix->addOptions(options, reporter);
   // ADD NEW SYMMETRIC MATRIX STRATEGIES HERE AND IN SWITCH BELOW //
 
+  // Add options for termination strategies
+  std::shared_ptr<Termination> termination;
+  termination = std::make_shared<TerminationGradientCombination>();
+  termination->addOptions(options, reporter);
+  // ADD NEW TERMINATION STRATEGIES HERE AND IN SWITCH BELOW //
+
 } // end addOptions
 
 // Set options
@@ -117,6 +129,7 @@ void Strategies::setOptions(const Options* options,
   std::string point_set_update_name;
   std::string qp_solver_name;
   std::string symmetric_matrix_name;
+  std::string termination_name;
 
   // Read integer options
   options->valueAsString(reporter, "direction_computation", direction_computation_name);
@@ -125,6 +138,7 @@ void Strategies::setOptions(const Options* options,
   options->valueAsString(reporter, "point_set_update", point_set_update_name);
   options->valueAsString(reporter, "qp_solver", qp_solver_name);
   options->valueAsString(reporter, "symmetric_matrix", symmetric_matrix_name);
+  options->valueAsString(reporter, "termination", termination_name);
 
   // Set direction computation strategy
   if (direction_computation_name.compare("CuttingPlane") == 0) {
@@ -189,6 +203,14 @@ void Strategies::setOptions(const Options* options,
     symmetric_matrix_ = std::make_shared<SymmetricMatrixDense>();
   }
 
+  // Set termination strategy
+  if (termination_name.compare("GradientCombination") == 0) {
+    termination_ = std::make_shared<TerminationGradientCombination>();
+  }
+  else {
+    termination_ = std::make_shared<TerminationGradientCombination>();
+  }
+
   // Set direction computation options
   direction_computation_->setOptions(options, reporter);
 
@@ -206,6 +228,9 @@ void Strategies::setOptions(const Options* options,
 
   // Set symmetric matrix options
   symmetric_matrix_->setOptions(options, reporter);
+
+  // Set termination options
+  termination_->setOptions(options, reporter);
 
 } // end setOptions
 
@@ -233,6 +258,9 @@ void Strategies::initialize(const Options* options,
   // Initialize symmetric matrix
   symmetric_matrix_->initialize(options, quantities, reporter);
 
+  // Initialize termination
+  termination_->initialize(options, quantities, reporter);
+
   // Set QP matrix as pointer to approximate Hessian
   qp_solver_->setMatrix(symmetric_matrix_);
 
@@ -247,6 +275,10 @@ void Strategies::setIterationHeader()
   if (direction_computation_->iterationHeader().length() > 0) {
     iteration_header_ += " ";
     iteration_header_ += direction_computation_->iterationHeader();
+  } // end if
+  if (termination_->iterationHeader().length() > 0) {
+    iteration_header_ += " ";
+    iteration_header_ += termination_->iterationHeader();
   } // end if
   if (line_search_->iterationHeader().length() > 0) {
     iteration_header_ += " ";
@@ -268,18 +300,20 @@ void Strategies::printHeader(const Reporter* reporter)
 {
 
   // Print header
-  reporter->printf(R_NL, R_BASIC, "Direction computation strategy..... : %s\n"
-                                  "Approximate Hessian update strategy : %s\n"
-                                  "Line search strategy............... : %s\n"
-                                  "Point set update strategy.......... : %s\n"
-                                  "QP solver strategy................. : %s\n"
-                                  "Symmetric matrix strategy.......... : %s\n",
+  reporter->printf(R_NL, R_BASIC, "Direction computation strategy....... : %s\n"
+                                  "Approximate Hessian update strategy.. : %s\n"
+                                  "Line search strategy................. : %s\n"
+                                  "Point set update strategy............ : %s\n"
+                                  "QP solver strategy................... : %s\n"
+                                  "Symmetric matrix strategy............ : %s\n"
+                                  "Termination strategy................. : %s\n",
                    direction_computation_->name().c_str(),
                    approximate_hessian_update_->name().c_str(),
                    line_search_->name().c_str(),
                    point_set_update_->name().c_str(),
                    qp_solver_->name().c_str(),
-                   symmetric_matrix_->name().c_str());
+                   symmetric_matrix_->name().c_str(),
+                   termination_->name().c_str());
 
 } // end printHeader
 

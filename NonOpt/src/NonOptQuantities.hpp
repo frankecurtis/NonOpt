@@ -107,14 +107,25 @@ public:
    */
   inline clock_t const startTime() const { return start_time_; };
   /**
+   * End time
    * \return end time that was set
    */
   inline clock_t const endTime() const { return end_time_; };
+  /**
+   * Direction computation time
+   * \return direction computation time that was set
+   */
+  inline clock_t const directionComputationTime() const { return direction_computation_time_; };
   /**
    * Evaluation time
    * \return problem function evaluation time that was set
    */
   inline clock_t const evaluationTime() const { return evaluation_time_; };
+  /**
+   * Line search time
+   * \return line search time that was set
+   */
+  inline clock_t const lineSearchTime() const { return line_search_time_; };
   /**
    * Get CPU time limit
    * \return CPU time limit
@@ -244,18 +255,27 @@ public:
   void updateInexactTerminationFactor();
   /**
    * Update radii
-   * \param[in] stationarity_tolerance is stationarity tolerance for reference
    */
-  void updateRadii(double stationarity_tolerance);
+  void updateRadii();
   //@}
 
   /** @name Increment methods */
   //@{
   /**
+   * Increment direction computation time
+   * \param[in] direction_computation_time is amount to add to total direction computation time
+   */
+  inline void incrementDirectionComputationTime(clock_t direction_computation_time) { direction_computation_time_ += direction_computation_time; };
+  /**
    * Increment evaluation time
    * \param[in] evaluation_time is amount to add to total problem function evaluation time
    */
   inline void incrementEvaluationTime(clock_t evaluation_time) { evaluation_time_ += evaluation_time; };
+  /**
+   * Increment line search time
+   * \param[in] line_search_time is amount to add to total line search time
+   */
+  inline void incrementLineSearchTime(clock_t line_search_time) { line_search_time_ += line_search_time; };
   /**
    * Increment function evaluation counter
    */
@@ -358,8 +378,10 @@ private:
 
   /** @name Private members */
   //@{
+  clock_t direction_computation_time_;
   clock_t end_time_;
   clock_t evaluation_time_;
+  clock_t line_search_time_;
   clock_t start_time_;
   double cpu_time_limit_;
   double inexact_termination_factor_;
@@ -390,6 +412,7 @@ private:
   double stationarity_radius_initialization_factor_;
   double stationarity_radius_initialization_minimum_;
   double stationarity_radius_update_factor_;
+  double stationarity_tolerance_;
   double trust_region_radius_initialization_factor_;
   double trust_region_radius_initialization_minimum_;
   double trust_region_radius_update_factor_;

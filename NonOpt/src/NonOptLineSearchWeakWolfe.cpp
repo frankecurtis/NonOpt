@@ -5,6 +5,7 @@
 // Author(s) : Frank E. Curtis
 
 #include <cmath>
+#include <ctime>
 
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
@@ -147,6 +148,7 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
   // Initialize values
   setStatus(LS_UNSET);
   quantities->setTrialIterateToCurrentIterate();
+  clock_t start_time = clock();
 
   // try line search, terminate on any exception
   try {
@@ -291,6 +293,9 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
 
   // Print iterate information
   reporter->printf(R_NL, R_PER_ITERATION, " %+.2e", quantities->stepsize());
+
+  // Increment line search time
+  quantities->incrementLineSearchTime(clock() - start_time);
 
 } // end runLineSearch
 

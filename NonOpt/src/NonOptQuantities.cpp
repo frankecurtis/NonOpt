@@ -14,7 +14,9 @@ namespace NonOpt
 
 // Constructor
 Quantities::Quantities()
-  : evaluation_time_(0),
+  : direction_computation_time_(0),
+    evaluation_time_(0),
+    line_search_time_(0),
     cpu_time_limit_(NONOPT_DOUBLE_INFINITY),
     inexact_termination_factor_(sqrt(2.0) - 1.0),
     stationarity_radius_(0.0),
@@ -34,6 +36,7 @@ Quantities::Quantities()
     stationarity_radius_initialization_factor_(1.0),
     stationarity_radius_initialization_minimum_(1.0),
     stationarity_radius_update_factor_(1.0),
+    stationarity_tolerance_(0.0),
     trust_region_radius_initialization_factor_(1.0),
     trust_region_radius_initialization_minimum_(1.0),
     trust_region_radius_update_factor_(1.0),
@@ -215,7 +218,9 @@ bool Quantities::initialize(const std::shared_ptr<Problem> problem)
   end_time_ = start_time_;
 
   // Initialize counters
+  direction_computation_time_ = 0;
   evaluation_time_ = 0;
+  line_search_time_ = 0;
   function_counter_ = 0;
   gradient_counter_ = 0;
   iteration_counter_ = 0;
@@ -295,13 +300,19 @@ std::string Quantities::iterationNullValues()
 void Quantities::initializeInexactTerminationFactor(const Options* options,
                                                     const Reporter* reporter)
 {
+
+  // Inexact termination factor
   inexact_termination_factor_ = inexact_termination_factor_initial_;
+
 } // end initializeInexactTerminationFactor
 
 // Initialization of radii
 void Quantities::initializeRadii(const Options* options,
                                  const Reporter* reporter)
 {
+
+  // Stationarity radius (for updates)
+  options->valueAsDouble(reporter, "stationarity_tolerance", stationarity_tolerance_);
 
   // Initialize stationarity radius
   stationarity_radius_ = fmax(stationarity_radius_initialization_minimum_, stationarity_radius_initialization_factor_ * current_iterate_->gradient()->normInf());
@@ -323,11 +334,11 @@ void Quantities::updateInexactTerminationFactor()
 } // end updateInexactTerminationFactor
 
 // Update radii
-void Quantities::updateRadii(double stationarity_tolerance)
+void Quantities::updateRadii()
 {
 
   // Decrease radii
-  stationarity_radius_ = fmax(stationarity_tolerance, stationarity_radius_update_factor_ * stationarity_radius_);
+  stationarity_radius_ = fmax(stationarity_tolerance_, stationarity_radius_update_factor_ * stationarity_radius_);
   trust_region_radius_ = trust_region_radius_update_factor_ * trust_region_radius_;
 
   // reset step size
@@ -340,7 +351,7 @@ void Quantities::printHeader(const Reporter* reporter)
 {
 
   // Print header
-  reporter->printf(R_NL, R_BASIC, "Number of variables................ : %d\n", number_of_variables_);
+  reporter->printf(R_NL, R_BASIC, "Number of variables.................. : %d\n", number_of_variables_);
 
 } // end printHeader
 
@@ -359,18 +370,19 @@ void Quantities::printFooter(const Reporter* reporter)
 
   // Print quantities footer
   reporter->printf(R_NL, R_BASIC, "\n\n"
-                                  "Objective.......................... : %e\n"
-                                  "Objective (unscaled)............... : %e\n"
+                                  "Objective............................ : %e\n"
+                                  "Objective (unscaled)................. : %e\n"
                                   "\n"
-                                  "Number of iterations............... : %d\n"
-                                  "Number of inner iterations......... : %d\n"
-                                  "Number of QP iterations............ : %d\n"
-                                  "Number of function evaluations..... : %d\n"
-                                  "Number of gradient evaluations..... : %d\n"
+                                  "Number of iterations................. : %d\n"
+                                  "Number of inner iterations........... : %d\n"
+                                  "Number of QP iterations.............. : %d\n"
+                                  "Number of function evaluations....... : %d\n"
+                                  "Number of gradient evaluations....... : %d\n"
                                   "\n"
-                                  "CPU seconds........................ : %f\n"
-                                  "CPU seconds in NonOpt.............. : %f\n"
-                                  "CPU seconds in evaluations......... : %f\n",
+                                  "CPU seconds.......................... : %f\n"
+                                  "CPU seconds in evaluations........... : %f\n"
+                                  "CPU seconds in direction computations : %f\n"
+                                  "CPU seconds in line searches......... : %f\n",
                    current_iterate_->objective(),
                    current_iterate_->objectiveUnscaled(),
                    iteration_counter_,
@@ -379,8 +391,9 @@ void Quantities::printFooter(const Reporter* reporter)
                    function_counter_,
                    gradient_counter_,
                    (end_time_ - start_time_) / (double)CLOCKS_PER_SEC,
-                   (end_time_ - start_time_ - evaluation_time_) / (double)CLOCKS_PER_SEC,
-                   evaluation_time_ / (double)CLOCKS_PER_SEC);
+                   evaluation_time_ / (double)CLOCKS_PER_SEC,
+                   direction_computation_time_ / (double)CLOCKS_PER_SEC,
+                   line_search_time_ / (double)CLOCKS_PER_SEC);
 
 } // end printFooter
 

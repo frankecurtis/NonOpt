@@ -108,7 +108,8 @@ public:
    * Get values (modifiable)
    * \return is pointer to array of Vector values (to allow modification of array)
    */
-  inline double* valuesModifiable() {
+  inline double* valuesModifiable()
+  {
     max_computed_ = false;
     min_computed_ = false;
     norm1_computed_ = false;

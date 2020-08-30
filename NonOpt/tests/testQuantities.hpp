@@ -111,7 +111,7 @@ int testQuantitiesImplementation(int option)
   quantities.setCurrentIterate(p);
 
   // Modify radii
-  quantities.updateRadii(0.0);
+  quantities.updateRadii();
 
   // Check quantities
   if (quantities.numberOfVariables() != 50) {

@@ -80,26 +80,6 @@ void NonOptSolver::addOptions()
                            "              the maximum of 1.0 and the norm of the initial iterate, then\n"
                            "              the algorithm terminates with a message of divergence.\n"
                            "Default     : 1e+20.");
-  options_.addDoubleOption(&reporter_,
-                           "stationarity_tolerance",
-                           1e-04,
-                           0.0,
-                           NONOPT_DOUBLE_INFINITY,
-                           "Tolerance for determining stationarity.  If the stationarity\n"
-                           "              radius falls below this tolerance and a computed convex\n"
-                           "              combination of gradients has norm below this tolerance times\n"
-                           "              the parameter stationarity_tolerance_factor, then the algorithm\n"
-                           "              terminates with a message of stationarity.\n"
-                           "Default     : 1e-04.");
-  options_.addDoubleOption(&reporter_,
-                           "stationarity_tolerance_factor",
-                           1e+00,
-                           0.0,
-                           NONOPT_DOUBLE_INFINITY,
-                           "Factor for checking termination with respect to stationarity.\n"
-                           "              For further explanation, see description for the parameter\n"
-                           "              stationarity_tolerance.\n"
-                           "Default     : 1e+00.");
 
   // Add integer options
   options_.addIntegerOption(&reporter_,
@@ -130,8 +110,6 @@ void NonOptSolver::setOptions()
   options_.valueAsDouble(&reporter_, "derivative_checker_increment", derivative_checker_increment_);
   options_.valueAsDouble(&reporter_, "derivative_checker_tolerance", derivative_checker_tolerance_);
   options_.valueAsDouble(&reporter_, "iterate_norm_tolerance", iterate_norm_tolerance_);
-  options_.valueAsDouble(&reporter_, "stationarity_tolerance", stationarity_tolerance_);
-  options_.valueAsDouble(&reporter_, "stationarity_tolerance_factor", stationarity_tolerance_factor_);
   options_.valueAsDouble(&reporter_, "stationarity_radius_update_factor", stationarity_radius_update_factor_);
   options_.valueAsDouble(&reporter_, "trust_region_radius_update_factor", trust_region_radius_update_factor_);
 
@@ -250,18 +228,15 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
         THROW_EXCEPTION(NONOPT_DIRECTION_COMPUTATION_FAILURE_EXCEPTION, "Direction computation failed.");
       }
 
-      // Check termination conditions
-      if (quantities_.stationarityRadius() <= stationarity_tolerance_ &&
-          strategies_.qpSolver()->combinationTranslatedNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_) {
+      // Check final termination conditions
+      if (strategies_.termination()->checkFinal(&options_, &quantities_, &reporter_, &strategies_)) {
         THROW_EXCEPTION(NONOPT_SUCCESS_EXCEPTION, "Stationary point found.");
       }
 
       // Check radius update conditions
-      if (stationarity_tolerance_ < quantities_.stationarityRadius() &&
-          strategies_.qpSolver()->primalSolutionNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
-          strategies_.qpSolver()->combinationNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_ &&
-          strategies_.qpSolver()->combinationTranslatedNormInf() <= quantities_.stationarityRadius() * stationarity_tolerance_factor_) {
-        quantities_.updateRadii(stationarity_tolerance_);
+      if (strategies_.termination()->checkRadiiNotFinal(&options_, &quantities_, &reporter_, &strategies_) &&
+          strategies_.termination()->checkRadiiUpdate(&options_, &quantities_, &reporter_, &strategies_)) {
+        quantities_.updateRadii();
         quantities_.initializeInexactTerminationFactor(&options_, &reporter_);
       }
 

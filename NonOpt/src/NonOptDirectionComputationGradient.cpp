@@ -4,9 +4,12 @@
 //
 // Author(s) : Frank E. Curtis
 
-#include "NonOptDirectionComputationGradient.hpp"
+#include <ctime>
+#include <vector>
+
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
+#include "NonOptDirectionComputationGradient.hpp"
 
 namespace NonOpt
 {
@@ -65,6 +68,7 @@ void DirectionComputationGradient::computeDirection(const Options* options,
   quantities->resetInnerIterationCounter();
   quantities->resetQPIterationCounter();
   quantities->setTrialIterateToCurrentIterate();
+  clock_t start_time = clock();
 
   // try direction computation, terminate on any exception
   try {
@@ -123,6 +127,10 @@ void DirectionComputationGradient::computeDirection(const Options* options,
   // catch exceptions
   catch (DC_SUCCESS_EXCEPTION& exec) {
     setStatus(DC_SUCCESS);
+  } catch (DC_CPU_TIME_LIMIT_EXCEPTION& exec) {
+    setStatus(DC_CPU_TIME_LIMIT);
+    quantities->incrementDirectionComputationTime(clock() - start_time);
+    THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
   } catch (DC_EVALUATION_FAILURE_EXCEPTION& exec) {
     setStatus(DC_EVALUATION_FAILURE);
   } catch (DC_QP_FAILURE_EXCEPTION& exec) {
@@ -137,6 +145,9 @@ void DirectionComputationGradient::computeDirection(const Options* options,
 
   // Increment total QP iteration counter
   quantities->incrementTotalQPIterationCounter();
+
+  // Increment direction computation time
+  quantities->incrementDirectionComputationTime(clock() - start_time);
 
 } // end computeDirection
 

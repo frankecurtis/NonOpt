@@ -246,7 +246,7 @@ int testSymmetricMatrixImplementation(int option)
           } // end for
           reporter.printf(R_NL, R_BASIC, "\n");
         } // end for
-      } // end if
+      }   // end if
       else {
         for (int i = 0; i < 5; i++) {
           for (int j = 0; j < 5; j++) {
@@ -339,7 +339,7 @@ int testSymmetricMatrixImplementation(int option)
           } // end for
           reporter.printf(R_NL, R_BASIC, "\n");
         } // end for
-      } // end else
+      }   // end else
       reporter.printf(R_NL, R_BASIC, "Matrix inverse:\n");
       if (approximate_hessian_update == 0) {
         for (int i = 0; i < 5; i++) {
@@ -433,7 +433,7 @@ int testSymmetricMatrixImplementation(int option)
           } // end for
           reporter.printf(R_NL, R_BASIC, "\n");
         } // end for
-      } // end if
+      }   // end if
       else {
         for (int i = 0; i < 5; i++) {
           for (int j = 0; j < 5; j++) {
@@ -526,7 +526,7 @@ int testSymmetricMatrixImplementation(int option)
           } // end for
           reporter.printf(R_NL, R_BASIC, "\n");
         } // end for
-      } // end else
+      }   // end else
 
       // Declare vector for column access
       Vector c(5, 0.0);
@@ -563,7 +563,7 @@ int testSymmetricMatrixImplementation(int option)
             }
           }
         } // end for
-      } // end if
+      }   // end if
       else {
         for (int i = 0; i < 5; i++) {
           if (i == 0) {
@@ -592,7 +592,7 @@ int testSymmetricMatrixImplementation(int option)
             }
           }
         } // end for
-      } // end else
+      }   // end else
 
       // Print column
       c.print(&reporter, "Column... should be vector of elements of column 3 of matrix:");
@@ -629,7 +629,7 @@ int testSymmetricMatrixImplementation(int option)
             }
           }
         } // end for
-      } // end if
+      }   // end if
       else {
         for (int i = 0; i < 5; i++) {
           if (i == 0) {
@@ -658,7 +658,7 @@ int testSymmetricMatrixImplementation(int option)
             }
           }
         } // end for
-      } // end else
+      }   // end else
 
       // Print column
       c.print(&reporter, "Column... should be vector of elements of column 3 of inverse:");
@@ -733,7 +733,7 @@ int testSymmetricMatrixImplementation(int option)
             }
           }
         } // end for
-      } // end if
+      }   // end if
       else {
         for (int i = 0; i < 5; i++) {
           if (i == 0) {
@@ -762,7 +762,7 @@ int testSymmetricMatrixImplementation(int option)
             }
           }
         } // end for
-      } // end else
+      }   // end else
 
       // Print matrix-vector product
       p.print(&reporter, "Matrix-vector product... should be vector of sums of rows of matrix inverse:");
@@ -802,8 +802,8 @@ int testSymmetricMatrixImplementation(int option)
       }
 
       // Set vectors for second update
-      s.set(0,-2.0);
-      s.set(1,-1.0);
+      s.set(0, -2.0);
+      s.set(1, -1.0);
       s.set(2, 0.0);
       s.set(3, 1.0);
       s.set(4, 2.0);
@@ -920,7 +920,7 @@ int testSymmetricMatrixImplementation(int option)
           } // end for
           reporter.printf(R_NL, R_BASIC, "\n");
         } // end for
-      } // end if
+      }   // end if
       else {
         for (int i = 0; i < 5; i++) {
           for (int j = 0; j < 5; j++) {
@@ -1013,7 +1013,7 @@ int testSymmetricMatrixImplementation(int option)
           } // end for
           reporter.printf(R_NL, R_BASIC, "\n");
         } // end for
-      } // end else
+      }   // end else
       reporter.printf(R_NL, R_BASIC, "Matrix inverse:\n");
       if (approximate_hessian_update == 0) {
         for (int i = 0; i < 5; i++) {
@@ -1107,7 +1107,7 @@ int testSymmetricMatrixImplementation(int option)
           } // end for
           reporter.printf(R_NL, R_BASIC, "\n");
         } // end for
-      } // end if
+      }   // end if
       else {
         for (int i = 0; i < 5; i++) {
           for (int j = 0; j < 5; j++) {
@@ -1200,7 +1200,7 @@ int testSymmetricMatrixImplementation(int option)
           } // end for
           reporter.printf(R_NL, R_BASIC, "\n");
         } // end for
-      } // end else
+      }   // end else
 
       // Reset as diagonal matrix
       H->setAsDiagonal(5, 7.0);

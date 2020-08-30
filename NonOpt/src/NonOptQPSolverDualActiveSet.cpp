@@ -1098,7 +1098,7 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
 
       // Check for CPU time limit
       if ((clock() - quantities->startTime()) / (double)CLOCKS_PER_SEC >= quantities->cpuTimeLimit()) {
-        THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
+        THROW_EXCEPTION(DC_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
       }
 
       // Print message

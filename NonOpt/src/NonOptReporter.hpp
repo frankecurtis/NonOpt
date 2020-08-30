@@ -294,7 +294,7 @@ public:
              ReportType type,
              ReportLevel level)
     : Report(name, type, level),
-      file_(nullptr) {};
+      file_(nullptr){};
   //@}
 
   /** @name Destructor */
@@ -393,7 +393,7 @@ public:
                ReportType type,
                ReportLevel level)
     : Report(name, type, level),
-      os_(nullptr) {};
+      os_(nullptr){};
   //@}
 
   /** @name Destructor */
@@ -401,7 +401,7 @@ public:
   /**
     * Delete StreamReport
     */
-  ~StreamReport() {};
+  ~StreamReport(){};
   //@}
 
   /** @name Set methods */
@@ -441,7 +441,7 @@ public:
   /**
     * Close report
     */
-  void close() {};
+  void close(){};
   //@}
 
 private:

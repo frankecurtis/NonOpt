@@ -45,8 +45,9 @@ AMPLProblem::AMPLProblem(char* stub)
 } // end AMPLProblem
 
 // Destructor
-AMPLProblem::~AMPLProblem() {
-  delete [] stub_;
+AMPLProblem::~AMPLProblem()
+{
+  delete[] stub_;
 }
 
 // Number of variables
@@ -93,7 +94,7 @@ bool AMPLProblem::evaluateObjective(int n,
   f = objval(0, x_non_const, &nerror);
 
   // Delete x
-  delete [] x_non_const;
+  delete[] x_non_const;
 
   // Determine evaluation success
   bool evaluation_success = true;
@@ -123,7 +124,7 @@ bool AMPLProblem::evaluateGradient(int n,
   objgrd(0, x_non_const, g, &nerror);
 
   // Delete x
-  delete [] x_non_const;
+  delete[] x_non_const;
 
   // Determine evaluation success
   bool evaluation_success = true;

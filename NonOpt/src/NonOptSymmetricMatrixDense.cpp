@@ -4,8 +4,6 @@
 //
 // Author(s) : Frank E. Curtis
 
-#include <iostream>
-
 #include "NonOptSymmetricMatrixDense.hpp"
 #include "NonOptBLASLAPACK.hpp"
 #include "NonOptDeclarations.hpp"
@@ -79,11 +77,20 @@ void const SymmetricMatrixDense::column(int column_index,
   ASSERT_EXCEPTION(size_ == column.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Column has incorrect length.");
 
   // Set inputs for BLASLAPACK
+  int length = column_index + 1;
   int increment1 = size_;
   int increment2 = 1;
 
-  // Copy elements
-  dcopy_(&size_, &values_[column_index], &increment1, column.valuesModifiable(), &increment2);
+  // Copy first column_index+1 elements
+  dcopy_(&length, &values_[column_index], &increment1, column.valuesModifiable(), &increment2);
+
+  // Set input for BLASLAPACK
+  length = size_ - (column_index + 1);
+
+  // Copy remaining size_-(column_index+1) elements
+  if (length > 0) {
+    dcopy_(&length, &values_[column_index * (size_ + 1) + 1], &increment2, &column.valuesModifiable()[column_index + 1], &increment2);
+  }
 
 } // end column
 
@@ -98,11 +105,20 @@ void const SymmetricMatrixDense::columnOfInverse(int column_index,
   ASSERT_EXCEPTION(size_ == column.length(), NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Column has incorrect length.");
 
   // Set inputs for BLASLAPACK
+  int length = column_index + 1;
   int increment1 = size_;
   int increment2 = 1;
 
   // Copy elements
-  dcopy_(&size_, &values_of_inverse_[column_index], &increment1, column.valuesModifiable(), &increment2);
+  dcopy_(&length, &values_of_inverse_[column_index], &increment1, column.valuesModifiable(), &increment2);
+
+  // Set input for BLASLAPACK
+  length = size_ - (column_index + 1);
+
+  // Copy remaining size_-(column_index+1) elements
+  if (length > 0) {
+    dcopy_(&length, &values_of_inverse_[column_index * (size_ + 1) + 1], &increment2, &column.valuesModifiable()[column_index + 1], &increment2);
+  }
 
 } // end columnOfInverse
 
@@ -118,6 +134,11 @@ double const SymmetricMatrixDense::element(int row_index,
   ASSERT_EXCEPTION(column_index < size_, NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Column index is too large.");
 
   // Return element
+  if (row_index > column_index) {
+    int temp = row_index;
+    row_index = column_index;
+    column_index = temp;
+  } // end if
   return values_[row_index * size_ + column_index];
 
 } // end element
@@ -134,6 +155,11 @@ double const SymmetricMatrixDense::elementOfInverse(int row_index,
   ASSERT_EXCEPTION(column_index < size_, NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Column index is too large.");
 
   // Return element
+  if (row_index > column_index) {
+    int temp = row_index;
+    row_index = column_index;
+    column_index = temp;
+  } // end if
   return values_of_inverse_[row_index * size_ + column_index];
 
 } // end elementOfInverse
@@ -287,10 +313,10 @@ void SymmetricMatrixDense::update(const Vector& s,
 
   // Call appropriate update method
   if (type_.compare("BFGS") == 0) {
-    updateBFGS(s,y);
+    updateBFGS(s, y);
   }
   else if (type_.compare("DFP") == 0) {
-    updateDFP(s,y);
+    updateDFP(s, y);
   }
 
 } // end update
@@ -346,14 +372,6 @@ void SymmetricMatrixDense::updateBFGS(const Vector& s,
 
   // Perform symmetric rank-2 update (to add -(1/sy)*s*Wy'-(1/sy)*Wy*s')
   dsyr2_(&upper_lower, &size_, &scale, s.values(), &increment, Wy, &increment, values_of_inverse_, &size_);
-
-  // Complete matrix
-  for (int i = 1; i < size_; i++) {
-    for (int j = 0; j < i; j++) {
-      values_[i * size_ + j] = values_[j * size_ + i];
-      values_of_inverse_[i * size_ + j] = values_of_inverse_[j * size_ + i];
-    }
-  } // end for
 
   // Delete intermediate vector
   if (Hs != nullptr) {
@@ -419,14 +437,6 @@ void SymmetricMatrixDense::updateDFP(const Vector& s,
   // Perform symmetric rank-2 update (to add -(1/sy)*y*Hs'-(1/sy)*Hs*y')
   dsyr2_(&upper_lower, &size_, &scale, y.values(), &increment, Hs, &increment, values_, &size_);
 
-  // Complete matrix
-  for (int i = 1; i < size_; i++) {
-    for (int j = 0; j < i; j++) {
-      values_[i * size_ + j] = values_[j * size_ + i];
-      values_of_inverse_[i * size_ + j] = values_of_inverse_[j * size_ + i];
-    }
-  } // end for
-
   // Delete intermediate vector
   if (Hs != nullptr) {
     delete[] Hs;
@@ -448,17 +458,21 @@ void SymmetricMatrixDense::print(const Reporter* reporter,
   reporter->printf(R_NL, R_BASIC, "Matrix:\n");
   reporter->printf(R_QP, R_BASIC, "Matrix:\n");
   for (int i = 0; i < length_; i++) {
-    reporter->printf(R_NL, R_BASIC, "%s[%6d][%6d]=%+23.16e\n", name.c_str(), row_(i), col_(i), values_[i]);
-    reporter->printf(R_QP, R_BASIC, "%s[%6d][%6d]=%+23.16e\n", name.c_str(), row_(i), col_(i), values_[i]);
-  } // end for
+    if (row_(i) <= col_(i)) {
+      reporter->printf(R_NL, R_BASIC, "%s[%6d][%6d]=%+23.16e\n", name.c_str(), row_(i), col_(i), values_[i]);
+      reporter->printf(R_QP, R_BASIC, "%s[%6d][%6d]=%+23.16e\n", name.c_str(), row_(i), col_(i), values_[i]);
+    } // end if
+  }   // end for
 
   // Print elements of symmetric matrix inverse
   reporter->printf(R_NL, R_BASIC, "Matrix inverse:\n");
   reporter->printf(R_QP, R_BASIC, "Matrix inverse:\n");
   for (int i = 0; i < length_; i++) {
-    reporter->printf(R_NL, R_BASIC, "%s[%6d][%6d]=%+23.16e\n", name.c_str(), row_(i), col_(i), values_of_inverse_[i]);
-    reporter->printf(R_QP, R_BASIC, "%s[%6d][%6d]=%+23.16e\n", name.c_str(), row_(i), col_(i), values_of_inverse_[i]);
-  } // end for
+    if (row_(i) <= col_(i)) {
+      reporter->printf(R_NL, R_BASIC, "%s[%6d][%6d]=%+23.16e\n", name.c_str(), row_(i), col_(i), values_of_inverse_[i]);
+      reporter->printf(R_QP, R_BASIC, "%s[%6d][%6d]=%+23.16e\n", name.c_str(), row_(i), col_(i), values_of_inverse_[i]);
+    } // end if
+  }   // end for
 
 } // end print
 

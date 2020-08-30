@@ -170,8 +170,6 @@ private:
   double derivative_checker_increment_;
   double derivative_checker_tolerance_;
   double iterate_norm_tolerance_;
-  double stationarity_tolerance_;
-  double stationarity_tolerance_factor_;
   double stationarity_radius_update_factor_;
   double trust_region_radius_update_factor_;
   int iteration_limit_;

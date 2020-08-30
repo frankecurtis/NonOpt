@@ -4,10 +4,10 @@
 //
 // Author(s) : Frank E. Curtis
 
-#include "NonOptSymmetricMatrixLimitedMemory.hpp"
 #include "NonOptBLASLAPACK.hpp"
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
+#include "NonOptSymmetricMatrixLimitedMemory.hpp"
 
 namespace NonOpt
 {
@@ -64,7 +64,7 @@ void SymmetricMatrixLimitedMemory::initialize(const Options* options,
 {
 
   // Reduce history to at most number of variables
-  history_ = fmin(history_,quantities->numberOfVariables());
+  history_ = fmin(history_, quantities->numberOfVariables());
 
   // Set as identity
   setAsDiagonal(quantities->numberOfVariables(), 1.0);
@@ -304,10 +304,10 @@ void SymmetricMatrixLimitedMemory::matrixVectorProduct(const Vector& vector,
 
   // Call appropriate update method
   if (type_.compare("BFGS") == 0) {
-    matrixVectorProductBFGS(vector,product);
+    matrixVectorProductBFGS(vector, product);
   }
   else if (type_.compare("DFP") == 0) {
-    matrixVectorProductDFP(vector,product);
+    matrixVectorProductDFP(vector, product);
   }
 
 } // end matrixVectorProduct
@@ -316,6 +316,8 @@ void SymmetricMatrixLimitedMemory::matrixVectorProduct(const Vector& vector,
 void SymmetricMatrixLimitedMemory::matrixVectorProductBFGS(const Vector& vector,
                                                            Vector& product)
 {
+
+  //std::cerr << std::endl << "MATRIX VECTOR PRODUCT IN BFGS" << std::endl;
 
   // Check if no pairs in storage
   if ((int)s_.size() == 0) {
@@ -491,10 +493,10 @@ void SymmetricMatrixLimitedMemory::matrixVectorProductOfInverse(const Vector& ve
 
   // Call appropriate update method
   if (type_.compare("BFGS") == 0) {
-    matrixVectorProductOfInverseBFGS(vector,product);
+    matrixVectorProductOfInverseBFGS(vector, product);
   }
   else if (type_.compare("DFP") == 0) {
-    matrixVectorProductOfInverseDFP(vector,product);
+    matrixVectorProductOfInverseDFP(vector, product);
   }
 
 } // end matrixVectorProductOfInverse
