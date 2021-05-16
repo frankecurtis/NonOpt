@@ -30,7 +30,7 @@ public:
   /** @name Destructor */
   //@{
   /**
-    * Deconstruct
+    * Destruct
     */
   ~TerminationGradientCombination(){};
   //@}
@@ -88,29 +88,29 @@ public:
   /** @name Check condition methods */
   //@{
   /**
-   * Check final termination conditions
+   * Check objective similarity
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in] quantities is pointer to Quantities object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    * \param[in] strategies is pointer to Strategies object from NonOpt
    * \return bool to indicate conditions satisfied or not
    */
-  bool checkFinal(const Options* options,
-                  Quantities* quantities,
-                  const Reporter* reporter,
-                  Strategies* strategies) const;
+  bool checkObjectiveSimilarity(const Options* options,
+                                Quantities* quantities,
+                                const Reporter* reporter,
+                                Strategies* strategies);
   /**
-   * Check radii not final
+   * Check radii final
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in] quantities is pointer to Quantities object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    * \param[in] strategies is pointer to Strategies object from NonOpt
    * \return bool to indicate conditions satisfied or not
    */
-  bool checkRadiiNotFinal(const Options* options,
-                          Quantities* quantities,
-                          const Reporter* reporter,
-                          Strategies* strategies) const;
+  bool checkRadiiFinal(const Options* options,
+                       Quantities* quantities,
+                       const Reporter* reporter,
+                       Strategies* strategies) const;
   /**
    * Check radii update
    * \param[in] options is pointer to Options object from NonOpt
@@ -123,6 +123,18 @@ public:
                         Quantities* quantities,
                         const Reporter* reporter,
                         Strategies* strategies) const;
+  /**
+   * Check stationarity final conditions
+   * \param[in] options is pointer to Options object from NonOpt
+   * \param[in] quantities is pointer to Quantities object from NonOpt
+   * \param[in] reporter is pointer to Reporter object from NonOpt
+   * \param[in] strategies is pointer to Strategies object from NonOpt
+   * \return bool to indicate conditions satisfied or not
+   */
+  bool checkStationarityFinal(const Options* options,
+                              Quantities* quantities,
+                              const Reporter* reporter,
+                              Strategies* strategies) const;
   //@}
 
 private:
@@ -142,8 +154,11 @@ private:
 
   /** @name Private members */
   //@{
+  int objective_similarity_counter_;
+  int objective_similarity_limit_;
+  double objective_reference_;
+  double objective_similarity_tolerance_;
   double stationarity_reference_;
-  double stationarity_tolerance_;
   double stationarity_tolerance_factor_;
   //@}
 

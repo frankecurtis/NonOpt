@@ -26,12 +26,13 @@ public:
     */
   SymmetricMatrixLimitedMemory()
     : compact_form_factorized_(false),
-      compact_form_factorized_of_inverse_(false),
       size_(-1),
       history_(-1),
       initial_diagonal_value_(1.0),
+      compact_form_diagonal_(nullptr),
       compact_form_factorization_(nullptr),
-      compact_form_factorization_of_inverse_(nullptr)
+      compact_form_inner_product_(nullptr),
+      compact_form_lower_triangular_(nullptr)
   {
     s_.clear();
     y_.clear();
@@ -199,12 +200,13 @@ private:
   /** @name Private members */
   //@{
   bool compact_form_factorized_;                                     /**< Bool indicating if factorization has been performed */
-  bool compact_form_factorized_of_inverse_;                          /**< Bool indicating if factorization has been performed */
   int size_;                                                         /**< Number of rows and number of columns */
   int history_;                                                      /**< Limited memory history length */
   double initial_diagonal_value_;                                    /**< Diagonal value of "initial" matrix */
+  double* compact_form_diagonal_;                                    /**< Double array, values of "D" matrix for compact form */
   double* compact_form_factorization_;                               /**< Double array, values of compact form factorization */
-  double* compact_form_factorization_of_inverse_;                    /**< Double array, values of compact form factorization */
+  double* compact_form_inner_product_;                               /**< Double array, values of "SHS" or "YWY" matrix for compact form */
+  double* compact_form_lower_triangular_;                            /**< Double array, values of "L" matrix for compact form */
   std::vector<std::shared_ptr<Vector>> s_;                           /**< Vector vector, "s" values */
   std::vector<std::shared_ptr<Vector>> y_;                           /**< Vector vector, "y" values */
   std::vector<double> rho_;                                          /**< Double vector, "rho" values */

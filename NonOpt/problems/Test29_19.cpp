@@ -56,7 +56,67 @@ bool Test29_19::evaluateObjective(int n,
   f = fmax(f, pow((3.0 - 2.0 * x[n - 1]) * x[n - 1] - x[n - 2] + 1.0, 2.0));
 
   // Return
-  return true;
+  return !isnan(f);
+
+} // end evaluateObjective
+
+// Objective and gradient value
+bool Test29_19::evaluateObjectiveAndGradient(int n,
+                                             const double* x,
+                                             double& f,
+                                             double* g)
+{
+
+  // Declare success
+  bool success = true;
+
+  // Initialize gradient and evaluate maximum value
+  int index = 0;
+  double term = (3.0 - 2.0 * x[0]) * x[0] - 2.0 * x[1] + 1.0;
+  double maximum = term;
+  f = pow(term, 2.0);
+  double temp;
+  g[0] = 0.0;
+  for (int i = 1; i < n - 1; i++) {
+    term = (3.0 - 2.0 * x[i]) * x[i] - x[i - 1] - 2.0 * x[i + 1] + 1.0;
+    temp = pow(term, 2.0);
+    if (temp > f) {
+      index = i;
+      maximum = term;
+      f = temp;
+    } // end if
+    g[i] = 0.0;
+  } // end for
+  term = (3.0 - 2.0 * x[n - 1]) * x[n - 1] - x[n - 2] + 1.0;
+  temp = pow(term, 2.0);
+  if (temp > f) {
+    index = n - 1;
+    maximum = term;
+    f = temp;
+  } // end if
+  g[n - 1] = 0.0;
+
+  // Check index of maximum value
+  double sign = ((f >= 0.0) ? 1.0 : -1.0);
+  g[index] = sign * (2.0 * maximum * (3.0 - 4.0 * x[index]));
+  if (isnan(g[index])) {
+    success = false;
+  }
+  if (index > 0) {
+    g[index - 1] = sign * (2.0 * maximum * (-1.0));
+    if (isnan(g[index-1])) {
+      success = false;
+    }
+  }
+  if (index < n - 1) {
+    g[index + 1] = sign * (2.0 * maximum * (-2.0));
+    if (isnan(g[index+1])) {
+      success = false;
+    }
+  }
+
+  // Return
+  return !isnan(f) && success;
 
 } // end evaluateObjective
 
@@ -66,41 +126,56 @@ bool Test29_19::evaluateGradient(int n,
                                  double* g)
 {
 
+  // Declare success
+  bool success = true;
+
   // Initialize gradient and evaluate maximum value
-  int max_ind = 0;
+  int index = 0;
   double term = (3.0 - 2.0 * x[0]) * x[0] - 2.0 * x[1] + 1.0;
-  double max_term = term;
-  double max_val = term * term;
+  double maximum = term;
+  double f = pow(term, 2.0);
+  double temp;
   g[0] = 0.0;
   for (int i = 1; i < n - 1; i++) {
     term = (3.0 - 2.0 * x[i]) * x[i] - x[i - 1] - 2.0 * x[i + 1] + 1.0;
-    if (term * term > max_val) {
-      max_ind = i;
-      max_term = term;
-      max_val = term * term;
+    temp = pow(term, 2.0);
+    if (temp > f) {
+      index = i;
+      maximum = term;
+      f = temp;
     } // end if
     g[i] = 0.0;
   } // end for
   term = (3.0 - 2.0 * x[n - 1]) * x[n - 1] - x[n - 2] + 1.0;
-  if (term * term > max_val) {
-    max_ind = n - 1;
-    max_term = term;
-    max_val = term * term;
+  temp = pow(term, 2.0);
+  if (temp > f) {
+    index = n - 1;
+    maximum = term;
+    f = temp;
   } // end if
   g[n - 1] = 0.0;
 
   // Check index of maximum value
-  double sign = ((max_val >= 0.0) ? 1.0 : -1.0);
-  g[max_ind] = sign * (2.0 * max_term * (3.0 - 4.0 * x[max_ind]));
-  if (max_ind > 0) {
-    g[max_ind - 1] = sign * (2.0 * max_term * (-1.0));
+  double sign = ((f >= 0.0) ? 1.0 : -1.0);
+  g[index] = sign * (2.0 * maximum * (3.0 - 4.0 * x[index]));
+  if (isnan(g[index])) {
+    success = false;
   }
-  if (max_ind < n - 1) {
-    g[max_ind + 1] = sign * (2.0 * max_term * (-2.0));
+  if (index > 0) {
+    g[index - 1] = sign * (2.0 * maximum * (-1.0));
+    if (isnan(g[index-1])) {
+      success = false;
+    }
+  }
+  if (index < n - 1) {
+    g[index + 1] = sign * (2.0 * maximum * (-2.0));
+    if (isnan(g[index+1])) {
+      success = false;
+    }
   }
 
   // Return
-  return true;
+  return success;
 
 } // end evaluateGradient
 

@@ -159,13 +159,13 @@ void DirectionComputationGradientCombination::initialize(const Options* options,
 // Iteration header
 std::string DirectionComputationGradientCombination::iterationHeader()
 {
-  return "In. Its.  QP Its. QP   QP KKT  |G. Cmb.|   |Step|   |Step|_H";
+  return "In. Its.  QP Its. QP   QP KKT    |Step|   |Step|_H";
 }
 
 // Iteration null values string
 std::string DirectionComputationGradientCombination::iterationNullValues()
 {
-  return "-------- -------- -- --------- --------- --------- ---------";
+  return "-------- -------- -- --------- --------- ---------";
 }
 
 // Compute direction
@@ -186,24 +186,40 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
   // try direction computation, terminate on any exception
   try {
 
-    // Initialize boolean for evaluation
-    bool evaluation_success = false;
+    // Declare bool for evaluations
+    bool evaluation_success;
 
-    // Evaluate current objective
-    evaluation_success = quantities->currentIterate()->evaluateObjective(*quantities);
+    // Check whether to evaluate function with gradient
+    if (quantities->evaluateFunctionWithGradient()) {
 
-    // Check for successful evaluation
-    if (!evaluation_success) {
-      THROW_EXCEPTION(DC_EVALUATION_FAILURE_EXCEPTION, "Direction computation unsuccessful. Evaluation failed.");
+      // Evaluate current objective
+      evaluation_success = quantities->currentIterate()->evaluateObjectiveAndGradient(*quantities);
+
+      // Check for successful evaluation
+      if (!evaluation_success) {
+        THROW_EXCEPTION(DC_EVALUATION_FAILURE_EXCEPTION, "Direction computation unsuccessful. Evaluation failed.");
+      }
+
     }
+    else {
 
-    // Evaluate current gradient
-    evaluation_success = quantities->currentIterate()->evaluateGradient(*quantities);
+      // Evaluate current objective
+      evaluation_success = quantities->currentIterate()->evaluateObjective(*quantities);
 
-    // Check for successful evaluation
-    if (!evaluation_success) {
-      THROW_EXCEPTION(DC_EVALUATION_FAILURE_EXCEPTION, "Direction computation unsuccessful. Evaluation failed.");
-    }
+      // Check for successful evaluation
+      if (!evaluation_success) {
+        THROW_EXCEPTION(DC_EVALUATION_FAILURE_EXCEPTION, "Direction computation unsuccessful. Evaluation failed.");
+      }
+
+      // Evaluate current gradient
+      evaluation_success = quantities->currentIterate()->evaluateGradient(*quantities);
+
+      // Check for successful evaluation
+      if (!evaluation_success) {
+        THROW_EXCEPTION(DC_EVALUATION_FAILURE_EXCEPTION, "Direction computation unsuccessful. Evaluation failed.");
+      }
+
+    } // end else
 
     // Declare QP quantities
     std::vector<std::shared_ptr<Vector>> QP_gradient_list;
@@ -234,7 +250,12 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, gradient_stepsize_, *quantities->direction()));
 
       // Evaluate trial objective
-      evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+      if (quantities->evaluateFunctionWithGradient()) {
+        evaluation_success = quantities->trialIterate()->evaluateObjectiveAndGradient(*quantities);
+      }
+      else {
+        evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+      }
 
       // Check for sufficient decrease
       if (evaluation_success &&
@@ -325,7 +346,12 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       reporter->flushBuffer();
 
       // Evaluate trial iterate objective
-      evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+      if (quantities->evaluateFunctionWithGradient()) {
+        evaluation_success = quantities->trialIterate()->evaluateObjectiveAndGradient(*quantities);
+      }
+      else {
+        evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+      }
 
       // Check for sufficient decrease
       if (evaluation_success &&
@@ -441,7 +467,12 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
         quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, shortened_stepsize, *quantities->direction()));
 
         // Evaluate trial objective
-        evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+        if (quantities->evaluateFunctionWithGradient()) {
+          evaluation_success = quantities->trialIterate()->evaluateObjectiveAndGradient(*quantities);
+        }
+        else {
+          evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+        }
 
         // Check for sufficient decrease
         if (evaluation_success &&
@@ -499,7 +530,12 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
         std::shared_ptr<Point> random_point = quantities->currentIterate()->makeNewRandom(quantities->stationarityRadius(), &random_number_generator_);
 
         // Evaluate gradient at random point
-        evaluation_success = random_point->evaluateGradient(*quantities);
+        if (quantities->evaluateFunctionWithGradient()) {
+          evaluation_success = random_point->evaluateObjectiveAndGradient(*quantities);
+        }
+        else {
+          evaluation_success = random_point->evaluateGradient(*quantities);
+        }
 
         // Check for gradient successful evaluation
         if (evaluation_success) {
@@ -532,7 +568,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       } // end for
 
       // Print QP solve / step information
-      reporter->printf(R_NL, R_PER_INNER_ITERATION, " %8d %8d %2d %+.2e %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
+      reporter->printf(R_NL, R_PER_INNER_ITERATION, " %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
       // Set blank solve string
       std::string blank_solve = "";
@@ -630,7 +666,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
   }
 
   // Print iteration information
-  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %2d %+.2e %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
+  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
   // Increment total inner iteration counter
   quantities->incrementTotalInnerIterationCounter();

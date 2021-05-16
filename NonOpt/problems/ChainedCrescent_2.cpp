@@ -56,14 +56,50 @@ bool ChainedCrescent_2::evaluateObjective(int n,
   // Evaluate objective
   f = 0.0;
   for (int i = 0; i < n - 1; i++) {
-    f = f + fmax(pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0,
-                 -pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0);
+    f += fmax(pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0,
+              -pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0);
   } // end for
 
   // Return
-  return true;
+  return !isnan(f);
 
 } // end evaluateObjective
+
+// Objective and gradient value
+bool ChainedCrescent_2::evaluateObjectiveAndGradient(int n,
+                                                     const double* x,
+                                                     double& f,
+                                                     double* g)
+{
+
+  // Declare success
+  bool success = true;
+
+  // Evaluate objective and gradient
+  f = 0.0;
+  g[0] = 0.0;
+  for (int i = 0; i < n - 1; i++) {
+    f += fmax(pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0,
+              -pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0);
+    g[i+1] = 0.0;
+    if (pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0 >=
+        -pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0) {
+      g[i] += 2.0 * x[i];
+      g[i + 1] += 2.0 * (x[i + 1] - 1.0) + 1.0;
+    } // end if
+    else {
+      g[i] += -2.0 * x[i];
+      g[i + 1] += -2.0 * (x[i + 1] - 1.0) + 1.0;
+    } // end else
+    if (isnan(g[i]) || isnan(g[i+1])) {
+      success = false;
+    }
+  } // end for
+
+  // Return
+  return !isnan(f) && success;
+
+} // end evaluateObjectiveAndGradient
 
 // Gradient value
 bool ChainedCrescent_2::evaluateGradient(int n,
@@ -71,26 +107,29 @@ bool ChainedCrescent_2::evaluateGradient(int n,
                                          double* g)
 {
 
-  // Initialize gradient
-  for (int i = 0; i < n; i++) {
-    g[i] = 0.0;
-  }
+  // Declare success
+  bool success = true;
 
   // Evaluate gradient
+  g[0] = 0.0;
   for (int i = 0; i < n - 1; i++) {
+    g[i+1] = 0.0;
     if (pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0 >=
         -pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0) {
-      g[i] = g[i] + 2.0 * x[i];
-      g[i + 1] = g[i + 1] + 2.0 * (x[i + 1] - 1.0) + 1.0;
+      g[i] += 2.0 * x[i];
+      g[i + 1] += 2.0 * (x[i + 1] - 1.0) + 1.0;
     } // end if
     else {
-      g[i] = g[i] - 2.0 * x[i];
-      g[i + 1] = g[i + 1] - 2.0 * (x[i + 1] - 1.0) + 1.0;
+      g[i] += -2.0 * x[i];
+      g[i + 1] += -2.0 * (x[i + 1] - 1.0) + 1.0;
     } // end else
-  }   // end for
+    if (isnan(g[i]) || isnan(g[i+1])) {
+      success = false;
+    }
+  } // end for
 
   // Return
-  return true;
+  return success;
 
 } // end evaluateGradient
 

@@ -46,13 +46,13 @@ void DirectionComputationGradient::initialize(const Options* options,
 // Iteration header
 std::string DirectionComputationGradient::iterationHeader()
 {
-  return "In. Its.  QP Its. QP   QP KKT  |G. Cmb.|   |Step|   |Step|_H";
+  return "In. Its.  QP Its. QP   QP KKT    |Step|   |Step|_H";
 }
 
 // Iteration null values string
 std::string DirectionComputationGradient::iterationNullValues()
 {
-  return "-------- -------- -- --------- --------- --------- ---------";
+  return "-------- -------- -- --------- --------- ---------";
 }
 
 // Compute direction
@@ -73,24 +73,40 @@ void DirectionComputationGradient::computeDirection(const Options* options,
   // try direction computation, terminate on any exception
   try {
 
-    // Initialize boolean for evaluation
-    bool evaluation_success = false;
+    // Declare bool for evaluations
+    bool evaluation_success;
 
-    // Evaluate current objective
-    evaluation_success = quantities->currentIterate()->evaluateObjective(*quantities);
+    // Check whether to evaluate function with gradient
+    if (quantities->evaluateFunctionWithGradient()) {
 
-    // Check for successful evaluation
-    if (!evaluation_success) {
-      THROW_EXCEPTION(DC_EVALUATION_FAILURE_EXCEPTION, "Direction computation unsuccessful. Evaluation failed.");
+      // Evaluate current objective
+      evaluation_success = quantities->currentIterate()->evaluateObjectiveAndGradient(*quantities);
+
+      // Check for successful evaluation
+      if (!evaluation_success) {
+        THROW_EXCEPTION(DC_EVALUATION_FAILURE_EXCEPTION, "Direction computation unsuccessful. Evaluation failed.");
+      }
+
     }
+    else {
 
-    // Evaluate current gradient
-    evaluation_success = quantities->currentIterate()->evaluateGradient(*quantities);
+      // Evaluate current objective
+      evaluation_success = quantities->currentIterate()->evaluateObjective(*quantities);
 
-    // Check for successful evaluation
-    if (!evaluation_success) {
-      THROW_EXCEPTION(DC_EVALUATION_FAILURE_EXCEPTION, "Direction computation unsuccessful. Evaluation failed.");
-    }
+      // Check for successful evaluation
+      if (!evaluation_success) {
+        THROW_EXCEPTION(DC_EVALUATION_FAILURE_EXCEPTION, "Direction computation unsuccessful. Evaluation failed.");
+      }
+
+      // Evaluate current gradient
+      evaluation_success = quantities->currentIterate()->evaluateGradient(*quantities);
+
+      // Check for successful evaluation
+      if (!evaluation_success) {
+        THROW_EXCEPTION(DC_EVALUATION_FAILURE_EXCEPTION, "Direction computation unsuccessful. Evaluation failed.");
+      }
+
+    } // end else
 
     // Declare QP quantities
     std::vector<std::shared_ptr<Vector>> QP_gradient_list;
@@ -138,7 +154,7 @@ void DirectionComputationGradient::computeDirection(const Options* options,
   }
 
   // Print iteration information
-  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %2d %+.2e %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->combinationNormInf(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
+  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
   // Increment total inner iteration counter
   quantities->incrementTotalInnerIterationCounter();

@@ -7,6 +7,7 @@
 #include "NonOptStrategies.hpp"
 #include "NonOptApproximateHessianUpdateBFGS.hpp"
 #include "NonOptApproximateHessianUpdateDFP.hpp"
+#include "NonOptDerivativeCheckerFiniteDifference.hpp"
 #include "NonOptDirectionComputationCuttingPlane.hpp"
 #include "NonOptDirectionComputationGradient.hpp"
 #include "NonOptDirectionComputationGradientCombination.hpp"
@@ -28,15 +29,20 @@ void Strategies::addOptions(Options* options,
 
   // Add string options
   options->addStringOption(reporter,
-                           "direction_computation",
-                           "CuttingPlane",
-                           "Direction computation strategy to use.\n"
-                           "Default     : CuttingPlane.");
-  options->addStringOption(reporter,
                            "approximate_hessian_update",
                            "BFGS",
                            "Approximate Hessian update strategy to use.\n"
                            "Default     : BFGS.");
+  options->addStringOption(reporter,
+                           "derivative_checker",
+                           "FiniteDifference",
+                           "Derivative checker strategy to use.\n"
+                           "Default     : FiniteDifference.");
+  options->addStringOption(reporter,
+                           "direction_computation",
+                           "CuttingPlane",
+                           "Direction computation strategy to use.\n"
+                           "Default     : CuttingPlane.");
   options->addStringOption(reporter,
                            "line_search",
                            "WeakWolfe",
@@ -63,6 +69,20 @@ void Strategies::addOptions(Options* options,
                            "Termination strategy to use.\n"
                            "Default     : GradientCombination.");
 
+  // Add options for approximate Hessian update strategies
+  std::shared_ptr<ApproximateHessianUpdate> approximate_hessian_update;
+  approximate_hessian_update = std::make_shared<ApproximateHessianUpdateBFGS>();
+  approximate_hessian_update->addOptions(options, reporter);
+  approximate_hessian_update = std::make_shared<ApproximateHessianUpdateDFP>();
+  approximate_hessian_update->addOptions(options, reporter);
+  // ADD NEW APPROXIMATE HESSIAN UPDATE STRATEGIES HERE AND IN SWITCH BELOW //
+
+  // Add options for derivative checker strategies
+  std::shared_ptr<DerivativeChecker> derivative_checker;
+  derivative_checker = std::make_shared<DerivativeCheckerFiniteDifference>();
+  derivative_checker->addOptions(options, reporter);
+  // ADD NEW POINT SET UPDATE STRATEGIES HERE AND IN SWITCH BELOW //
+
   // Add options for direction computation strategies
   std::shared_ptr<DirectionComputation> direction_computation;
   direction_computation = std::make_shared<DirectionComputationCuttingPlane>();
@@ -72,14 +92,6 @@ void Strategies::addOptions(Options* options,
   direction_computation = std::make_shared<DirectionComputationGradientCombination>();
   direction_computation->addOptions(options, reporter);
   // ADD NEW DIRECTION COMPUTATION STRATEGIES HERE AND IN SWITCH BELOW //
-
-  // Add options for approximate Hessian update strategies
-  std::shared_ptr<ApproximateHessianUpdate> approximate_hessian_update;
-  approximate_hessian_update = std::make_shared<ApproximateHessianUpdateBFGS>();
-  approximate_hessian_update->addOptions(options, reporter);
-  approximate_hessian_update = std::make_shared<ApproximateHessianUpdateDFP>();
-  approximate_hessian_update->addOptions(options, reporter);
-  // ADD NEW APPROXIMATE HESSIAN UPDATE STRATEGIES HERE AND IN SWITCH BELOW //
 
   // Add options for line search strategies
   std::shared_ptr<LineSearch> line_search;
@@ -123,8 +135,9 @@ void Strategies::setOptions(const Options* options,
 {
 
   // Declare strategy names
-  std::string direction_computation_name;
   std::string approximate_hessian_update_name;
+  std::string derivative_checker_name;
+  std::string direction_computation_name;
   std::string line_search_name;
   std::string point_set_update_name;
   std::string qp_solver_name;
@@ -132,13 +145,33 @@ void Strategies::setOptions(const Options* options,
   std::string termination_name;
 
   // Read integer options
-  options->valueAsString(reporter, "direction_computation", direction_computation_name);
   options->valueAsString(reporter, "approximate_hessian_update", approximate_hessian_update_name);
+  options->valueAsString(reporter, "derivative_checker", derivative_checker_name);
+  options->valueAsString(reporter, "direction_computation", direction_computation_name);
   options->valueAsString(reporter, "line_search", line_search_name);
   options->valueAsString(reporter, "point_set_update", point_set_update_name);
   options->valueAsString(reporter, "qp_solver", qp_solver_name);
   options->valueAsString(reporter, "symmetric_matrix", symmetric_matrix_name);
   options->valueAsString(reporter, "termination", termination_name);
+
+  // Set approximate Hessian update strategy
+  if (approximate_hessian_update_name.compare("BFGS") == 0) {
+    approximate_hessian_update_ = std::make_shared<ApproximateHessianUpdateBFGS>();
+  }
+  else if (approximate_hessian_update_name.compare("DFP") == 0) {
+    approximate_hessian_update_ = std::make_shared<ApproximateHessianUpdateDFP>();
+  }
+  else {
+    approximate_hessian_update_ = std::make_shared<ApproximateHessianUpdateBFGS>();
+  }
+
+  // Set derivative checker strategy
+  if (derivative_checker_name.compare("FiniteDifference") == 0) {
+    derivative_checker_ = std::make_shared<DerivativeCheckerFiniteDifference>();
+  }
+  else {
+    derivative_checker_ = std::make_shared<DerivativeCheckerFiniteDifference>();
+  }
 
   // Set direction computation strategy
   if (direction_computation_name.compare("CuttingPlane") == 0) {
@@ -152,17 +185,6 @@ void Strategies::setOptions(const Options* options,
   }
   else {
     direction_computation_ = std::make_shared<DirectionComputationCuttingPlane>();
-  }
-
-  // Set approximate Hessian update strategy
-  if (approximate_hessian_update_name.compare("BFGS") == 0) {
-    approximate_hessian_update_ = std::make_shared<ApproximateHessianUpdateBFGS>();
-  }
-  else if (approximate_hessian_update_name.compare("DFP") == 0) {
-    approximate_hessian_update_ = std::make_shared<ApproximateHessianUpdateDFP>();
-  }
-  else {
-    approximate_hessian_update_ = std::make_shared<ApproximateHessianUpdateBFGS>();
   }
 
   // Set line search strategy
@@ -211,11 +233,14 @@ void Strategies::setOptions(const Options* options,
     termination_ = std::make_shared<TerminationGradientCombination>();
   }
 
-  // Set direction computation options
-  direction_computation_->setOptions(options, reporter);
-
   // Set approximate Hessian update options
   approximate_hessian_update_->setOptions(options, reporter);
+
+  // Set derivative checker options
+  derivative_checker_->setOptions(options, reporter);
+
+  // Set direction computation options
+  direction_computation_->setOptions(options, reporter);
 
   // Set line search options
   line_search_->setOptions(options, reporter);
@@ -240,11 +265,14 @@ void Strategies::initialize(const Options* options,
                             const Reporter* reporter)
 {
 
-  // Initialize direction computation
-  direction_computation_->initialize(options, quantities, reporter);
-
   // Initialize approximate Hessian update
   approximate_hessian_update_->initialize(options, quantities, reporter);
+
+  // Initialize derivative checker
+  derivative_checker_->initialize(options, quantities, reporter);
+
+  // Initialize direction computation
+  direction_computation_->initialize(options, quantities, reporter);
 
   // Initialize line search
   line_search_->initialize(options, quantities, reporter);
@@ -300,15 +328,17 @@ void Strategies::printHeader(const Reporter* reporter)
 {
 
   // Print header
-  reporter->printf(R_NL, R_BASIC, "Direction computation strategy....... : %s\n"
-                                  "Approximate Hessian update strategy.. : %s\n"
+  reporter->printf(R_NL, R_BASIC, "Approximate Hessian update strategy.. : %s\n"
+                                  "Derivative checker strategy.......... : %s\n"
+                                  "Direction computation strategy....... : %s\n"
                                   "Line search strategy................. : %s\n"
                                   "Point set update strategy............ : %s\n"
                                   "QP solver strategy................... : %s\n"
                                   "Symmetric matrix strategy............ : %s\n"
                                   "Termination strategy................. : %s\n",
-                   direction_computation_->name().c_str(),
                    approximate_hessian_update_->name().c_str(),
+                   derivative_checker_->name().c_str(),
+                   direction_computation_->name().c_str(),
                    line_search_->name().c_str(),
                    point_set_update_->name().c_str(),
                    qp_solver_->name().c_str(),

@@ -20,11 +20,11 @@ LIB = libAMPLProblem.a
 EXE = solveAMPLProblem
 
 # Libraries
-NonOptLIB = $(NONOPTDIR)/NonOpt/src/libNonOpt.a
-AMPLLIB   = $(AMPLDIR)/amplsolver.a
+NonOptLIB = "$(NONOPTDIR)"/NonOpt/src/libNonOpt.a
+AMPLLIB   = "$(AMPLDIR)"/amplsolver.a
 
 # Includes
-INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(AMPLDIR)
+INCLUDES = -I "$(NONOPTDIR)"/NonOpt/src -I "$(AMPLDIR)"
 
 # Rule for all
 all: $(LIB) $(EXE)
@@ -42,7 +42,7 @@ AMPLProblem.cpp: AMPLProblem.hpp
 
 # Create executable
 $(EXE): solveAMPLProblem.o
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(AMPLLIB) $(LIB) -L $(LAPACKDIR) -ldl -lblas -llapack
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(AMPLLIB) $(LIB) -L "$(LAPACKDIR)" -ldl -lblas -llapack
 
 # Rule for object
 solveAMPLProblem.o: solveAMPLProblem.cpp
@@ -53,8 +53,8 @@ $(LIB): $(NonOptLIB)
 $(EXE): $(NonOptLIB)
 
 # Rules
-$(NonOptLIB): $(wildcard $(NONOPTDIR)/NonOpt/src/*.hpp) $(wildcard $(NONOPTDIR)/NonOpt/src/*.cpp)
-	$(MAKE) --directory=$(NONOPTDIR)/NonOpt/src
+$(NonOptLIB): $(wildcard "$(NONOPTDIR)"/NonOpt/src/*.hpp) $(wildcard "$(NONOPTDIR)"/NonOpt/src/*.cpp)
+	$(MAKE) --directory="$(NONOPTDIR)"/NonOpt/src
 
 # Clean
 clean:

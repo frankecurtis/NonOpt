@@ -22,7 +22,7 @@ NonOptSolver::NonOptSolver()
 {
 
   // Declare stream report
-  std::shared_ptr<StreamReport> s(new StreamReport("default", R_NL, R_PER_ITERATION));
+  std::shared_ptr<StreamReport> s(new StreamReport("default", R_NL, R_BASIC));
 
   // Set stream report to standard output
   s->setStream(&std::cout);
@@ -48,49 +48,6 @@ NonOptSolver::~NonOptSolver()
 void NonOptSolver::addOptions()
 {
 
-  // Add bool options
-  options_.addBoolOption(&reporter_,
-                         "check_derivatives",
-                         false,
-                         "Determines whether to check derivatives at iterates.\n"
-                         "Default     : false.");
-
-  // Add double options
-  options_.addDoubleOption(&reporter_,
-                           "derivative_checker_increment",
-                           1e-08,
-                           0.0,
-                           NONOPT_DOUBLE_INFINITY,
-                           "Increment for derivative checker.\n"
-                           "Default     : 1e-08.");
-  options_.addDoubleOption(&reporter_,
-                           "derivative_checker_tolerance",
-                           1e-04,
-                           0.0,
-                           NONOPT_DOUBLE_INFINITY,
-                           "Tolerance for derivative checker.\n"
-                           "Default     : 1e-04.");
-  options_.addDoubleOption(&reporter_,
-                           "iterate_norm_tolerance",
-                           1e+20,
-                           0.0,
-                           NONOPT_DOUBLE_INFINITY,
-                           "Tolerance for determining divergence of the algorithm iterates.\n"
-                           "              If the norm of an iterate is larger than this tolerance times\n"
-                           "              the maximum of 1.0 and the norm of the initial iterate, then\n"
-                           "              the algorithm terminates with a message of divergence.\n"
-                           "Default     : 1e+20.");
-
-  // Add integer options
-  options_.addIntegerOption(&reporter_,
-                            "iteration_limit",
-                            1e+04,
-                            0,
-                            NONOPT_INT_INFINITY,
-                            "Limit on the number of iterations that will be performed.\n"
-                            "              Note that each iteration might involve inner iterations.\n"
-                            "Default     : 1e+04.");
-
   // Add options for quantities
   quantities_.addOptions(&options_, &reporter_);
 
@@ -102,19 +59,6 @@ void NonOptSolver::addOptions()
 // Set options
 void NonOptSolver::setOptions()
 {
-
-  // Set bool options
-  options_.valueAsBool(&reporter_, "check_derivatives", check_derivatives_);
-
-  // Set double options
-  options_.valueAsDouble(&reporter_, "derivative_checker_increment", derivative_checker_increment_);
-  options_.valueAsDouble(&reporter_, "derivative_checker_tolerance", derivative_checker_tolerance_);
-  options_.valueAsDouble(&reporter_, "iterate_norm_tolerance", iterate_norm_tolerance_);
-  options_.valueAsDouble(&reporter_, "stationarity_radius_update_factor", stationarity_radius_update_factor_);
-  options_.valueAsDouble(&reporter_, "trust_region_radius_update_factor", trust_region_radius_update_factor_);
-
-  // Set integer options
-  options_.valueAsInteger(&reporter_, "iteration_limit", iteration_limit_);
 
   // Set quantities options
   quantities_.setOptions(&options_, &reporter_);
@@ -182,10 +126,6 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
     // Initialize strategies
     strategies_.initialize(&options_, &quantities_, &reporter_);
 
-    // Set derivative checker increment and tolerance
-    derivative_checker_.setIncrement(derivative_checker_increment_);
-    derivative_checker_.setTolerance(derivative_checker_tolerance_);
-
     // Print header
     printHeader();
 
@@ -198,11 +138,6 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
       // Print iteration header
       printIterationHeader();
 
-      // Check derivatives?
-      if (check_derivatives_) {
-        derivative_checker_.checkDerivatives(&reporter_, quantities_.currentIterate());
-      }
-
       // Print quantities iteration values
       quantities_.printIterationValues(&reporter_);
 
@@ -210,14 +145,22 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
       reporter_.flushBuffer();
 
       // Check termination conditions
-      if (quantities_.iterationCounter() >= iteration_limit_) {
+      if (quantities_.iterationCounter() >= quantities_.iterationLimit()) {
         THROW_EXCEPTION(NONOPT_ITERATION_LIMIT_EXCEPTION, "Iteration limit has been reached.");
       }
       if ((clock() - quantities_.startTime()) / (double)CLOCKS_PER_SEC >= quantities_.cpuTimeLimit()) {
         THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
       }
-      if (quantities_.currentIterate()->vector()->norm2() >= iterate_norm_tolerance_ * fmax(1.0, initial_iterate_norm)) {
+      if (quantities_.currentIterate()->vector()->norm2() >= quantities_.iterateNormTolerance() * fmax(1.0, initial_iterate_norm)) {
         THROW_EXCEPTION(NONOPT_ITERATE_NORM_LIMIT_EXCEPTION, "Iterates appear to be diverging.");
+      }
+
+      // Check derivatives
+      strategies_.derivativeChecker()->checkDerivatives(&options_, &quantities_, &reporter_);
+
+      // Check status
+      if (strategies_.derivativeChecker()->status() != DE_SUCCESS) {
+        THROW_EXCEPTION(NONOPT_DERIVATIVE_CHECKER_FAILURE_EXCEPTION, "Derivative checker failed.");
       }
 
       // Compute direction
@@ -229,13 +172,21 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
       }
 
       // Check final termination conditions
-      if (strategies_.termination()->checkFinal(&options_, &quantities_, &reporter_, &strategies_)) {
+      if (strategies_.termination()->checkStationarityFinal(&options_, &quantities_, &reporter_, &strategies_) &&
+          strategies_.termination()->checkRadiiFinal(&options_, &quantities_, &reporter_, &strategies_)) {
         THROW_EXCEPTION(NONOPT_SUCCESS_EXCEPTION, "Stationary point found.");
       }
 
+      // Check objective similarity termination conditions
+      if (strategies_.termination()->checkRadiiFinal(&options_, &quantities_, &reporter_, &strategies_) &&
+          strategies_.termination()->checkObjectiveSimilarity(&options_, &quantities_, &reporter_, &strategies_)) {
+        THROW_EXCEPTION(NONOPT_OBJECTIVE_SIMILARITY_EXCEPTION, "Insufficient objective improvement.");
+      }
+
       // Check radius update conditions
-      if (strategies_.termination()->checkRadiiNotFinal(&options_, &quantities_, &reporter_, &strategies_) &&
-          strategies_.termination()->checkRadiiUpdate(&options_, &quantities_, &reporter_, &strategies_)) {
+      if (!strategies_.termination()->checkRadiiFinal(&options_, &quantities_, &reporter_, &strategies_) &&
+          (strategies_.termination()->checkRadiiUpdate(&options_, &quantities_, &reporter_, &strategies_) ||
+           strategies_.termination()->checkObjectiveSimilarity(&options_, &quantities_, &reporter_, &strategies_))) {
         quantities_.updateRadii();
         quantities_.initializeInexactTerminationFactor(&options_, &reporter_);
       }
@@ -291,6 +242,8 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
   // catch exceptions
   catch (NONOPT_SUCCESS_EXCEPTION& exec) {
     setStatus(NONOPT_SUCCESS);
+  } catch (NONOPT_OBJECTIVE_SIMILARITY_EXCEPTION& exec) {
+    setStatus(NONOPT_OBJECTIVE_SIMILARITY);
   } catch (NONOPT_CPU_TIME_LIMIT_EXCEPTION& exec) {
     setStatus(NONOPT_CPU_TIME_LIMIT);
   } catch (NONOPT_ITERATE_NORM_LIMIT_EXCEPTION& exec) {
@@ -311,6 +264,8 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
     setStatus(NONOPT_FUNCTION_EVALUATION_ASSERT);
   } catch (NONOPT_GRADIENT_EVALUATION_ASSERT_EXCEPTION& exec) {
     setStatus(NONOPT_GRADIENT_EVALUATION_ASSERT);
+  } catch (NONOPT_DERIVATIVE_CHECKER_FAILURE_EXCEPTION& exec) {
+    setStatus(NONOPT_DERIVATIVE_CHECKER_FAILURE);
   } catch (NONOPT_DIRECTION_COMPUTATION_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_DIRECTION_COMPUTATION_FAILURE);
   } catch (NONOPT_LINE_SEARCH_FAILURE_EXCEPTION& exec) {
@@ -349,20 +304,39 @@ void NonOptSolver::evaluateFunctionsAtCurrentIterate()
 {
 
   // Evaluate objective
-  bool evaluation_success = quantities_.currentIterate()->evaluateObjective(quantities_);
+  bool evaluation_success;
 
-  // Check for evaluation success
-  if (!evaluation_success) {
-    THROW_EXCEPTION(NONOPT_FUNCTION_EVALUATION_FAILURE_EXCEPTION, "Function evaluation failed.");
+  // Check whether to evaluate function with gradient
+  if (quantities_.evaluateFunctionWithGradient()) {
+
+    // Evaluate function
+    evaluation_success = quantities_.currentIterate()->evaluateObjectiveAndGradient(quantities_);
+
+    // Check for evaluation success
+    if (!evaluation_success) {
+      THROW_EXCEPTION(NONOPT_FUNCTION_EVALUATION_FAILURE_EXCEPTION, "Function + gradient evaluation failed.");
+    }
+
   }
+  else {
 
-  // Evaluate gradient
-  evaluation_success = quantities_.currentIterate()->evaluateGradient(quantities_);
+    // Evaluate function
+    evaluation_success = quantities_.currentIterate()->evaluateObjective(quantities_);
 
-  // Check for evaluation success
-  if (!evaluation_success) {
-    THROW_EXCEPTION(NONOPT_GRADIENT_EVALUATION_FAILURE_EXCEPTION, "Initialization failed.");
-  }
+    // Check for evaluation success
+    if (!evaluation_success) {
+      THROW_EXCEPTION(NONOPT_FUNCTION_EVALUATION_FAILURE_EXCEPTION, "Function evaluation failed.");
+    }
+
+    // Evaluate gradient
+    evaluation_success = quantities_.currentIterate()->evaluateGradient(quantities_);
+
+    // Check for evaluation success
+    if (!evaluation_success) {
+      THROW_EXCEPTION(NONOPT_GRADIENT_EVALUATION_FAILURE_EXCEPTION, "Initialization failed.");
+    }
+
+  } // end else
 
 } // end evaluateFunctionsAtCurrentIterate
 
@@ -380,6 +354,9 @@ void NonOptSolver::printFooter()
     break;
   case NONOPT_SUCCESS:
     reporter_.printf(R_NL, R_BASIC, "Stationary point found.");
+    break;
+  case NONOPT_OBJECTIVE_SIMILARITY:
+    reporter_.printf(R_NL, R_BASIC, "Objective not improving sufficiently.");
     break;
   case NONOPT_CPU_TIME_LIMIT:
     reporter_.printf(R_NL, R_BASIC, "CPU time limit reached.");
@@ -410,6 +387,9 @@ void NonOptSolver::printFooter()
     break;
   case NONOPT_GRADIENT_EVALUATION_ASSERT:
     reporter_.printf(R_NL, R_BASIC, "Gradient evaluation assert failure! This wasn't supposed to happen!");
+    break;
+  case NONOPT_DERIVATIVE_CHECKER_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Derivative checker failure.");
     break;
   case NONOPT_DIRECTION_COMPUTATION_FAILURE:
     reporter_.printf(R_NL, R_BASIC, "Direction computation failure.");

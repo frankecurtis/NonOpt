@@ -19,31 +19,31 @@ depends = $(sources:.cpp=.d)
 EXES = $(sources:.cpp=)
 
 # Libraries
-NonOptLIB         = $(NONOPTDIR)/NonOpt/src/libNonOpt.a
-NonOptProblemsLIB = $(NONOPTDIR)/NonOpt/problems/libNonOptProblems.a
+NonOptLIB         = "$(NONOPTDIR)"/NonOpt/src/libNonOpt.a
+NonOptProblemsLIB = "$(NONOPTDIR)"/NonOpt/problems/libNonOptProblems.a
 
 # Includes
-INCLUDES = -I $(NONOPTDIR)/NonOpt/src -I $(NONOPTDIR)/NonOpt/problems
+INCLUDES = -I "$(NONOPTDIR)"/NonOpt/src -I "$(NONOPTDIR)"/NonOpt/problems
 
 # Rule for all
 all: $(EXES)
 
 # Dependence for executable
 $(EXES): % : %.o
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(NonOptProblemsLIB) -L $(LAPACKDIR) -ldl -lblas -llapack
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(NonOptProblemsLIB) -L "$(LAPACKDIR)" -ldl -lblas -llapack
 
 # Dependencies for executable
 $(EXES): $(NonOptLIB) $(NonOptProblemsLIB)
 
 # Rules for libraries
 $(NonOptLIB):
-	$(MAKE) --directory=$(NONOPTDIR)/NonOpt/src
+	$(MAKE) --directory="$(NONOPTDIR)"/NonOpt/src
 $(NonOptProblemsLIB):
-	$(MAKE) --directory=$(NONOPTDIR)/NonOpt/problems
+	$(MAKE) --directory="$(NONOPTDIR)"/NonOpt/problems
 
 # Dependencies for libraries
-$(NonOptLIB): $(wildcard $(NONOPTDIR)/NonOpt/src/*.hpp) $(wildcard $(NONOPTDIR)/NonOpt/src/*.cpp)
-$(NonOptProblemsLIB): $(wildcard $(NONOPTDIR)/NonOpt/problems/*.hpp) $(wildcard $(NONOPTDIR)/NonOpt/problems/*.cpp)
+$(NonOptLIB): $(wildcard "$(NONOPTDIR)"/NonOpt/src/*.hpp) $(wildcard "$(NONOPTDIR)"/NonOpt/src/*.cpp)
+$(NonOptProblemsLIB): $(wildcard "$(NONOPTDIR)"/NonOpt/problems/*.hpp) $(wildcard "$(NONOPTDIR)"/NonOpt/problems/*.cpp)
 
 # Rule for .cpp.o
 .cpp.o:

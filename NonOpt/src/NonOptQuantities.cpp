@@ -17,8 +17,7 @@ Quantities::Quantities()
   : direction_computation_time_(0),
     evaluation_time_(0),
     line_search_time_(0),
-    cpu_time_limit_(NONOPT_DOUBLE_INFINITY),
-    inexact_termination_factor_(sqrt(2.0) - 1.0),
+    inexact_termination_factor_(0.0),
     stationarity_radius_(0.0),
     stepsize_(0.0),
     trust_region_radius_(0.0),
@@ -30,8 +29,13 @@ Quantities::Quantities()
     qp_iteration_counter_(0),
     total_inner_iteration_counter_(0),
     total_qp_iteration_counter_(0),
+    approximate_hessian_initial_scaling_(false),
+    evaluate_function_with_gradient_(false),
+    cpu_time_limit_(NONOPT_DOUBLE_INFINITY),
     inexact_termination_factor_initial_(1.0),
     inexact_termination_update_factor_(1.0),
+    inexact_termination_update_stepsize_threshold_(1.0),
+    iterate_norm_tolerance_(1.0),
     scaling_threshold_(1.0),
     stationarity_radius_initialization_factor_(1.0),
     stationarity_radius_initialization_minimum_(1.0),
@@ -41,7 +45,8 @@ Quantities::Quantities()
     trust_region_radius_initialization_minimum_(1.0),
     trust_region_radius_update_factor_(1.0),
     function_evaluation_limit_(1),
-    gradient_evaluation_limit_(1)
+    gradient_evaluation_limit_(1),
+    iteration_limit_(1)
 {
   start_time_ = clock();
   end_time_ = start_time_;
@@ -64,6 +69,12 @@ void Quantities::addOptions(Options* options,
                          "approximate_hessian_initial_scaling",
                          false,
                          "Indicator of whether to scale initial matrix for approximate Hessian.\n"
+                         "Default     : false.");
+  options->addBoolOption(reporter,
+                         "evaluate_function_with_gradient",
+                         false,
+                         "Determines whether to evaluate function and gradient\n"
+                         "              at the same time (or separately).\n"
                          "Default     : false.");
 
   // Add double options
@@ -103,6 +114,16 @@ void Quantities::addOptions(Options* options,
                            "              inexact termination factor.\n"
                            "Default     : 1e-10.");
   options->addDoubleOption(reporter,
+                           "iterate_norm_tolerance",
+                           1e+20,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Tolerance for determining divergence of the algorithm iterates.\n"
+                           "              If the norm of an iterate is larger than this tolerance times\n"
+                           "              the maximum of 1.0 and the norm of the initial iterate, then\n"
+                           "              the algorithm terminates with a message of divergence.\n"
+                           "Default     : 1e+20.");
+  options->addDoubleOption(reporter,
                            "scaling_threshold",
                            1e+02,
                            0.0,
@@ -137,6 +158,16 @@ void Quantities::addOptions(Options* options,
                            "              for updating the stationarity and trust region radii are met,\n"
                            "              then the stationarity radius is multiplied by this fraction.\n"
                            "Default     : 1e-01.");
+  options->addDoubleOption(reporter,
+                           "stationarity_tolerance",
+                           1e-04,
+                           0.0,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Tolerance for determining stationarity.  If the stationarity\n"
+                           "              radius falls below this tolerance and other factors determined\n"
+                           "              by the termination strategy are met, then the algorithm\n"
+                           "              terminates with a message of stationarity.\n"
+                           "Default     : 1e-04.");
   options->addDoubleOption(reporter,
                            "trust_region_radius_initialization_factor",
                            1e+04,
@@ -179,6 +210,14 @@ void Quantities::addOptions(Options* options,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of gradient evaluations performed.\n"
                             "Default     : 1e+05.");
+  options->addIntegerOption(reporter,
+                            "iteration_limit",
+                            1e+04,
+                            0,
+                            NONOPT_INT_INFINITY,
+                            "Limit on the number of iterations that will be performed.\n"
+                            "              Note that each iteration might involve inner iterations.\n"
+                            "Default     : 1e+04.");
 
 } // end addOptions
 
@@ -189,16 +228,19 @@ void Quantities::setOptions(const Options* options,
 
   // Read bool options
   options->valueAsBool(reporter, "approximate_hessian_initial_scaling", approximate_hessian_initial_scaling_);
+  options->valueAsBool(reporter, "evaluate_function_with_gradient", evaluate_function_with_gradient_);
 
   // Read double options
   options->valueAsDouble(reporter, "cpu_time_limit", cpu_time_limit_);
   options->valueAsDouble(reporter, "inexact_termination_factor_initial", inexact_termination_factor_initial_);
   options->valueAsDouble(reporter, "inexact_termination_update_factor", inexact_termination_update_factor_);
   options->valueAsDouble(reporter, "inexact_termination_update_stepsize_threshold", inexact_termination_update_stepsize_threshold_);
+  options->valueAsDouble(reporter, "iterate_norm_tolerance", iterate_norm_tolerance_);
   options->valueAsDouble(reporter, "scaling_threshold", scaling_threshold_);
   options->valueAsDouble(reporter, "stationarity_radius_initialization_factor", stationarity_radius_initialization_factor_);
   options->valueAsDouble(reporter, "stationarity_radius_initialization_minimum", stationarity_radius_initialization_minimum_);
   options->valueAsDouble(reporter, "stationarity_radius_update_factor", stationarity_radius_update_factor_);
+  options->valueAsDouble(reporter, "stationarity_tolerance", stationarity_tolerance_);
   options->valueAsDouble(reporter, "trust_region_radius_initialization_factor", trust_region_radius_initialization_factor_);
   options->valueAsDouble(reporter, "trust_region_radius_initialization_minimum", trust_region_radius_initialization_minimum_);
   options->valueAsDouble(reporter, "trust_region_radius_update_factor", trust_region_radius_update_factor_);
@@ -206,6 +248,7 @@ void Quantities::setOptions(const Options* options,
   // Read integer options
   options->valueAsInteger(reporter, "function_evaluation_limit", function_evaluation_limit_);
   options->valueAsInteger(reporter, "gradient_evaluation_limit", gradient_evaluation_limit_);
+  options->valueAsInteger(reporter, "iteration_limit", iteration_limit_);
 
 } // end setOptions
 
@@ -311,9 +354,6 @@ void Quantities::initializeRadii(const Options* options,
                                  const Reporter* reporter)
 {
 
-  // Stationarity radius (for updates)
-  options->valueAsDouble(reporter, "stationarity_tolerance", stationarity_tolerance_);
-
   // Initialize stationarity radius
   stationarity_radius_ = fmax(stationarity_radius_initialization_minimum_, stationarity_radius_initialization_factor_ * current_iterate_->gradient()->normInf());
 
@@ -341,7 +381,7 @@ void Quantities::updateRadii()
   stationarity_radius_ = fmax(stationarity_tolerance_, stationarity_radius_update_factor_ * stationarity_radius_);
   trust_region_radius_ = trust_region_radius_update_factor_ * trust_region_radius_;
 
-  // reset step size
+  // Reset step size
   stepsize_ = 1.0;
 
 } // end updateRadii

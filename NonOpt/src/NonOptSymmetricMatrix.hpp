@@ -196,7 +196,6 @@ public:
 protected:
   /** @name Protected members */
   //@{
-  bool initial_scaling_; /**< Indicator of initial scaling */
   std::string type_;     /**< Type of update */
   //@}
 

@@ -73,6 +73,18 @@ public:
                          const double* x,
                          double& f);
   /**
+   * Evaluates objective and gradient
+   * \param[in] n is the number of variables, the size of "x", a constant integer
+   * \param[in] x is a given point/iterate, a constant double array
+   * \param[out] f is the objective value at "x", a double (return value)
+   * \param[out] g is the gradient value at "x", a double array (return value)
+   * \return indicator of success (true) or failure (false)
+   */
+  bool evaluateObjectiveAndGradient(int n,
+                                    const double* x,
+                                    double& f,
+                                    double* g);
+  /**
    * Evaluates gradient
    * \param[in] n is the number of variables, the size of "x", a constant integer
    * \param[in] x is a given point/iterate, a constant double array
@@ -118,6 +130,7 @@ private:
   /** @name Private members */
   //@{
   int number_of_variables_; /**< Number of variables */
+  double* sum_;             /**< Array for sums      */
   //@}
 
 }; // end MxHilb

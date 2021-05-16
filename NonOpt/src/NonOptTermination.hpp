@@ -101,29 +101,29 @@ public:
   /** @name Check condition methods */
   //@{
   /**
-   * Check final termination conditions
+   * Check objective similarity
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in] quantities is pointer to Quantities object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    * \param[in] strategies is pointer to Strategies object from NonOpt
    * \return bool to indicate conditions satisfied or not
    */
-  virtual bool checkFinal(const Options* options,
-                          Quantities* quantities,
-                          const Reporter* reporter,
-                          Strategies* strategies) const = 0;
+  virtual bool checkObjectiveSimilarity(const Options* options,
+                                        Quantities* quantities,
+                                        const Reporter* reporter,
+                                        Strategies* strategies) = 0;
   /**
-   * Check radii not final
+   * Check radii final
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in] quantities is pointer to Quantities object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    * \param[in] strategies is pointer to Strategies object from NonOpt
    * \return bool to indicate conditions satisfied or not
    */
-  virtual bool checkRadiiNotFinal(const Options* options,
-                                  Quantities* quantities,
-                                  const Reporter* reporter,
-                                  Strategies* strategies) const = 0;
+  virtual bool checkRadiiFinal(const Options* options,
+                               Quantities* quantities,
+                               const Reporter* reporter,
+                               Strategies* strategies) const = 0;
   /**
    * Check radii update
    * \param[in] options is pointer to Options object from NonOpt
@@ -136,6 +136,19 @@ public:
                                 Quantities* quantities,
                                 const Reporter* reporter,
                                 Strategies* strategies) const = 0;
+  /**
+   * Check stationarity final conditions
+   * \param[in] options is pointer to Options object from NonOpt
+   * \param[in] quantities is pointer to Quantities object from NonOpt
+   * \param[in] reporter is pointer to Reporter object from NonOpt
+   * \param[in] strategies is pointer to Strategies object from NonOpt
+   * \return bool to indicate conditions satisfied or not
+   */
+  virtual bool checkStationarityFinal(const Options* options,
+                                      Quantities* quantities,
+                                      const Reporter* reporter,
+                                      Strategies* strategies) const = 0;
+
   //@}
 
 private:

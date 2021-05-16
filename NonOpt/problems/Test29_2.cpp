@@ -54,15 +54,37 @@ bool Test29_2::evaluateObjective(int n,
   // Evaluate maximum absolute value
   f = 0.0;
   for (int i = 0; i < n; i++) {
-    if (fabs(x[i]) > f) {
-      f = fabs(x[i]);
-    }
+    f = fmax(f, fabs(x[i]));
   } // end for
 
   // Return
-  return true;
+  return !isnan(f);
 
 } // end evaluateObjective
+
+// Objective and gradient value
+bool Test29_2::evaluateObjectiveAndGradient(int n,
+                                            const double* x,
+                                            double& f,
+                                            double* g)
+{
+
+  // Initialize gradient and evaluate maximum absolute value
+  int index = 0;
+  f = 0.0;
+  for (int i = 0; i < n; i++) {
+    if (fabs(x[i]) > f) {
+      index = i;
+      f = fabs(x[i]);
+    }
+    g[i] = 0.0;
+  }
+  g[index] = ((x[index] > 0.0) ? 1.0 : ((x[index] < 0.0) ? -1.0 : 0.0));
+
+  // Return
+  return !isnan(f) && !isnan(g[index]);
+
+} // end evaluateObjectiveAndGradient
 
 // Gradient value
 bool Test29_2::evaluateGradient(int n,
@@ -71,19 +93,19 @@ bool Test29_2::evaluateGradient(int n,
 {
 
   // Initialize gradient and evaluate maximum absolute value
-  int max_ind = 0;
-  double max_val = 0.0;
+  int index = 0;
+  double f = 0.0;
   for (int i = 0; i < n; i++) {
-    if (fabs(x[i]) > max_val) {
-      max_ind = i;
-      max_val = fabs(x[i]);
+    if (fabs(x[i]) > f) {
+      index = i;
+      f = fabs(x[i]);
     }
     g[i] = 0.0;
   }
-  g[max_ind] = ((x[max_ind] > 0.0) ? 1.0 : ((x[max_ind] < 0.0) ? -1.0 : 0.0));
+  g[index] = ((x[index] > 0.0) ? 1.0 : ((x[index] < 0.0) ? -1.0 : 0.0));
 
   // Return
-  return true;
+  return !isnan(g[index]);
 
 } // end evaluateGradient
 

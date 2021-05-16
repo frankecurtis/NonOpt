@@ -19,16 +19,17 @@ void TerminationGradientCombination::addOptions(Options* options,
 
   // Add double options
   options->addDoubleOption(reporter,
-                           "stationarity_tolerance",
-                           1e-04,
+                           "objective_similarity_tolerance",
+                           1e-05,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
-                           "Tolerance for determining stationarity.  If the stationarity\n"
-                           "              radius falls below this tolerance and a computed convex\n"
-                           "              combination of gradients has norm below this tolerance times\n"
-                           "              the parameter stationarity_tolerance_factor, then the algorithm\n"
-                           "              terminates with a message of stationarity.\n"
-                           "Default     : 1e-04.");
+                           "Tolerance for determining objective similarity.  If the\n"
+                           "              difference between two consecutive objective values is less\n"
+                           "              than this tolerance times max{1,objective value}, then a\n"
+                           "              counter is increased.  If the counter exceeds\n"
+                           "              objective_similarity_limit, then the stationarity radius\n"
+                           "              is decreased or the algorithm terminates.\n"
+                           "Default     : 1e-05.");
   options->addDoubleOption(reporter,
                            "stationarity_tolerance_factor",
                            1e+00,
@@ -40,6 +41,18 @@ void TerminationGradientCombination::addOptions(Options* options,
                            "Default     : 1e+00.");
 
   // Add integer options
+  options->addIntegerOption(reporter,
+                            "objective_similarity_limit",
+                            10,
+                            0.0,
+                            NONOPT_INT_INFINITY,
+                            "Limit on an objective similarity counter.  If the difference\n"
+                            "              between two consecutive objective values is less than\n"
+                            "              objective_similarity_tolerance times max{1,objective value},\n"
+                            "              then a counter is increased.  If the counter exceeds\n"
+                            "              objective_similarity_limit, then the stationarity\n"
+                            "              radius is decreased or the algorithm terminates.\n"
+                            "Default     : 10.");
 
 } // end addOptions
 
@@ -51,10 +64,11 @@ void TerminationGradientCombination::setOptions(const Options* options,
   // Read bool options
 
   // Read double options
-  options->valueAsDouble(reporter, "stationarity_tolerance", stationarity_tolerance_);
+  options->valueAsDouble(reporter, "objective_similarity_tolerance", objective_similarity_tolerance_);
   options->valueAsDouble(reporter, "stationarity_tolerance_factor", stationarity_tolerance_factor_);
 
   // Read integer options
+  options->valueAsInteger(reporter, "objective_similarity_limit", objective_similarity_limit_);
 
 } // end setOptions
 
@@ -64,56 +78,67 @@ void TerminationGradientCombination::initialize(const Options* options,
                                                 const Reporter* reporter)
 {
 
-  // Set stationarity reference
+  // Initialize objective similarity counter
+  objective_similarity_counter_ = 0;
+
+  // Set reference values
+  objective_reference_ = quantities->currentIterate()->objective();
   stationarity_reference_ = quantities->currentIterate()->gradient()->normInf();
 
 } // end initialize
 
-// Check final conditions
-bool TerminationGradientCombination::checkFinal(const Options* options,
-                                                Quantities* quantities,
-                                                const Reporter* reporter,
-                                                Strategies* strategies) const
+// Check objective similarity condition
+bool TerminationGradientCombination::checkObjectiveSimilarity(const Options* options,
+                                                              Quantities* quantities,
+                                                              const Reporter* reporter,
+                                                              Strategies* strategies)
 {
 
   // Initialize check
   bool check = false;
 
-  // Evaluate reference value
-  double reference = fmax(1.0, fmax(stationarity_reference_, quantities->currentIterate()->gradient()->normInf()));
-
-  // Check final conditions
-  if (quantities->stationarityRadius() <= stationarity_tolerance_ &&
-      strategies->qpSolver()->combinationTranslatedNormInf() <= stationarity_tolerance_ * stationarity_tolerance_factor_ * reference) {
-    check = true;
+  // Check objective similarity
+  if (objective_reference_ - quantities->currentIterate()->objective() <= objective_similarity_tolerance_*fmax(1.0,fabs(objective_reference_))) {
+    objective_similarity_counter_++;
   }
+  else {
+    objective_similarity_counter_--;
+    objective_similarity_counter_ = fmax(0,objective_similarity_counter_);
+  } // end else
 
-  // Print check values
-  reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %+.2e", quantities->currentIterate()->gradient()->normInf(), strategies->qpSolver()->combinationTranslatedNormInf());
+  // Update objective reference value
+  objective_reference_ = quantities->currentIterate()->objective();
+
+  // Check if objective similarity counter exceeds limit
+  if (objective_similarity_counter_ > objective_similarity_limit_) {
+    objective_similarity_counter_ = 0;
+    check = true;
+  } // end if
 
   // Return
   return check;
 
-} // end checkFinal
+} // end checkObjectiveSimilarity
 
-// Check radii not final condition
-bool TerminationGradientCombination::checkRadiiNotFinal(const Options* options,
-                                                        Quantities* quantities,
-                                                        const Reporter* reporter,
-                                                        Strategies* strategies) const
+// Check radii final condition
+bool TerminationGradientCombination::checkRadiiFinal(const Options* options,
+                                                     Quantities* quantities,
+                                                     const Reporter* reporter,
+                                                     Strategies* strategies) const
 {
 
   // Initialize check
   bool check = false;
 
-  // Check radii not final condition
-  if (stationarity_tolerance_ < quantities->stationarityRadius()) {
+  // Check radii final condition
+  if (quantities->stationarityRadius() <= quantities->stationarityTolerance()) {
     check = true;
   }
 
   // Return
   return check;
-}
+
+} // end checkRadiiNotFinal
 
 // Check radii update conditions
 bool TerminationGradientCombination::checkRadiiUpdate(const Options* options,
@@ -134,6 +159,33 @@ bool TerminationGradientCombination::checkRadiiUpdate(const Options* options,
       strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
     check = true;
   }
+
+  // Return
+  return check;
+
+} // end checkRadiiUpdate
+
+// Check final stationarity conditions
+bool TerminationGradientCombination::checkStationarityFinal(const Options* options,
+                                                            Quantities* quantities,
+                                                            const Reporter* reporter,
+                                                            Strategies* strategies) const
+{
+
+  // Initialize check
+  bool check = false;
+
+  // Evaluate stationarity reference value
+  double reference = fmax(1.0, fmax(stationarity_reference_, quantities->currentIterate()->gradient()->normInf()));
+
+  // Check final stationarity conditions
+  if (quantities->stationarityRadius() <= quantities->stationarityTolerance() &&
+      strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityTolerance() * stationarity_tolerance_factor_ * reference) {
+    check = true;
+  }
+
+  // Print check values
+  reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %+.2e", quantities->currentIterate()->gradient()->normInf(), strategies->qpSolver()->combinationTranslatedNormInf());
 
   // Return
   return check;

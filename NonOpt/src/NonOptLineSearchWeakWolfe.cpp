@@ -134,9 +134,11 @@ void LineSearchWeakWolfe::initialize(const Options* options,
                                      Quantities* quantities,
                                      const Reporter* reporter)
 {
-  // initialize line search strategy
+
+  // Initialize stepsize
   quantities->setStepsize(fmax(stepsize_minimum_, fmin(stepsize_initial_, stepsize_maximum_)));
-}
+
+} // end initialize
 
 // Run line search
 void LineSearchWeakWolfe::runLineSearch(const Options* options,
@@ -153,25 +155,43 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
   // try line search, terminate on any exception
   try {
 
-    // Evaluate objective at current point
-    bool evaluation_success = quantities->currentIterate()->evaluateObjective(*quantities);
+    // Declare bool for evaluations
+    bool evaluation_success;
 
-    // Check for successful evaluation
-    if (!evaluation_success) {
-      quantities->setStepsize(0.0);
-      THROW_EXCEPTION(LS_EVALUATION_FAILURE_EXCEPTION, "Line search unsuccessful. Evaluation failed.");
-      printf("bad func");
+    // Check whether to evaluate function with gradient
+    if (quantities->evaluateFunctionWithGradient()) {
+
+      // Evaluate function
+      evaluation_success = quantities->currentIterate()->evaluateObjectiveAndGradient(*quantities);
+
+      // Check for evaluation success
+      if (!evaluation_success) {
+        quantities->setStepsize(0.0);
+        THROW_EXCEPTION(LS_EVALUATION_FAILURE_EXCEPTION, "Line search unsuccessful. Evaluation failed.");
+      }
+
     }
+    else {
 
-    // Evaluate gradient at current point
-    evaluation_success = quantities->currentIterate()->evaluateGradient(*quantities);
+      // Evaluate function
+      evaluation_success = quantities->currentIterate()->evaluateObjective(*quantities);
 
-    // Check for successful evaluation
-    if (!evaluation_success) {
-      quantities->setStepsize(0.0);
-      THROW_EXCEPTION(LS_EVALUATION_FAILURE_EXCEPTION, "Line search unsuccessful. Evaluation failed.");
-      printf("bad grad");
-    }
+      // Check for evaluation success
+      if (!evaluation_success) {
+        quantities->setStepsize(0.0);
+        THROW_EXCEPTION(LS_EVALUATION_FAILURE_EXCEPTION, "Line search unsuccessful. Evaluation failed.");
+      }
+
+      // Evaluate gradient
+      evaluation_success = quantities->currentIterate()->evaluateGradient(*quantities);
+
+      // Check for evaluation success
+      if (!evaluation_success) {
+        quantities->setStepsize(0.0);
+        THROW_EXCEPTION(LS_EVALUATION_FAILURE_EXCEPTION, "Line search unsuccessful. Evaluation failed.");
+      }
+
+    } // end else
 
     // Compute directional derivative
     double directional_derivative = quantities->currentIterate()->gradient()->innerProduct(*quantities->direction());
@@ -194,7 +214,12 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
       quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, quantities->stepsize(), *quantities->direction()));
 
       // Evaluate trial objective
-      evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+      if (quantities->evaluateFunctionWithGradient()) {
+        evaluation_success = quantities->trialIterate()->evaluateObjectiveAndGradient(*quantities);
+      }
+      else {
+        evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+      }
 
       // Check for evaluation success
       if (evaluation_success) {
@@ -236,7 +261,12 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
         }
 
         // Evaluate objective at trial iterate
-        evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+        if (quantities->evaluateFunctionWithGradient()) {
+          evaluation_success = quantities->trialIterate()->evaluateObjectiveAndGradient(*quantities);
+        }
+        else {
+          evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+        }
 
         // Check for evaluation success
         if (evaluation_success) {

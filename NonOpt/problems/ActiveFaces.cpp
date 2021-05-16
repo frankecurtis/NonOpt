@@ -58,9 +58,69 @@ bool ActiveFaces::evaluateObjective(int n,
   f = fmax(f, log(fabs(sum) + 1.0));
 
   // Return
-  return true;
+  return !isnan(f);
 
 } // end evaluateObjective
+
+// Objective and gradient value
+bool ActiveFaces::evaluateObjectiveAndGradient(int n,
+                                               const double* x,
+                                               double& f,
+                                               double* g)
+{
+
+  // Initialize gradient and evaluate maximum value
+  f = 0.0;
+  int index = 0;
+  double sum = 0.0;
+  double temp = 0.0;
+  for (int i = 0; i < n; i++) {
+    g[i] = 0.0;
+    temp = log(fabs(x[i]) + 1.0);
+    if (temp > f) {
+      f = temp;
+      index = i;
+    } // end if
+    sum = sum + x[i];
+  } // end for
+  temp = log(fabs(sum) + 1.0);
+  if (temp > f) {
+    f = temp;
+    index = -1;
+  } // end if
+
+  // Declare success
+  bool success = !isnan(f);
+
+  // Evaluate gradient
+  if (index >= 0) {
+    if (x[index] >= 0) {
+      g[index] = 1 / (x[index] + 1);
+    }
+    else {
+      g[index] = -1 / (-x[index] + 1);
+    }
+    success = !isnan(g[index]);
+  } // end if
+  else {
+    if (-sum >= 0) {
+      for (int i = 0; i < n; i++) {
+        g[i] = -1 / (-sum + 1);
+      }
+      success = !isnan(-1 / (-sum + 1));
+    }
+    else {
+      for (int i = 0; i < n; i++) {
+        g[i] = 1 / (sum + 1);
+      }
+      success = !isnan(1 / (sum + 1));
+    }
+  } // end else
+
+  // Return
+  return success;
+
+} // end evaluateObjectiveAndGradient
 
 // Gradient value
 bool ActiveFaces::evaluateGradient(int n,
@@ -69,49 +129,55 @@ bool ActiveFaces::evaluateGradient(int n,
 {
 
   // Initialize gradient and evaluate maximum value
-  double max_val = 0.0;
-  int max_ind = 0;
+  double f = 0.0;
+  int index = 0;
   double sum = 0.0;
   double temp = 0.0;
   for (int i = 0; i < n; i++) {
     g[i] = 0.0;
     temp = log(fabs(x[i]) + 1.0);
-    if (temp > max_val) {
-      max_val = temp;
-      max_ind = i;
+    if (temp > f) {
+      f = temp;
+      index = i;
     } // end if
     sum = sum + x[i];
   } // end for
   temp = log(fabs(sum) + 1.0);
-  if (temp > max_val) {
-    max_val = temp;
-    max_ind = -1;
+  if (temp > f) {
+    f = temp;
+    index = -1;
   } // end if
 
+  // Declare success
+  bool success = true;
+
   // Evaluate gradient
-  if (max_ind >= 0) {
-    if (x[max_ind] >= 0) {
-      g[max_ind] = 1 / (x[max_ind] + 1);
+  if (index >= 0) {
+    if (x[index] >= 0) {
+      g[index] = 1 / (x[index] + 1);
     }
     else {
-      g[max_ind] = -1 / (-x[max_ind] + 1);
+      g[index] = -1 / (-x[index] + 1);
     }
+    success = !isnan(g[index]);
   } // end if
   else {
     if (-sum >= 0) {
       for (int i = 0; i < n; i++) {
         g[i] = -1 / (-sum + 1);
       }
+      success = !isnan(-1 / (-sum + 1));
     }
     else {
       for (int i = 0; i < n; i++) {
         g[i] = 1 / (sum + 1);
       }
+      success = !isnan(1 / (sum + 1));
     }
   } // end else
 
   // Return
-  return true;
+  return success;
 
 } // end evaluateGradient
 

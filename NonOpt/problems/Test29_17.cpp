@@ -56,37 +56,36 @@ bool Test29_17::evaluateObjective(int n,
   } // end for
 
   // Return
-  return true;
+  return !isnan(f);
 
 } // end evaluateObjective
 
-// Gradient value
-bool Test29_17::evaluateGradient(int n,
-                                 const double* x,
-                                 double* g)
+// Objective and gradient value
+bool Test29_17::evaluateObjectiveAndGradient(int n,
+                                             const double* x,
+                                             double& f,
+                                             double* g)
 {
 
-  // Initialize gradient
+  // Evaluate gradient
+  int index = 0;
+  f = 0.0;
+  double maximum = 0.0;
+  double term;
+  int j;
   for (int i = 0; i < n; i++) {
     g[i] = 0.0;
-  }
-
-  // Evaluate gradient
-  int max_ind = 0;
-  double max_val = 0.0;
-  double max_term = 0.0;
-  for (int i = 0; i < n; i++) {
-    int j = i / 5;
-    double term = 5 - (double)(j + 1) * (1 - cos(x[i])) - sin(x[i]) - cos(x[5 * j]) - cos(x[5 * j + 1]) - cos(x[5 * j + 2]) - cos(x[5 * j + 3]) - cos(x[5 * j + 4]);
-    if (fabs(term) > max_val) {
-      max_ind = i;
-      max_val = fabs(term);
-      max_term = term;
+    j = i / 5;
+    term = 5 - (double)(j + 1) * (1 - cos(x[i])) - sin(x[i]) - cos(x[5 * j]) - cos(x[5 * j + 1]) - cos(x[5 * j + 2]) - cos(x[5 * j + 3]) - cos(x[5 * j + 4]);
+    if (fabs(term) > f) {
+      index = i;
+      f = fabs(term);
+      maximum = term;
     } // end if
   }   // end for
-  int j = max_ind / 5;
-  double sign = ((max_term >= 0) ? 1.0 : -1.0);
-  g[max_ind] += sign * (-(double)(j + 1) * sin(x[max_ind]) - cos(x[max_ind]));
+  j = index / 5;
+  double sign = ((maximum >= 0) ? 1.0 : -1.0);
+  g[index] += sign * (-(double)(j + 1) * sin(x[index]) - cos(x[index]));
   g[5 * j] += sign * sin(x[5 * j]);
   g[5 * j + 1] += sign * sin(x[5 * j + 1]);
   g[5 * j + 2] += sign * sin(x[5 * j + 2]);
@@ -94,7 +93,43 @@ bool Test29_17::evaluateGradient(int n,
   g[5 * j + 4] += sign * sin(x[5 * j + 4]);
 
   // Return
-  return true;
+  return !isnan(g[index]) && !isnan(g[5 * j]) && !isnan(g[5 * j + 1]) && !isnan(g[5 * j + 2]) && !isnan(g[5 * j + 3]) && !isnan(g[5 * j + 4]);
+
+} // end evaluateObjectiveAndGradient
+
+// Gradient value
+bool Test29_17::evaluateGradient(int n,
+                                 const double* x,
+                                 double* g)
+{
+
+  // Evaluate gradient
+  int index = 0;
+  double f = 0.0;
+  double maximum = 0.0;
+  double term;
+  int j;
+  for (int i = 0; i < n; i++) {
+    g[i] = 0.0;
+    j = i / 5;
+    term = 5 - (double)(j + 1) * (1 - cos(x[i])) - sin(x[i]) - cos(x[5 * j]) - cos(x[5 * j + 1]) - cos(x[5 * j + 2]) - cos(x[5 * j + 3]) - cos(x[5 * j + 4]);
+    if (fabs(term) > f) {
+      index = i;
+      f = fabs(term);
+      maximum = term;
+    } // end if
+  }   // end for
+  j = index / 5;
+  double sign = ((maximum >= 0) ? 1.0 : -1.0);
+  g[index] += sign * (-(double)(j + 1) * sin(x[index]) - cos(x[index]));
+  g[5 * j] += sign * sin(x[5 * j]);
+  g[5 * j + 1] += sign * sin(x[5 * j + 1]);
+  g[5 * j + 2] += sign * sin(x[5 * j + 2]);
+  g[5 * j + 3] += sign * sin(x[5 * j + 3]);
+  g[5 * j + 4] += sign * sin(x[5 * j + 4]);
+
+  // Return
+  return !isnan(g[index]) && !isnan(g[5 * j]) && !isnan(g[5 * j + 1]) && !isnan(g[5 * j + 2]) && !isnan(g[5 * j + 3]) && !isnan(g[5 * j + 4]);
 
 } // end evaluateGradient
 

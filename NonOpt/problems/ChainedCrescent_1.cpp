@@ -57,17 +57,65 @@ bool ChainedCrescent_1::evaluateObjective(int n,
   double sum1 = 0.0;
   double sum2 = 0.0;
   for (int i = 0; i < n - 1; i++) {
-    sum1 = sum1 + pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0;
-    sum2 = sum2 - pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0;
+    sum1 += pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0;
+    sum2 += -pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0;
   } // end for
 
   // Evaluate objective
   f = fmax(sum1, sum2);
 
   // Return
-  return true;
+  return !isnan(f);
 
 } // end evaluateObjective
+
+// Objective and gradient value
+bool ChainedCrescent_1::evaluateObjectiveAndGradient(int n,
+                                                     const double* x,
+                                                     double& f,
+                                                     double* g)
+{
+
+  // Declare success
+  bool success = true;
+
+  // Initialize gradient and evaluate sums
+  g[0] = 0.0;
+  double sum1 = 0.0;
+  double sum2 = 0.0;
+  for (int i = 0; i < n - 1; i++) {
+    g[i+1] = 0.0;
+    sum1 += pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0;
+    sum2 += -pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0;
+  } // end for
+
+  // Evaluate objective
+  f = fmax(sum1, sum2);
+
+  // Evaluate gradient
+  if (sum1 >= sum2) {
+    for (int i = 0; i < n - 1; i++) {
+      g[i] += 2.0 * x[i];
+      g[i + 1] += 2.0 * (x[i + 1] - 1.0) + 1.0;
+      if (isnan(g[i]) || isnan(g[i+1])) {
+        success = false;
+      }
+    } // end for
+  }   // end if
+  else {
+    for (int i = 0; i < n - 1; i++) {
+      g[i] += -2.0 * x[i];
+      g[i + 1] += -2.0 * (x[i + 1] - 1.0) + 1.0;
+      if (isnan(g[i]) || isnan(g[i+1])) {
+        success = false;
+      }
+    } // end for
+  }   // end else
+
+  // Return
+  return !isnan(f) && success;
+
+} // end evaluateObjectiveAndGradient
 
 // Gradient value
 bool ChainedCrescent_1::evaluateGradient(int n,
@@ -75,32 +123,41 @@ bool ChainedCrescent_1::evaluateGradient(int n,
                                          double* g)
 {
 
+  // Declare success
+  bool success = true;
+
   // Initialize gradient and evaluate sums
   double sum1 = 0.0;
   double sum2 = 0.0;
+  g[0] = 0.0;
   for (int i = 0; i < n - 1; i++) {
-    g[i] = 0.0;
-    sum1 = sum1 + pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0;
-    sum2 = sum2 - pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0;
+    g[i+1] = 0.0;
+    sum1 += pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0;
+    sum2 += -pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0;
   } // end for
-  g[n - 1] = 0.0;
 
   // Evaluate gradient
   if (sum1 >= sum2) {
     for (int i = 0; i < n - 1; i++) {
-      g[i] = g[i] + 2.0 * x[i];
-      g[i + 1] = g[i + 1] + 2.0 * (x[i + 1] - 1.0) + 1.0;
+      g[i] += 2.0 * x[i];
+      g[i + 1] += 2.0 * (x[i + 1] - 1.0) + 1.0;
+      if (isnan(g[i]) || isnan(g[i+1])) {
+        success = false;
+      }
     } // end for
   }   // end if
   else {
     for (int i = 0; i < n - 1; i++) {
-      g[i] = g[i] - 2.0 * x[i];
-      g[i + 1] = g[i + 1] - 2.0 * (x[i + 1] - 1.0) + 1.0;
+      g[i] += -2.0 * x[i];
+      g[i + 1] += -2.0 * (x[i + 1] - 1.0) + 1.0;
+      if (isnan(g[i]) || isnan(g[i+1])) {
+        success = false;
+      }
     } // end for
   }   // end else
 
   // Return
-  return true;
+  return success;
 
 } // end evaluateGradient
 

@@ -7,6 +7,8 @@
 #ifndef __NONOPTPROBLEM_HPP__
 #define __NONOPTPROBLEM_HPP__
 
+#include <iostream>
+
 namespace NonOpt
 {
 
@@ -59,6 +61,32 @@ public:
   virtual bool evaluateObjective(int n,
                                  const double* x,
                                  double& f) = 0;
+  /**
+   * Evaluates objective and gradient
+   * \param[in] n is the number of variables, the size of "x", a constant integer
+   * \param[in] x is a given point/iterate, a constant double array
+   * \param[out] f is the objective value at "x", a double (return value)
+   * \param[out] g is the gradient value at "x", a double array (return value)
+   */
+  virtual bool evaluateObjectiveAndGradient(int n,
+                                            const double* x,
+                                            double& f,
+                                            double* g)
+  {
+    ///////////////////////////////////////////////
+    // Default method if not overwritten by user //
+    ///////////////////////////////////////////////
+
+    // Evaluate function
+    bool objective_evaluation_success = evaluateObjective(n,x,f);
+
+    // Evaluate gradient
+    bool gradient_evaluation_success = evaluateGradient(n,x,g);
+
+    // Return
+    return (objective_evaluation_success && gradient_evaluation_success);
+
+  }
   /**
    * Evaluates gradient
    * \param[in] n is the number of variables, the size of "x", a constant integer

@@ -58,9 +58,39 @@ bool MaxQ::evaluateObjective(int n,
   }
 
   // Return
-  return true;
+  return !isnan(f);
 
 } // end evaluateObjective
+
+// Objective and gradient value
+bool MaxQ::evaluateObjectiveAndGradient(int n,
+                                        const double* x,
+                                        double& f,
+                                        double* g)
+{
+
+  // Initialize objective
+  f = 0.0;
+
+  // Initalize gradient and evaluate max of squares
+  double f_temp = 0.0;
+  int index = 0;
+  for (int i = 0; i < n; i++) {
+    g[i] = 0.0;
+    f_temp = pow(x[i], 2.0);
+    if (f_temp > f) {
+      f = f_temp;
+      index = i;
+    } // end if
+  } // end for
+
+  // Evaluate gradient
+  g[index] = 2 * x[index];
+
+  // Return
+  return !isnan(f) && !isnan(g[index]);
+
+} // end evaluateObjectiveAndGradient
 
 // Gradient value
 bool MaxQ::evaluateGradient(int n,
@@ -69,22 +99,23 @@ bool MaxQ::evaluateGradient(int n,
 {
 
   // Initialize gradient and evaluate index of maximum of squares
-  double max_val = 0.0;
-  int max_ind = 0;
+  double f = 0.0;
+  double f_temp = 0.0;
+  int index = 0;
   for (int i = 0; i < n; i++) {
     g[i] = 0.0;
-    double temp = pow(x[i], 2.0);
-    if (temp > max_val) {
-      max_val = temp;
-      max_ind = i;
-    }
+    f_temp = pow(x[i], 2.0);
+    if (f_temp > f) {
+      f = f_temp;
+      index = i;
+    } // end if
   } // end for
 
   // Evaluate gradient
-  g[max_ind] = 2 * x[max_ind];
+  g[index] = 2 * x[index];
 
   // Return
-  return true;
+  return !isnan(g[index]);
 
 } // end evaluateGradient
 

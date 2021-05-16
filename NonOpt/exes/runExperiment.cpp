@@ -150,7 +150,7 @@ int main()
                   nonopt.reporter()->deleteReports();
 
                   // Declare file report
-                  std::shared_ptr<FileReport> r(new FileReport("f", R_NL, R_PER_INNER_ITERATION));
+                  std::shared_ptr<FileReport> r(new FileReport("f", R_NL, R_BASIC));
 
                   // Declare output file name
                   char out_file[200];

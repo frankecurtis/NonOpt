@@ -934,7 +934,7 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
     reporter->printf(R_QP, R_PER_INNER_ITERATION, "Entering main iteration loop\n");
 
     // Set iteration limit
-    int iteration_limit = fmax(iteration_limit_minimum_, fmin(pow((int)vector_list_.size(), 2), iteration_limit_maximum_));
+    int iteration_limit = fmax(iteration_limit_minimum_, fmin((int)pow((double)vector_list_.size() + (double)gamma_length_, 2.0), iteration_limit_maximum_));
 
     // Iteration loop
     while (true) {

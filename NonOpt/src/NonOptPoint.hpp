@@ -94,26 +94,32 @@ public:
   //@{
   /**
    * Determine scale for objective function
-   * \param[in,out] quantities is reference to IterationQuanitites object from NonOpt
+   * \param[in,out] quantities is reference to Quantities object from NonOpt
    * \return boolean indicating success
    */
   void determineScale(Quantities& quantities);
   /**
    * Evaluate objective
-   * \param[in,out] quantities is reference to IterationQuanitites object from NonOpt
+   * \param[in,out] quantities is reference to Quantities object from NonOpt
    * \return boolean indicating success
    */
   bool evaluateObjective(Quantities& quantities);
   /**
+   * Evaluate objective and gradient
+   * \param[in,out] quantities is reference to Quantities object from NonOpt
+   * \return boolean indicating success
+   */
+  bool evaluateObjectiveAndGradient(Quantities& quantities);
+  /**
    * Evaluate gradient
-   * \param[in,out] quantities is reference to IterationQuanitites object from NonOpt
+   * \param[in,out] quantities is reference to Quantities object from NonOpt
    * \return boolean indicating success
    */
   bool evaluateGradient(Quantities& quantities);
   /**
    * Scale objective
    */
-  void scaleObjective()
+  inline void scaleObjective()
   {
     ASSERT_EXCEPTION(objective_evaluated_, NONOPT_FUNCTION_EVALUATION_ASSERT_EXCEPTION, "Objective should have been evaluated, but wasn't.");
     objective_ *= scale_;
@@ -121,7 +127,7 @@ public:
   /**
    * Scale gradient
    */
-  void scaleGradient()
+  inline void scaleGradient()
   {
     ASSERT_EXCEPTION(gradient_evaluated_, NONOPT_GRADIENT_EVALUATION_ASSERT_EXCEPTION, "Gradient should have been evaluated, but wasn't.");
     gradient_->scale(scale_);

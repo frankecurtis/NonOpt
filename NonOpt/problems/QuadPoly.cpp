@@ -216,15 +216,79 @@ bool QuadPoly::evaluateObjective(int n,
   }
 
   // Return
-  return true;
+  return !isnan(f);
 
 } // end evaluateObjective
+
+// Objective and gradient value
+bool QuadPoly::evaluateObjectiveAndGradient(int n,
+                                            const double* x,
+                                            double& f,
+                                            double* g)
+{
+
+  // Declare success
+  bool success = true;
+
+  // Initialize objective value
+  f = 0.0;
+
+  // Evaluate linear term and initialize gradient value
+  for (int i = 0; i < number_of_variables_; i++) {
+    f += linear_[i] * x[i];
+    g[i] = linear_[i];
+  }
+
+  // Add quadratic term and update gradient
+  for (int i = 0; i < number_of_variables_; i++) {
+    for (int j = 0; j < number_of_variables_; j++) {
+      f += 0.5 * symmetric_matrix_[i * number_of_variables_ + j] * x[i] * x[j];
+      g[i] += symmetric_matrix_[i * number_of_variables_ + j] * x[j];
+    }
+    if (isnan(g[i])) {
+      success = false;
+    }
+  } // end for
+
+  // Evaluate affine term
+  double affine_max = -std::numeric_limits<double>::infinity();
+  double affine;
+  int affine_ind = -1;
+  for (int i = 0; i < number_of_affine_; i++) {
+    affine = constant_[i];
+    for (int j = 0; j < number_of_variables_; j++) {
+      affine += matrix_[i * number_of_variables_ + j] * x[j];
+    }
+    if (affine > affine_max) {
+      affine_max = affine;
+      affine_ind = i;
+    }
+  } // end for
+
+  // Add objective and gradient of max term
+  if (number_of_affine_ > 0) {
+    f += affine_max;
+    for (int i = 0; i < number_of_variables_; i++) {
+      g[i] += matrix_[affine_ind * number_of_variables_ + i];
+      if (isnan(g[i])) {
+        success = false;
+      }
+    }
+  } // end if
+
+  // Return
+  return !isnan(f) && success;
+
+} // end evaluateObjectiveAndGradient
 
 // Gradient value
 bool QuadPoly::evaluateGradient(int n,
                                 const double* x,
                                 double* g)
 {
+
+  // Declare success
+  bool success = true;
 
   // Initialize gradient value
   for (int i = 0; i < number_of_variables_; i++) {
@@ -236,13 +300,17 @@ bool QuadPoly::evaluateGradient(int n,
     for (int j = 0; j < number_of_variables_; j++) {
       g[i] += symmetric_matrix_[i * number_of_variables_ + j] * x[j];
     }
+    if (isnan(g[i])) {
+      success = false;
+    }
   } // end for
 
   // Evaluate affine term
   double affine_max = -std::numeric_limits<double>::infinity();
+  double affine;
   int affine_ind = -1;
   for (int i = 0; i < number_of_affine_; i++) {
-    double affine = constant_[i];
+    affine = constant_[i];
     for (int j = 0; j < number_of_variables_; j++) {
       affine += matrix_[i * number_of_variables_ + j] * x[j];
     }
@@ -256,11 +324,14 @@ bool QuadPoly::evaluateGradient(int n,
   if (number_of_affine_ > 0) {
     for (int i = 0; i < number_of_variables_; i++) {
       g[i] += matrix_[affine_ind * number_of_variables_ + i];
+      if (isnan(g[i])) {
+        success = false;
+      }
     }
   } // end if
 
   // Return
-  return true;
+  return success;
 
 } // end evaluateGradient
 

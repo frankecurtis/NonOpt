@@ -61,9 +61,6 @@ void SymmetricMatrixDense::initialize(const Options* options,
   // Get approximation type
   options->valueAsString(reporter, "approximate_hessian_update", type_);
 
-  // Get indicator of initial scaling
-  options->valueAsBool(reporter, "approximate_hessian_initial_scaling", initial_scaling_);
-
 } // end initialize
 
 // Column

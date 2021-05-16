@@ -118,8 +118,16 @@ void LineSearchBacktracking::runLineSearch(const Options* options,
   // try line search, terminate on any exception
   try {
 
+    // Declare bool for evaluations
+    bool evaluation_success;
+
     // Evaluate objective at current point
-    bool evaluation_success = quantities->currentIterate()->evaluateObjective(*quantities);
+    if (quantities->evaluateFunctionWithGradient()) {
+      evaluation_success = quantities->currentIterate()->evaluateObjectiveAndGradient(*quantities);
+    }
+    else {
+      evaluation_success = quantities->currentIterate()->evaluateObjective(*quantities);
+    }
 
     // Check for successful evaluation
     if (!evaluation_success) {
@@ -137,7 +145,12 @@ void LineSearchBacktracking::runLineSearch(const Options* options,
       quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, quantities->stepsize(), *quantities->direction()));
 
       // Evaluate trial objective
-      evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+      if (quantities->evaluateFunctionWithGradient()) {
+        evaluation_success = quantities->trialIterate()->evaluateObjectiveAndGradient(*quantities);
+      }
+      else {
+        evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+      }
 
       // Check for successful evaluation
       if (evaluation_success) {
@@ -169,7 +182,12 @@ void LineSearchBacktracking::runLineSearch(const Options* options,
         }
 
         // Evaluate objective at trial iterate
-        evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+        if (quantities->evaluateFunctionWithGradient()) {
+          evaluation_success = quantities->trialIterate()->evaluateObjectiveAndGradient(*quantities);
+        }
+        else {
+          evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
+        }
 
         // Check for evaluation success
         if (evaluation_success) {

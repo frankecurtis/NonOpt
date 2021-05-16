@@ -10,10 +10,25 @@
 
 // Constructor
 MxHilb::MxHilb(int n)
-  : number_of_variables_(n) {}
+  : number_of_variables_(n)
+{
+
+  // Declare array for sums
+  sum_ = new double[n];
+
+} // end constructor
 
 // Destructor
-MxHilb::~MxHilb() {}
+MxHilb::~MxHilb()
+{
+
+  // Delete array
+  if (sum_ != nullptr) {
+    delete[] sum_;
+    sum_ = nullptr;
+  } // end if
+
+} // end destructor
 
 // Number of variables
 bool MxHilb::numberOfVariables(int& n)
@@ -50,8 +65,9 @@ bool MxHilb::evaluateObjective(int n,
 
   // Evaluate objective
   f = 0.0;
+  double sum;
   for (int i = 0; i < n; i++) {
-    double sum = 0.0;
+    sum = 0.0;
     for (int j = 0; j < n; j++) {
       sum = sum + x[j] / ((double)i + (double)j + 1.0);
     }
@@ -59,9 +75,56 @@ bool MxHilb::evaluateObjective(int n,
   } // end for
 
   // Return
-  return true;
+  return !isnan(f);
 
 } // end evaluateObjective
+
+// Objective and gradient value
+bool MxHilb::evaluateObjectiveAndGradient(int n,
+                                        const double* x,
+                                        double& f,
+                                        double* g)
+{
+
+  // Evaluate sums
+  f = 0.0;
+  int index = 0;
+  for (int i = 0; i < n; i++) {
+    sum_[i] = 0.0;
+    for (int j = 0; j < n; j++) {
+      sum_[i] = sum_[i] + x[j] / ((double)i + (double)j + 1.0);
+    }
+    if (fabs(sum_[i]) > f) {
+      f = fabs(sum_[i]);
+      index = i;
+    } // end if
+  } // end for
+
+  // Declare success
+  bool success = !isnan(f);
+
+  // Evaluate gradient
+  if (sum_[index] >= 0.0) {
+    for (int j = 0; j < n; j++) {
+      g[j] = 1.0 / ((double)index + (double)j + 1.0);
+      if (isnan(g[j])) {
+        success = false;
+      }
+    } // end for
+  } // end if
+  else {
+    for (int j = 0; j < n; j++) {
+      g[j] = -1.0 / ((double)index + (double)j + 1.0);
+      if (isnan(g[j])) {
+        success = false;
+      }
+    } // end for
+  } // end else
+
+  // Return
+  return success;
+
+} // end evaluateObjectiveAndGradient
 
 // Gradient value
 bool MxHilb::evaluateGradient(int n,
@@ -70,41 +133,42 @@ bool MxHilb::evaluateGradient(int n,
 {
 
   // Evaluate sums
-  double* sum = new double[n];
+  double f = 0.0;
+  int index = 0;
   for (int i = 0; i < n; i++) {
-    sum[i] = 0.0;
+    sum_[i] = 0.0;
     for (int j = 0; j < n; j++) {
-      sum[i] = sum[i] + x[j] / ((double)i + (double)j + 1.0);
+      sum_[i] = sum_[i] + x[j] / ((double)i + (double)j + 1.0);
     }
+    if (fabs(sum_[i]) > f) {
+      f = fabs(sum_[i]);
+      index = i;
+    } // end if
   } // end for
 
-  // Evaluate maximum of absolute values
-  double max_val = 0.0;
-  int max_ind = 0;
-  for (int i = 0; i < n; i++) {
-    if (fabs(sum[i]) > max_val) {
-      max_val = fabs(sum[i]);
-      max_ind = i;
-    }
-  } // end for
+  // Declare success
+  bool success = true;
 
   // Evaluate gradient
-  if (sum[max_ind] >= 0.0) {
+  if (sum_[index] >= 0.0) {
     for (int j = 0; j < n; j++) {
-      g[j] = 1.0 / ((double)max_ind + (double)j + 1.0);
-    }
+      g[j] = 1.0 / ((double)index + (double)j + 1.0);
+      if (isnan(g[j])) {
+        success = false;
+      }
+    } // end for
   } // end if
   else {
     for (int j = 0; j < n; j++) {
-      g[j] = -1.0 / ((double)max_ind + (double)j + 1.0);
-    }
+      g[j] = -1.0 / ((double)index + (double)j + 1.0);
+      if (isnan(g[j])) {
+        success = false;
+      }
+    } // end for
   } // end else
 
-  // Delete sums
-  delete[] sum;
-
   // Return
-  return true;
+  return success;
 
 } // end evaluateGradient
 

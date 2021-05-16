@@ -102,60 +102,40 @@ public:
    */
   inline bool const approximateHessianInitialScaling() const { return approximate_hessian_initial_scaling_; };
   /**
-   * Start time
-   * \return start time that was set
+   * CPU time limit
+   * \return CPU time limit
    */
-  inline clock_t const startTime() const { return start_time_; };
+  inline double const cpuTimeLimit() const { return cpu_time_limit_; };
   /**
-   * End time
-   * \return end time that was set
+   * Get pointer to current iterate
+   * \return pointer to Point representing current iterate
    */
-  inline clock_t const endTime() const { return end_time_; };
+  inline std::shared_ptr<Point> currentIterate() { return current_iterate_; };
+  /**
+   * Get direction
+   * \return pointer to Vector representing search direction
+   */
+  inline std::shared_ptr<Vector> direction() { return direction_; };
   /**
    * Direction computation time
    * \return direction computation time that was set
    */
   inline clock_t const directionComputationTime() const { return direction_computation_time_; };
   /**
+   * End time
+   * \return end time that was set
+   */
+  inline clock_t const endTime() const { return end_time_; };
+  /**
+   * Evaluate function with gradient indicator
+   * \return indicator of whether to evaluate function with gradient
+   */
+  inline bool const evaluateFunctionWithGradient() const { return evaluate_function_with_gradient_; };
+  /**
    * Evaluation time
    * \return problem function evaluation time that was set
    */
   inline clock_t const evaluationTime() const { return evaluation_time_; };
-  /**
-   * Line search time
-   * \return line search time that was set
-   */
-  inline clock_t const lineSearchTime() const { return line_search_time_; };
-  /**
-   * Get CPU time limit
-   * \return CPU time limit
-   */
-  inline double const cpuTimeLimit() const { return cpu_time_limit_; };
-  /**
-   * Get inexact termination factor
-   * \return current inexact termination factor
-   */
-  inline double const inexactTerminationFactor() const { return inexact_termination_factor_; };
-  /**
-   * Get scaling threshold
-   * \return scaling threshold
-   */
-  inline double const scalingThreshold() const { return scaling_threshold_; };
-  /**
-   * Get stationarity radius
-   * \return current stationarity radius
-   */
-  inline double const stationarityRadius() const { return stationarity_radius_; };
-  /**
-   * Get stepsize
-   * \return current stepsize
-   */
-  inline double const stepsize() const { return stepsize_; };
-  /**
-   * Get trust region radius
-   * \return current trust region radius
-   */
-  inline double const trustRegionRadius() const { return trust_region_radius_; };
   /**
    * Function evaluation counter
    * \return function evaluations performed so far
@@ -177,20 +157,75 @@ public:
    */
   inline int const gradientEvaluationLimit() const { return gradient_evaluation_limit_; };
   /**
-   * Iteration counter
-   * \return iterations performed so far
+   * Inexact termination factor
+   * \return current inexact termination factor
    */
-  inline int const iterationCounter() const { return iteration_counter_; };
+  inline double const inexactTerminationFactor() const { return inexact_termination_factor_; };
   /**
    * Inner iteration counter
    * \return inner iterations performed so far (during current iteration)
    */
   inline int const innerIterationCounter() const { return inner_iteration_counter_; };
   /**
+   * Iterate norm tolerance
+   * \return iterate norm tolerance
+   */
+  inline double const iterateNormTolerance() const { return iterate_norm_tolerance_; };
+  /**
+   * Iteration counter
+   * \return iterations performed so far
+   */
+  inline int const iterationCounter() const { return iteration_counter_; };
+  /**
+   * Iteration limit
+   * \return iteration limit
+   */
+  inline int const iterationLimit() const { return iteration_limit_; };
+  /**
+   * Line search time
+   * \return line search time that was set
+   */
+  inline clock_t const lineSearchTime() const { return line_search_time_; };
+  /**
+   * Get problem size
+   * \return number of variables
+   */
+  inline int const numberOfVariables() const { return number_of_variables_; };
+  /**
+   * Get point set
+   * \return pointer to vector of pointers to Points representing current point set
+   */
+  inline std::shared_ptr<std::vector<std::shared_ptr<Point>>> pointSet() { return point_set_; };
+  /**
    * QP iteration counter
    * \return QP iterations performed so far (during current iteration)
    */
   inline int const QPIterationCounter() const { return qp_iteration_counter_; };
+  /**
+   * Scaling threshold
+   * \return scaling threshold
+   */
+  inline double const scalingThreshold() const { return scaling_threshold_; };
+  /**
+   * Start time
+   * \return start time that was set
+   */
+  inline clock_t const startTime() const { return start_time_; };
+  /**
+   * Stationarity radius
+   * \return current stationarity radius
+   */
+  inline double const stationarityRadius() const { return stationarity_radius_; };
+  /**
+   * Stationarity tolerance
+   * \return stationarity tolerance
+   */
+  inline double const stationarityTolerance() const { return stationarity_tolerance_; };
+  /**
+   * Stepsize
+   * \return current stepsize
+   */
+  inline double const stepsize() const { return stepsize_; };
   /**
    * Inner iteration counter
    * \return total inner iterations performed so far (over all iterations so far)
@@ -202,30 +237,15 @@ public:
    */
   inline int const totalQPIterationCounter() const { return total_qp_iteration_counter_; };
   /**
-   * Get problem size
-   * \return number of variables
-   */
-  inline int const numberOfVariables() const { return number_of_variables_; };
-  /**
-   * Get pointer to current iterate
-   * \return pointer to Point representing current iterate
-   */
-  inline std::shared_ptr<Point> currentIterate() { return current_iterate_; };
-  /**
    * Get pointer to trial iterate
    * \return pointer to Point representing trial iterate
    */
   inline std::shared_ptr<Point> trialIterate() { return trial_iterate_; };
   /**
-   * Get direction
-   * \return pointer to Vector representing search direction
+   * Trust region radius
+   * \return current trust region radius
    */
-  inline std::shared_ptr<Vector> direction() { return direction_; };
-  /**
-   * Get point set
-   * \return pointer to vector of pointers to Points representing current point set
-   */
-  inline std::shared_ptr<std::vector<std::shared_ptr<Point>>> pointSet() { return point_set_; };
+  inline double const trustRegionRadius() const { return trust_region_radius_; };
   //@}
 
   /** @name Set methods */
@@ -383,7 +403,6 @@ private:
   clock_t evaluation_time_;
   clock_t line_search_time_;
   clock_t start_time_;
-  double cpu_time_limit_;
   double inexact_termination_factor_;
   double stationarity_radius_;
   double stepsize_;
@@ -405,9 +424,12 @@ private:
   /** @name Private members (options) */
   //@{
   bool approximate_hessian_initial_scaling_;
+  bool evaluate_function_with_gradient_;
+  double cpu_time_limit_;
   double inexact_termination_factor_initial_;
   double inexact_termination_update_factor_;
   double inexact_termination_update_stepsize_threshold_;
+  double iterate_norm_tolerance_;
   double scaling_threshold_;
   double stationarity_radius_initialization_factor_;
   double stationarity_radius_initialization_minimum_;
@@ -418,6 +440,7 @@ private:
   double trust_region_radius_update_factor_;
   int function_evaluation_limit_;
   int gradient_evaluation_limit_;
+  int iteration_limit_;
   //@}
 
 }; // end Quantities

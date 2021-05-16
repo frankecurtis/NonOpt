@@ -51,15 +51,57 @@ bool ChainedCB3_1::evaluateObjective(int n,
   // Evaluate objective
   f = 0.0;
   for (int i = 0; i < n - 1; i++) {
-    f = f + fmax(pow(x[i], 4) + pow(x[i + 1], 2),
-                 fmax(pow(2.0 - x[i], 2) + pow(2.0 - x[i + 1], 2),
-                      2.0 * exp(-x[i] + x[i + 1])));
+    f += fmax(pow(x[i], 4) + pow(x[i + 1], 2),
+              fmax(pow(2.0 - x[i], 2) + pow(2.0 - x[i + 1], 2),
+                   2.0 * exp(-x[i] + x[i + 1])));
   } // end for
 
   // Return
-  return true;
+  return !isnan(f);
 
 } // end evaluateObjective
+
+// Objective and gradient value
+bool ChainedCB3_1::evaluateObjectiveAndGradient(int n,
+                                                const double* x,
+                                                double& f,
+                                                double* g)
+{
+
+  // Declare success
+  bool success = true;
+
+  // Evaluate objective and gradient
+  f = 0.0;
+  g[0] = 0.0;
+  double term1, term2, term3;
+  for (int i = 0; i < n - 1; i++) {
+    term1 = pow(x[i], 4) + pow(x[i + 1], 2);
+    term2 = pow(2.0 - x[i], 2) + pow(2.0 - x[i + 1], 2);
+    term3 = 2.0 * exp(-x[i] + x[i + 1]);
+    f += fmax(term1, fmax(term2, term3));
+    g[i+1] = 0.0;
+    if (term1 >= term2 && term1 >= term3) {
+      g[i] += 4.0 * pow(x[i], 3);
+      g[i + 1] += 2.0 * x[i + 1];
+    } // end if
+    else if (term2 >= term1 && term2 >= term3) {
+      g[i] += -2.0 * (2.0 - x[i]);
+      g[i + 1] += -2.0 * (2.0 - x[i + 1]);
+    } // end else if
+    else {
+      g[i] += -2.0 * exp(-x[i] + x[i + 1]);
+      g[i + 1] += 2.0 * exp(-x[i] + x[i + 1]);
+    } // end else
+    if (isnan(g[i]) || isnan(g[i+1])) {
+      success = false;
+    }
+  } // end for
+
+  // Return
+  return !isnan(f) && success;
+
+} // end evaluateObjectiveAndGradient
 
 // Gradient value
 bool ChainedCB3_1::evaluateGradient(int n,
@@ -67,32 +109,36 @@ bool ChainedCB3_1::evaluateGradient(int n,
                                     double* g)
 {
 
-  // Initialize gradient
-  for (int i = 0; i < n; i++) {
-    g[i] = 0.0;
-  }
+  // Declare success
+  bool success = true;
 
   // Evaluate gradient
+  g[0] = 0.0;
+  double term1, term2, term3;
   for (int i = 0; i < n - 1; i++) {
-    double term1 = pow(x[i], 4) + pow(x[i + 1], 2);
-    double term2 = pow(2.0 - x[i], 2) + pow(2.0 - x[i + 1], 2);
-    double term3 = 2.0 * exp(-x[i] + x[i + 1]);
+    g[i+1] = 0.0;
+    term1 = pow(x[i], 4) + pow(x[i + 1], 2);
+    term2 = pow(2.0 - x[i], 2) + pow(2.0 - x[i + 1], 2);
+    term3 = 2.0 * exp(-x[i] + x[i + 1]);
     if (term1 >= term2 && term1 >= term3) {
-      g[i] = g[i] + 4.0 * pow(x[i], 3);
-      g[i + 1] = g[i + 1] + 2.0 * x[i + 1];
+      g[i] += 4.0 * pow(x[i], 3);
+      g[i + 1] += 2.0 * x[i + 1];
     } // end if
     else if (term2 >= term1 && term2 >= term3) {
-      g[i] = g[i] - 2.0 * (2.0 - x[i]);
-      g[i + 1] = g[i + 1] - 2.0 * (2.0 - x[i + 1]);
+      g[i] += -2.0 * (2.0 - x[i]);
+      g[i + 1] += -2.0 * (2.0 - x[i + 1]);
     } // end else if
     else {
-      g[i] = g[i] - 2.0 * exp(-x[i] + x[i + 1]);
-      g[i + 1] = g[i + 1] + 2.0 * exp(-x[i] + x[i + 1]);
+      g[i] += -2.0 * exp(-x[i] + x[i + 1]);
+      g[i + 1] += 2.0 * exp(-x[i] + x[i + 1]);
     } // end else
+    if (isnan(g[i]) || isnan(g[i+1])) {
+      success = false;
+    }
   }   // end for
 
   // Return
-  return true;
+  return success;
 
 } // end evaluateGradient
 

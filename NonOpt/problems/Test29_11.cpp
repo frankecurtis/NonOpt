@@ -62,15 +62,19 @@ bool Test29_11::evaluateObjective(int n,
   } // end for
 
   // Return
-  return true;
+  return !isnan(f);
 
 } // end evaluateObjective
 
-// Gradient value
-bool Test29_11::evaluateGradient(int n,
-                                 const double* x,
-                                 double* g)
+// Objective and gradient value
+bool Test29_11::evaluateObjectiveAndGradient(int n,
+                                             const double* x,
+                                             double& f,
+                                             double* g)
 {
+
+  // Declare success
+  bool success = true;
 
   // Initialize gradient
   for (int i = 0; i < n; i++) {
@@ -78,24 +82,77 @@ bool Test29_11::evaluateGradient(int n,
   }
 
   // Evaluate gradient
+  double term, sign;
+  f = 0.0;
   for (int k = 1; k <= 2 * n - 2; k++) {
     int i = (k + 1) / 2;
     if (k % 2 == 1) {
-      double term = x[i - 1] + x[i] * ((5.0 - x[i]) * x[i] - 2.0) - 13.0;
-      double sign = ((term >= 0.0) ? 1.0 : -1.0);
+      term = x[i - 1] + x[i] * ((5.0 - x[i]) * x[i] - 2.0) - 13.0;
+      f += fabs(term);
+      sign = ((term >= 0.0) ? 1.0 : -1.0);
       g[i - 1] += sign * (1.0);
       g[i] += sign * (-3.0 * x[i] * x[i] + 10.0 * x[i] - 2.0);
+      if (isnan(g[i-1]) || isnan(g[i])) {
+        success = false;
+      }
     } // end if
     else {
-      double term = x[i - 1] + x[i] * ((1.0 + x[i]) * x[i] - 14.0) - 29.0;
-      double sign = ((term >= 0.0) ? 1.0 : -1.0);
+      term = x[i - 1] + x[i] * ((1.0 + x[i]) * x[i] - 14.0) - 29.0;
+      f += fabs(term);
+      sign = ((term >= 0.0) ? 1.0 : -1.0);
       g[i - 1] += sign * (1.0);
       g[i] += sign * (3.0 * x[i] * x[i] + 2.0 * x[i] - 14.0);
+      if (isnan(g[i-1]) || isnan(g[i])) {
+        success = false;
+      }
     } // end else
   }   // end for
 
   // Return
-  return true;
+  return !isnan(f) && success;
+
+} // end evaluateObjectiveAndGradient
+
+// Gradient value
+bool Test29_11::evaluateGradient(int n,
+                                 const double* x,
+                                 double* g)
+{
+
+  // Declare success
+  bool success = true;
+
+  // Initialize gradient
+  for (int i = 0; i < n; i++) {
+    g[i] = 0.0;
+  }
+
+  // Evaluate gradient
+  double term, sign;
+  for (int k = 1; k <= 2 * n - 2; k++) {
+    int i = (k + 1) / 2;
+    if (k % 2 == 1) {
+      term = x[i - 1] + x[i] * ((5.0 - x[i]) * x[i] - 2.0) - 13.0;
+      sign = ((term >= 0.0) ? 1.0 : -1.0);
+      g[i - 1] += sign * (1.0);
+      g[i] += sign * (-3.0 * x[i] * x[i] + 10.0 * x[i] - 2.0);
+      if (isnan(g[i-1]) || isnan(g[i])) {
+        success = false;
+      }
+    } // end if
+    else {
+      term = x[i - 1] + x[i] * ((1.0 + x[i]) * x[i] - 14.0) - 29.0;
+      sign = ((term >= 0.0) ? 1.0 : -1.0);
+      g[i - 1] += sign * (1.0);
+      g[i] += sign * (3.0 * x[i] * x[i] + 2.0 * x[i] - 14.0);
+      if (isnan(g[i-1]) || isnan(g[i])) {
+        success = false;
+      }
+    } // end else
+  }   // end for
+
+  // Return
+  return success;
 
 } // end evaluateGradient
 

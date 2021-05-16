@@ -7,8 +7,11 @@
 #ifndef __NONOPTDERIVATIVECHECKER_HPP__
 #define __NONOPTDERIVATIVECHECKER_HPP__
 
-#include "NonOptPoint.hpp"
+#include "NonOptEnumerations.hpp"
+#include "NonOptOptions.hpp"
+#include "NonOptQuantities.hpp"
 #include "NonOptReporter.hpp"
+#include "NonOptStrategy.hpp"
 
 namespace NonOpt
 {
@@ -16,13 +19,15 @@ namespace NonOpt
 /**
  * Forward declarations
  */
-class Point;
+class Options;
+class Quantities;
 class Reporter;
+class Strategy;
 
 /**
  * DerivativeChecker class
  */
-class DerivativeChecker
+class DerivativeChecker : public Strategy
 {
 
 public:
@@ -31,9 +36,7 @@ public:
   /**
    * Constructor
    */
-  DerivativeChecker()
-    : increment_(1e-8),
-      tolerance_(1e-4){};
+  DerivativeChecker(){};
   //@}
 
   /** @name Destructor */
@@ -41,40 +44,74 @@ public:
   /**
    * Destructor
    */
-  ~DerivativeChecker(){};
+  virtual ~DerivativeChecker(){};
+  //@}
+
+  /** @name Options handling methods */
+  //@{
+  /**
+   * Add options
+   * \param[in,out] options is pointer to Options object from NonOpt
+   * \param[in] reporter is pointer to Reporter object from NonOpt
+   */
+  virtual void addOptions(Options* options,
+                          const Reporter* reporter) = 0;
+  /**
+   * Set options
+   * \param[in] options is pointer to Options object from NonOpt
+   * \param[in] reporter is pointer to Reporter object from NonOpt
+   */
+  virtual void setOptions(const Options* options,
+                          const Reporter* reporter) = 0;
+  //@}
+
+  /** @name Initialization method */
+  //@{
+  /**
+   * Initialize strategy
+   * \param[in] options is pointer to Options object from NonOpt
+   * \param[in,out] quantities is pointer to Quantities object from NonOpt
+   * \param[in] reporter is pointer to Reporter object from NonOpt
+   */
+  virtual void initialize(const Options* options,
+                          Quantities* quantities,
+                          const Reporter* reporter) = 0;
+  //@}
+
+  /** @name Get methods */
+  //@{
+  /**
+   * Get name of strategy
+   * \return string with name of strategy
+   */
+  virtual std::string name() = 0;
+  /**
+   * Get status
+   * \return current status of derivative checker
+   */
+  inline DE_Status status() { return status_; };
   //@}
 
   /** @name Set methods */
   //@{
   /**
-   * Set increment
+   * Set status
+   * \param[in] status is new status to be set
    */
-  inline void setIncrement(double increment)
-  {
-    if (increment > 0.0) {
-      increment_ = increment;
-    }
-  }
-  /**
-   * Set tolerance
-   */
-  inline void setTolerance(double tolerance)
-  {
-    if (tolerance > 0.0) {
-      tolerance_ = tolerance;
-    }
-  }
+  inline void setStatus(DE_Status status) { status_ = status; };
   //@}
 
-  /** @name Derivative checker methods */
+  /** @name Check methods */
   //@{
   /**
    * Check derivatives at a point
+   * \param[in] options is pointer to Options
+   * \param[in] quantities is pointer to Quantities
    * \param[in] reporter is pointer to Reporter
-   * \param[in] point is pointer to Point
    */
-  void checkDerivatives(const Reporter* reporter,
-                        const std::shared_ptr<Point> point) const;
+  virtual void checkDerivatives(const Options* options,
+                                Quantities* quantities,
+                                const Reporter* reporter) = 0;
   //@}
 
 private:
@@ -94,8 +131,7 @@ private:
 
   /** @name Private members */
   //@{
-  double increment_;
-  double tolerance_;
+  DE_Status status_; /**< DerivativeChecker status */
   //@}
 
 }; // end DerivativeChecker

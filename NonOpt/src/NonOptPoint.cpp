@@ -129,11 +129,6 @@ bool Point::evaluateObjective(Quantities& quantities)
     // Scale
     objective_ = scale_ * objective_;
 
-    // Check for nan
-    if (isnan(objective_)) {
-      objective_evaluated_ = false;
-    }
-
     // Increment function evaluation counter
     quantities.incrementFunctionCounter();
 
@@ -149,6 +144,58 @@ bool Point::evaluateObjective(Quantities& quantities)
 
 } // end evaluateObjective
 
+// Evaluate objective and gradient
+bool Point::evaluateObjectiveAndGradient(Quantities& quantities)
+{
+
+  // Check if objective has been evaluated already
+  if (!objective_evaluated_ || !gradient_evaluated_) {
+
+    // Declare gradient vector
+    std::shared_ptr<Vector> gradient(new Vector(vector_->length()));
+
+    // Set gradient vector
+    gradient_ = gradient;
+
+    // Set evaluation start time as current time
+    clock_t start_time = clock();
+
+    // Evaluate objective value for problem
+    objective_evaluated_ = problem_->evaluateObjectiveAndGradient(vector_->length(), vector_->values(), objective_, gradient_->valuesModifiable());
+    gradient_evaluated_  = objective_evaluated_;
+
+    // Increment evaluation time
+    quantities.incrementEvaluationTime(clock() - start_time);
+
+    // Scale
+    objective_ = scale_ * objective_;
+
+    // Scale
+    gradient_->scale(scale_);
+
+    // Increment function evaluation counter
+    quantities.incrementFunctionCounter();
+
+    // Increment gradient evaluation counter
+    quantities.incrementGradientCounter();
+
+    // Check for function evaluation limit
+    if (quantities.functionCounter() >= quantities.functionEvaluationLimit()) {
+      THROW_EXCEPTION(NONOPT_FUNCTION_EVALUATION_LIMIT_EXCEPTION, "Function evaluation limit reached.");
+    }
+
+    // Check for gradient evaluation limit
+    if (quantities.gradientCounter() >= quantities.gradientEvaluationLimit()) {
+      THROW_EXCEPTION(NONOPT_GRADIENT_EVALUATION_LIMIT_EXCEPTION, "Gradient evaluation limit reached.");
+    }
+
+  } // end if
+
+  // Return
+  return (objective_evaluated_ && gradient_evaluated_);
+
+} // end evaluateObjectiveAndGradient
+
 // Evaluate gradient
 bool Point::evaluateGradient(Quantities& quantities)
 {
@@ -162,36 +209,17 @@ bool Point::evaluateGradient(Quantities& quantities)
     // Set gradient vector
     gradient_ = gradient;
 
-    // Declare temporary array
-    double* g = new double[vector_->length()];
-
     // Set evaluation start time as current time
     clock_t start_time = clock();
 
     // Evaluate gradient value
-    gradient_evaluated_ = problem_->evaluateGradient(vector_->length(), vector_->values(), g);
+    gradient_evaluated_ = problem_->evaluateGradient(vector_->length(), vector_->values(), gradient_->valuesModifiable());
 
     // Increment evaluation time
     quantities.incrementEvaluationTime(clock() - start_time);
 
-    // Evaluate gradient value
-    gradient_->copyArray(g);
-
     // Scale
     gradient_->scale(scale_);
-
-    // Delete temporary array
-    if (g != nullptr) {
-      delete[] g;
-      g = nullptr;
-    } // end if
-
-    // Check for nan
-    for (int i = 0; i < gradient_->length(); i++) {
-      if (isnan(gradient_->values()[i])) {
-        gradient_evaluated_ = false;
-      }
-    }
 
     // Increment gradient evaluation counter
     quantities.incrementGradientCounter();
