@@ -53,6 +53,7 @@ Quantities::Quantities()
   current_iterate_.reset();
   trial_iterate_.reset();
   direction_.reset();
+  direction_termination_.reset();
   point_set_.reset();
 }
 
@@ -308,6 +309,9 @@ bool Quantities::initialize(const std::shared_ptr<Problem> problem)
 
   // Initialize direction
   direction_ = std::make_shared<Vector>(number_of_variables_);
+
+  // Initialize direction for termination check
+  direction_termination_ = std::make_shared<Vector>(number_of_variables_);
 
   // Initialize point set
   point_set_ = std::make_shared<std::vector<std::shared_ptr<Point>>>();

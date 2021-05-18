@@ -171,22 +171,22 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
         THROW_EXCEPTION(NONOPT_DIRECTION_COMPUTATION_FAILURE_EXCEPTION, "Direction computation failed.");
       }
 
+      // Check radius update and termination conditions
+      strategies_.termination()->checkConditions(&options_, &quantities_, &reporter_, &strategies_);
+
+      // Check status
+      if (strategies_.termination()->status() != TE_SUCCESS) {
+        THROW_EXCEPTION(NONOPT_TERMINATION_FAILURE_EXCEPTION, "Termination check failed.");
+      }
+
       // Check final termination conditions
-      if (strategies_.termination()->checkStationarityFinal(&options_, &quantities_, &reporter_, &strategies_) &&
-          strategies_.termination()->checkRadiiFinal(&options_, &quantities_, &reporter_, &strategies_)) {
+      if (strategies_.termination()->terminateStationary()) {
         THROW_EXCEPTION(NONOPT_SUCCESS_EXCEPTION, "Stationary point found.");
       }
-
-      // Check objective similarity termination conditions
-      if (strategies_.termination()->checkRadiiFinal(&options_, &quantities_, &reporter_, &strategies_) &&
-          strategies_.termination()->checkObjectiveSimilarity(&options_, &quantities_, &reporter_, &strategies_)) {
+      else if (strategies_.termination()->terminateObjective()) {
         THROW_EXCEPTION(NONOPT_OBJECTIVE_SIMILARITY_EXCEPTION, "Insufficient objective improvement.");
       }
-
-      // Check radius update conditions
-      if (!strategies_.termination()->checkRadiiFinal(&options_, &quantities_, &reporter_, &strategies_) &&
-          (strategies_.termination()->checkRadiiUpdate(&options_, &quantities_, &reporter_, &strategies_) ||
-           strategies_.termination()->checkObjectiveSimilarity(&options_, &quantities_, &reporter_, &strategies_))) {
+      else if (strategies_.termination()->updateRadii()) {
         quantities_.updateRadii();
         quantities_.initializeInexactTerminationFactor(&options_, &reporter_);
       }
@@ -274,6 +274,8 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
     setStatus(NONOPT_APPROXIMATE_HESSIAN_UPDATE_FAILURE);
   } catch (NONOPT_POINT_SET_UPDATE_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_POINT_SET_UPDATE_FAILURE);
+  } catch (NONOPT_TERMINATION_FAILURE_EXCEPTION& exec) {
+    setStatus(NONOPT_TERMINATION_FAILURE);
   }
 
   // Print end of line
@@ -402,6 +404,9 @@ void NonOptSolver::printFooter()
     break;
   case NONOPT_POINT_SET_UPDATE_FAILURE:
     reporter_.printf(R_NL, R_BASIC, "Point set update failure.");
+    break;
+  case NONOPT_TERMINATION_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Termination check failure.");
     break;
   default:
     reporter_.printf(R_NL, R_BASIC, "Unknown exit status! This wasn't supposed to happen!");

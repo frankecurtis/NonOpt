@@ -107,15 +107,20 @@ public:
    */
   inline double const cpuTimeLimit() const { return cpu_time_limit_; };
   /**
-   * Get pointer to current iterate
+   * Current iterate
    * \return pointer to Point representing current iterate
    */
   inline std::shared_ptr<Point> currentIterate() { return current_iterate_; };
   /**
-   * Get direction
+   * Direction
    * \return pointer to Vector representing search direction
    */
   inline std::shared_ptr<Vector> direction() { return direction_; };
+  /**
+   * Direction for termination check
+   * \return pointer to Vector representing direction for termination check
+   */
+  inline std::shared_ptr<Vector> directionTermination() { return direction_termination_; };
   /**
    * Direction computation time
    * \return direction computation time that was set
@@ -418,6 +423,7 @@ private:
   std::shared_ptr<Point> current_iterate_;
   std::shared_ptr<Point> trial_iterate_;
   std::shared_ptr<Vector> direction_;
+  std::shared_ptr<Vector> direction_termination_;
   std::shared_ptr<std::vector<std::shared_ptr<Point>>> point_set_;
   //@}
 

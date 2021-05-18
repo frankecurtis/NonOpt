@@ -17,7 +17,8 @@
 #include "NonOptQPSolverDualActiveSet.hpp"
 #include "NonOptSymmetricMatrixDense.hpp"
 #include "NonOptSymmetricMatrixLimitedMemory.hpp"
-#include "NonOptTerminationGradientCombination.hpp"
+#include "NonOptTerminationBasic.hpp"
+#include "NonOptTerminationSecondQP.hpp"
 
 namespace NonOpt
 {
@@ -65,9 +66,9 @@ void Strategies::addOptions(Options* options,
                            "Default     : Dense.");
   options->addStringOption(reporter,
                            "termination",
-                           "GradientCombination",
+                           "Basic",
                            "Termination strategy to use.\n"
-                           "Default     : GradientCombination.");
+                           "Default     : Basic.");
 
   // Add options for approximate Hessian update strategies
   std::shared_ptr<ApproximateHessianUpdate> approximate_hessian_update;
@@ -75,13 +76,13 @@ void Strategies::addOptions(Options* options,
   approximate_hessian_update->addOptions(options, reporter);
   approximate_hessian_update = std::make_shared<ApproximateHessianUpdateDFP>();
   approximate_hessian_update->addOptions(options, reporter);
-  // ADD NEW APPROXIMATE HESSIAN UPDATE STRATEGIES HERE AND IN SWITCH BELOW //
+  // ADD NEW APPROXIMATE HESSIAN UPDATE STRATEGIES HERE //
 
   // Add options for derivative checker strategies
   std::shared_ptr<DerivativeChecker> derivative_checker;
   derivative_checker = std::make_shared<DerivativeCheckerFiniteDifference>();
   derivative_checker->addOptions(options, reporter);
-  // ADD NEW POINT SET UPDATE STRATEGIES HERE AND IN SWITCH BELOW //
+  // ADD NEW POINT SET UPDATE STRATEGIES HERE //
 
   // Add options for direction computation strategies
   std::shared_ptr<DirectionComputation> direction_computation;
@@ -91,7 +92,7 @@ void Strategies::addOptions(Options* options,
   direction_computation->addOptions(options, reporter);
   direction_computation = std::make_shared<DirectionComputationGradientCombination>();
   direction_computation->addOptions(options, reporter);
-  // ADD NEW DIRECTION COMPUTATION STRATEGIES HERE AND IN SWITCH BELOW //
+  // ADD NEW DIRECTION COMPUTATION STRATEGIES HERE //
 
   // Add options for line search strategies
   std::shared_ptr<LineSearch> line_search;
@@ -99,19 +100,19 @@ void Strategies::addOptions(Options* options,
   line_search->addOptions(options, reporter);
   line_search = std::make_shared<LineSearchWeakWolfe>();
   line_search->addOptions(options, reporter);
-  // ADD NEW LINE SEARCH STRATEGIES HERE AND IN SWITCH BELOW //
+  // ADD NEW LINE SEARCH STRATEGIES HERE //
 
   // Add options for point set update strategies
   std::shared_ptr<PointSetUpdate> point_set_update;
   point_set_update = std::make_shared<PointSetUpdateProximity>();
   point_set_update->addOptions(options, reporter);
-  // ADD NEW POINT SET UPDATE STRATEGIES HERE AND IN SWITCH BELOW //
+  // ADD NEW POINT SET UPDATE STRATEGIES HERE //
 
   // Add options for QP solver strategies
   std::shared_ptr<QPSolver> qp_solver;
   qp_solver = std::make_shared<QPSolverDualActiveSet>();
   qp_solver->addOptions(options, reporter);
-  // ADD NEW QP SOLVER STRATEGIES HERE AND IN SWITCH BELOW //
+  // ADD NEW QP SOLVER STRATEGIES HERE //
 
   // Add options for symmetric matrix strategies
   std::shared_ptr<SymmetricMatrix> symmetric_matrix;
@@ -119,13 +120,15 @@ void Strategies::addOptions(Options* options,
   symmetric_matrix->addOptions(options, reporter);
   symmetric_matrix = std::make_shared<SymmetricMatrixLimitedMemory>();
   symmetric_matrix->addOptions(options, reporter);
-  // ADD NEW SYMMETRIC MATRIX STRATEGIES HERE AND IN SWITCH BELOW //
+  // ADD NEW SYMMETRIC MATRIX STRATEGIES HERE //
 
   // Add options for termination strategies
   std::shared_ptr<Termination> termination;
-  termination = std::make_shared<TerminationGradientCombination>();
+  termination = std::make_shared<TerminationBasic>();
   termination->addOptions(options, reporter);
-  // ADD NEW TERMINATION STRATEGIES HERE AND IN SWITCH BELOW //
+  termination = std::make_shared<TerminationSecondQP>();
+  termination->addOptions(options, reporter);
+  // ADD NEW TERMINATION STRATEGIES HERE //
 
 } // end addOptions
 
@@ -209,9 +212,11 @@ void Strategies::setOptions(const Options* options,
   // Set QP solver strategy
   if (qp_solver_name.compare("DualActiveSet") == 0) {
     qp_solver_ = std::make_shared<QPSolverDualActiveSet>();
+    qp_solver_termination_ = std::make_shared<QPSolverDualActiveSet>();
   }
   else {
     qp_solver_ = std::make_shared<QPSolverDualActiveSet>();
+    qp_solver_termination_ = std::make_shared<QPSolverDualActiveSet>();
   }
 
   // Set symmetric matrix strategy
@@ -224,13 +229,18 @@ void Strategies::setOptions(const Options* options,
   else {
     symmetric_matrix_ = std::make_shared<SymmetricMatrixDense>();
   }
+  // ALWAYS USE LIMITED MEMORY FOR TERMINATION QP
+  symmetric_matrix_termination_ = std::make_shared<SymmetricMatrixLimitedMemory>();
 
   // Set termination strategy
-  if (termination_name.compare("GradientCombination") == 0) {
-    termination_ = std::make_shared<TerminationGradientCombination>();
+  if (termination_name.compare("Basic") == 0) {
+    termination_ = std::make_shared<TerminationBasic>();
+  }
+  else if (termination_name.compare("SecondQP") == 0) {
+    termination_ = std::make_shared<TerminationSecondQP>();
   }
   else {
-    termination_ = std::make_shared<TerminationGradientCombination>();
+    termination_ = std::make_shared<TerminationBasic>();
   }
 
   // Set approximate Hessian update options
@@ -250,9 +260,11 @@ void Strategies::setOptions(const Options* options,
 
   // Set QP solver options
   qp_solver_->setOptions(options, reporter);
+  qp_solver_termination_->setOptions(options, reporter);
 
   // Set symmetric matrix options
   symmetric_matrix_->setOptions(options, reporter);
+  symmetric_matrix_termination_->setOptions(options, reporter);
 
   // Set termination options
   termination_->setOptions(options, reporter);
@@ -282,15 +294,18 @@ void Strategies::initialize(const Options* options,
 
   // Initialize QP data
   qp_solver_->initialize(options, quantities, reporter);
+  qp_solver_termination_->initialize(options, quantities, reporter);
 
   // Initialize symmetric matrix
   symmetric_matrix_->initialize(options, quantities, reporter);
+  symmetric_matrix_termination_->initialize(options, quantities, reporter);
 
   // Initialize termination
   termination_->initialize(options, quantities, reporter);
 
   // Set QP matrix as pointer to approximate Hessian
   qp_solver_->setMatrix(symmetric_matrix_);
+  qp_solver_termination_->setMatrix(symmetric_matrix_termination_);
 
 } // end initialize
 

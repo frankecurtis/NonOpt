@@ -121,10 +121,20 @@ public:
    */
   inline std::shared_ptr<QPSolver> qpSolver() { return qp_solver_; }
   /**
+   * Get pointer to QPSolver
+   * \return pointer QPSolver object
+   */
+  inline std::shared_ptr<QPSolver> qpSolverTermination() { return qp_solver_termination_; }
+  /**
    * Get pointer to SymmetricMatrix
    * \return pointer to SymmetricMatrix object
    */
   inline std::shared_ptr<SymmetricMatrix> symmetricMatrix() { return symmetric_matrix_; }
+  /**
+   * Get pointer to SymmetricMatrix
+   * \return pointer to SymmetricMatrix object
+   */
+  inline std::shared_ptr<SymmetricMatrix> symmetricMatrixTermination() { return symmetric_matrix_termination_; }
   /**
    * Get pointer to Termination
    * \return pointer to Termination object
@@ -182,7 +192,9 @@ private:
   std::shared_ptr<LineSearch> line_search_;
   std::shared_ptr<PointSetUpdate> point_set_update_;
   std::shared_ptr<QPSolver> qp_solver_;
+  std::shared_ptr<QPSolver> qp_solver_termination_;
   std::shared_ptr<SymmetricMatrix> symmetric_matrix_;
+  std::shared_ptr<SymmetricMatrix> symmetric_matrix_termination_;
   std::shared_ptr<Termination> termination_;
   std::string iteration_header_;
   //@}

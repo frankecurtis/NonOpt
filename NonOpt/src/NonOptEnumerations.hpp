@@ -36,7 +36,8 @@ enum NonOpt_Status
   NONOPT_DIRECTION_COMPUTATION_FAILURE,
   NONOPT_LINE_SEARCH_FAILURE,
   NONOPT_APPROXIMATE_HESSIAN_UPDATE_FAILURE,
-  NONOPT_POINT_SET_UPDATE_FAILURE
+  NONOPT_POINT_SET_UPDATE_FAILURE,
+  NONOPT_TERMINATION_FAILURE
 };
 /**
  * Approximate Hessian update enumerations
@@ -128,6 +129,15 @@ enum SM_Status
   SM_UNSET = -1,
   SM_SUCCESS,
   SM_FAILURE
+};
+/**
+ * Termination enumerations
+ */
+enum TE_Status
+{
+  TE_UNSET = -1,
+  TE_SUCCESS,
+  TE_EVALUATION_FAILURE
 };
 //@}
 

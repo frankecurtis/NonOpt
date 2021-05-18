@@ -68,7 +68,8 @@ int main()
   qp_solver_names.push_back("DualActiveSet");
   symmetric_matrix_names.push_back("Dense");
   symmetric_matrix_names.push_back("LimitedMemory");
-  termination_names.push_back("GradientCombination");
+  termination_names.push_back("Basic");
+  termination_names.push_back("SecondQP");
 
   // Loop through direction computations
   for (int direction_computation_number = 0; direction_computation_number < (int)direction_computation_names.size(); direction_computation_number++) {
@@ -108,6 +109,9 @@ int main()
 
               // Loop through termination
               for (int termination_number = 0; termination_number < (int)termination_names.size(); termination_number++) {
+
+                // Set termination strategy
+                nonopt.options()->modifyStringValue(nonopt.reporter(), "termination", termination_names[termination_number]);
 
                 // Declare strategy names
                 std::string direction_computation_name;

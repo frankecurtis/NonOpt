@@ -221,6 +221,10 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
 
     } // end else
 
+    // Set QP scalars
+    strategies->qpSolver()->setScalar(quantities->trustRegionRadius());
+    strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
+
     // Declare QP quantities
     std::vector<std::shared_ptr<Vector>> QP_gradient_list;
     std::vector<double> QP_vector;
@@ -234,8 +238,6 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
     // Set QP data
     strategies->qpSolver()->setVectorList(QP_gradient_list);
     strategies->qpSolver()->setVector(QP_vector);
-    strategies->qpSolver()->setScalar(quantities->trustRegionRadius());
-    strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
 
     // Try gradient step?
     if (try_gradient_step_) {
@@ -257,10 +259,13 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
         evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
       }
 
+      // Check radius update conditions
+      strategies->termination()->checkConditionsDirectionComputation(options, quantities, reporter, strategies);
+
       // Check for sufficient decrease
       if (evaluation_success &&
           (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * gradient_stepsize_ * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
-           strategies->termination()->checkRadiiUpdate(options, quantities, reporter, strategies))) {
+           strategies->termination()->updateRadiiDirectionComputation())) {
         THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
       }
 
@@ -295,6 +300,10 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       } // end if
 
     } // end for
+
+    // Set QP data
+    strategies->qpSolver()->setVectorList(QP_gradient_list);
+    strategies->qpSolver()->setVector(QP_vector);
 
     // Solve QP
     strategies->qpSolver()->solveQP(options, reporter, quantities);
@@ -353,10 +362,13 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
         evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
       }
 
+      // Check radius update conditions
+      strategies->termination()->checkConditionsDirectionComputation(options, quantities, reporter, strategies);
+
       // Check for sufficient decrease
       if (evaluation_success &&
           (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
-           strategies->termination()->checkRadiiUpdate(options, quantities, reporter, strategies))) {
+           strategies->termination()->updateRadiiDirectionComputation())) {
         THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
       }
 
@@ -474,10 +486,13 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
           evaluation_success = quantities->trialIterate()->evaluateObjective(*quantities);
         }
 
+        // Check radius update conditions
+        strategies->termination()->checkConditionsDirectionComputation(options, quantities, reporter, strategies);
+
         // Check for sufficient decrease
         if (evaluation_success &&
             (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
-             strategies->termination()->checkRadiiUpdate(options, quantities, reporter, strategies))) {
+             strategies->termination()->updateRadiiDirectionComputation())) {
           THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
         }
 

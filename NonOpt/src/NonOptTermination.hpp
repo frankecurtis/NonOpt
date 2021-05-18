@@ -79,76 +79,94 @@ public:
                           const Reporter* reporter) = 0;
   //@}
 
-  /** @name Get method */
+  /** @name Get methods */
   //@{
   /**
-   * Get iteration header string
+   * Iteration header string
    * \return string of header values
    */
   virtual std::string iterationHeader() = 0;
   /**
-   * Get iteration null values string
+   * Iteration null values string
    * \return string of null values
    */
   virtual std::string iterationNullValues() = 0;
   /**
-   * Get name of strategy
+   * Name of strategy
    * \return string with name of strategy
    */
   virtual std::string name() = 0;
+  /**
+   * Status
+   * \return current status of termination
+   */
+  inline TE_Status status() { return status_; };
+  /**
+   * Termination indicator based on objective changes
+   * \return bool with termination indicator
+   */
+  inline bool const terminateObjective() const { return terminate_objective_; };
+  /**
+   * Termination indicator based on stationarity
+   * \return bool with termination indicator
+   */
+  inline bool const terminateStationary() const { return terminate_stationary_; };
+  /**
+   * Update radii indicator
+   * \return bool with update indicator
+   */
+  inline bool const updateRadii() const { return update_radii_; };
+  /**
+   * Update radii indicator for use in direction computation
+   * \return bool with update indicator
+   */
+  inline bool const updateRadiiDirectionComputation() const { return update_radii_direction_computation_; };
   //@}
 
-  /** @name Check condition methods */
+  /** @name Set methods */
   //@{
   /**
-   * Check objective similarity
-   * \param[in] options is pointer to Options object from NonOpt
-   * \param[in] quantities is pointer to Quantities object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
-   * \param[in] strategies is pointer to Strategies object from NonOpt
-   * \return bool to indicate conditions satisfied or not
+   * Set status
+   * \param[in] status is new status to be set
    */
-  virtual bool checkObjectiveSimilarity(const Options* options,
-                                        Quantities* quantities,
-                                        const Reporter* reporter,
-                                        Strategies* strategies) = 0;
+  inline void setStatus(TE_Status status) { status_ = status; };
+  //@}
+
+  /** @name Check methods */
+  //@{
   /**
-   * Check radii final
+   * Check all conditions
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in] quantities is pointer to Quantities object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    * \param[in] strategies is pointer to Strategies object from NonOpt
    * \return bool to indicate conditions satisfied or not
    */
-  virtual bool checkRadiiFinal(const Options* options,
+  virtual void checkConditions(const Options* options,
                                Quantities* quantities,
                                const Reporter* reporter,
-                               Strategies* strategies) const = 0;
+                               Strategies* strategies) = 0;
   /**
-   * Check radii update
+   * Check conditions for use in direction computation
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in] quantities is pointer to Quantities object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    * \param[in] strategies is pointer to Strategies object from NonOpt
    * \return bool to indicate conditions satisfied or not
    */
-  virtual bool checkRadiiUpdate(const Options* options,
-                                Quantities* quantities,
-                                const Reporter* reporter,
-                                Strategies* strategies) const = 0;
-  /**
-   * Check stationarity final conditions
-   * \param[in] options is pointer to Options object from NonOpt
-   * \param[in] quantities is pointer to Quantities object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
-   * \param[in] strategies is pointer to Strategies object from NonOpt
-   * \return bool to indicate conditions satisfied or not
-   */
-  virtual bool checkStationarityFinal(const Options* options,
-                                      Quantities* quantities,
-                                      const Reporter* reporter,
-                                      Strategies* strategies) const = 0;
+  virtual void checkConditionsDirectionComputation(const Options* options,
+                                                   Quantities* quantities,
+                                                   const Reporter* reporter,
+                                                   Strategies* strategies) = 0;
+  //@}
 
+protected:
+  /** @name Protected members */
+  //@{
+  bool terminate_objective_;                /**< Indicator for termination based on objective changes */
+  bool terminate_stationary_;               /**< Indicator for termination based on stationarity */
+  bool update_radii_;                       /**< Indicator for radii update */
+  bool update_radii_direction_computation_; /**< Indicator for radii update for use in direction computation */
   //@}
 
 private:
@@ -164,6 +182,11 @@ private:
    * Overloaded equals operator
    */
   void operator=(const Termination&);
+  //@}
+
+  /** @name Private members */
+  //@{
+  TE_Status status_; /**< Termination status */
   //@}
 
 }; // end Termination

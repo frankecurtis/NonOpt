@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTSYMMETRICTERMINATIONGRADIENTCOMBINATION_HPP__
-#define __NONOPTSYMMETRICTERMINATIONGRADIENTCOMBINATION_HPP__
+#ifndef __NONOPTSYMMETRICTERMINATIONSECONDQP_HPP__
+#define __NONOPTSYMMETRICTERMINATIONSECONDQP_HPP__
 
 #include "NonOptTermination.hpp"
 
@@ -13,18 +13,18 @@ namespace NonOpt
 {
 
 /**
-  * TerminationGradientCombination class
+  * TerminationSecondQP class
   */
-class TerminationGradientCombination : public Termination
+class TerminationSecondQP : public Termination
 {
 
 public:
   /** @name Constructors */
   //@{
   /**
-    * Construct TerminationGradientCombination
+    * Construct TerminationSecondQP
     */
-  TerminationGradientCombination(){};
+  TerminationSecondQP(){};
   //@}
 
   /** @name Destructor */
@@ -32,7 +32,7 @@ public:
   /**
     * Destruct
     */
-  ~TerminationGradientCombination(){};
+  ~TerminationSecondQP(){};
   //@}
 
   /** @name Options handling methods */
@@ -72,69 +72,46 @@ public:
    * Get iteration header values
    * \return string of header values
    */
-  std::string iterationHeader() { return " |Grad.|  |G. Cmb.|"; };
+  std::string iterationHeader() { return " |Grad.|  |G. C. H| |G. C. I|"; };
   /**
    * Get iteration null values string
    * \return string of null values
    */
-  std::string iterationNullValues() { return "--------- ---------"; };
+  std::string iterationNullValues() { return "--------- --------- ---------"; };
   /**
    * Get name of strategy
    * \return string with name of strategy
    */
-  std::string name() { return "GradientCombination"; };
+  std::string name() { return "SecondQP"; };
   //@}
 
   /** @name Check condition methods */
   //@{
   /**
-   * Check objective similarity
+   * Check all conditions
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in] quantities is pointer to Quantities object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    * \param[in] strategies is pointer to Strategies object from NonOpt
    * \return bool to indicate conditions satisfied or not
    */
-  bool checkObjectiveSimilarity(const Options* options,
-                                Quantities* quantities,
-                                const Reporter* reporter,
-                                Strategies* strategies);
-  /**
-   * Check radii final
-   * \param[in] options is pointer to Options object from NonOpt
-   * \param[in] quantities is pointer to Quantities object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
-   * \param[in] strategies is pointer to Strategies object from NonOpt
-   * \return bool to indicate conditions satisfied or not
-   */
-  bool checkRadiiFinal(const Options* options,
+  void checkConditions(const Options* options,
                        Quantities* quantities,
                        const Reporter* reporter,
-                       Strategies* strategies) const;
+                       Strategies* strategies);
   /**
-   * Check radii update
+   * Check conditions for use in direction computation
    * \param[in] options is pointer to Options object from NonOpt
    * \param[in] quantities is pointer to Quantities object from NonOpt
    * \param[in] reporter is pointer to Reporter object from NonOpt
    * \param[in] strategies is pointer to Strategies object from NonOpt
    * \return bool to indicate conditions satisfied or not
    */
-  bool checkRadiiUpdate(const Options* options,
-                        Quantities* quantities,
-                        const Reporter* reporter,
-                        Strategies* strategies) const;
-  /**
-   * Check stationarity final conditions
-   * \param[in] options is pointer to Options object from NonOpt
-   * \param[in] quantities is pointer to Quantities object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
-   * \param[in] strategies is pointer to Strategies object from NonOpt
-   * \return bool to indicate conditions satisfied or not
-   */
-  bool checkStationarityFinal(const Options* options,
-                              Quantities* quantities,
-                              const Reporter* reporter,
-                              Strategies* strategies) const;
+  void checkConditionsDirectionComputation(const Options* options,
+                                           Quantities* quantities,
+                                           const Reporter* reporter,
+                                           Strategies* strategies);
+
   //@}
 
 private:
@@ -145,11 +122,11 @@ private:
   /**
     * Copy constructor
     */
-  TerminationGradientCombination(const TerminationGradientCombination&);
+  TerminationSecondQP(const TerminationSecondQP&);
   /**
     * Overloaded equals operator
     */
-  void operator=(const TerminationGradientCombination&);
+  void operator=(const TerminationSecondQP&);
   //@}
 
   /** @name Private members */
@@ -162,8 +139,16 @@ private:
   double stationarity_tolerance_factor_;
   //@}
 
-}; // end TerminationGradientCombination
+  /** @name Private methods */
+  //@{
+  void solveQP(const Options* options,
+               Quantities* quantities,
+               const Reporter* reporter,
+               Strategies* strategies);
+  //@}
+
+}; // end TerminationSecondQP
 
 } // namespace NonOpt
 
-#endif /* __NONOPTSYMMETRICMATRIXDENSE_HPP__ */
+#endif /* __NONOPTSYMMETRICTERMINATIONSECONDQP_HPP__ */
