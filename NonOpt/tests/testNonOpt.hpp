@@ -8,6 +8,7 @@
 #define __TESTNONOPT_HPP__
 
 #include "NonOptProblem.hpp"
+#include "NonOptReporter.hpp"
 #include "NonOptSolver.hpp"
 
 #include "MaxQ.hpp"
@@ -21,15 +22,15 @@ int testNonOptImplementation()
   // Declare NonOptSolver
   NonOptSolver nonopt;
 
-  // Change print level
-  std::shared_ptr<Report> report = nonopt.reporter()->report("default");
-  report->setTypeAndLevel(R_NL, R_BASIC);
-
   // Declare problem pointer
   std::shared_ptr<Problem> problem = std::make_shared<MaxQ>(10);
 
   // Print message
-  nonopt.reporter()->printf(R_NL, R_BASIC, "solving MaxQ(10):\n");
+  Reporter r;
+  std::shared_ptr<StreamReport> s(new StreamReport("temp", R_NL, R_BASIC));
+  s->setStream(&std::cout);
+  r.addReport(s);
+  r.printf(R_NL, R_BASIC, "solving MaxQ(10):\n");
 
   // Optimize
   nonopt.optimize(problem);

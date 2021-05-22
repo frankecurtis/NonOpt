@@ -11,15 +11,13 @@ namespace NonOpt
 {
 
 // Add options
-void TerminationBasic::addOptions(Options* options,
-                                  const Reporter* reporter)
+void TerminationBasic::addOptions(Options* options)
 {
 
   // Add bool options
 
   // Add double options
-  options->addDoubleOption(reporter,
-                           "TB_objective_similarity_tolerance",
+  options->addDoubleOption("TB_objective_similarity_tolerance",
                            1e-05,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -30,8 +28,7 @@ void TerminationBasic::addOptions(Options* options,
                            "              objective_similarity_limit, then the stationarity radius\n"
                            "              is decreased or the algorithm terminates.\n"
                            "Default     : 1e-05.");
-  options->addDoubleOption(reporter,
-                           "TB_stationarity_tolerance_factor",
+  options->addDoubleOption("TB_stationarity_tolerance_factor",
                            1e+00,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -41,8 +38,7 @@ void TerminationBasic::addOptions(Options* options,
                            "Default     : 1e+00.");
 
   // Add integer options
-  options->addIntegerOption(reporter,
-                            "TB_objective_similarity_limit",
+  options->addIntegerOption("TB_objective_similarity_limit",
                             10,
                             0.0,
                             NONOPT_INT_INFINITY,
@@ -57,18 +53,17 @@ void TerminationBasic::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void TerminationBasic::setOptions(const Options* options,
-                                  const Reporter* reporter)
+void TerminationBasic::setOptions(Options* options)
 {
 
   // Read bool options
 
   // Read double options
-  options->valueAsDouble(reporter, "TB_objective_similarity_tolerance", objective_similarity_tolerance_);
-  options->valueAsDouble(reporter, "TB_stationarity_tolerance_factor", stationarity_tolerance_factor_);
+  options->valueAsDouble("TB_objective_similarity_tolerance", objective_similarity_tolerance_);
+  options->valueAsDouble("TB_stationarity_tolerance_factor", stationarity_tolerance_factor_);
 
   // Read integer options
-  options->valueAsInteger(reporter, "TB_objective_similarity_limit", objective_similarity_limit_);
+  options->valueAsInteger("TB_objective_similarity_limit", objective_similarity_limit_);
 
 } // end setOptions
 

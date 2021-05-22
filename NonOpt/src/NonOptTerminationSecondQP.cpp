@@ -11,15 +11,13 @@ namespace NonOpt
 {
 
 // Add options
-void TerminationSecondQP::addOptions(Options* options,
-                                     const Reporter* reporter)
+void TerminationSecondQP::addOptions(Options* options)
 {
 
   // Add bool options
 
   // Add double options
-  options->addDoubleOption(reporter,
-                           "TS_objective_similarity_tolerance",
+  options->addDoubleOption("TS_objective_similarity_tolerance",
                            1e-05,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -30,8 +28,7 @@ void TerminationSecondQP::addOptions(Options* options,
                            "              objective_similarity_limit, then the stationarity radius\n"
                            "              is decreased or the algorithm terminates.\n"
                            "Default     : 1e-05.");
-  options->addDoubleOption(reporter,
-                           "TS_stationarity_tolerance_factor",
+  options->addDoubleOption("TS_stationarity_tolerance_factor",
                            1e+00,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -41,8 +38,7 @@ void TerminationSecondQP::addOptions(Options* options,
                            "Default     : 1e+00.");
 
   // Add integer options
-  options->addIntegerOption(reporter,
-                            "TS_objective_similarity_limit",
+  options->addIntegerOption("TS_objective_similarity_limit",
                             10,
                             0.0,
                             NONOPT_INT_INFINITY,
@@ -57,18 +53,17 @@ void TerminationSecondQP::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void TerminationSecondQP::setOptions(const Options* options,
-                                     const Reporter* reporter)
+void TerminationSecondQP::setOptions(Options* options)
 {
 
   // Read bool options
 
   // Read double options
-  options->valueAsDouble(reporter, "TS_objective_similarity_tolerance", objective_similarity_tolerance_);
-  options->valueAsDouble(reporter, "TS_stationarity_tolerance_factor", stationarity_tolerance_factor_);
+  options->valueAsDouble("TS_objective_similarity_tolerance", objective_similarity_tolerance_);
+  options->valueAsDouble("TS_stationarity_tolerance_factor", stationarity_tolerance_factor_);
 
   // Read integer options
-  options->valueAsInteger(reporter, "TS_objective_similarity_limit", objective_similarity_limit_);
+  options->valueAsInteger("TS_objective_similarity_limit", objective_similarity_limit_);
 
 } // end setOptions
 
@@ -173,7 +168,7 @@ void TerminationSecondQP::checkConditions(const Options* options,
   }
 
   // Print check values
-  reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %+.2e %+.2e", quantities->currentIterate()->gradient()->normInf(), strategies->qpSolver()->combinationTranslatedNormInf(), strategies->qpSolverTermination()->combinationTranslatedNormInf());
+  reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %8d %8d %+.2e %+.2e", quantities->currentIterate()->gradient()->normInf(), strategies->qpSolverTermination()->vectorListLength(), strategies->qpSolverTermination()->numberOfIterations(), strategies->qpSolver()->combinationTranslatedNormInf(), strategies->qpSolverTermination()->combinationTranslatedNormInf());
 
 } // end checkConditions
 
@@ -253,7 +248,7 @@ void TerminationSecondQP::solveQP(const Options* options,
     } // end else
 
     // Set QP scalar values
-    strategies->qpSolverTermination()->setScalar(quantities->trustRegionRadius());
+    strategies->qpSolverTermination()->setScalar(NONOPT_DOUBLE_INFINITY);
     strategies->qpSolverTermination()->setInexactSolutionTolerance(quantities->stationarityRadius());
 
     // Declare QP quantities

@@ -18,6 +18,7 @@ Quantities::Quantities()
     evaluation_time_(0),
     line_search_time_(0),
     inexact_termination_factor_(0.0),
+    iterate_norm_initial_(0.0),
     stationarity_radius_(0.0),
     stepsize_(0.0),
     trust_region_radius_(0.0),
@@ -44,8 +45,8 @@ Quantities::Quantities()
     trust_region_radius_initialization_factor_(1.0),
     trust_region_radius_initialization_minimum_(1.0),
     trust_region_radius_update_factor_(1.0),
-    function_evaluation_limit_(1),
-    gradient_evaluation_limit_(1),
+    function_evaluation_limit_(10),
+    gradient_evaluation_limit_(10),
     iteration_limit_(1)
 {
   start_time_ = clock();
@@ -58,64 +59,56 @@ Quantities::Quantities()
 }
 
 // Destructor
-Quantities::~Quantities() {}
+Quantities::~Quantities(){}
 
 // Add options
-void Quantities::addOptions(Options* options,
-                            const Reporter* reporter)
+void Quantities::addOptions(Options* options)
 {
 
   // Add bool options
-  options->addBoolOption(reporter,
-                         "approximate_hessian_initial_scaling",
+  options->addBoolOption("approximate_hessian_initial_scaling",
                          false,
                          "Indicator of whether to scale initial matrix for approximate Hessian.\n"
-                         "Default     : false.");
-  options->addBoolOption(reporter,
-                         "evaluate_function_with_gradient",
+                         "Default     : false");
+  options->addBoolOption("evaluate_function_with_gradient",
                          false,
                          "Determines whether to evaluate function and gradient\n"
                          "              at the same time (or separately).\n"
-                         "Default     : false.");
+                         "Default     : false");
 
   // Add double options
-  options->addDoubleOption(reporter,
-                           "cpu_time_limit",
+  options->addDoubleOption("cpu_time_limit",
                            1e+04,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Limit on the number of CPU seconds.  This limit is only checked\n"
                            "              at the beginning of an iteration, so the true CPU time limit\n"
                            "              also depends on the time required to a complete an iteration.\n"
-                           "Default     : 1e+04.");
-  options->addDoubleOption(reporter,
-                           "inexact_termination_factor_initial",
+                           "Default     : 1e+04");
+  options->addDoubleOption("inexact_termination_factor_initial",
                            sqrt(2.0) - 1.0,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Initial inexact termination factor.  Factor by which norm of\n"
                            "              inexact subproblem solution needs to be within norm of true\n"
                            "              (unknown) projection of origin onto convex hull of gradients.\n"
-                           "Default     : sqrt(2.0)-1.0.");
-  options->addDoubleOption(reporter,
-                           "inexact_termination_update_factor",
+                           "Default     : sqrt(2.0)-1.0");
+  options->addDoubleOption("inexact_termination_update_factor",
                            0.9999,
                            0.0,
                            1.0,
                            "Factor for updating the inexact termination factor.  If the\n"
                            "              conditions for updating the inexact termination factor are met,\n"
                            "              then the inexact termination factor is multiplied by this fraction.\n"
-                           "Default     : 0.9999.");
-  options->addDoubleOption(reporter,
-                           "inexact_termination_update_stepsize_threshold",
+                           "Default     : 0.9999");
+  options->addDoubleOption("inexact_termination_update_stepsize_threshold",
                            1e-10,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Stepsize threshold for determining whether to reduce the\n"
                            "              inexact termination factor.\n"
-                           "Default     : 1e-10.");
-  options->addDoubleOption(reporter,
-                           "iterate_norm_tolerance",
+                           "Default     : 1e-10");
+  options->addDoubleOption("iterate_norm_tolerance",
                            1e+20,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -123,18 +116,16 @@ void Quantities::addOptions(Options* options,
                            "              If the norm of an iterate is larger than this tolerance times\n"
                            "              the maximum of 1.0 and the norm of the initial iterate, then\n"
                            "              the algorithm terminates with a message of divergence.\n"
-                           "Default     : 1e+20.");
-  options->addDoubleOption(reporter,
-                           "scaling_threshold",
+                           "Default     : 1e+20");
+  options->addDoubleOption("scaling_threshold",
                            1e+02,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Threshold for determining objective scaling.  If norm of gradient\n"
                            "              at the initial point is greater than this value, then the objective\n"
                            "              is scaled so that the initial gradient norm is at this value.\n"
-                           "Default     : 1e+02.");
-  options->addDoubleOption(reporter,
-                           "stationarity_radius_initialization_factor",
+                           "Default     : 1e+02");
+  options->addDoubleOption("stationarity_radius_initialization_factor",
                            1e-01,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -142,25 +133,22 @@ void Quantities::addOptions(Options* options,
                            "              stationarity radius is the maximum of this value times the\n"
                            "              inf-norm of the gradient at the initial point and\n"
                            "              stationarity_radius_initialization_minimum.\n"
-                           "Default     : 1e-01.");
-  options->addDoubleOption(reporter,
-                           "stationarity_radius_initialization_minimum",
+                           "Default     : 1e-01");
+  options->addDoubleOption("stationarity_radius_initialization_minimum",
                            1e-02,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Minimum initial value for stationarity radius.\n"
-                           "Default     : 1e-02.");
-  options->addDoubleOption(reporter,
-                           "stationarity_radius_update_factor",
+                           "Default     : 1e-02");
+  options->addDoubleOption("stationarity_radius_update_factor",
                            1e-01,
                            0.0,
                            1.0,
                            "Factor for updating the stationarity radius.  If the conditions\n"
                            "              for updating the stationarity and trust region radii are met,\n"
                            "              then the stationarity radius is multiplied by this fraction.\n"
-                           "Default     : 1e-01.");
-  options->addDoubleOption(reporter,
-                           "stationarity_tolerance",
+                           "Default     : 1e-01");
+  options->addDoubleOption("stationarity_tolerance",
                            1e-04,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -168,9 +156,8 @@ void Quantities::addOptions(Options* options,
                            "              radius falls below this tolerance and other factors determined\n"
                            "              by the termination strategy are met, then the algorithm\n"
                            "              terminates with a message of stationarity.\n"
-                           "Default     : 1e-04.");
-  options->addDoubleOption(reporter,
-                           "trust_region_radius_initialization_factor",
+                           "Default     : 1e-04");
+  options->addDoubleOption("trust_region_radius_initialization_factor",
                            1e+04,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -178,93 +165,87 @@ void Quantities::addOptions(Options* options,
                            "              trust region radius is the maximum of this value times the\n"
                            "              inf-norm of the gradient at the initial point and\n"
                            "              trust_region_radius_initialization_minimum.\n"
-                           "Default     : 1e+04.");
-  options->addDoubleOption(reporter,
-                           "trust_region_radius_initialization_minimum",
+                           "Default     : 1e+04");
+  options->addDoubleOption("trust_region_radius_initialization_minimum",
                            1e-01,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Minimum initial value for trust region radius.\n"
-                           "Default     : 1e-01.");
-  options->addDoubleOption(reporter,
-                           "trust_region_radius_update_factor",
+                           "Default     : 1e-01");
+  options->addDoubleOption("trust_region_radius_update_factor",
                            1e-01,
                            0.0,
                            1.0,
                            "Factor for updating the trust region radius.  If the conditions\n"
                            "              for updating the stationarity and trust region radii are met,\n"
                            "              then the trust region radius is multiplied by this fraction.\n"
-                           "Default     : 1e-01.");
+                           "Default     : 1e-01");
 
   // Add integer options
-  options->addIntegerOption(reporter,
-                            "function_evaluation_limit",
+  options->addIntegerOption("function_evaluation_limit",
                             1e+05,
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of function evaluations performed.\n"
-                            "Default     : 1e+05.");
-  options->addIntegerOption(reporter,
-                            "gradient_evaluation_limit",
+                            "Default     : 1e+05");
+  options->addIntegerOption("gradient_evaluation_limit",
                             1e+05,
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of gradient evaluations performed.\n"
-                            "Default     : 1e+05.");
-  options->addIntegerOption(reporter,
-                            "iteration_limit",
+                            "Default     : 1e+05");
+  options->addIntegerOption("iteration_limit",
                             1e+04,
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of iterations that will be performed.\n"
                             "              Note that each iteration might involve inner iterations.\n"
-                            "Default     : 1e+04.");
+                            "Default     : 1e+04");
 
 } // end addOptions
 
 // Set options
-void Quantities::setOptions(const Options* options,
-                            const Reporter* reporter)
+void Quantities::setOptions(Options* options)
 {
 
   // Read bool options
-  options->valueAsBool(reporter, "approximate_hessian_initial_scaling", approximate_hessian_initial_scaling_);
-  options->valueAsBool(reporter, "evaluate_function_with_gradient", evaluate_function_with_gradient_);
+  options->valueAsBool("approximate_hessian_initial_scaling", approximate_hessian_initial_scaling_);
+  options->valueAsBool("evaluate_function_with_gradient", evaluate_function_with_gradient_);
 
   // Read double options
-  options->valueAsDouble(reporter, "cpu_time_limit", cpu_time_limit_);
-  options->valueAsDouble(reporter, "inexact_termination_factor_initial", inexact_termination_factor_initial_);
-  options->valueAsDouble(reporter, "inexact_termination_update_factor", inexact_termination_update_factor_);
-  options->valueAsDouble(reporter, "inexact_termination_update_stepsize_threshold", inexact_termination_update_stepsize_threshold_);
-  options->valueAsDouble(reporter, "iterate_norm_tolerance", iterate_norm_tolerance_);
-  options->valueAsDouble(reporter, "scaling_threshold", scaling_threshold_);
-  options->valueAsDouble(reporter, "stationarity_radius_initialization_factor", stationarity_radius_initialization_factor_);
-  options->valueAsDouble(reporter, "stationarity_radius_initialization_minimum", stationarity_radius_initialization_minimum_);
-  options->valueAsDouble(reporter, "stationarity_radius_update_factor", stationarity_radius_update_factor_);
-  options->valueAsDouble(reporter, "stationarity_tolerance", stationarity_tolerance_);
-  options->valueAsDouble(reporter, "trust_region_radius_initialization_factor", trust_region_radius_initialization_factor_);
-  options->valueAsDouble(reporter, "trust_region_radius_initialization_minimum", trust_region_radius_initialization_minimum_);
-  options->valueAsDouble(reporter, "trust_region_radius_update_factor", trust_region_radius_update_factor_);
+  options->valueAsDouble("cpu_time_limit", cpu_time_limit_);
+  options->valueAsDouble("inexact_termination_factor_initial", inexact_termination_factor_initial_);
+  options->valueAsDouble("inexact_termination_update_factor", inexact_termination_update_factor_);
+  options->valueAsDouble("inexact_termination_update_stepsize_threshold", inexact_termination_update_stepsize_threshold_);
+  options->valueAsDouble("iterate_norm_tolerance", iterate_norm_tolerance_);
+  options->valueAsDouble("scaling_threshold", scaling_threshold_);
+  options->valueAsDouble("stationarity_radius_initialization_factor", stationarity_radius_initialization_factor_);
+  options->valueAsDouble("stationarity_radius_initialization_minimum", stationarity_radius_initialization_minimum_);
+  options->valueAsDouble("stationarity_radius_update_factor", stationarity_radius_update_factor_);
+  options->valueAsDouble("stationarity_tolerance", stationarity_tolerance_);
+  options->valueAsDouble("trust_region_radius_initialization_factor", trust_region_radius_initialization_factor_);
+  options->valueAsDouble("trust_region_radius_initialization_minimum", trust_region_radius_initialization_minimum_);
+  options->valueAsDouble("trust_region_radius_update_factor", trust_region_radius_update_factor_);
 
   // Read integer options
-  options->valueAsInteger(reporter, "function_evaluation_limit", function_evaluation_limit_);
-  options->valueAsInteger(reporter, "gradient_evaluation_limit", gradient_evaluation_limit_);
-  options->valueAsInteger(reporter, "iteration_limit", iteration_limit_);
+  options->valueAsInteger("function_evaluation_limit", function_evaluation_limit_);
+  options->valueAsInteger("gradient_evaluation_limit", gradient_evaluation_limit_);
+  options->valueAsInteger("iteration_limit", iteration_limit_);
 
 } // end setOptions
 
 // Initialization
-bool Quantities::initialize(const std::shared_ptr<Problem> problem)
+void Quantities::initialize(const std::shared_ptr<Problem> problem)
 {
 
-  // Start clock
+  // Start times
   start_time_ = clock();
   end_time_ = start_time_;
-
-  // Initialize counters
   direction_computation_time_ = 0;
   evaluation_time_ = 0;
   line_search_time_ = 0;
+
+  // Initialize counters
   function_counter_ = 0;
   gradient_counter_ = 0;
   iteration_counter_ = 0;
@@ -273,18 +254,15 @@ bool Quantities::initialize(const std::shared_ptr<Problem> problem)
   total_inner_iteration_counter_ = 0;
   total_qp_iteration_counter_ = 0;
 
-  // Declare success boolean
-  bool success = true;
-
   // Declare integer
   int n;
 
   // Get number of variables
-  success = problem->numberOfVariables(n);
+  bool evaluation_success = problem->numberOfVariables(n);
 
-  // Check for success
-  if (!success) {
-    return false;
+  // Check for evaluation success
+  if (!evaluation_success) {
+    THROW_EXCEPTION(NONOPT_PROBLEM_DATA_FAILURE_EXCEPTION, "Read of number of variables failed.");
   }
 
   // Set number of variables
@@ -294,11 +272,11 @@ bool Quantities::initialize(const std::shared_ptr<Problem> problem)
   std::shared_ptr<Vector> v(new Vector(number_of_variables_));
 
   // Get initial point
-  success = problem->initialPoint(number_of_variables_, v->valuesModifiable());
+  evaluation_success = problem->initialPoint(number_of_variables_, v->valuesModifiable());
 
   // Check for success
-  if (!success) {
-    return false;
+  if (!evaluation_success) {
+    THROW_EXCEPTION(NONOPT_PROBLEM_DATA_FAILURE_EXCEPTION, "Read of initial point failed.");
   }
 
   // Declare iterate
@@ -316,18 +294,32 @@ bool Quantities::initialize(const std::shared_ptr<Problem> problem)
   // Initialize point set
   point_set_ = std::make_shared<std::vector<std::shared_ptr<Point>>>();
 
-  // Initialize radii
-  stationarity_radius_ = 0.0;
-  trust_region_radius_ = 0.0;
-
-  // Initialize inexact termination factor
-  inexact_termination_factor_ = 0.0;
-
   // Initialize stepsize
   stepsize_ = 0.0;
 
-  // Return
-  return success;
+  // Evaluate all functions at current iterate
+  evaluateFunctionsAtCurrentIterate();
+
+  // Determine problem scaling
+  current_iterate_->determineScale(*this);
+
+  // Scale evaluated objective
+  current_iterate_->scaleObjective();
+
+  // Scale evaluated gradient
+  current_iterate_->scaleGradient();
+
+  // Initialize stationarity radius
+  stationarity_radius_ = fmax(stationarity_radius_initialization_minimum_, stationarity_radius_initialization_factor_ * current_iterate_->gradient()->normInf());
+
+  // Initialize trust region radius
+  trust_region_radius_ = fmax(trust_region_radius_initialization_minimum_, trust_region_radius_initialization_factor_ * current_iterate_->gradient()->normInf());
+
+  // Initialize inexact termination factor
+  resetInexactTerminationFactor();
+
+  // Store norm of initial point (for termination check)
+  iterate_norm_initial_ = current_iterate_->vector()->norm2();
 
 } // end initialize
 
@@ -343,28 +335,55 @@ std::string Quantities::iterationNullValues()
   return " ------ ----------- --------- --------- ------";
 }
 
-// Initialize inexact termination factor
-void Quantities::initializeInexactTerminationFactor(const Options* options,
-                                                    const Reporter* reporter)
+// Evaluate all functions at current iterate
+void Quantities::evaluateFunctionsAtCurrentIterate()
 {
 
-  // Inexact termination factor
+  // Evaluate objective
+  bool evaluation_success;
+
+  // Check whether to evaluate function with gradient
+  if (evaluate_function_with_gradient_) {
+
+    // Evaluate function
+    evaluation_success = current_iterate_->evaluateObjectiveAndGradient(*this);
+
+    // Check for evaluation success
+    if (!evaluation_success) {
+      THROW_EXCEPTION(NONOPT_FUNCTION_EVALUATION_FAILURE_EXCEPTION, "Function + gradient evaluation failed.");
+    }
+
+  }
+  else {
+
+    // Evaluate function
+    evaluation_success = current_iterate_->evaluateObjective(*this);
+
+    // Check for evaluation success
+    if (!evaluation_success) {
+      THROW_EXCEPTION(NONOPT_FUNCTION_EVALUATION_FAILURE_EXCEPTION, "Function evaluation failed.");
+    }
+
+    // Evaluate gradient
+    evaluation_success = current_iterate_->evaluateGradient(*this);
+
+    // Check for evaluation success
+    if (!evaluation_success) {
+      THROW_EXCEPTION(NONOPT_GRADIENT_EVALUATION_FAILURE_EXCEPTION, "Gradient evaluation failed.");
+    }
+
+  } // end else
+
+} // end evaluateFunctionsAtCurrentIterate
+
+// Reset inexact termination factor
+void Quantities::resetInexactTerminationFactor()
+{
+
+  // Set termination factor to initial value
   inexact_termination_factor_ = inexact_termination_factor_initial_;
 
-} // end initializeInexactTerminationFactor
-
-// Initialization of radii
-void Quantities::initializeRadii(const Options* options,
-                                 const Reporter* reporter)
-{
-
-  // Initialize stationarity radius
-  stationarity_radius_ = fmax(stationarity_radius_initialization_minimum_, stationarity_radius_initialization_factor_ * current_iterate_->gradient()->normInf());
-
-  // Initialize trust region radius
-  trust_region_radius_ = fmax(trust_region_radius_initialization_minimum_, trust_region_radius_initialization_factor_ * current_iterate_->gradient()->normInf());
-
-} // end initializeRadii
+} // end resetInexactTerminationFactor
 
 // Update inexact termination factor
 void Quantities::updateInexactTerminationFactor()

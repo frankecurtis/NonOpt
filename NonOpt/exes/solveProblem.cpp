@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   }
 
   // Declare problem dimension
-  int const dimension = 10;
+  int const dimension = 1000;
 
   // Declare problem
   std::shared_ptr<Problem> problem;
@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
   NonOptSolver nonopt;
 
   // Modify options from file
-  nonopt.options()->modifyOptionsFromFile(nonopt.reporter(), "nonopt.opt");
+  nonopt.options()->modifyOptionsFromFile("nonopt.opt");
 
   // Optimize
   nonopt.optimize(problem);

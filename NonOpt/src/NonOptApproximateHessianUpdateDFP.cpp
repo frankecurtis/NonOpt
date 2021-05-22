@@ -15,20 +15,17 @@ namespace NonOpt
 {
 
 // Add options
-void ApproximateHessianUpdateDFP::addOptions(Options* options,
-                                             const Reporter* reporter)
+void ApproximateHessianUpdateDFP::addOptions(Options* options)
 {
 
   // Add bool options
-  options->addBoolOption(reporter,
-                         "DFP_fail_on_tolerance_violation",
+  options->addBoolOption("DFP_fail_on_tolerance_violation",
                          false,
                          "Indicator for whether to indicate failure on violated tolerance.\n"
                          "Default     : false.");
 
   // Add double options
-  options->addDoubleOption(reporter,
-                           "DFP_correction_threshold_1",
+  options->addDoubleOption("DFP_correction_threshold_1",
                            1e-20,
                            0.0,
                            1.0,
@@ -36,8 +33,7 @@ void ApproximateHessianUpdateDFP::addOptions(Options* options,
                            "              gradient displacement v is set so that inner product with step,\n"
                            "              call it s, is such that <s,v>/<s,s> is at least this threshold.\n"
                            "Default     : 1e-20.");
-  options->addDoubleOption(reporter,
-                           "DFP_correction_threshold_2",
+  options->addDoubleOption("DFP_correction_threshold_2",
                            1e+02,
                            1.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -45,8 +41,7 @@ void ApproximateHessianUpdateDFP::addOptions(Options* options,
                            "              gradient displacement v is set so that inner product with step,\n"
                            "              call it s, is such that <v,v>/<s,v> is at most this threshold.\n"
                            "Default     : 1e+02.");
-  options->addDoubleOption(reporter,
-                           "DFP_norm_tolerance",
+  options->addDoubleOption("DFP_norm_tolerance",
                            1e-20,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -55,8 +50,7 @@ void ApproximateHessianUpdateDFP::addOptions(Options* options,
                            "              greater than this tolerance, then the DFP update may occur;\n"
                            "              else, it is skipped.\n"
                            "Default     : 1e-20.");
-  options->addDoubleOption(reporter,
-                           "DFP_product_tolerance",
+  options->addDoubleOption("DFP_product_tolerance",
                            1e-20,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -69,18 +63,17 @@ void ApproximateHessianUpdateDFP::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void ApproximateHessianUpdateDFP::setOptions(const Options* options,
-                                             const Reporter* reporter)
+void ApproximateHessianUpdateDFP::setOptions(Options* options)
 {
 
   // Read bool options
-  options->valueAsBool(reporter, "DFP_fail_on_tolerance_violation", fail_on_tolerance_violation_);
+  options->valueAsBool("DFP_fail_on_tolerance_violation", fail_on_tolerance_violation_);
 
   // Read double options
-  options->valueAsDouble(reporter, "DFP_correction_threshold_1", correction_threshold_1_);
-  options->valueAsDouble(reporter, "DFP_correction_threshold_2", correction_threshold_2_);
-  options->valueAsDouble(reporter, "DFP_norm_tolerance", norm_tolerance_);
-  options->valueAsDouble(reporter, "DFP_product_tolerance", product_tolerance_);
+  options->valueAsDouble("DFP_correction_threshold_1", correction_threshold_1_);
+  options->valueAsDouble("DFP_correction_threshold_2", correction_threshold_2_);
+  options->valueAsDouble("DFP_norm_tolerance", norm_tolerance_);
+  options->valueAsDouble("DFP_product_tolerance", product_tolerance_);
 
 } // end setOptions
 

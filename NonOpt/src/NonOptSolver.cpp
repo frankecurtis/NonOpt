@@ -21,15 +21,6 @@ namespace NonOpt
 NonOptSolver::NonOptSolver()
 {
 
-  // Declare stream report
-  std::shared_ptr<StreamReport> s(new StreamReport("default", R_NL, R_BASIC));
-
-  // Set stream report to standard output
-  s->setStream(&std::cout);
-
-  // Add stream report to reporter
-  reporter_.addReport(s);
-
   // Add options
   addOptions();
 
@@ -39,7 +30,7 @@ NonOptSolver::NonOptSolver()
 NonOptSolver::~NonOptSolver()
 {
 
-  // Delete reporter
+  // Delete reports
   reporter_.deleteReports();
 
 } // end destructor
@@ -48,11 +39,47 @@ NonOptSolver::~NonOptSolver()
 void NonOptSolver::addOptions()
 {
 
+  // Add integer options
+  options_.addIntegerOption("print_level",
+                            R_BASIC,
+                            R_NONE,
+                            R_PER_INNER_ITERATION,
+                            "Print level to standard output.\n"
+                            "Default     : 1");
+  options_.addIntegerOption("print_level_file",
+                            R_NONE,
+                            R_NONE,
+                            R_PER_INNER_ITERATION,
+                            "Print level to file specified by print_file_name.\n"
+                            "Default     : 0");
+  options_.addIntegerOption("qp_print_level",
+                            R_NONE,
+                            R_NONE,
+                            R_PER_INNER_ITERATION,
+                            "Print level for QP solver to standard output.\n"
+                            "Default     : 0");
+  options_.addIntegerOption("qp_print_level_file",
+                            R_NONE,
+                            R_NONE,
+                            R_PER_INNER_ITERATION,
+                            "Print level for QP solver to file specified qp_print_file_name.\n"
+                            "Default     : 0");
+
+  // Add string options
+  options_.addStringOption("print_file_name",
+                           "nonopt.out",
+                           "File name for printing if print_level_file > 0.\n"
+                           "Default     : nonopt.out");
+  options_.addStringOption("qp_print_file_name",
+                           "nonopt_qp.out",
+                           "File name for printing for QP solver if qp_print_level_file > 0.\n"
+                           "Default     : nonopt_qp.out");
+
   // Add options for quantities
-  quantities_.addOptions(&options_, &reporter_);
+  quantities_.addOptions(&options_);
 
   // Add options for strategies
-  strategies_.addOptions(&options_, &reporter_);
+  strategies_.addOptions(&options_);
 
 } // end addOptions
 
@@ -60,13 +87,65 @@ void NonOptSolver::addOptions()
 void NonOptSolver::setOptions()
 {
 
+  // Read integer options
+  options_.valueAsInteger("print_level", print_level_);
+  options_.valueAsInteger("print_level_file", print_level_file_);
+  options_.valueAsInteger("qp_print_level", qp_print_level_);
+  options_.valueAsInteger("qp_print_level_file", qp_print_level_file_);
+
+  // Read string options
+  options_.valueAsString("print_file_name", print_file_name_);
+  options_.valueAsString("qp_print_file_name", qp_print_file_name_);
+
+  // Set standard output stream
+  std::shared_ptr<StreamReport> s_out(new StreamReport("default", R_NL,  static_cast<ReportLevel>(print_level_)));
+  s_out->setStream(&std::cout);
+  reporter_.addReport(s_out);
+
+  // Set file output stream
+  if (print_level_file_ > R_NONE) {
+    std::shared_ptr<FileReport> f_out(new FileReport("default_file", R_NL, static_cast<ReportLevel>(print_level_file_)));
+    f_out->open(print_file_name_.c_str());
+    reporter_.addReport(f_out);
+  } // end if
+
+  // Set standard output stream for QP solver
+  std::shared_ptr<StreamReport> s_qp_out(new StreamReport("default_qp", R_QP, static_cast<ReportLevel>(qp_print_level_)));
+  s_qp_out->setStream(&std::cout);
+  reporter_.addReport(s_qp_out);
+
+  // Set file output stream for QP solver
+  if (qp_print_level_file_ > R_NONE) {
+    std::shared_ptr<FileReport> f_qp_out(new FileReport("default_qp_file", R_QP, static_cast<ReportLevel>(qp_print_level_file_)));
+    f_qp_out->open(qp_print_file_name_.c_str());
+    reporter_.addReport(f_qp_out);
+  } // end if
+
   // Set quantities options
-  quantities_.setOptions(&options_, &reporter_);
+  quantities_.setOptions(&options_);
 
   // Set strategies options
-  strategies_.setOptions(&options_, &reporter_);
+  strategies_.setOptions(&options_);
+
+  // Print message
+  reporter_.printf(R_NL, R_BASIC, options_.message().c_str());
+
+  // Clear message
+  options_.resetMessage();
 
 } // end setOptions
+
+// Initialize
+void NonOptSolver::initialize(const std::shared_ptr<Problem> problem)
+{
+
+  // Initialize quantities
+  quantities_.initialize(problem);
+
+  // Initialize strategies
+  strategies_.initialize(&options_, &quantities_, &reporter_);
+
+} // end initialize
 
 // Solution
 void NonOptSolver::solution(double vector[])
@@ -94,37 +173,8 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
   // try to run algorithm, terminate on any exception
   try {
 
-    // (Re)initialize quantities
-    bool initialization_success = quantities_.initialize(problem);
-
-    // Check for initialization success
-    if (!initialization_success) {
-      THROW_EXCEPTION(NONOPT_INITIALIZATION_FAILURE_EXCEPTION, "Initialization failed.");
-    }
-
-    // Evaluate all functions at current iterate
-    evaluateFunctionsAtCurrentIterate();
-
-    // Determine problem scaling
-    quantities_.currentIterate()->determineScale(quantities_);
-
-    // Scale evaluated objective
-    quantities_.currentIterate()->scaleObjective();
-
-    // Scale evaluated gradient
-    quantities_.currentIterate()->scaleGradient();
-
-    // Initialize radii
-    quantities_.initializeRadii(&options_, &reporter_);
-
-    // Initialize inexact termination factor
-    quantities_.initializeInexactTerminationFactor(&options_, &reporter_);
-
-    // Store norm of initial point (for termination check)
-    double initial_iterate_norm = quantities_.currentIterate()->vector()->norm2();
-
-    // Initialize strategies
-    strategies_.initialize(&options_, &quantities_, &reporter_);
+    // Initialize
+    initialize(problem);
 
     // Print header
     printHeader();
@@ -151,7 +201,7 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
       if ((clock() - quantities_.startTime()) / (double)CLOCKS_PER_SEC >= quantities_.cpuTimeLimit()) {
         THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
       }
-      if (quantities_.currentIterate()->vector()->norm2() >= quantities_.iterateNormTolerance() * fmax(1.0, initial_iterate_norm)) {
+      if (quantities_.currentIterate()->vector()->norm2() >= quantities_.iterateNormTolerance() * fmax(1.0, quantities_.iterateNormInitial())) {
         THROW_EXCEPTION(NONOPT_ITERATE_NORM_LIMIT_EXCEPTION, "Iterates appear to be diverging.");
       }
 
@@ -188,7 +238,7 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
       }
       else if (strategies_.termination()->updateRadii()) {
         quantities_.updateRadii();
-        quantities_.initializeInexactTerminationFactor(&options_, &reporter_);
+        quantities_.resetInexactTerminationFactor();
       }
 
       // Run line search
@@ -198,9 +248,6 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
       if (strategies_.lineSearch()->status() != LS_SUCCESS) {
         THROW_EXCEPTION(NONOPT_LINE_SEARCH_FAILURE_EXCEPTION, "Line search failed.");
       }
-
-      // Update inexact termination factor (depends on stepsize from line search)
-      quantities_.updateInexactTerminationFactor();
 
       // Update approximate Hessian
       strategies_.approximateHessianUpdate()->updateApproximateHessian(&options_, &quantities_, &reporter_, &strategies_);
@@ -215,14 +262,17 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
         quantities_.pointSet()->push_back(quantities_.currentIterate());
       }
 
+      // Update inexact termination factor (depends on stepsize from line search)
+      quantities_.updateInexactTerminationFactor();
+
       // Update iterate
       quantities_.setCurrentIterate(quantities_.trialIterate());
 
+      // Evaluate all functions at current iterate
+      quantities_.evaluateFunctionsAtCurrentIterate();
+
       // Increment iteration counter
       quantities_.incrementIterationCounter();
-
-      // Evaluate all functions at current iterate
-      evaluateFunctionsAtCurrentIterate();
 
       // Update point set
       strategies_.pointSetUpdate()->updatePointSet(&options_, &quantities_, &reporter_, &strategies_);
@@ -254,37 +304,44 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
     setStatus(NONOPT_FUNCTION_EVALUATION_LIMIT);
   } catch (NONOPT_GRADIENT_EVALUATION_LIMIT_EXCEPTION& exec) {
     setStatus(NONOPT_GRADIENT_EVALUATION_LIMIT);
-  } catch (NONOPT_INITIALIZATION_FAILURE_EXCEPTION& exec) {
-    setStatus(NONOPT_INITIALIZATION_FAILURE);
-  } catch (NONOPT_FUNCTION_EVALUATION_FAILURE_EXCEPTION& exec) {
-    setStatus(NONOPT_FUNCTION_EVALUATION_FAILURE);
-  } catch (NONOPT_GRADIENT_EVALUATION_FAILURE_EXCEPTION& exec) {
-    setStatus(NONOPT_GRADIENT_EVALUATION_FAILURE);
-  } catch (NONOPT_FUNCTION_EVALUATION_ASSERT_EXCEPTION& exec) {
-    setStatus(NONOPT_FUNCTION_EVALUATION_ASSERT);
-  } catch (NONOPT_GRADIENT_EVALUATION_ASSERT_EXCEPTION& exec) {
-    setStatus(NONOPT_GRADIENT_EVALUATION_ASSERT);
+  } catch (NONOPT_APPROXIMATE_HESSIAN_UPDATE_FAILURE_EXCEPTION& exec) {
+    setStatus(NONOPT_APPROXIMATE_HESSIAN_UPDATE_FAILURE);
   } catch (NONOPT_DERIVATIVE_CHECKER_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_DERIVATIVE_CHECKER_FAILURE);
   } catch (NONOPT_DIRECTION_COMPUTATION_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_DIRECTION_COMPUTATION_FAILURE);
+  } catch (NONOPT_FUNCTION_EVALUATION_FAILURE_EXCEPTION& exec) {
+    setStatus(NONOPT_FUNCTION_EVALUATION_FAILURE);
+  } catch (NONOPT_FUNCTION_EVALUATION_ASSERT_FAILURE_EXCEPTION& exec) {
+    setStatus(NONOPT_FUNCTION_EVALUATION_ASSERT_FAILURE);
+  } catch (NONOPT_GRADIENT_EVALUATION_FAILURE_EXCEPTION& exec) {
+    setStatus(NONOPT_GRADIENT_EVALUATION_FAILURE);
+  } catch (NONOPT_GRADIENT_EVALUATION_ASSERT_FAILURE_EXCEPTION& exec) {
+    setStatus(NONOPT_GRADIENT_EVALUATION_ASSERT_FAILURE);
   } catch (NONOPT_LINE_SEARCH_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_LINE_SEARCH_FAILURE);
-  } catch (NONOPT_APPROXIMATE_HESSIAN_UPDATE_FAILURE_EXCEPTION& exec) {
-    setStatus(NONOPT_APPROXIMATE_HESSIAN_UPDATE_FAILURE);
   } catch (NONOPT_POINT_SET_UPDATE_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_POINT_SET_UPDATE_FAILURE);
+  } catch (NONOPT_PROBLEM_DATA_FAILURE_EXCEPTION& exec) {
+    setStatus(NONOPT_PROBLEM_DATA_FAILURE);
+  } catch (NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION& exec) {
+    setStatus(NONOPT_SYMMETRIC_MATRIX_ASSERT_FAILURE);
   } catch (NONOPT_TERMINATION_FAILURE_EXCEPTION& exec) {
     setStatus(NONOPT_TERMINATION_FAILURE);
+  } catch (NONOPT_VECTOR_ASSERT_EXCEPTION& exec) {
+    setStatus(NONOPT_VECTOR_ASSERT_FAILURE);
   }
 
   // Print end of line
   reporter_.printf(R_NL, R_PER_ITERATION, "\n");
 
   // Check whether to finalize problem solution
-  if (status() != NONOPT_INITIALIZATION_FAILURE &&
-      status() != NONOPT_FUNCTION_EVALUATION_FAILURE &&
-      status() != NONOPT_GRADIENT_EVALUATION_FAILURE) {
+  if (status() != NONOPT_FUNCTION_EVALUATION_FAILURE &&
+      status() != NONOPT_FUNCTION_EVALUATION_ASSERT_FAILURE &&
+      status() != NONOPT_GRADIENT_EVALUATION_FAILURE &&
+      status() != NONOPT_GRADIENT_EVALUATION_ASSERT_FAILURE &&
+      status() != NONOPT_PROBLEM_DATA_FAILURE &&
+      status() != NONOPT_VECTOR_ASSERT_FAILURE) {
 
     // Finalize problem solution
     problem->finalizeSolution(quantities_.numberOfVariables(),
@@ -300,47 +357,6 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
   printFooter();
 
 } // end optimize
-
-// Evaluate all functions at current iterate
-void NonOptSolver::evaluateFunctionsAtCurrentIterate()
-{
-
-  // Evaluate objective
-  bool evaluation_success;
-
-  // Check whether to evaluate function with gradient
-  if (quantities_.evaluateFunctionWithGradient()) {
-
-    // Evaluate function
-    evaluation_success = quantities_.currentIterate()->evaluateObjectiveAndGradient(quantities_);
-
-    // Check for evaluation success
-    if (!evaluation_success) {
-      THROW_EXCEPTION(NONOPT_FUNCTION_EVALUATION_FAILURE_EXCEPTION, "Function + gradient evaluation failed.");
-    }
-
-  }
-  else {
-
-    // Evaluate function
-    evaluation_success = quantities_.currentIterate()->evaluateObjective(quantities_);
-
-    // Check for evaluation success
-    if (!evaluation_success) {
-      THROW_EXCEPTION(NONOPT_FUNCTION_EVALUATION_FAILURE_EXCEPTION, "Function evaluation failed.");
-    }
-
-    // Evaluate gradient
-    evaluation_success = quantities_.currentIterate()->evaluateGradient(quantities_);
-
-    // Check for evaluation success
-    if (!evaluation_success) {
-      THROW_EXCEPTION(NONOPT_GRADIENT_EVALUATION_FAILURE_EXCEPTION, "Initialization failed.");
-    }
-
-  } // end else
-
-} // end evaluateFunctionsAtCurrentIterate
 
 // Print footer
 void NonOptSolver::printFooter()
@@ -375,20 +391,8 @@ void NonOptSolver::printFooter()
   case NONOPT_GRADIENT_EVALUATION_LIMIT:
     reporter_.printf(R_NL, R_BASIC, "Gradient evaluation limit reached.");
     break;
-  case NONOPT_INITIALIZATION_FAILURE:
-    reporter_.printf(R_NL, R_BASIC, "Initialization failure! Check definition of problem.");
-    break;
-  case NONOPT_FUNCTION_EVALUATION_FAILURE:
-    reporter_.printf(R_NL, R_BASIC, "Function evaluation failure! Check definition of problem.");
-    break;
-  case NONOPT_GRADIENT_EVALUATION_FAILURE:
-    reporter_.printf(R_NL, R_BASIC, "Gradient evaluation failure! Check definition of problem.");
-    break;
-  case NONOPT_FUNCTION_EVALUATION_ASSERT:
-    reporter_.printf(R_NL, R_BASIC, "Function evaluation assert failure! This wasn't supposed to happen!");
-    break;
-  case NONOPT_GRADIENT_EVALUATION_ASSERT:
-    reporter_.printf(R_NL, R_BASIC, "Gradient evaluation assert failure! This wasn't supposed to happen!");
+  case NONOPT_APPROXIMATE_HESSIAN_UPDATE_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Approximate Hessian update failure.");
     break;
   case NONOPT_DERIVATIVE_CHECKER_FAILURE:
     reporter_.printf(R_NL, R_BASIC, "Derivative checker failure.");
@@ -396,17 +400,35 @@ void NonOptSolver::printFooter()
   case NONOPT_DIRECTION_COMPUTATION_FAILURE:
     reporter_.printf(R_NL, R_BASIC, "Direction computation failure.");
     break;
+  case NONOPT_FUNCTION_EVALUATION_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Function evaluation failure! Check definition of problem.");
+    break;
+  case NONOPT_FUNCTION_EVALUATION_ASSERT_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Function evaluation assert failure! This wasn't supposed to happen!");
+    break;
+  case NONOPT_GRADIENT_EVALUATION_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Gradient evaluation failure! Check definition of problem.");
+    break;
+  case NONOPT_GRADIENT_EVALUATION_ASSERT_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Gradient evaluation assert failure! This wasn't supposed to happen!");
+    break;
   case NONOPT_LINE_SEARCH_FAILURE:
     reporter_.printf(R_NL, R_BASIC, "Line search failure.");
-    break;
-  case NONOPT_APPROXIMATE_HESSIAN_UPDATE_FAILURE:
-    reporter_.printf(R_NL, R_BASIC, "Approximate Hessian update failure.");
     break;
   case NONOPT_POINT_SET_UPDATE_FAILURE:
     reporter_.printf(R_NL, R_BASIC, "Point set update failure.");
     break;
+  case NONOPT_PROBLEM_DATA_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Problem data read failure!  Check definition of problem.");
+    break;
+  case NONOPT_SYMMETRIC_MATRIX_ASSERT_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Symmetric matrix assert failure!  This wasn't supposed to happen!");
+    break;
   case NONOPT_TERMINATION_FAILURE:
     reporter_.printf(R_NL, R_BASIC, "Termination check failure.");
+    break;
+  case NONOPT_VECTOR_ASSERT_FAILURE:
+    reporter_.printf(R_NL, R_BASIC, "Vector assert failure!  This wasn't supposed to happen!");
     break;
   default:
     reporter_.printf(R_NL, R_BASIC, "Unknown exit status! This wasn't supposed to happen!");
@@ -414,8 +436,12 @@ void NonOptSolver::printFooter()
   } // end switch
 
   // Check whether to print final data
-  if (status() != NONOPT_INITIALIZATION_FAILURE &&
-      status() != NONOPT_FUNCTION_EVALUATION_FAILURE) {
+  if (status() != NONOPT_FUNCTION_EVALUATION_FAILURE &&
+      status() != NONOPT_FUNCTION_EVALUATION_ASSERT_FAILURE &&
+      status() != NONOPT_GRADIENT_EVALUATION_FAILURE &&
+      status() != NONOPT_GRADIENT_EVALUATION_ASSERT_FAILURE &&
+      status() != NONOPT_PROBLEM_DATA_FAILURE &&
+      status() != NONOPT_VECTOR_ASSERT_FAILURE) {
 
     // Print quantities footer
     quantities_.printFooter(&reporter_);

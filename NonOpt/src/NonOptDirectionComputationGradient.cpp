@@ -15,13 +15,11 @@ namespace NonOpt
 {
 
 // Add options
-void DirectionComputationGradient::addOptions(Options* options,
-                                              const Reporter* reporter)
+void DirectionComputationGradient::addOptions(Options* options)
 {
 
   // Add bool options
-  options->addBoolOption(reporter,
-                         "DCG_fail_on_QP_failure",
+  options->addBoolOption("DCG_fail_on_QP_failure",
                          false,
                          "Determines whether to fail if QP solver ever fails.\n"
                          "Default     : false.");
@@ -29,12 +27,11 @@ void DirectionComputationGradient::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void DirectionComputationGradient::setOptions(const Options* options,
-                                              const Reporter* reporter)
+void DirectionComputationGradient::setOptions(Options* options)
 {
 
   // Read bool options
-  options->valueAsBool(reporter, "DCG_fail_on_QP_failure", fail_on_QP_failure_);
+  options->valueAsBool("DCG_fail_on_QP_failure", fail_on_QP_failure_);
 
 } // end setOptions
 
@@ -46,13 +43,13 @@ void DirectionComputationGradient::initialize(const Options* options,
 // Iteration header
 std::string DirectionComputationGradient::iterationHeader()
 {
-  return "In. Its.  QP Its. QP   QP KKT    |Step|   |Step|_H";
+  return "In. Its.  QP Pts.  QP Its. QP   QP KKT    |Step|   |Step|_H";
 }
 
 // Iteration null values string
 std::string DirectionComputationGradient::iterationNullValues()
 {
-  return "-------- -------- -- --------- --------- ---------";
+  return "-------- -------- -------- -- --------- --------- ---------";
 }
 
 // Compute direction
@@ -143,10 +140,6 @@ void DirectionComputationGradient::computeDirection(const Options* options,
   // catch exceptions
   catch (DC_SUCCESS_EXCEPTION& exec) {
     setStatus(DC_SUCCESS);
-  } catch (DC_CPU_TIME_LIMIT_EXCEPTION& exec) {
-    setStatus(DC_CPU_TIME_LIMIT);
-    quantities->incrementDirectionComputationTime(clock() - start_time);
-    THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
   } catch (DC_EVALUATION_FAILURE_EXCEPTION& exec) {
     setStatus(DC_EVALUATION_FAILURE);
   } catch (DC_QP_FAILURE_EXCEPTION& exec) {
@@ -154,7 +147,7 @@ void DirectionComputationGradient::computeDirection(const Options* options,
   }
 
   // Print iteration information
-  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
+  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), strategies->qpSolver()->vectorListLength(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
   // Increment total inner iteration counter
   quantities->incrementTotalInnerIterationCounter();

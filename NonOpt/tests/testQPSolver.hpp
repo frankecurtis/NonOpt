@@ -63,13 +63,13 @@ int testQPSolverImplementation(int option)
   QPSolverDualActiveSet q;
 
   // Add options
-  q.addOptions(&options, &reporter);
+  q.addOptions(&options);
 
   // Use exact solves
-  options.modifyBoolValue(&reporter, "QPDAS_allow_inexact_termination", false);
+  options.modifyBoolValue("QPDAS_allow_inexact_termination", false);
 
   // Set options
-  q.setOptions(&options, &reporter);
+  q.setOptions(&options);
 
   // Initialize data
   q.initializeData(numberVariables);

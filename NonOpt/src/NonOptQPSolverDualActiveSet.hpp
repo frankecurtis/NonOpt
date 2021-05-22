@@ -42,17 +42,13 @@ public:
   /**
    * Add options
    * \param[in,out] options is pointer to Options object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
    */
-  void addOptions(Options* options,
-                  const Reporter* reporter);
+  void addOptions(Options* options);
   /**
    * Set options
    * \param[in] options is pointer to Options object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
    */
-  void setOptions(const Options* options,
-                  const Reporter* reporter);
+  void setOptions(Options* options);
   //@}
 
   /** @name Initialization method */
@@ -156,6 +152,10 @@ public:
    * \return string with name of strategy
    */
   std::string name() { return "DualActiveSet"; };
+  /**
+   * Vector list length
+   */
+  inline int const vectorListLength() const { return (int)vector_list_.size(); };
   //@}
 
   /** @name Set methods */

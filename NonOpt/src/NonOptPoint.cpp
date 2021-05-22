@@ -101,7 +101,7 @@ void Point::determineScale(Quantities& quantities)
 {
 
   // Assert gradient has been evaluated
-  ASSERT_EXCEPTION(gradient_evaluated_, NONOPT_GRADIENT_EVALUATION_ASSERT_EXCEPTION, "Gradient should have been evaluated, but wasn't.");
+  ASSERT_EXCEPTION(gradient_evaluated_, NONOPT_GRADIENT_EVALUATION_ASSERT_FAILURE_EXCEPTION, "Gradient should have been evaluated, but wasn't.");
 
   // Set scale
   if (gradient_->normInf() > quantities.scalingThreshold()) {

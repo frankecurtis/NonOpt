@@ -121,7 +121,7 @@ public:
    */
   inline void scaleObjective()
   {
-    ASSERT_EXCEPTION(objective_evaluated_, NONOPT_FUNCTION_EVALUATION_ASSERT_EXCEPTION, "Objective should have been evaluated, but wasn't.");
+    ASSERT_EXCEPTION(objective_evaluated_, NONOPT_FUNCTION_EVALUATION_ASSERT_FAILURE_EXCEPTION, "Objective should have been evaluated, but wasn't.");
     objective_ *= scale_;
   }
   /**
@@ -129,7 +129,7 @@ public:
    */
   inline void scaleGradient()
   {
-    ASSERT_EXCEPTION(gradient_evaluated_, NONOPT_GRADIENT_EVALUATION_ASSERT_EXCEPTION, "Gradient should have been evaluated, but wasn't.");
+    ASSERT_EXCEPTION(gradient_evaluated_, NONOPT_GRADIENT_EVALUATION_ASSERT_FAILURE_EXCEPTION, "Gradient should have been evaluated, but wasn't.");
     gradient_->scale(scale_);
   };
   //@}
@@ -152,7 +152,7 @@ public:
    */
   inline double objective() const
   {
-    ASSERT_EXCEPTION(objective_evaluated_, NONOPT_FUNCTION_EVALUATION_ASSERT_EXCEPTION, "Function should have been evaluated, but wasn't.");
+    ASSERT_EXCEPTION(objective_evaluated_, NONOPT_FUNCTION_EVALUATION_ASSERT_FAILURE_EXCEPTION, "Function should have been evaluated, but wasn't.");
     return objective_;
   };
   /**
@@ -161,7 +161,7 @@ public:
    */
   inline double objectiveUnscaled() const
   {
-    ASSERT_EXCEPTION(objective_evaluated_, NONOPT_FUNCTION_EVALUATION_ASSERT_EXCEPTION, "Function should have been evaluated, but wasn't.");
+    ASSERT_EXCEPTION(objective_evaluated_, NONOPT_FUNCTION_EVALUATION_ASSERT_FAILURE_EXCEPTION, "Function should have been evaluated, but wasn't.");
     return objective_ / scale_;
   };
   /**
@@ -170,7 +170,7 @@ public:
    */
   inline std::shared_ptr<Vector> gradient() const
   {
-    ASSERT_EXCEPTION(gradient_evaluated_, NONOPT_GRADIENT_EVALUATION_ASSERT_EXCEPTION, "Gradient should have been evaluated, but wasn't.");
+    ASSERT_EXCEPTION(gradient_evaluated_, NONOPT_GRADIENT_EVALUATION_ASSERT_FAILURE_EXCEPTION, "Gradient should have been evaluated, but wasn't.");
     return gradient_;
   };
   /**

@@ -52,17 +52,13 @@ public:
   /**
    * Add options
    * \param[in,out] options is pointer to Options object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
    */
-  virtual void addOptions(Options* options,
-                          const Reporter* reporter) = 0;
+  virtual void addOptions(Options* options) = 0;
   /**
    * Set options
    * \param[in] options is pointer to Options object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
    */
-  virtual void setOptions(const Options* options,
-                          const Reporter* reporter) = 0;
+  virtual void setOptions(Options* options) = 0;
   //@}
 
   /** @name Initialization method */

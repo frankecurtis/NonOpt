@@ -59,13 +59,12 @@ int testSymmetricMatrixImplementation(int option)
   // Declare pointer to symmetric matrix object
   std::shared_ptr<SymmetricMatrix> symmetric_matrix;
   symmetric_matrix = std::make_shared<SymmetricMatrixDense>();
-  symmetric_matrix->addOptions(&options, &reporter);
+  symmetric_matrix->addOptions(&options);
   symmetric_matrix = std::make_shared<SymmetricMatrixLimitedMemory>();
-  symmetric_matrix->addOptions(&options, &reporter);
+  symmetric_matrix->addOptions(&options);
 
   // Add approximate hessian update option
-  options.addStringOption(&reporter,
-                          "approximate_hessian_update",
+  options.addStringOption("approximate_hessian_update",
                           "BFGS",
                           "Approximate Hessian update strategy to use.\n"
                           "Default     : BFGS.");
@@ -88,16 +87,16 @@ int testSymmetricMatrixImplementation(int option)
 
       // Set update stratgy
       if (approximate_hessian_update == 0) {
-        options.modifyStringValue(&reporter, "approximate_hessian_update", "BFGS");
+        options.modifyStringValue("approximate_hessian_update", "BFGS");
         reporter.printf(R_NL, R_BASIC, "TESTING BFGS\n");
       } // end if
       else {
-        options.modifyStringValue(&reporter, "approximate_hessian_update", "DFP");
+        options.modifyStringValue("approximate_hessian_update", "DFP");
         reporter.printf(R_NL, R_BASIC, "TESTING DFP\n");
       } // end else
 
       // Set options
-      symmetric_matrix->setOptions(&options, &reporter);
+      symmetric_matrix->setOptions(&options);
 
       // Initialize
       symmetric_matrix->initialize(&options, &quantities, &reporter);

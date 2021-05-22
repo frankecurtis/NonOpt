@@ -176,10 +176,20 @@ private:
   Strategies strategies_;
   //@}
 
+  /** @name Private members, options */
+  //@{
+  int print_level_;
+  int print_level_file_;
+  int qp_print_level_;
+  int qp_print_level_file_;
+  std::string print_file_name_;
+  std::string qp_print_file_name_;
+  //@}
+
   /** @name Private methods */
   //@{
   void addOptions();
-  void evaluateFunctionsAtCurrentIterate();
+  void initialize(const std::shared_ptr<Problem> problem);
   void printFooter();
   void printHeader();
   void printIterationHeader();

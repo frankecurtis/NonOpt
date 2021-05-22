@@ -39,10 +39,10 @@ int main()
   NonOptSolver nonopt;
 
   // Modify options from file
-  nonopt.options()->modifyOptionsFromFile(nonopt.reporter(), "nonopt.opt");
+  nonopt.options()->modifyOptionsFromFile("nonopt_experiment.opt");
 
-  // Delete reports
-  nonopt.reporter()->deleteReports();
+  // Set print level to 0
+  nonopt.options()->modifyIntegerValue("print_level",0);
 
   // Declare problem pointer
   std::shared_ptr<Problem> problem;
@@ -75,43 +75,43 @@ int main()
   for (int direction_computation_number = 0; direction_computation_number < (int)direction_computation_names.size(); direction_computation_number++) {
 
     // Set direction computation strategy
-    nonopt.options()->modifyStringValue(nonopt.reporter(), "direction_computation", direction_computation_names[direction_computation_number]);
+    nonopt.options()->modifyStringValue("direction_computation", direction_computation_names[direction_computation_number]);
 
     // Loop through approximate Hessian update strategies
     for (int approximate_hessian_update_number = 0; approximate_hessian_update_number < (int)approximate_hessian_update_names.size(); approximate_hessian_update_number++) {
 
       // Set approximate Hessian update strategy
-      nonopt.options()->modifyStringValue(nonopt.reporter(), "approximate_hessian_update", approximate_hessian_update_names[approximate_hessian_update_number]);
+      nonopt.options()->modifyStringValue("approximate_hessian_update", approximate_hessian_update_names[approximate_hessian_update_number]);
 
       // Loop through line searches
       for (int line_search_number = 0; line_search_number < (int)line_search_names.size(); line_search_number++) {
 
         // Set line search strategy
-        nonopt.options()->modifyStringValue(nonopt.reporter(), "line_search", line_search_names[line_search_number]);
+        nonopt.options()->modifyStringValue("line_search", line_search_names[line_search_number]);
 
         // Loop through point set updates
         for (int point_set_update_number = 0; point_set_update_number < (int)point_set_update_names.size(); point_set_update_number++) {
 
           // Set point set update strategy
-          nonopt.options()->modifyStringValue(nonopt.reporter(), "point_set_update", point_set_update_names[point_set_update_number]);
+          nonopt.options()->modifyStringValue("point_set_update", point_set_update_names[point_set_update_number]);
 
           // Loop through qp solvers
           for (int qp_solver_number = 0; qp_solver_number < (int)qp_solver_names.size(); qp_solver_number++) {
 
             // Set qp solver strategy
-            nonopt.options()->modifyStringValue(nonopt.reporter(), "qp_solver", qp_solver_names[qp_solver_number]);
+            nonopt.options()->modifyStringValue("qp_solver", qp_solver_names[qp_solver_number]);
 
             // Loop through symmetric matrices
             for (int symmetric_matrix_number = 0; symmetric_matrix_number < (int)symmetric_matrix_names.size(); symmetric_matrix_number++) {
 
               // Set symmetric matrix strategy
-              nonopt.options()->modifyStringValue(nonopt.reporter(), "symmetric_matrix", symmetric_matrix_names[symmetric_matrix_number]);
+              nonopt.options()->modifyStringValue("symmetric_matrix", symmetric_matrix_names[symmetric_matrix_number]);
 
               // Loop through termination
               for (int termination_number = 0; termination_number < (int)termination_names.size(); termination_number++) {
 
                 // Set termination strategy
-                nonopt.options()->modifyStringValue(nonopt.reporter(), "termination", termination_names[termination_number]);
+                nonopt.options()->modifyStringValue("termination", termination_names[termination_number]);
 
                 // Declare strategy names
                 std::string direction_computation_name;
@@ -123,13 +123,13 @@ int main()
                 std::string termination_name;
 
                 // Read integer options
-                nonopt.options()->valueAsString(nonopt.reporter(), "direction_computation", direction_computation_name);
-                nonopt.options()->valueAsString(nonopt.reporter(), "approximate_hessian_update", approximate_hessian_update_name);
-                nonopt.options()->valueAsString(nonopt.reporter(), "line_search", line_search_name);
-                nonopt.options()->valueAsString(nonopt.reporter(), "point_set_update", point_set_update_name);
-                nonopt.options()->valueAsString(nonopt.reporter(), "qp_solver", qp_solver_name);
-                nonopt.options()->valueAsString(nonopt.reporter(), "symmetric_matrix", symmetric_matrix_name);
-                nonopt.options()->valueAsString(nonopt.reporter(), "termination", termination_name);
+                nonopt.options()->valueAsString("direction_computation", direction_computation_name);
+                nonopt.options()->valueAsString("approximate_hessian_update", approximate_hessian_update_name);
+                nonopt.options()->valueAsString("line_search", line_search_name);
+                nonopt.options()->valueAsString("point_set_update", point_set_update_name);
+                nonopt.options()->valueAsString("qp_solver", qp_solver_name);
+                nonopt.options()->valueAsString("symmetric_matrix", symmetric_matrix_name);
+                nonopt.options()->valueAsString("termination", termination_name);
 
                 // Print header
                 printf("%s, %s, %s, %s, %s, %s, %s\n",

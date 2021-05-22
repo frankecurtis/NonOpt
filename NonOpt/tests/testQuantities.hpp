@@ -50,17 +50,14 @@ int testQuantitiesImplementation(int option)
   Options options;
 
   // Add and set quantities options
-  quantities.addOptions(&options, &reporter);
-  quantities.setOptions(&options, &reporter);
+  quantities.addOptions(&options);
+  quantities.setOptions(&options);
 
   // Initialize quantities
   quantities.initialize(problem);
 
   // Evaluate gradient (for radii initialization)
   quantities.currentIterate()->evaluateGradient(quantities);
-
-  // Initialize radii
-  quantities.initializeRadii(&options, &reporter);
 
   // Check quantities
   if (quantities.numberOfVariables() != 50) {
@@ -157,10 +154,10 @@ int testQuantitiesImplementation(int option)
       }
     }
   } // end for
-  if (quantities.stationarityRadius() < 0.0 - 1e-12 || quantities.stationarityRadius() > 0.0 + 1e-12) {
+  if (quantities.stationarityRadius() < 1e+01 - 1e-12 || quantities.stationarityRadius() > 1e+01 + 1e-12) {
     result = 1;
   }
-  if (quantities.trustRegionRadius() < 0.0 - 1e-12 || quantities.trustRegionRadius() > 0.0 + 1e-12) {
+  if (quantities.trustRegionRadius() < 1e+06 - 1e-12 || quantities.trustRegionRadius() > 1e+06 + 1e-12) {
     result = 1;
   }
 

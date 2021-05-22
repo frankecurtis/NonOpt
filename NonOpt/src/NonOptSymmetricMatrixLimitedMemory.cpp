@@ -37,14 +37,12 @@ SymmetricMatrixLimitedMemory::~SymmetricMatrixLimitedMemory()
 } // end destructor
 
 // Add options
-void SymmetricMatrixLimitedMemory::addOptions(Options* options,
-                                              const Reporter* reporter)
+void SymmetricMatrixLimitedMemory::addOptions(Options* options)
 {
   // Add double options
 
   // Add integer options
-  options->addIntegerOption(reporter,
-                            "SMLM_history",
+  options->addIntegerOption("SMLM_history",
                             20,
                             0,
                             NONOPT_INT_INFINITY,
@@ -54,14 +52,16 @@ void SymmetricMatrixLimitedMemory::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void SymmetricMatrixLimitedMemory::setOptions(const Options* options,
-                                              const Reporter* reporter)
+void SymmetricMatrixLimitedMemory::setOptions(Options* options)
 {
 
   // Read double options
 
   // Read integer options
-  options->valueAsInteger(reporter, "SMLM_history", history_);
+  options->valueAsInteger("SMLM_history", history_);
+
+  // Read string options
+  options->valueAsString("approximate_hessian_update", type_);
 
 } // end setOptions
 
@@ -70,9 +70,6 @@ void SymmetricMatrixLimitedMemory::initialize(const Options* options,
                                               Quantities* quantities,
                                               const Reporter* reporter)
 {
-
-  // Get approximation type
-  options->valueAsString(reporter, "approximate_hessian_update", type_);
 
   // Reduce history to at most number of variables
   history_ = fmin(history_, quantities->numberOfVariables());

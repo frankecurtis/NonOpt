@@ -15,20 +15,17 @@ namespace NonOpt
 {
 
 // Add options
-void LineSearchBacktracking::addOptions(Options* options,
-                                        const Reporter* reporter)
+void LineSearchBacktracking::addOptions(Options* options)
 {
 
   // Add bool options
-  options->addBoolOption(reporter,
-                         "LSB_fail_on_small_stepsize",
+  options->addBoolOption("LSB_fail_on_small_stepsize",
                          false,
                          "Indicator for whether to indicate failure on small stepsize.\n"
                          "Default     : false.");
 
   // Add double options
-  options->addDoubleOption(reporter,
-                           "LSB_stepsize_initial",
+  options->addDoubleOption("LSB_stepsize_initial",
                            1.0,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -37,8 +34,7 @@ void LineSearchBacktracking::addOptions(Options* options,
                            "              iterations is set the minimum of this value and a factor times\n"
                            "              the stepsize accepted in the previous iteration.\n"
                            "Default     : 1.0.");
-  options->addDoubleOption(reporter,
-                           "LSB_stepsize_minimum",
+  options->addDoubleOption("LSB_stepsize_minimum",
                            1e-20,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -46,29 +42,25 @@ void LineSearchBacktracking::addOptions(Options* options,
                            "              line search yields a stepsize below this tolerance, then the\n"
                            "              algorithm may terminate with a message of a small stepsize.\n"
                            "Default     : 1e-20.");
-  options->addDoubleOption(reporter,
-                           "LSB_stepsize_sufficient_decrease_threshold",
+  options->addDoubleOption("LSB_stepsize_sufficient_decrease_threshold",
                            1e-10,
                            0.0,
                            1.0,
                            "Sufficient decrease constant for the weak Wolfe line search.\n"
                            "Default     : 1e-10.");
-  options->addDoubleOption(reporter,
-                           "LSB_stepsize_sufficient_decrease_fudge_factor",
+  options->addDoubleOption("LSB_stepsize_sufficient_decrease_fudge_factor",
                            1e-10,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Sufficient decrease fudge factor.\n"
                            "Default     : 1e-10.");
-  options->addDoubleOption(reporter,
-                           "LSB_stepsize_decrease_factor",
+  options->addDoubleOption("LSB_stepsize_decrease_factor",
                            9e-01,
                            0.0,
                            1.0,
                            "Factor for updating the stepsize during the line search.\n"
                            "Default     : 9e-01.");
-  options->addDoubleOption(reporter,
-                           "LSB_stepsize_increase_factor",
+  options->addDoubleOption("LSB_stepsize_increase_factor",
                            1e+01,
                            1.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -78,20 +70,19 @@ void LineSearchBacktracking::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void LineSearchBacktracking::setOptions(const Options* options,
-                                        const Reporter* reporter)
+void LineSearchBacktracking::setOptions(Options* options)
 {
 
   // Read bool options
-  options->valueAsBool(reporter, "LSB_fail_on_small_stepsize", fail_on_small_stepsize_);
+  options->valueAsBool("LSB_fail_on_small_stepsize", fail_on_small_stepsize_);
 
   // Read options
-  options->valueAsDouble(reporter, "LSB_stepsize_initial", stepsize_initial_);
-  options->valueAsDouble(reporter, "LSB_stepsize_minimum", stepsize_minimum_);
-  options->valueAsDouble(reporter, "LSB_stepsize_sufficient_decrease_threshold", stepsize_sufficient_decrease_threshold_);
-  options->valueAsDouble(reporter, "LSB_stepsize_sufficient_decrease_fudge_factor", stepsize_sufficient_decrease_fudge_factor_);
-  options->valueAsDouble(reporter, "LSB_stepsize_decrease_factor", stepsize_decrease_factor_);
-  options->valueAsDouble(reporter, "LSB_stepsize_increase_factor", stepsize_increase_factor_);
+  options->valueAsDouble("LSB_stepsize_initial", stepsize_initial_);
+  options->valueAsDouble("LSB_stepsize_minimum", stepsize_minimum_);
+  options->valueAsDouble("LSB_stepsize_sufficient_decrease_threshold", stepsize_sufficient_decrease_threshold_);
+  options->valueAsDouble("LSB_stepsize_sufficient_decrease_fudge_factor", stepsize_sufficient_decrease_fudge_factor_);
+  options->valueAsDouble("LSB_stepsize_decrease_factor", stepsize_decrease_factor_);
+  options->valueAsDouble("LSB_stepsize_increase_factor", stepsize_increase_factor_);
 
 } // end setOptions
 

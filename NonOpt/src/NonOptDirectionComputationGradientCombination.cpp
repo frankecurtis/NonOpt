@@ -16,41 +16,34 @@ namespace NonOpt
 {
 
 // Add options
-void DirectionComputationGradientCombination::addOptions(Options* options,
-                                                         const Reporter* reporter)
+void DirectionComputationGradientCombination::addOptions(Options* options)
 {
 
   // Add bool options
-  options->addBoolOption(reporter,
-                         "DCGC_add_far_points",
+  options->addBoolOption("DCGC_add_far_points",
                          false,
                          "Determines whether to add points far outside stationarity\n"
                          "              radius to point set during subproblem solve.\n"
                          "Default     : false.");
-  options->addBoolOption(reporter,
-                         "DCGC_fail_on_iteration_limit",
+  options->addBoolOption("DCGC_fail_on_iteration_limit",
                          false,
                          "Determines whether to fail if iteration limit exceeded.\n"
                          "Default     : false.");
-  options->addBoolOption(reporter,
-                         "DCGC_fail_on_QP_failure",
+  options->addBoolOption("DCGC_fail_on_QP_failure",
                          false,
                          "Determines whether to fail if QP solver ever fails.\n"
                          "Default     : false.");
-  options->addBoolOption(reporter,
-                         "DCGC_try_aggregation",
+  options->addBoolOption("DCGC_try_aggregation",
                          false,
                          "Determines whether to consider aggregating subgradients.\n"
                          "Default     : false.");
-  options->addBoolOption(reporter,
-                         "DCGC_try_gradient_step",
+  options->addBoolOption("DCGC_try_gradient_step",
                          true,
                          "Determines whether to consider gradient step before solving\n"
                          "              gradient combination subproblem.\n"
                          "              Gradient step stepsize set by DCGC_gradient_stepsize parameter.\n"
                          "Default     : true.");
-  options->addBoolOption(reporter,
-                         "DCGC_try_shortened_step",
+  options->addBoolOption("DCGC_try_shortened_step",
                          true,
                          "Determines whether to consider shortened step if subproblem\n"
                          "              solver does not terminate after considering full QP step.\n"
@@ -58,15 +51,13 @@ void DirectionComputationGradientCombination::addOptions(Options* options,
                          "Default     : true.");
 
   // Add double options
-  options->addDoubleOption(reporter,
-                           "DCGC_aggregation_size_threshold",
+  options->addDoubleOption("DCGC_aggregation_size_threshold",
                            1e+01,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Threshold for switching from aggregation to full point set.\n"
                            "Default     : 1e+01.");
-  options->addDoubleOption(reporter,
-                           "DCGC_downshift_constant",
+  options->addDoubleOption("DCGC_downshift_constant",
                            1e-02,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -75,8 +66,7 @@ void DirectionComputationGradientCombination::addOptions(Options* options,
                            "              minus this value times the squared norm difference between the\n"
                            "              sampled point and the current iterate.\n"
                            "Default     : 1e-02.");
-  options->addDoubleOption(reporter,
-                           "DCGC_gradient_stepsize",
+  options->addDoubleOption("DCGC_gradient_stepsize",
                            1e-04,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -85,8 +75,7 @@ void DirectionComputationGradientCombination::addOptions(Options* options,
                            "              then full gradient combination subproblem is avoided.  This scheme\n"
                            "              is only considered if DCGC_try_gradient_step == true.\n"
                            "Default     : 1e-04.");
-  options->addDoubleOption(reporter,
-                           "DCGC_random_sample_factor",
+  options->addDoubleOption("DCGC_random_sample_factor",
                            1e-02,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -95,8 +84,7 @@ void DirectionComputationGradientCombination::addOptions(Options* options,
                            "              of points that will be sampled; otherwise, if < 1, then\n"
                            "              number sampled is factor times number of variables (rounded up).\n"
                            "Default     : 1e-02.");
-  options->addDoubleOption(reporter,
-                           "DCGC_shortened_stepsize",
+  options->addDoubleOption("DCGC_shortened_stepsize",
                            1e-02,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -106,8 +94,7 @@ void DirectionComputationGradientCombination::addOptions(Options* options,
                            "              In particular, the shortened stepsize that is considered is\n"
                            "              DCGC_shortened_stepsize*min(stat. rad.,||qp_step||_inf)/||qp_step||_inf.\n"
                            "Default     : 1e-02.");
-  options->addDoubleOption(reporter,
-                           "DCGC_step_acceptance_tolerance",
+  options->addDoubleOption("DCGC_step_acceptance_tolerance",
                            1e-08,
                            0.0,
                            1.0,
@@ -115,8 +102,7 @@ void DirectionComputationGradientCombination::addOptions(Options* options,
                            "Default     : 1e-08.");
 
   // Add integer options
-  options->addIntegerOption(reporter,
-                            "DCGC_inner_iteration_limit",
+  options->addIntegerOption("DCGC_inner_iteration_limit",
                             20,
                             0,
                             NONOPT_INT_INFINITY,
@@ -126,28 +112,27 @@ void DirectionComputationGradientCombination::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void DirectionComputationGradientCombination::setOptions(const Options* options,
-                                                         const Reporter* reporter)
+void DirectionComputationGradientCombination::setOptions(Options* options)
 {
 
   // Read bool options
-  options->valueAsBool(reporter, "DCGC_add_far_points", add_far_points_);
-  options->valueAsBool(reporter, "DCGC_fail_on_iteration_limit", fail_on_iteration_limit_);
-  options->valueAsBool(reporter, "DCGC_fail_on_QP_failure", fail_on_QP_failure_);
-  options->valueAsBool(reporter, "DCGC_try_aggregation", try_aggregation_);
-  options->valueAsBool(reporter, "DCGC_try_gradient_step", try_gradient_step_);
-  options->valueAsBool(reporter, "DCGC_try_shortened_step", try_shortened_step_);
+  options->valueAsBool("DCGC_add_far_points", add_far_points_);
+  options->valueAsBool("DCGC_fail_on_iteration_limit", fail_on_iteration_limit_);
+  options->valueAsBool("DCGC_fail_on_QP_failure", fail_on_QP_failure_);
+  options->valueAsBool("DCGC_try_aggregation", try_aggregation_);
+  options->valueAsBool("DCGC_try_gradient_step", try_gradient_step_);
+  options->valueAsBool("DCGC_try_shortened_step", try_shortened_step_);
 
   // Read double options
-  options->valueAsDouble(reporter, "DCGC_aggregation_size_threshold", aggregation_size_threshold_);
-  options->valueAsDouble(reporter, "DCGC_downshift_constant", downshift_constant_);
-  options->valueAsDouble(reporter, "DCGC_gradient_stepsize", gradient_stepsize_);
-  options->valueAsDouble(reporter, "DCGC_random_sample_factor", random_sample_factor_);
-  options->valueAsDouble(reporter, "DCGC_shortened_stepsize", shortened_stepsize_);
-  options->valueAsDouble(reporter, "DCGC_step_acceptance_tolerance", step_acceptance_tolerance_);
+  options->valueAsDouble("DCGC_aggregation_size_threshold", aggregation_size_threshold_);
+  options->valueAsDouble("DCGC_downshift_constant", downshift_constant_);
+  options->valueAsDouble("DCGC_gradient_stepsize", gradient_stepsize_);
+  options->valueAsDouble("DCGC_random_sample_factor", random_sample_factor_);
+  options->valueAsDouble("DCGC_shortened_stepsize", shortened_stepsize_);
+  options->valueAsDouble("DCGC_step_acceptance_tolerance", step_acceptance_tolerance_);
 
   // Read integer options
-  options->valueAsInteger(reporter, "DCGC_inner_iteration_limit", inner_iteration_limit_);
+  options->valueAsInteger("DCGC_inner_iteration_limit", inner_iteration_limit_);
 
 } // end setOptions
 
@@ -159,13 +144,13 @@ void DirectionComputationGradientCombination::initialize(const Options* options,
 // Iteration header
 std::string DirectionComputationGradientCombination::iterationHeader()
 {
-  return "In. Its.  QP Its. QP   QP KKT    |Step|   |Step|_H";
+  return "In. Its.  QP Pts.  QP Its. QP   QP KKT    |Step|   |Step|_H";
 }
 
 // Iteration null values string
 std::string DirectionComputationGradientCombination::iterationNullValues()
 {
-  return "-------- -------- -- --------- --------- ---------";
+  return "-------- -------- -------- -- --------- --------- ---------";
 }
 
 // Compute direction
@@ -385,7 +370,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       // Check for CPU time limit
       if ((clock() - quantities->startTime()) / (double)CLOCKS_PER_SEC >= quantities->cpuTimeLimit()) {
         quantities->incrementDirectionComputationTime(clock() - start_time);
-        THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
+        THROW_EXCEPTION(DC_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
       }
 
       // Set aggregated data
@@ -583,7 +568,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       } // end for
 
       // Print QP solve / step information
-      reporter->printf(R_NL, R_PER_INNER_ITERATION, " %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
+      reporter->printf(R_NL, R_PER_INNER_ITERATION, " %8d %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), strategies->qpSolver()->vectorListLength(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
       // Set blank solve string
       std::string blank_solve = "";
@@ -670,7 +655,6 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
     setStatus(DC_SUCCESS);
   } catch (DC_CPU_TIME_LIMIT_EXCEPTION& exec) {
     setStatus(DC_CPU_TIME_LIMIT);
-    quantities->incrementDirectionComputationTime(clock() - start_time);
     THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
   } catch (DC_EVALUATION_FAILURE_EXCEPTION& exec) {
     setStatus(DC_EVALUATION_FAILURE);
@@ -681,7 +665,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
   }
 
   // Print iteration information
-  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
+  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), strategies->qpSolver()->vectorListLength(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
 
   // Increment total inner iteration counter
   quantities->incrementTotalInnerIterationCounter();

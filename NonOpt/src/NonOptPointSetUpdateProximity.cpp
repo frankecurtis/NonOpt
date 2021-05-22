@@ -11,15 +11,13 @@ namespace NonOpt
 {
 
 // Add options
-void PointSetUpdateProximity::addOptions(Options* options,
-                                         const Reporter* reporter)
+void PointSetUpdateProximity::addOptions(Options* options)
 {
 
   // Add bool options
 
   // Add double options
-  options->addDoubleOption(reporter,
-                           "PSP_envelope_factor",
+  options->addDoubleOption("PSP_envelope_factor",
                            1e+02,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -29,8 +27,7 @@ void PointSetUpdateProximity::addOptions(Options* options,
                            "              radius times this envelope, then the point is removed;\n"
                            "              otherwise, it is kept in the point set.\n"
                            "Default     : 1e+02.");
-  options->addDoubleOption(reporter,
-                           "PSP_size_factor",
+  options->addDoubleOption("PSP_size_factor",
                            2e+00,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -44,15 +41,14 @@ void PointSetUpdateProximity::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void PointSetUpdateProximity::setOptions(const Options* options,
-                                         const Reporter* reporter)
+void PointSetUpdateProximity::setOptions(Options* options)
 {
 
   // Read bool options
 
   // Read double options
-  options->valueAsDouble(reporter, "PSP_envelope_factor", envelope_factor_);
-  options->valueAsDouble(reporter, "PSP_size_factor", size_factor_);
+  options->valueAsDouble("PSP_envelope_factor", envelope_factor_);
+  options->valueAsDouble("PSP_size_factor", size_factor_);
 
   // Read integer options
 

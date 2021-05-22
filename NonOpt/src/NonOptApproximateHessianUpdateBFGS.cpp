@@ -15,20 +15,17 @@ namespace NonOpt
 {
 
 // Add options
-void ApproximateHessianUpdateBFGS::addOptions(Options* options,
-                                              const Reporter* reporter)
+void ApproximateHessianUpdateBFGS::addOptions(Options* options)
 {
 
   // Add bool options
-  options->addBoolOption(reporter,
-                         "BFGS_fail_on_tolerance_violation",
+  options->addBoolOption("BFGS_fail_on_tolerance_violation",
                          false,
                          "Indicator for whether to indicate failure on violated tolerance.\n"
                          "Default     : false.");
 
   // Add double options
-  options->addDoubleOption(reporter,
-                           "BFGS_correction_threshold_1",
+  options->addDoubleOption("BFGS_correction_threshold_1",
                            1e-20,
                            0.0,
                            1.0,
@@ -36,8 +33,7 @@ void ApproximateHessianUpdateBFGS::addOptions(Options* options,
                            "              gradient displacement v is set so that inner product with step,\n"
                            "              call it s, is such that <s,v>/<s,s> is at least this threshold.\n"
                            "Default     : 1e-20.");
-  options->addDoubleOption(reporter,
-                           "BFGS_correction_threshold_2",
+  options->addDoubleOption("BFGS_correction_threshold_2",
                            1e+02,
                            1.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -45,8 +41,7 @@ void ApproximateHessianUpdateBFGS::addOptions(Options* options,
                            "              gradient displacement v is set so that inner product with step,\n"
                            "              call it s, is such that <v,v>/<s,v> is at most this threshold.\n"
                            "Default     : 1e+02.");
-  options->addDoubleOption(reporter,
-                           "BFGS_norm_tolerance",
+  options->addDoubleOption("BFGS_norm_tolerance",
                            1e-20,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -55,8 +50,7 @@ void ApproximateHessianUpdateBFGS::addOptions(Options* options,
                            "              greater than this tolerance, then the BFGS update may occur;\n"
                            "              else, it is skipped.\n"
                            "Default     : 1e-20.");
-  options->addDoubleOption(reporter,
-                           "BFGS_product_tolerance",
+  options->addDoubleOption("BFGS_product_tolerance",
                            1e-20,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -69,18 +63,17 @@ void ApproximateHessianUpdateBFGS::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void ApproximateHessianUpdateBFGS::setOptions(const Options* options,
-                                              const Reporter* reporter)
+void ApproximateHessianUpdateBFGS::setOptions(Options* options)
 {
 
   // Read bool options
-  options->valueAsBool(reporter, "BFGS_fail_on_tolerance_violation", fail_on_tolerance_violation_);
+  options->valueAsBool("BFGS_fail_on_tolerance_violation", fail_on_tolerance_violation_);
 
   // Read double options
-  options->valueAsDouble(reporter, "BFGS_correction_threshold_1", correction_threshold_1_);
-  options->valueAsDouble(reporter, "BFGS_correction_threshold_2", correction_threshold_2_);
-  options->valueAsDouble(reporter, "BFGS_norm_tolerance", norm_tolerance_);
-  options->valueAsDouble(reporter, "BFGS_product_tolerance", product_tolerance_);
+  options->valueAsDouble("BFGS_correction_threshold_1", correction_threshold_1_);
+  options->valueAsDouble("BFGS_correction_threshold_2", correction_threshold_2_);
+  options->valueAsDouble("BFGS_norm_tolerance", norm_tolerance_);
+  options->valueAsDouble("BFGS_product_tolerance", product_tolerance_);
 
 } // end setOptions
 

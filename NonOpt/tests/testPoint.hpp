@@ -77,8 +77,8 @@ int testPointImplementation(int option)
   Options options;
 
   // Add and set quantities options
-  quantities.addOptions(&options, &reporter);
-  quantities.setOptions(&options, &reporter);
+  quantities.addOptions(&options);
+  quantities.setOptions(&options);
 
   // Get function value
   p.evaluateObjective(quantities);

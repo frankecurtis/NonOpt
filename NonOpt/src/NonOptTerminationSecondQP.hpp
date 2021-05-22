@@ -40,17 +40,13 @@ public:
   /**
    * Add options
    * \param[in,out] options is pointer to Options object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
    */
-  void addOptions(Options* options,
-                  const Reporter* reporter);
+  void addOptions(Options* options);
   /**
    * Set options
    * \param[in] options is pointer to Options object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
    */
-  void setOptions(const Options* options,
-                  const Reporter* reporter);
+  void setOptions(Options* options);
   //@}
 
   /** @name Initialization method */
@@ -72,12 +68,12 @@ public:
    * Get iteration header values
    * \return string of header values
    */
-  std::string iterationHeader() { return " |Grad.|  |G. C. H| |G. C. I|"; };
+  std::string iterationHeader() { return " |Grad.|   QP Pts.  QP Its. |G. C. H| |G. C. I|"; };
   /**
    * Get iteration null values string
    * \return string of null values
    */
-  std::string iterationNullValues() { return "--------- --------- ---------"; };
+  std::string iterationNullValues() { return "--------- -------- -------- --------- ---------"; };
   /**
    * Get name of strategy
    * \return string with name of strategy

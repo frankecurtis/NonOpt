@@ -13,27 +13,23 @@ namespace NonOpt
 {
 
 // Add options
-void DerivativeCheckerFiniteDifference::addOptions(Options* options,
-                                                   const Reporter* reporter)
+void DerivativeCheckerFiniteDifference::addOptions(Options* options)
 {
 
   // Add bool options
-  options->addBoolOption(reporter,
-                         "DEFD_check_derivatives",
+  options->addBoolOption("DEFD_check_derivatives",
                          false,
                          "Determines whether to check derivatives at iterates.\n"
                          "Default     : false.");
 
   // Add double options
-  options->addDoubleOption(reporter,
-                           "DEFD_increment",
+  options->addDoubleOption("DEFD_increment",
                            1e-08,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Increment for derivative checker.\n"
                            "Default     : 1e-08.");
-  options->addDoubleOption(reporter,
-                           "DEFD_tolerance",
+  options->addDoubleOption("DEFD_tolerance",
                            1e-04,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -45,16 +41,15 @@ void DerivativeCheckerFiniteDifference::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void DerivativeCheckerFiniteDifference::setOptions(const Options* options,
-                                                   const Reporter* reporter)
+void DerivativeCheckerFiniteDifference::setOptions(Options* options)
 {
 
   // Read bool options
-  options->valueAsBool(reporter, "DEFD_check_derivatives", check_derivatives_);
+  options->valueAsBool("DEFD_check_derivatives", check_derivatives_);
 
   // Read double options
-  options->valueAsDouble(reporter, "DEFD_increment", increment_);
-  options->valueAsDouble(reporter, "DEFD_tolerance", tolerance_);
+  options->valueAsDouble("DEFD_increment", increment_);
+  options->valueAsDouble("DEFD_tolerance", tolerance_);
 
   // Read integer options
 

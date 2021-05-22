@@ -24,48 +24,39 @@ namespace NonOpt
 {
 
 // Add options
-void Strategies::addOptions(Options* options,
-                            const Reporter* reporter)
+void Strategies::addOptions(Options* options)
 {
 
   // Add string options
-  options->addStringOption(reporter,
-                           "approximate_hessian_update",
+  options->addStringOption("approximate_hessian_update",
                            "BFGS",
                            "Approximate Hessian update strategy to use.\n"
                            "Default     : BFGS.");
-  options->addStringOption(reporter,
-                           "derivative_checker",
+  options->addStringOption("derivative_checker",
                            "FiniteDifference",
                            "Derivative checker strategy to use.\n"
                            "Default     : FiniteDifference.");
-  options->addStringOption(reporter,
-                           "direction_computation",
+  options->addStringOption("direction_computation",
                            "CuttingPlane",
                            "Direction computation strategy to use.\n"
                            "Default     : CuttingPlane.");
-  options->addStringOption(reporter,
-                           "line_search",
+  options->addStringOption("line_search",
                            "WeakWolfe",
                            "Line search strategy to use.\n"
                            "Default     : WeakWolfe.");
-  options->addStringOption(reporter,
-                           "point_set_update",
+  options->addStringOption("point_set_update",
                            "Proximity",
                            "Point set update strategy to use.\n"
                            "Default     : Proximity.");
-  options->addStringOption(reporter,
-                           "qp_solver",
+  options->addStringOption("qp_solver",
                            "DualActiveSet",
                            "QP solver strategy to use.\n"
                            "Default     : DualActiveSet.");
-  options->addStringOption(reporter,
-                           "symmetric_matrix",
+  options->addStringOption("symmetric_matrix",
                            "Dense",
                            "Symmetric matrix strategy to use.\n"
                            "Default     : Dense.");
-  options->addStringOption(reporter,
-                           "termination",
+  options->addStringOption("termination",
                            "Basic",
                            "Termination strategy to use.\n"
                            "Default     : Basic.");
@@ -73,68 +64,67 @@ void Strategies::addOptions(Options* options,
   // Add options for approximate Hessian update strategies
   std::shared_ptr<ApproximateHessianUpdate> approximate_hessian_update;
   approximate_hessian_update = std::make_shared<ApproximateHessianUpdateBFGS>();
-  approximate_hessian_update->addOptions(options, reporter);
+  approximate_hessian_update->addOptions(options);
   approximate_hessian_update = std::make_shared<ApproximateHessianUpdateDFP>();
-  approximate_hessian_update->addOptions(options, reporter);
+  approximate_hessian_update->addOptions(options);
   // ADD NEW APPROXIMATE HESSIAN UPDATE STRATEGIES HERE //
 
   // Add options for derivative checker strategies
   std::shared_ptr<DerivativeChecker> derivative_checker;
   derivative_checker = std::make_shared<DerivativeCheckerFiniteDifference>();
-  derivative_checker->addOptions(options, reporter);
+  derivative_checker->addOptions(options);
   // ADD NEW POINT SET UPDATE STRATEGIES HERE //
 
   // Add options for direction computation strategies
   std::shared_ptr<DirectionComputation> direction_computation;
   direction_computation = std::make_shared<DirectionComputationCuttingPlane>();
-  direction_computation->addOptions(options, reporter);
+  direction_computation->addOptions(options);
   direction_computation = std::make_shared<DirectionComputationGradient>();
-  direction_computation->addOptions(options, reporter);
+  direction_computation->addOptions(options);
   direction_computation = std::make_shared<DirectionComputationGradientCombination>();
-  direction_computation->addOptions(options, reporter);
+  direction_computation->addOptions(options);
   // ADD NEW DIRECTION COMPUTATION STRATEGIES HERE //
 
   // Add options for line search strategies
   std::shared_ptr<LineSearch> line_search;
   line_search = std::make_shared<LineSearchBacktracking>();
-  line_search->addOptions(options, reporter);
+  line_search->addOptions(options);
   line_search = std::make_shared<LineSearchWeakWolfe>();
-  line_search->addOptions(options, reporter);
+  line_search->addOptions(options);
   // ADD NEW LINE SEARCH STRATEGIES HERE //
 
   // Add options for point set update strategies
   std::shared_ptr<PointSetUpdate> point_set_update;
   point_set_update = std::make_shared<PointSetUpdateProximity>();
-  point_set_update->addOptions(options, reporter);
+  point_set_update->addOptions(options);
   // ADD NEW POINT SET UPDATE STRATEGIES HERE //
 
   // Add options for QP solver strategies
   std::shared_ptr<QPSolver> qp_solver;
   qp_solver = std::make_shared<QPSolverDualActiveSet>();
-  qp_solver->addOptions(options, reporter);
+  qp_solver->addOptions(options);
   // ADD NEW QP SOLVER STRATEGIES HERE //
 
   // Add options for symmetric matrix strategies
   std::shared_ptr<SymmetricMatrix> symmetric_matrix;
   symmetric_matrix = std::make_shared<SymmetricMatrixDense>();
-  symmetric_matrix->addOptions(options, reporter);
+  symmetric_matrix->addOptions(options);
   symmetric_matrix = std::make_shared<SymmetricMatrixLimitedMemory>();
-  symmetric_matrix->addOptions(options, reporter);
+  symmetric_matrix->addOptions(options);
   // ADD NEW SYMMETRIC MATRIX STRATEGIES HERE //
 
   // Add options for termination strategies
   std::shared_ptr<Termination> termination;
   termination = std::make_shared<TerminationBasic>();
-  termination->addOptions(options, reporter);
+  termination->addOptions(options);
   termination = std::make_shared<TerminationSecondQP>();
-  termination->addOptions(options, reporter);
+  termination->addOptions(options);
   // ADD NEW TERMINATION STRATEGIES HERE //
 
 } // end addOptions
 
 // Set options
-void Strategies::setOptions(const Options* options,
-                            const Reporter* reporter)
+void Strategies::setOptions(Options* options)
 {
 
   // Declare strategy names
@@ -148,14 +138,14 @@ void Strategies::setOptions(const Options* options,
   std::string termination_name;
 
   // Read integer options
-  options->valueAsString(reporter, "approximate_hessian_update", approximate_hessian_update_name);
-  options->valueAsString(reporter, "derivative_checker", derivative_checker_name);
-  options->valueAsString(reporter, "direction_computation", direction_computation_name);
-  options->valueAsString(reporter, "line_search", line_search_name);
-  options->valueAsString(reporter, "point_set_update", point_set_update_name);
-  options->valueAsString(reporter, "qp_solver", qp_solver_name);
-  options->valueAsString(reporter, "symmetric_matrix", symmetric_matrix_name);
-  options->valueAsString(reporter, "termination", termination_name);
+  options->valueAsString("approximate_hessian_update", approximate_hessian_update_name);
+  options->valueAsString("derivative_checker", derivative_checker_name);
+  options->valueAsString("direction_computation", direction_computation_name);
+  options->valueAsString("line_search", line_search_name);
+  options->valueAsString("point_set_update", point_set_update_name);
+  options->valueAsString("qp_solver", qp_solver_name);
+  options->valueAsString("symmetric_matrix", symmetric_matrix_name);
+  options->valueAsString("termination", termination_name);
 
   // Set approximate Hessian update strategy
   if (approximate_hessian_update_name.compare("BFGS") == 0) {
@@ -244,30 +234,30 @@ void Strategies::setOptions(const Options* options,
   }
 
   // Set approximate Hessian update options
-  approximate_hessian_update_->setOptions(options, reporter);
+  approximate_hessian_update_->setOptions(options);
 
   // Set derivative checker options
-  derivative_checker_->setOptions(options, reporter);
+  derivative_checker_->setOptions(options);
 
   // Set direction computation options
-  direction_computation_->setOptions(options, reporter);
+  direction_computation_->setOptions(options);
 
   // Set line search options
-  line_search_->setOptions(options, reporter);
+  line_search_->setOptions(options);
 
   // Set point set update options
-  point_set_update_->setOptions(options, reporter);
+  point_set_update_->setOptions(options);
 
   // Set QP solver options
-  qp_solver_->setOptions(options, reporter);
-  qp_solver_termination_->setOptions(options, reporter);
+  qp_solver_->setOptions(options);
+  qp_solver_termination_->setOptions(options);
 
   // Set symmetric matrix options
-  symmetric_matrix_->setOptions(options, reporter);
-  symmetric_matrix_termination_->setOptions(options, reporter);
+  symmetric_matrix_->setOptions(options);
+  symmetric_matrix_termination_->setOptions(options);
 
   // Set termination options
-  termination_->setOptions(options, reporter);
+  termination_->setOptions(options);
 
 } // end setOptions
 

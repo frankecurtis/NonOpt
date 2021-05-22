@@ -58,17 +58,13 @@ public:
   /**
    * Add options
    * \param[in,out] options is pointer to Options object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
    */
-  void addOptions(Options* options,
-                  const Reporter* reporter);
+  void addOptions(Options* options);
   /**
    * Set options
    * \param[in] options is pointer to Options object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
    */
-  void setOptions(const Options* options,
-                  const Reporter* reporter);
+  void setOptions(Options* options);
   //@}
 
   /** @name Initialization methods */
@@ -77,21 +73,7 @@ public:
    * Initialize quantities
    * \param[in] problem is pointer to Problem object
    */
-  bool initialize(const std::shared_ptr<Problem> problem);
-  /**
-   * Initialize inexact termination factor
-   * \param[in] options is pointer to Options object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
-   */
-  void initializeInexactTerminationFactor(const Options* options,
-                                          const Reporter* reporter);
-  /**
-   * Initialize radii
-   * \param[in] options is pointer to Options object from NonOpt
-   * \param[in] reporter is pointer to Reporter object from NonOpt
-   */
-  void initializeRadii(const Options* options,
-                       const Reporter* reporter);
+  void initialize(const std::shared_ptr<Problem> problem);
   //@}
 
   /** @name Get methods */
@@ -177,6 +159,11 @@ public:
    */
   inline double const iterateNormTolerance() const { return iterate_norm_tolerance_; };
   /**
+   * Iterate norm initial
+   * \return iterate norm initial
+   */
+  inline double const iterateNormInitial() const { return iterate_norm_initial_; };
+  /**
    * Iteration counter
    * \return iterations performed so far
    */
@@ -255,6 +242,14 @@ public:
 
   /** @name Set methods */
   //@{
+  /**
+   * Evaluate functions at current iterate
+   */
+  void evaluateFunctionsAtCurrentIterate();
+  /**
+   * Update inexact termination factor
+   */
+  void resetInexactTerminationFactor();
   /**
    * Set current iterate pointer
    * \param[in] iterate is pointer to Point to represent current iterate
@@ -409,6 +404,7 @@ private:
   clock_t line_search_time_;
   clock_t start_time_;
   double inexact_termination_factor_;
+  double iterate_norm_initial_;
   double stationarity_radius_;
   double stepsize_;
   double trust_region_radius_;

@@ -81,24 +81,20 @@ QPSolverDualActiveSet::~QPSolverDualActiveSet()
 } // end destructor
 
 // Add options
-void QPSolverDualActiveSet::addOptions(Options* options,
-                                       const Reporter* reporter)
+void QPSolverDualActiveSet::addOptions(Options* options)
 {
 
   // Add bool options
-  options->addBoolOption(reporter,
-                         "QPDAS_fail_on_factorization_error",
+  options->addBoolOption("QPDAS_fail_on_factorization_error",
                          false,
                          "Indicator for whether to indicate failure on factorization error.\n"
                          "Default     : false.");
-  options->addBoolOption(reporter,
-                         "QPDAS_allow_inexact_termination",
+  options->addBoolOption("QPDAS_allow_inexact_termination",
                          false,
                          "Indicator for whether to allow early termination.\n"
                          "Default     : false.");
   // Add double options
-  options->addDoubleOption(reporter,
-                           "QPDAS_kkt_tolerance",
+  options->addDoubleOption("QPDAS_kkt_tolerance",
                            1e-08,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -106,8 +102,7 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                            "              computed by the algorithm falls below this tolerance, then\n"
                            "              the algorithm terminates with a message of success.\n"
                            "Default     : 1e-08.");
-  options->addDoubleOption(reporter,
-                           "QPDAS_cholesky_tolerance",
+  options->addDoubleOption("QPDAS_cholesky_tolerance",
                            1e-12,
                            0.0,
                            1.0,
@@ -117,30 +112,26 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                            "              the factorization may be re-computed from scratch and/or the\n"
                            "              diagonal value may be replaced by this tolerance value.\n"
                            "Default     : 1e-12.");
-  options->addDoubleOption(reporter,
-                           "QPDAS_inexact_termination_descent_tolerance",
+  options->addDoubleOption("QPDAS_inexact_termination_descent_tolerance",
                            1e-04,
                            0.0,
                            1.0,
                            "Descent direction tolerance for inexactness conditions.\n"
                            "Default     : 1e-04.");
-  options->addDoubleOption(reporter,
-                           "QPDAS_inexact_termination_initialization_factor",
+  options->addDoubleOption("QPDAS_inexact_termination_initialization_factor",
                            2.5e-01,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Determines number of iterations (fraction of gradient list size)\n"
                            "              to perform before inexact termination conditions are checked.\n"
                            "Default     : 2.5e-01.");
-  options->addDoubleOption(reporter,
-                           "QPDAS_inexact_termination_ratio_minimum",
+  options->addDoubleOption("QPDAS_inexact_termination_ratio_minimum",
                            1e-02,
                            0.0,
                            1.0,
                            "Minimum value for ratio used in inexact termination condition.\n"
                            "Default     : 1e-02.");
-  options->addDoubleOption(reporter,
-                           "QPDAS_linear_independence_tolerance",
+  options->addDoubleOption("QPDAS_linear_independence_tolerance",
                            1e-12,
                            0.0,
                            1.0,
@@ -151,23 +142,20 @@ void QPSolverDualActiveSet::addOptions(Options* options,
                            "Default     : 1e-12.");
 
   // Add integer options
-  options->addIntegerOption(reporter,
-                            "QPDAS_inexact_termination_check_interval",
+  options->addIntegerOption("QPDAS_inexact_termination_check_interval",
                             4,
                             1,
                             NONOPT_INT_INFINITY,
                             "Number of iterations to perform between checks of inexact\n"
                             "              termination conditions.\n"
                             "Default     : 4.");
-  options->addIntegerOption(reporter,
-                            "QPDAS_iteration_limit_minimum",
+  options->addIntegerOption("QPDAS_iteration_limit_minimum",
                             1e+00,
                             0.0,
                             NONOPT_INT_INFINITY,
                             "Minimum limit on the number of iterations.\n"
                             "Default     : 1e+00.");
-  options->addIntegerOption(reporter,
-                            "QPDAS_iteration_limit_maximum",
+  options->addIntegerOption("QPDAS_iteration_limit_maximum",
                             1e+06,
                             0.0,
                             NONOPT_INT_INFINITY,
@@ -177,26 +165,25 @@ void QPSolverDualActiveSet::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void QPSolverDualActiveSet::setOptions(const Options* options,
-                                       const Reporter* reporter)
+void QPSolverDualActiveSet::setOptions(Options* options)
 {
 
   // Read bool options
-  options->valueAsBool(reporter, "QPDAS_fail_on_factorization_error", fail_on_factorization_error_);
-  options->valueAsBool(reporter, "QPDAS_allow_inexact_termination", allow_inexact_termination_);
+  options->valueAsBool("QPDAS_fail_on_factorization_error", fail_on_factorization_error_);
+  options->valueAsBool("QPDAS_allow_inexact_termination", allow_inexact_termination_);
 
   // Read double options
-  options->valueAsDouble(reporter, "QPDAS_kkt_tolerance", kkt_tolerance_);
-  options->valueAsDouble(reporter, "QPDAS_cholesky_tolerance", cholesky_tolerance_);
-  options->valueAsDouble(reporter, "QPDAS_inexact_termination_descent_tolerance", inexact_termination_descent_tolerance_);
-  options->valueAsDouble(reporter, "QPDAS_inexact_termination_initialization_factor", inexact_termination_initialization_factor_);
-  options->valueAsDouble(reporter, "QPDAS_inexact_termination_ratio_minimum", inexact_termination_ratio_minimum_);
-  options->valueAsDouble(reporter, "QPDAS_linear_independence_tolerance", linear_independence_tolerance_);
+  options->valueAsDouble("QPDAS_kkt_tolerance", kkt_tolerance_);
+  options->valueAsDouble("QPDAS_cholesky_tolerance", cholesky_tolerance_);
+  options->valueAsDouble("QPDAS_inexact_termination_descent_tolerance", inexact_termination_descent_tolerance_);
+  options->valueAsDouble("QPDAS_inexact_termination_initialization_factor", inexact_termination_initialization_factor_);
+  options->valueAsDouble("QPDAS_inexact_termination_ratio_minimum", inexact_termination_ratio_minimum_);
+  options->valueAsDouble("QPDAS_linear_independence_tolerance", linear_independence_tolerance_);
 
   // Read integer options
-  options->valueAsInteger(reporter, "QPDAS_inexact_termination_check_interval", inexact_termination_check_interval_);
-  options->valueAsInteger(reporter, "QPDAS_iteration_limit_minimum", iteration_limit_minimum_);
-  options->valueAsInteger(reporter, "QPDAS_iteration_limit_maximum", iteration_limit_maximum_);
+  options->valueAsInteger("QPDAS_inexact_termination_check_interval", inexact_termination_check_interval_);
+  options->valueAsInteger("QPDAS_iteration_limit_minimum", iteration_limit_minimum_);
+  options->valueAsInteger("QPDAS_iteration_limit_maximum", iteration_limit_maximum_);
 
 } // end setOptions
 
@@ -1098,7 +1085,7 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
 
       // Check for CPU time limit
       if ((clock() - quantities->startTime()) / (double)CLOCKS_PER_SEC >= quantities->cpuTimeLimit()) {
-        THROW_EXCEPTION(DC_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
+        THROW_EXCEPTION(QP_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
       }
 
       // Print message
@@ -1482,6 +1469,9 @@ void QPSolverDualActiveSet::solveQPHot(const Options* options,
   // catch exceptions
   catch (QP_SUCCESS_EXCEPTION& exec) {
     setStatus(QP_SUCCESS);
+  } catch (QP_CPU_TIME_LIMIT_EXCEPTION& exec) {
+    setStatus(QP_CPU_TIME_LIMIT);
+    THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
   } catch (QP_FACTORIZATION_ERROR_EXCEPTION& exec) {
     setStatus(QP_FACTORIZATION_ERROR);
   } catch (QP_INPUT_ERROR_EXCEPTION& exec) {

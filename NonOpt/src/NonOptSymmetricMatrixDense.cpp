@@ -28,8 +28,7 @@ SymmetricMatrixDense::~SymmetricMatrixDense()
 } // end destructor
 
 // Add options
-void SymmetricMatrixDense::addOptions(Options* options,
-                                      const Reporter* reporter)
+void SymmetricMatrixDense::addOptions(Options* options)
 {
 
   // Add double options
@@ -39,13 +38,15 @@ void SymmetricMatrixDense::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void SymmetricMatrixDense::setOptions(const Options* options,
-                                      const Reporter* reporter)
+void SymmetricMatrixDense::setOptions(Options* options)
 {
 
   // Read double options
 
   // Read integer options
+
+  // Read string options
+  options->valueAsString("approximate_hessian_update", type_);
 
 } // end setOptions
 
@@ -57,9 +58,6 @@ void SymmetricMatrixDense::initialize(const Options* options,
 
   // Set as identity
   setAsDiagonal(quantities->numberOfVariables(), 1.0);
-
-  // Get approximation type
-  options->valueAsString(reporter, "approximate_hessian_update", type_);
 
 } // end initialize
 

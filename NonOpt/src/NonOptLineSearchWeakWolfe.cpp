@@ -15,20 +15,17 @@ namespace NonOpt
 {
 
 // Add options
-void LineSearchWeakWolfe::addOptions(Options* options,
-                                     const Reporter* reporter)
+void LineSearchWeakWolfe::addOptions(Options* options)
 {
 
   // Add bool options
-  options->addBoolOption(reporter,
-                         "LSWW_fail_on_small_interval",
+  options->addBoolOption("LSWW_fail_on_small_interval",
                          false,
                          "Indicator for whether to indicate failure on small interval.\n"
                          "Default     : false.");
 
   // Add double options
-  options->addDoubleOption(reporter,
-                           "LSWW_stepsize_initial",
+  options->addDoubleOption("LSWW_stepsize_initial",
                            1.0,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -37,8 +34,7 @@ void LineSearchWeakWolfe::addOptions(Options* options,
                            "              iterations is set the minimum of this value and a factor times\n"
                            "              the stepsize accepted in the previous iteration.\n"
                            "Default     : 1.0.");
-  options->addDoubleOption(reporter,
-                           "LSWW_stepsize_minimum",
+  options->addDoubleOption("LSWW_stepsize_minimum",
                            1e-20,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -46,57 +42,49 @@ void LineSearchWeakWolfe::addOptions(Options* options,
                            "              line search yields a stepsize below this tolerance, then the\n"
                            "              algorithm may terminate with a message of a small stepsize.\n"
                            "Default     : 1e-20.");
-  options->addDoubleOption(reporter,
-                           "LSWW_stepsize_maximum",
+  options->addDoubleOption("LSWW_stepsize_maximum",
                            1e+02,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Maximum stepsize allowed by the line search.\n"
                            "Default     : 1e+02.");
-  options->addDoubleOption(reporter,
-                           "LSWW_stepsize_sufficient_decrease_threshold",
+  options->addDoubleOption("LSWW_stepsize_sufficient_decrease_threshold",
                            1e-10,
                            0.0,
                            1.0,
                            "Sufficient decrease constant for the weak Wolfe line search.\n"
                            "Default     : 1e-10.");
-  options->addDoubleOption(reporter,
-                           "LSWW_stepsize_sufficient_decrease_fudge_factor",
+  options->addDoubleOption("LSWW_stepsize_sufficient_decrease_fudge_factor",
                            1e-10,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Sufficient decrease fudge factor.\n"
                            "Default     : 1e-10.");
-  options->addDoubleOption(reporter,
-                           "LSWW_stepsize_curvature_threshold",
+  options->addDoubleOption("LSWW_stepsize_curvature_threshold",
                            9e-01,
                            0.0,
                            1.0,
                            "Curvature condition constant for the weak Wolfe line search.\n"
                            "Default     : 9e-01.");
-  options->addDoubleOption(reporter,
-                           "LSWW_stepsize_curvature_fudge_factor",
+  options->addDoubleOption("LSWW_stepsize_curvature_fudge_factor",
                            1e-10,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Curvature condition fudge factor.\n"
                            "Default     : 1e-10.");
-  options->addDoubleOption(reporter,
-                           "LSWW_stepsize_decrease_factor",
+  options->addDoubleOption("LSWW_stepsize_decrease_factor",
                            5e-01,
                            0.0,
                            1.0,
                            "Factor for updating the stepsize during the line search.\n"
                            "Default     : 5e-01.");
-  options->addDoubleOption(reporter,
-                           "LSWW_stepsize_increase_factor",
+  options->addDoubleOption("LSWW_stepsize_increase_factor",
                            1e+01,
                            1.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Factor for updating the stepsize before the line search.\n"
                            "Default     : 1e+01.");
-  options->addDoubleOption(reporter,
-                           "LSWW_stepsize_bound_tolerance",
+  options->addDoubleOption("LSWW_stepsize_bound_tolerance",
                            1e-20,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
@@ -108,24 +96,23 @@ void LineSearchWeakWolfe::addOptions(Options* options,
 } // end addOptions
 
 // Set options
-void LineSearchWeakWolfe::setOptions(const Options* options,
-                                     const Reporter* reporter)
+void LineSearchWeakWolfe::setOptions(Options* options)
 {
 
   // Read bool options
-  options->valueAsBool(reporter, "LSWW_fail_on_small_interval", fail_on_small_interval_);
+  options->valueAsBool("LSWW_fail_on_small_interval", fail_on_small_interval_);
 
   // Read options
-  options->valueAsDouble(reporter, "LSWW_stepsize_initial", stepsize_initial_);
-  options->valueAsDouble(reporter, "LSWW_stepsize_minimum", stepsize_minimum_);
-  options->valueAsDouble(reporter, "LSWW_stepsize_maximum", stepsize_maximum_);
-  options->valueAsDouble(reporter, "LSWW_stepsize_sufficient_decrease_threshold", stepsize_sufficient_decrease_threshold_);
-  options->valueAsDouble(reporter, "LSWW_stepsize_sufficient_decrease_fudge_factor", stepsize_sufficient_decrease_fudge_factor_);
-  options->valueAsDouble(reporter, "LSWW_stepsize_curvature_threshold", stepsize_curvature_threshold_);
-  options->valueAsDouble(reporter, "LSWW_stepsize_curvature_fudge_factor", stepsize_curvature_fudge_factor_);
-  options->valueAsDouble(reporter, "LSWW_stepsize_decrease_factor", stepsize_decrease_factor_);
-  options->valueAsDouble(reporter, "LSWW_stepsize_increase_factor", stepsize_increase_factor_);
-  options->valueAsDouble(reporter, "LSWW_stepsize_bound_tolerance", stepsize_bound_tolerance_);
+  options->valueAsDouble("LSWW_stepsize_initial", stepsize_initial_);
+  options->valueAsDouble("LSWW_stepsize_minimum", stepsize_minimum_);
+  options->valueAsDouble("LSWW_stepsize_maximum", stepsize_maximum_);
+  options->valueAsDouble("LSWW_stepsize_sufficient_decrease_threshold", stepsize_sufficient_decrease_threshold_);
+  options->valueAsDouble("LSWW_stepsize_sufficient_decrease_fudge_factor", stepsize_sufficient_decrease_fudge_factor_);
+  options->valueAsDouble("LSWW_stepsize_curvature_threshold", stepsize_curvature_threshold_);
+  options->valueAsDouble("LSWW_stepsize_curvature_fudge_factor", stepsize_curvature_fudge_factor_);
+  options->valueAsDouble("LSWW_stepsize_decrease_factor", stepsize_decrease_factor_);
+  options->valueAsDouble("LSWW_stepsize_increase_factor", stepsize_increase_factor_);
+  options->valueAsDouble("LSWW_stepsize_bound_tolerance", stepsize_bound_tolerance_);
 
 } // end setOptions
 
