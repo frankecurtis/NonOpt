@@ -83,7 +83,6 @@ void DirectionComputationGradient::computeDirection(const Options* options,
       if (!evaluation_success) {
         THROW_EXCEPTION(DC_EVALUATION_FAILURE_EXCEPTION, "Direction computation unsuccessful. Evaluation failed.");
       }
-
     }
     else {
 

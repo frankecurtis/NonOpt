@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
     problem = std::make_shared<MxHilb>(dimension);
   }
   else if (strcmp(argv[1], "QuadPoly") == 0) {
-    problem = std::make_shared<QuadPoly>(dimension, 10, 5, 10.0);
+    problem = std::make_shared<QuadPoly>(dimension, 2 * dimension, (int)(0.9 * dimension), 10.0, 0);
   }
   else if (strcmp(argv[1], "Test29_2") == 0) {
     problem = std::make_shared<Test29_2>(dimension);

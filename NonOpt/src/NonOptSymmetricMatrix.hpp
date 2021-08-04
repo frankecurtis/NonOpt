@@ -192,7 +192,7 @@ public:
 protected:
   /** @name Protected members */
   //@{
-  std::string type_;     /**< Type of update */
+  std::string type_; /**< Type of update */
   //@}
 
 private:

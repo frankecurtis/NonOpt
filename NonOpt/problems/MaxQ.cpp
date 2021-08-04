@@ -82,7 +82,7 @@ bool MaxQ::evaluateObjectiveAndGradient(int n,
       f = f_temp;
       index = i;
     } // end if
-  } // end for
+  }   // end for
 
   // Evaluate gradient
   g[index] = 2 * x[index];
@@ -109,7 +109,7 @@ bool MaxQ::evaluateGradient(int n,
       f = f_temp;
       index = i;
     } // end if
-  } // end for
+  }   // end for
 
   // Evaluate gradient
   g[index] = 2 * x[index];

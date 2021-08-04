@@ -130,6 +130,7 @@ private:
   int objective_similarity_limit_;
   double objective_reference_;
   double objective_similarity_tolerance_;
+  double objective_tolerance_;
   double stationarity_reference_;
   double stationarity_tolerance_factor_;
   //@}

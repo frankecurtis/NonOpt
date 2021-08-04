@@ -31,12 +31,14 @@ public:
    * \param[in] n is the number of variables
    * \param[in] m is the number of affine functions
    * \param[in] a is the number of active affine functions at the solution
-   * \param[in] s is the scaling factor for the quadratic term
+   * \param[in] f is the scaling factor for the quadratic term
+   * \param[in] s is the random number generator seed
    */
   QuadPoly(int n,
            int m,
            int a,
-           double s);
+           double f,
+           int s);
   //@}
 
   /** @name Destructor */

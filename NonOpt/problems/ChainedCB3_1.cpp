@@ -80,7 +80,7 @@ bool ChainedCB3_1::evaluateObjectiveAndGradient(int n,
     term2 = pow(2.0 - x[i], 2) + pow(2.0 - x[i + 1], 2);
     term3 = 2.0 * exp(-x[i] + x[i + 1]);
     f += fmax(term1, fmax(term2, term3));
-    g[i+1] = 0.0;
+    g[i + 1] = 0.0;
     if (term1 >= term2 && term1 >= term3) {
       g[i] += 4.0 * pow(x[i], 3);
       g[i + 1] += 2.0 * x[i + 1];
@@ -93,7 +93,7 @@ bool ChainedCB3_1::evaluateObjectiveAndGradient(int n,
       g[i] += -2.0 * exp(-x[i] + x[i + 1]);
       g[i + 1] += 2.0 * exp(-x[i] + x[i + 1]);
     } // end else
-    if (isnan(g[i]) || isnan(g[i+1])) {
+    if (isnan(g[i]) || isnan(g[i + 1])) {
       success = false;
     }
   } // end for
@@ -116,7 +116,7 @@ bool ChainedCB3_1::evaluateGradient(int n,
   g[0] = 0.0;
   double term1, term2, term3;
   for (int i = 0; i < n - 1; i++) {
-    g[i+1] = 0.0;
+    g[i + 1] = 0.0;
     term1 = pow(x[i], 4) + pow(x[i + 1], 2);
     term2 = pow(2.0 - x[i], 2) + pow(2.0 - x[i + 1], 2);
     term3 = 2.0 * exp(-x[i] + x[i + 1]);
@@ -132,10 +132,10 @@ bool ChainedCB3_1::evaluateGradient(int n,
       g[i] += -2.0 * exp(-x[i] + x[i + 1]);
       g[i + 1] += 2.0 * exp(-x[i] + x[i + 1]);
     } // end else
-    if (isnan(g[i]) || isnan(g[i+1])) {
+    if (isnan(g[i]) || isnan(g[i + 1])) {
       success = false;
     }
-  }   // end for
+  } // end for
 
   // Return
   return success;

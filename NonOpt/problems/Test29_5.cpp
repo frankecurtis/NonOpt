@@ -91,7 +91,7 @@ bool Test29_5::evaluateObjectiveAndGradient(int n,
         success = false;
       }
     } // end for
-  } // end for
+  }   // end for
 
   // Return
   return !isnan(f) && success;

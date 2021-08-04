@@ -28,6 +28,13 @@ void TerminationBasic::addOptions(Options* options)
                            "              objective_similarity_limit, then the stationarity radius\n"
                            "              is decreased or the algorithm terminates.\n"
                            "Default     : 1e-05.");
+  options->addDoubleOption("TB_objective_tolerance",
+                           -NONOPT_DOUBLE_INFINITY,
+                           -NONOPT_DOUBLE_INFINITY,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Tolerance for objective function value.  Algorithm terminates\n"
+                           "              if objective falls below this tolerance.\n"
+                           "Default     : -Infinity.");
   options->addDoubleOption("TB_stationarity_tolerance_factor",
                            1e+00,
                            0.0,
@@ -60,6 +67,7 @@ void TerminationBasic::setOptions(Options* options)
 
   // Read double options
   options->valueAsDouble("TB_objective_similarity_tolerance", objective_similarity_tolerance_);
+  options->valueAsDouble("TB_objective_tolerance", objective_tolerance_);
   options->valueAsDouble("TB_stationarity_tolerance_factor", stationarity_tolerance_factor_);
 
   // Read integer options
@@ -97,6 +105,7 @@ void TerminationBasic::checkConditions(const Options* options,
 
   // Initialize indicators
   terminate_objective_ = false;
+  terminate_objective_similarity_ = false;
   terminate_stationary_ = false;
   update_radii_ = false;
 
@@ -113,17 +122,17 @@ void TerminationBasic::checkConditions(const Options* options,
     terminate_stationary_ = true;
   }
 
-  //////////////////////////////
-  // TERMINATION BY OBJECTIVE //
-  //////////////////////////////
+  /////////////////////////////////////////
+  // TERMINATION BY OBJECTIVE SIMILARITY //
+  /////////////////////////////////////////
 
   // Check objective similarity
-  if (objective_reference_ - quantities->currentIterate()->objective() <= objective_similarity_tolerance_*fmax(1.0,fabs(objective_reference_))) {
+  if (objective_reference_ - quantities->currentIterate()->objective() <= objective_similarity_tolerance_ * fmax(1.0, fabs(objective_reference_))) {
     objective_similarity_counter_++;
   }
   else {
     objective_similarity_counter_--;
-    objective_similarity_counter_ = fmax(0,objective_similarity_counter_);
+    objective_similarity_counter_ = fmax(0, objective_similarity_counter_);
   } // end else
 
   // Update objective reference value
@@ -132,8 +141,17 @@ void TerminationBasic::checkConditions(const Options* options,
   // Check for termination based on objective changes
   if (quantities->stationarityRadius() <= quantities->stationarityTolerance() &&
       objective_similarity_counter_ > objective_similarity_limit_) {
-    terminate_objective_ = true;
+    terminate_objective_similarity_ = true;
   } // end if
+
+  ////////////////////////////////////////
+  // TERMINATION BY OBJECTIVE TOLERANCE //
+  ////////////////////////////////////////
+
+  // Check for termination based on objective tolerance
+  if (quantities->currentIterate()->objective() <= objective_tolerance_) {
+    terminate_objective_ = true;
+  }
 
   //////////////////
   // RADII UPDATE //

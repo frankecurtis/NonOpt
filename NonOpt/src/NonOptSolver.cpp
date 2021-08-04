@@ -98,7 +98,7 @@ void NonOptSolver::setOptions()
   options_.valueAsString("qp_print_file_name", qp_print_file_name_);
 
   // Set standard output stream
-  std::shared_ptr<StreamReport> s_out(new StreamReport("default", R_NL,  static_cast<ReportLevel>(print_level_)));
+  std::shared_ptr<StreamReport> s_out(new StreamReport("default", R_NL, static_cast<ReportLevel>(print_level_)));
   s_out->setStream(&std::cout);
   reporter_.addReport(s_out);
 
@@ -234,6 +234,9 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
         THROW_EXCEPTION(NONOPT_SUCCESS_EXCEPTION, "Stationary point found.");
       }
       else if (strategies_.termination()->terminateObjective()) {
+        THROW_EXCEPTION(NONOPT_OBJECTIVE_TOLERANCE_EXCEPTION, "Objective tolerance reached.");
+      }
+      else if (strategies_.termination()->terminateObjectiveSimilarity()) {
         THROW_EXCEPTION(NONOPT_OBJECTIVE_SIMILARITY_EXCEPTION, "Insufficient objective improvement.");
       }
       else if (strategies_.termination()->updateRadii()) {
@@ -294,6 +297,8 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
     setStatus(NONOPT_SUCCESS);
   } catch (NONOPT_OBJECTIVE_SIMILARITY_EXCEPTION& exec) {
     setStatus(NONOPT_OBJECTIVE_SIMILARITY);
+  } catch (NONOPT_OBJECTIVE_TOLERANCE_EXCEPTION& exec) {
+    setStatus(NONOPT_OBJECTIVE_TOLERANCE);
   } catch (NONOPT_CPU_TIME_LIMIT_EXCEPTION& exec) {
     setStatus(NONOPT_CPU_TIME_LIMIT);
   } catch (NONOPT_ITERATE_NORM_LIMIT_EXCEPTION& exec) {
@@ -375,6 +380,9 @@ void NonOptSolver::printFooter()
     break;
   case NONOPT_OBJECTIVE_SIMILARITY:
     reporter_.printf(R_NL, R_BASIC, "Objective not improving sufficiently.");
+    break;
+  case NONOPT_OBJECTIVE_TOLERANCE:
+    reporter_.printf(R_NL, R_BASIC, "Objective tolerance reached.");
     break;
   case NONOPT_CPU_TIME_LIMIT:
     reporter_.printf(R_NL, R_BASIC, "CPU time limit reached.");

@@ -98,10 +98,15 @@ public:
    */
   inline TE_Status status() { return status_; };
   /**
-   * Termination indicator based on objective changes
+   * Termination indicator based on objective tolerance
    * \return bool with termination indicator
    */
   inline bool const terminateObjective() const { return terminate_objective_; };
+  /**
+   * Termination indicator based on objective similarity
+   * \return bool with termination indicator
+   */
+  inline bool const terminateObjectiveSimilarity() const { return terminate_objective_similarity_; };
   /**
    * Termination indicator based on stationarity
    * \return bool with termination indicator
@@ -159,7 +164,8 @@ public:
 protected:
   /** @name Protected members */
   //@{
-  bool terminate_objective_;                /**< Indicator for termination based on objective changes */
+  bool terminate_objective_;                /**< Indicator for termination based on objective tolerance */
+  bool terminate_objective_similarity_;     /**< Indicator for termination based on objective similarity */
   bool terminate_stationary_;               /**< Indicator for termination based on stationarity */
   bool update_radii_;                       /**< Indicator for radii update */
   bool update_radii_direction_computation_; /**< Indicator for radii update for use in direction computation */

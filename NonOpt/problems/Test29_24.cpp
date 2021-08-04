@@ -102,13 +102,13 @@ bool Test29_24::evaluateObjectiveAndGradient(int n,
   }
   if (index > 0) {
     g[index - 1] = sign * (-1.0);
-    if (isnan(g[index-1])) {
+    if (isnan(g[index - 1])) {
       success = false;
     }
   } // end if
   if (index < n - 1) {
     g[index + 1] = sign * (-1.0);
-    if (isnan(g[index+1])) {
+    if (isnan(g[index + 1])) {
       success = false;
     }
   } // end if
@@ -158,13 +158,13 @@ bool Test29_24::evaluateGradient(int n,
   }
   if (index > 0) {
     g[index - 1] = sign * (-1.0);
-    if (isnan(g[index-1])) {
+    if (isnan(g[index - 1])) {
       success = false;
     }
   } // end if
   if (index < n - 1) {
     g[index + 1] = sign * (-1.0);
-    if (isnan(g[index+1])) {
+    if (isnan(g[index + 1])) {
       success = false;
     }
   } // end if

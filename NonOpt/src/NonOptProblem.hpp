@@ -78,14 +78,13 @@ public:
     ///////////////////////////////////////////////
 
     // Evaluate function
-    bool objective_evaluation_success = evaluateObjective(n,x,f);
+    bool objective_evaluation_success = evaluateObjective(n, x, f);
 
     // Evaluate gradient
-    bool gradient_evaluation_success = evaluateGradient(n,x,g);
+    bool gradient_evaluation_success = evaluateGradient(n, x, g);
 
     // Return
     return (objective_evaluation_success && gradient_evaluation_success);
-
   }
   /**
    * Evaluates gradient

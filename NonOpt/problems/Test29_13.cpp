@@ -132,7 +132,7 @@ bool Test29_13::evaluateObjectiveAndGradient(int n,
         } // end for
         double sign_x = ((x[i + j - 1] >= 0.0) ? 1.0 : -1.0);
         g[i + j - 1] += value * sign_x * x[i + j - 1] * ((double)j / double(h * l)) * pow(fabs(x[i + j - 1]), ((double)j / (double)(h * l) - 2.0));
-        if (isnan(g[i+j-1])) {
+        if (isnan(g[i + j - 1])) {
           success = false;
         }
       } // end for
@@ -188,7 +188,7 @@ bool Test29_13::evaluateGradient(int n,
         } // end for
         double sign_x = ((x[i + j - 1] >= 0.0) ? 1.0 : -1.0);
         g[i + j - 1] += value * sign_x * x[i + j - 1] * ((double)j / double(h * l)) * pow(fabs(x[i + j - 1]), ((double)j / (double)(h * l) - 2.0));
-        if (isnan(g[i+j-1])) {
+        if (isnan(g[i + j - 1])) {
           success = false;
         }
       } // end for

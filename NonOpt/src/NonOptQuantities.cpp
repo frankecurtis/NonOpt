@@ -59,7 +59,7 @@ Quantities::Quantities()
 }
 
 // Destructor
-Quantities::~Quantities(){}
+Quantities::~Quantities() {}
 
 // Add options
 void Quantities::addOptions(Options* options)
@@ -352,7 +352,6 @@ void Quantities::evaluateFunctionsAtCurrentIterate()
     if (!evaluation_success) {
       THROW_EXCEPTION(NONOPT_FUNCTION_EVALUATION_FAILURE_EXCEPTION, "Function + gradient evaluation failed.");
     }
-
   }
   else {
 

@@ -84,7 +84,7 @@ bool ChainedCrescent_1::evaluateObjectiveAndGradient(int n,
   double sum1 = 0.0;
   double sum2 = 0.0;
   for (int i = 0; i < n - 1; i++) {
-    g[i+1] = 0.0;
+    g[i + 1] = 0.0;
     sum1 += pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0;
     sum2 += -pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0;
   } // end for
@@ -97,7 +97,7 @@ bool ChainedCrescent_1::evaluateObjectiveAndGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += 2.0 * x[i];
       g[i + 1] += 2.0 * (x[i + 1] - 1.0) + 1.0;
-      if (isnan(g[i]) || isnan(g[i+1])) {
+      if (isnan(g[i]) || isnan(g[i + 1])) {
         success = false;
       }
     } // end for
@@ -106,7 +106,7 @@ bool ChainedCrescent_1::evaluateObjectiveAndGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += -2.0 * x[i];
       g[i + 1] += -2.0 * (x[i + 1] - 1.0) + 1.0;
-      if (isnan(g[i]) || isnan(g[i+1])) {
+      if (isnan(g[i]) || isnan(g[i + 1])) {
         success = false;
       }
     } // end for
@@ -131,7 +131,7 @@ bool ChainedCrescent_1::evaluateGradient(int n,
   double sum2 = 0.0;
   g[0] = 0.0;
   for (int i = 0; i < n - 1; i++) {
-    g[i+1] = 0.0;
+    g[i + 1] = 0.0;
     sum1 += pow(x[i], 2) + pow(x[i + 1] - 1.0, 2) + x[i + 1] - 1.0;
     sum2 += -pow(x[i], 2) - pow(x[i + 1] - 1.0, 2) + x[i + 1] + 1.0;
   } // end for
@@ -141,7 +141,7 @@ bool ChainedCrescent_1::evaluateGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += 2.0 * x[i];
       g[i + 1] += 2.0 * (x[i + 1] - 1.0) + 1.0;
-      if (isnan(g[i]) || isnan(g[i+1])) {
+      if (isnan(g[i]) || isnan(g[i + 1])) {
         success = false;
       }
     } // end for
@@ -150,7 +150,7 @@ bool ChainedCrescent_1::evaluateGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += -2.0 * x[i];
       g[i + 1] += -2.0 * (x[i + 1] - 1.0) + 1.0;
-      if (isnan(g[i]) || isnan(g[i+1])) {
+      if (isnan(g[i]) || isnan(g[i + 1])) {
         success = false;
       }
     } // end for

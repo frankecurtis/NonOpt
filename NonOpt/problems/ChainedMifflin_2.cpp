@@ -74,7 +74,7 @@ bool ChainedMifflin_2::evaluateObjectiveAndGradient(int n,
   g[0] = 0.0;
   for (int i = 0; i < n - 1; i++) {
     f = f - x[i] + 2.0 * (pow(x[i], 2) + pow(x[i + 1], 2) - 1.0) + 1.75 * fabs(pow(x[i], 2) + pow(x[i + 1], 2) - 1.0);
-    g[i+1] = 0.0;
+    g[i + 1] = 0.0;
     if (pow(x[i], 2) + pow(x[i + 1], 2) - 1.0 >= 0.0) {
       g[i] += -1.0 + 7.5 * x[i];
       g[i + 1] += 7.5 * x[i + 1];
@@ -83,7 +83,7 @@ bool ChainedMifflin_2::evaluateObjectiveAndGradient(int n,
       g[i] += -1.0 + 0.5 * x[i];
       g[i + 1] += 0.5 * x[i + 1];
     } // end else
-    if (isnan(g[i]) || isnan(g[i+1])) {
+    if (isnan(g[i]) || isnan(g[i + 1])) {
       success = false;
     }
   } // end for
@@ -105,7 +105,7 @@ bool ChainedMifflin_2::evaluateGradient(int n,
   // Evaluate gradient
   g[0] = 0.0;
   for (int i = 0; i < n - 1; i++) {
-    g[i+1] = 0.0;
+    g[i + 1] = 0.0;
     if (pow(x[i], 2) + pow(x[i + 1], 2) - 1.0 >= 0.0) {
       g[i] += -1.0 + 7.5 * x[i];
       g[i + 1] += 7.5 * x[i + 1];
@@ -114,7 +114,7 @@ bool ChainedMifflin_2::evaluateGradient(int n,
       g[i] += -1.0 + 0.5 * x[i];
       g[i + 1] += 0.5 * x[i + 1];
     } // end else
-    if (isnan(g[i]) || isnan(g[i+1])) {
+    if (isnan(g[i]) || isnan(g[i + 1])) {
       success = false;
     }
   } // end for

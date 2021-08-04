@@ -74,7 +74,7 @@ bool BrownFunction_2::evaluateObjectiveAndGradient(int n,
   g[0] = 0.0;
   for (int i = 0; i < n - 1; i++) {
     f = f + pow(fabs(x[i]), (x[i + 1] * x[i + 1] + 1.0)) + pow(fabs(x[i + 1]), (x[i] * x[i] + 1.0));
-    g[i+1] = 0.0;
+    g[i + 1] = 0.0;
     if (x[i] >= 0.0 && x[i + 1] >= 0.0) {
       g[i] += (pow(x[i + 1], 2) + 1.0) * pow(x[i], pow(x[i + 1], 2)) + 2.0 * x[i] * log(x[i + 1]) * pow(x[i + 1], pow(x[i], 2) + 1.0);
       g[i + 1] += 2.0 * x[i + 1] * log(x[i]) * pow(x[i], pow(x[i + 1], 2) + 1.0) + (pow(x[i], 2) + 1.0) * pow(x[i + 1], pow(x[i], 2));
@@ -91,7 +91,7 @@ bool BrownFunction_2::evaluateObjectiveAndGradient(int n,
       g[i] += -(pow(x[i + 1], 2) + 1.0) * pow(-x[i], pow(x[i + 1], 2)) + 2.0 * x[i] * log(-x[i + 1]) * pow(-x[i + 1], pow(x[i], 2) + 1.0);
       g[i + 1] += 2.0 * x[i + 1] * log(-x[i]) * pow(-x[i], pow(x[i + 1], 2) + 1.0) - (pow(x[i], 2) + 1.0) * pow(-x[i + 1], pow(x[i], 2));
     } // end else
-    if (isnan(g[i]) || isnan(g[i+1])) {
+    if (isnan(g[i]) || isnan(g[i + 1])) {
       success = false;
     }
   } // end for
@@ -113,7 +113,7 @@ bool BrownFunction_2::evaluateGradient(int n,
   // Evaluate gradient
   g[0] = 0.0;
   for (int i = 0; i < n - 1; i++) {
-    g[i+1] = 0.0;
+    g[i + 1] = 0.0;
     if (x[i] >= 0.0 && x[i + 1] >= 0.0) {
       g[i] += (pow(x[i + 1], 2) + 1.0) * pow(x[i], pow(x[i + 1], 2)) + 2.0 * x[i] * log(x[i + 1]) * pow(x[i + 1], pow(x[i], 2) + 1.0);
       g[i + 1] += 2.0 * x[i + 1] * log(x[i]) * pow(x[i], pow(x[i + 1], 2) + 1.0) + (pow(x[i], 2) + 1.0) * pow(x[i + 1], pow(x[i], 2));
@@ -130,7 +130,7 @@ bool BrownFunction_2::evaluateGradient(int n,
       g[i] += -(pow(x[i + 1], 2) + 1.0) * pow(-x[i], pow(x[i + 1], 2)) + 2.0 * x[i] * log(-x[i + 1]) * pow(-x[i + 1], pow(x[i], 2) + 1.0);
       g[i + 1] += 2.0 * x[i + 1] * log(-x[i]) * pow(-x[i], pow(x[i + 1], 2) + 1.0) - (pow(x[i], 2) + 1.0) * pow(-x[i + 1], pow(x[i], 2));
     } // end else
-    if (isnan(g[i]) || isnan(g[i+1])) {
+    if (isnan(g[i]) || isnan(g[i + 1])) {
       success = false;
     }
   } // end for

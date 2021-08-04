@@ -28,6 +28,13 @@ void TerminationSecondQP::addOptions(Options* options)
                            "              objective_similarity_limit, then the stationarity radius\n"
                            "              is decreased or the algorithm terminates.\n"
                            "Default     : 1e-05.");
+  options->addDoubleOption("TS_objective_tolerance",
+                           -NONOPT_DOUBLE_INFINITY,
+                           -NONOPT_DOUBLE_INFINITY,
+                           NONOPT_DOUBLE_INFINITY,
+                           "Tolerance for objective function value.  Algorithm terminates\n"
+                           "              if objective falls below this tolerance.\n"
+                           "Default     : -Infinity.");
   options->addDoubleOption("TS_stationarity_tolerance_factor",
                            1e+00,
                            0.0,
@@ -40,7 +47,7 @@ void TerminationSecondQP::addOptions(Options* options)
   // Add integer options
   options->addIntegerOption("TS_objective_similarity_limit",
                             10,
-                            0.0,
+                            0,
                             NONOPT_INT_INFINITY,
                             "Limit on an objective similarity counter.  If the difference\n"
                             "              between two consecutive objective values is less than\n"
@@ -48,6 +55,12 @@ void TerminationSecondQP::addOptions(Options* options)
                             "              then a counter is increased.  If the counter exceeds\n"
                             "              objective_similarity_limit, then the stationarity\n"
                             "              radius is decreased or the algorithm terminates.\n"
+                            "Default     : 10.");
+  options->addIntegerOption("TS_solve_QP_every",
+                            10,
+                            1,
+                            NONOPT_INT_INFINITY,
+                            "Dictates that QP should be solved every how many iterations.\n"
                             "Default     : 10.");
 
 } // end addOptions
@@ -60,10 +73,12 @@ void TerminationSecondQP::setOptions(Options* options)
 
   // Read double options
   options->valueAsDouble("TS_objective_similarity_tolerance", objective_similarity_tolerance_);
+  options->valueAsDouble("TS_objective_tolerance", objective_tolerance_);
   options->valueAsDouble("TS_stationarity_tolerance_factor", stationarity_tolerance_factor_);
 
   // Read integer options
   options->valueAsInteger("TS_objective_similarity_limit", objective_similarity_limit_);
+  options->valueAsInteger("TS_solve_QP_every", solve_QP_every_);
 
 } // end setOptions
 
@@ -73,8 +88,9 @@ void TerminationSecondQP::initialize(const Options* options,
                                      const Reporter* reporter)
 {
 
-  // Initialize objective similarity counter
+  // Initialize counters
   objective_similarity_counter_ = 0;
+  solve_QP_counter_ = 0;
 
   // Set reference values
   objective_reference_ = quantities->currentIterate()->objective();
@@ -97,6 +113,7 @@ void TerminationSecondQP::checkConditions(const Options* options,
 
   // Initialize indicators
   terminate_objective_ = false;
+  terminate_objective_similarity_ = false;
   terminate_stationary_ = false;
   update_radii_ = false;
 
@@ -104,8 +121,17 @@ void TerminationSecondQP::checkConditions(const Options* options,
   // SOLVE QP //
   //////////////
 
+  // Increment counter
+  solve_QP_counter_++;
+
+  // Initialize solve boolean
+  bool qp_solved = false;
+
   // Solve QP
-  solveQP(options, quantities, reporter, strategies);
+  if (solve_QP_counter_ % solve_QP_every_ == 0) {
+    qp_solved = true;
+    solveQP(options, quantities, reporter, strategies);
+  }
 
   /////////////////////////////////
   // TERMINATION BY STATIONARITY //
@@ -120,21 +146,22 @@ void TerminationSecondQP::checkConditions(const Options* options,
     terminate_stationary_ = true;
   }
   else if (quantities->stationarityRadius() <= quantities->stationarityTolerance() &&
+           qp_solved &&
            strategies->qpSolverTermination()->combinationTranslatedNormInf() <= quantities->stationarityTolerance() * stationarity_tolerance_factor_ * reference) {
     terminate_stationary_ = true;
   }
 
-  //////////////////////////////
-  // TERMINATION BY OBJECTIVE //
-  //////////////////////////////
+  /////////////////////////////////////////
+  // TERMINATION BY OBJECTIVE SIMILARITY //
+  /////////////////////////////////////////
 
   // Check objective similarity
-  if (objective_reference_ - quantities->currentIterate()->objective() <= objective_similarity_tolerance_*fmax(1.0,fabs(objective_reference_))) {
+  if (objective_reference_ - quantities->currentIterate()->objective() <= objective_similarity_tolerance_ * fmax(1.0, fabs(objective_reference_))) {
     objective_similarity_counter_++;
   }
   else {
     objective_similarity_counter_--;
-    objective_similarity_counter_ = fmax(0,objective_similarity_counter_);
+    objective_similarity_counter_ = fmax(0, objective_similarity_counter_);
   } // end else
 
   // Update objective reference value
@@ -143,8 +170,17 @@ void TerminationSecondQP::checkConditions(const Options* options,
   // Check for termination based on objective changes
   if (quantities->stationarityRadius() <= quantities->stationarityTolerance() &&
       objective_similarity_counter_ > objective_similarity_limit_) {
-    terminate_objective_ = true;
+    terminate_objective_similarity_ = true;
   } // end if
+
+  ////////////////////////////////////////
+  // TERMINATION BY OBJECTIVE TOLERANCE //
+  ////////////////////////////////////////
+
+  // Check for termination based on objective tolerance
+  if (quantities->currentIterate()->objective() <= objective_tolerance_) {
+    terminate_objective_ = true;
+  }
 
   //////////////////
   // RADII UPDATE //
@@ -156,7 +192,8 @@ void TerminationSecondQP::checkConditions(const Options* options,
       strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
     direction_conditions = true;
   } // end if
-  else if (strategies->qpSolverTermination()->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
+  else if (qp_solved &&
+           strategies->qpSolverTermination()->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
     direction_conditions = true;
   }
 
@@ -168,7 +205,12 @@ void TerminationSecondQP::checkConditions(const Options* options,
   }
 
   // Print check values
-  reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %8d %8d %+.2e %+.2e", quantities->currentIterate()->gradient()->normInf(), strategies->qpSolverTermination()->vectorListLength(), strategies->qpSolverTermination()->numberOfIterations(), strategies->qpSolver()->combinationTranslatedNormInf(), strategies->qpSolverTermination()->combinationTranslatedNormInf());
+  if (qp_solved) {
+    reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %8d %8d %+.2e %+.2e", quantities->currentIterate()->gradient()->normInf(), strategies->qpSolverTermination()->vectorListLength(), strategies->qpSolverTermination()->numberOfIterations(), strategies->qpSolver()->combinationTranslatedNormInf(), strategies->qpSolverTermination()->combinationTranslatedNormInf());
+  }
+  else {
+    reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %8s %8s %+.2e %9s", quantities->currentIterate()->gradient()->normInf(), "--------", "--------", strategies->qpSolver()->combinationTranslatedNormInf(), "---------");
+  }
 
 } // end checkConditions
 
@@ -225,7 +267,6 @@ void TerminationSecondQP::solveQP(const Options* options,
       if (!evaluation_success) {
         THROW_EXCEPTION(TE_EVALUATION_FAILURE_EXCEPTION, "Termination check unsuccessful. Evaluation failed.");
       }
-
     }
     else {
 

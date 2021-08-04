@@ -35,6 +35,11 @@ public:
   ~RandomNumberGenerator(){};
   //@}
 
+  /** @name Set methods */
+  //@{
+  inline void resetSeed() { generator.seed(0); };
+  //@}
+
   /** @name Generate methods */
   //@{
   /**

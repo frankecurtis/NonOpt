@@ -14,14 +14,15 @@
 QuadPoly::QuadPoly(int n,
                    int m,
                    int a,
-                   double s)
+                   double f,
+                   int s)
   : number_of_active_affine_(a),
     number_of_affine_(m),
     number_of_variables_(n)
 {
 
   // Declare scaling factor
-  double symmetric_matrix_scaling = s;
+  double symmetric_matrix_scaling = f;
 
   // Reset number of active affine
   number_of_active_affine_ = fmin(number_of_active_affine_, number_of_affine_);
@@ -30,7 +31,7 @@ QuadPoly::QuadPoly(int n,
   std::default_random_engine generator;
   std::uniform_real_distribution<double> uniform(0.0, 1.0);
   std::normal_distribution<double> normal(0.0, 1.0);
-  generator.seed(0);
+  generator.seed(s);
 
   // Declare quantities
   linear_ = new double[number_of_variables_];

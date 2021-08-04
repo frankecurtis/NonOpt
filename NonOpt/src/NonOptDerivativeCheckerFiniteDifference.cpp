@@ -6,8 +6,8 @@
 
 #include <cmath>
 
-#include "NonOptDerivativeCheckerFiniteDifference.hpp"
 #include "NonOptDefinitions.hpp"
+#include "NonOptDerivativeCheckerFiniteDifference.hpp"
 
 namespace NonOpt
 {
@@ -59,7 +59,8 @@ void DerivativeCheckerFiniteDifference::setOptions(Options* options)
 void DerivativeCheckerFiniteDifference::initialize(const Options* options,
                                                    Quantities* quantities,
                                                    const Reporter* reporter)
-{} // end initialize
+{
+} // end initialize
 
 // Check derivatives
 void DerivativeCheckerFiniteDifference::checkDerivatives(const Options* options,

@@ -42,7 +42,7 @@ int main()
   nonopt.options()->modifyOptionsFromFile("nonopt_experiment.opt");
 
   // Set print level to 0
-  nonopt.options()->modifyIntegerValue("print_level",0);
+  nonopt.options()->modifyIntegerValue("print_level", 0);
 
   // Declare problem pointer
   std::shared_ptr<Problem> problem;
@@ -225,7 +225,7 @@ int main()
                     optimal_value = 0.0;
                     break;
                   case 10:
-                    problem = std::make_shared<QuadPoly>(dimension, 10, 5, 10.0);
+                    problem = std::make_shared<QuadPoly>(dimension, 10, 5, 10.0, 0);
                     printf("QuadPoly           ");
                     strcpy(out_file, (char*)"output/QuadPoly");
                     optimal_value = 0.0;

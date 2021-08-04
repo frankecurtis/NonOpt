@@ -4,10 +4,10 @@
 //
 // Author(s) : Frank E. Curtis
 
+#include "NonOptSymmetricMatrixLimitedMemory.hpp"
 #include "NonOptBLASLAPACK.hpp"
 #include "NonOptDeclarations.hpp"
 #include "NonOptDefinitions.hpp"
-#include "NonOptSymmetricMatrixLimitedMemory.hpp"
 
 namespace NonOpt
 {
@@ -778,50 +778,50 @@ void SymmetricMatrixLimitedMemory::update(const Vector& s,
   // Update diagonal matrix
   if (remove) {
     for (int i = 0; i < history_ - 1; i++) {
-      compact_form_diagonal_[i] = compact_form_diagonal_[i+1];
+      compact_form_diagonal_[i] = compact_form_diagonal_[i + 1];
     } // end for
-  } // end if
+  }   // end if
   compact_form_diagonal_[(int)s_.size() - 1] = sy_new;
 
   // Update inner product matrix
   if (remove) {
     for (int i = 0; i < history_ - 1; i++) {
       for (int j = i; j < history_ - 1; j++) {
-        compact_form_inner_product_[i * history_ + j] = compact_form_inner_product_[(i+1) * history_ + (j+1)];
+        compact_form_inner_product_[i * history_ + j] = compact_form_inner_product_[(i + 1) * history_ + (j + 1)];
       } // end for
-    } // end for
-  } // end if
+    }   // end for
+  }     // end if
   if (type_.compare("BFGS") == 0) {
     for (int i = 0; i < (int)s_.size() - 1; i++) {
       compact_form_inner_product_[i * history_ + (int)s_.size() - 1] = initial_diagonal_value_ * s_[i]->innerProduct(*s_new);
     } // end for
-    compact_form_inner_product_[((int)s_.size() - 1) * history_ + (int)s_.size() - 1] = initial_diagonal_value_ * pow(s_new->norm2(),2.0);
+    compact_form_inner_product_[((int)s_.size() - 1) * history_ + (int)s_.size() - 1] = initial_diagonal_value_ * pow(s_new->norm2(), 2.0);
   } // end if
   else if (type_.compare("DFP") == 0) {
     for (int i = 0; i < (int)s_.size() - 1; i++) {
       compact_form_inner_product_[i * history_ + (int)s_.size() - 1] = (1.0 / initial_diagonal_value_) * y_[i]->innerProduct(*y_new);
     } // end for
-    compact_form_inner_product_[((int)s_.size() - 1) * history_ + (int)s_.size() - 1] = (1.0 / initial_diagonal_value_) * pow(y_new->norm2(),2.0);
+    compact_form_inner_product_[((int)s_.size() - 1) * history_ + (int)s_.size() - 1] = (1.0 / initial_diagonal_value_) * pow(y_new->norm2(), 2.0);
   } // end else if
 
   // Update lower triangular matrix
   if (remove) {
     for (int i = 1; i < history_ - 1; i++) {
       for (int j = 0; j <= i - 1; j++) {
-        compact_form_lower_triangular_[i * history_ + j] = compact_form_lower_triangular_[(i+1) * history_ + (j+1)];
+        compact_form_lower_triangular_[i * history_ + j] = compact_form_lower_triangular_[(i + 1) * history_ + (j + 1)];
       } // end for
-    } // end for
-  } // end if
+    }   // end for
+  }     // end if
   if (type_.compare("BFGS") == 0) {
     for (int j = 0; j < (int)s_.size() - 1; j++) {
       compact_form_lower_triangular_[((int)s_.size() - 1) * history_ + j] = s_new->innerProduct(*y_[j]);
     } // end for
-  } // end if
+  }   // end if
   else if (type_.compare("DFP") == 0) {
     for (int j = 0; j < (int)s_.size() - 1; j++) {
       compact_form_lower_triangular_[((int)s_.size() - 1) * history_ + j] = y_new->innerProduct(*s_[j]);
     } // end for
-  } // end else if
+  }   // end else if
 
   // Clear computed columns sets
   computed_columns_.clear();

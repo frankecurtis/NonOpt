@@ -156,7 +156,6 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
         quantities->setStepsize(0.0);
         THROW_EXCEPTION(LS_EVALUATION_FAILURE_EXCEPTION, "Line search unsuccessful. Evaluation failed.");
       }
-
     }
     else {
 
@@ -244,7 +243,6 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
         // Check for failure on interval
         if (fail_on_small_interval_) {
           THROW_EXCEPTION(LS_INTERVAL_TOO_SMALL_EXCEPTION, "Line search unsuccessful.  Interval too small.");
-          printf("small interval");
         }
 
         // Evaluate objective at trial iterate

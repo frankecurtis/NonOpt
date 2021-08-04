@@ -81,9 +81,9 @@ bool MxHilb::evaluateObjective(int n,
 
 // Objective and gradient value
 bool MxHilb::evaluateObjectiveAndGradient(int n,
-                                        const double* x,
-                                        double& f,
-                                        double* g)
+                                          const double* x,
+                                          double& f,
+                                          double* g)
 {
 
   // Evaluate sums
@@ -98,7 +98,7 @@ bool MxHilb::evaluateObjectiveAndGradient(int n,
       f = fabs(sum_[i]);
       index = i;
     } // end if
-  } // end for
+  }   // end for
 
   // Declare success
   bool success = !isnan(f);
@@ -111,7 +111,7 @@ bool MxHilb::evaluateObjectiveAndGradient(int n,
         success = false;
       }
     } // end for
-  } // end if
+  }   // end if
   else {
     for (int j = 0; j < n; j++) {
       g[j] = -1.0 / ((double)index + (double)j + 1.0);
@@ -119,7 +119,7 @@ bool MxHilb::evaluateObjectiveAndGradient(int n,
         success = false;
       }
     } // end for
-  } // end else
+  }   // end else
 
   // Return
   return success;
@@ -144,7 +144,7 @@ bool MxHilb::evaluateGradient(int n,
       f = fabs(sum_[i]);
       index = i;
     } // end if
-  } // end for
+  }   // end for
 
   // Declare success
   bool success = true;
@@ -157,7 +157,7 @@ bool MxHilb::evaluateGradient(int n,
         success = false;
       }
     } // end for
-  } // end if
+  }   // end if
   else {
     for (int j = 0; j < n; j++) {
       g[j] = -1.0 / ((double)index + (double)j + 1.0);
@@ -165,7 +165,7 @@ bool MxHilb::evaluateGradient(int n,
         success = false;
       }
     } // end for
-  } // end else
+  }   // end else
 
   // Return
   return success;

@@ -162,7 +162,7 @@ bool Point::evaluateObjectiveAndGradient(Quantities& quantities)
 
     // Evaluate objective value for problem
     objective_evaluated_ = problem_->evaluateObjectiveAndGradient(vector_->length(), vector_->values(), objective_, gradient_->valuesModifiable());
-    gradient_evaluated_  = objective_evaluated_;
+    gradient_evaluated_ = objective_evaluated_;
 
     // Increment evaluation time
     quantities.incrementEvaluationTime(clock() - start_time);

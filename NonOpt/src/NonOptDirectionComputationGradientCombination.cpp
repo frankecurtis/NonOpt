@@ -139,7 +139,10 @@ void DirectionComputationGradientCombination::setOptions(Options* options)
 // Initialize
 void DirectionComputationGradientCombination::initialize(const Options* options,
                                                          Quantities* quantities,
-                                                         const Reporter* reporter) {}
+                                                         const Reporter* reporter)
+{
+  random_number_generator_.resetSeed();
+} // end initialize
 
 // Iteration header
 std::string DirectionComputationGradientCombination::iterationHeader()
@@ -184,7 +187,6 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       if (!evaluation_success) {
         THROW_EXCEPTION(DC_EVALUATION_FAILURE_EXCEPTION, "Direction computation unsuccessful. Evaluation failed.");
       }
-
     }
     else {
 
@@ -457,11 +459,8 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       // Try shortened step?
       if (try_shortened_step_) {
 
-        // Set shortened stepsize
-        double shortened_stepsize = shortened_stepsize_ * fmin(quantities->stationarityRadius(), strategies->qpSolver()->primalSolutionNormInf()) / strategies->qpSolver()->primalSolutionNormInf();
-
         // Compute shortened trial iterate
-        quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, shortened_stepsize, *quantities->direction()));
+        quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, shortened_stepsize_, *quantities->direction()));
 
         // Evaluate trial objective
         if (quantities->evaluateFunctionWithGradient()) {
@@ -476,7 +475,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
 
         // Check for sufficient decrease
         if (evaluation_success &&
-            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
+            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize_ * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
              strategies->termination()->updateRadiiDirectionComputation())) {
           THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
         }

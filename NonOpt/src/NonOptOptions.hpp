@@ -34,8 +34,7 @@ public:
    * Constructor
    */
   Options()
-    : message_("")
-  {};
+    : message_(""){};
   //@}
 
   /** @name Destructor */
