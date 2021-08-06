@@ -33,7 +33,7 @@ void TerminationBasic::addOptions(Options* options)
                            -NONOPT_DOUBLE_INFINITY,
                            NONOPT_DOUBLE_INFINITY,
                            "Tolerance for objective function value.  Algorithm terminates\n"
-                           "              if objective falls below this tolerance.\n"
+                           "              if unscaled objective falls below this tolerance.\n"
                            "Default     : -Infinity.");
   options->addDoubleOption("TB_stationarity_tolerance_factor",
                            1e+00,
@@ -149,7 +149,7 @@ void TerminationBasic::checkConditions(const Options* options,
   ////////////////////////////////////////
 
   // Check for termination based on objective tolerance
-  if (quantities->currentIterate()->objective() <= objective_tolerance_) {
+  if (quantities->currentIterate()->objectiveUnscaled() <= objective_tolerance_) {
     terminate_objective_ = true;
   }
 

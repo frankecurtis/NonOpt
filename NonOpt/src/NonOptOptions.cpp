@@ -78,15 +78,21 @@ bool Options::addDoubleOption(std::string name,
     } // end if
   }   // end for
 
+  // Read values
+  std::ostringstream a, b, c;
+  a << value;
+  b << lower_bound;
+  c << upper_bound;
+
   // Check that lower bound is lower than upper bound
   if (lower_bound > upper_bound) {
-    message_ += "Attempted to add double option \'" + name + "\', but lower bound \'" + std::to_string(lower_bound) + "\' greater than upper bound \'" + std::to_string(upper_bound) + "\'.  Ignoring addition request.\n";
+    message_ += "Attempted to add double option \'" + name + "\', but lower bound \'" + b.str() + "\' greater than upper bound \'" + c.str() + "\'.  Ignoring addition request.\n";
     return false;
   } // end if
 
   // Check that value is within bounds
   if (value < lower_bound || value > upper_bound) {
-    message_ += "Attempted to add double option \'" + name + "\', but value \'" + std::to_string(value) + "\' outside of bound interval \'" + std::to_string(lower_bound) + "," + std::to_string(upper_bound) + "\'.  Ignoring addition request.\n";
+    message_ += "Attempted to add double option \'" + name + "\', but value \'" + a.str() + "\' outside of bound interval \'" + b.str() + "," + c.str() + "\'.  Ignoring addition request.\n";
     return false;
   } // end if
 
@@ -117,15 +123,21 @@ bool Options::addIntegerOption(std::string name,
     } // end if
   }   // end for
 
+  // Read values
+  std::ostringstream a, b, c;
+  a << value;
+  b << lower_bound;
+  c << upper_bound;
+
   // Check that lower bound is lower than upper bound
   if (lower_bound > upper_bound) {
-    message_ += "Attempted to add integer option \'" + name + "\', but lower bound \'" + std::to_string(lower_bound) + "\' greater than upper bound \'" + std::to_string(upper_bound) + "\'.  Ignoring addition request.\n";
+    message_ += "Attempted to add integer option \'" + name + "\', but lower bound \'" + b.str() + "\' greater than upper bound \'" + c.str() + "\'.  Ignoring addition request.\n";
     return false;
   } // end if
 
   // Check that value is within bounds
   if (value < lower_bound || value > upper_bound) {
-    message_ += "Attempted to add integer option \'" + name + "\', but value \'" + std::to_string(value) + "\' outside of bound interval \'" + std::to_string(lower_bound) + "," + std::to_string(upper_bound) + "\'.  Ignoring addition request.\n";
+    message_ += "Attempted to add integer option \'" + name + "\', but value \'" + a.str() + "\' outside of bound interval \'" + b.str() + "," + c.str() + "\'.  Ignoring addition request.\n";
     return false;
   } // end if
 
@@ -360,14 +372,18 @@ bool Options::modifyDoubleValue(std::string name,
   for (int i = 0; i < (int)list_.size(); i++) {
     if (list_[i]->name().compare(name) == 0) {
       if (list_[i]->type().compare("double") == 0) {
+        std::ostringstream a, b, c;
+        a << value;
+        b << list_[i]->lowerBoundAsDouble();
+        c << list_[i]->upperBoundAsDouble();
         if (value >= list_[i]->lowerBoundAsDouble() &&
             value <= list_[i]->upperBoundAsDouble()) {
           list_[i]->modifyDoubleValue(value);
-          message_ += "Set value for option \'" + name + "\' as " + std::to_string(value) + ".\n";
+          message_ += "Set value for option \'" + name + "\' as " + a.str() + ".\n";
           return true;
         } // end if
         else {
-          message_ += "Attempted to set value for option \'" + name + "\', but value " + std::to_string(value) + " outside of bound interval " + std::to_string(list_[i]->lowerBoundAsDouble()) + "," + std::to_string(list_[i]->upperBoundAsDouble()) + ".  Ignoring request.\n";
+          message_ += "Attempted to set value for option \'" + name + "\', but value " + a.str() + " outside of bound interval " + b.str() + "," + c.str() + ".  Ignoring request.\n";
           return false;
         } // end else
       }   // end if
@@ -392,14 +408,18 @@ bool Options::modifyIntegerValue(std::string name,
   for (int i = 0; i < (int)list_.size(); i++) {
     if (list_[i]->name().compare(name) == 0) {
       if (list_[i]->type().compare("integer") == 0) {
+        std::ostringstream a, b, c;
+        a << value;
+        b << list_[i]->lowerBoundAsInteger();
+        c << list_[i]->upperBoundAsInteger();
         if (value >= list_[i]->lowerBoundAsInteger() &&
             value <= list_[i]->upperBoundAsInteger()) {
           list_[i]->modifyIntegerValue(value);
-          message_ += "Set value for option \'" + name + "\' as " + std::to_string(value) + ".\n";
+          message_ += "Set value for option \'" + name + "\' as " + a.str() + ".\n";
           return true;
         } // end if
         else {
-          message_ += "Attempted to set value for option \'" + name + "\', but value " + std::to_string(value) + " outside of bound interval " + std::to_string(list_[i]->lowerBoundAsInteger()) + "," + std::to_string(list_[i]->upperBoundAsInteger()) + ".  Ignoring request.\n";
+          message_ += "Attempted to set value for option \'" + name + "\', but value " + a.str() + " outside of bound interval " + b.str() + "," + c.str() + ".  Ignoring request.\n";
           return false;
         } // end else
       }   // end if
