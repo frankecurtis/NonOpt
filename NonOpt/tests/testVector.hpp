@@ -41,6 +41,11 @@ int testVectorImplementation(int option)
   // Declare zero vector
   Vector u(5);
 
+  // Set values to 0.0
+  for (int i = 0; i < 5; i++) {
+    u.values()[i] = 0.0;
+  }
+
   // Check values
   for (int i = 0; i < 5; i++) {
     if (u.values()[i] < -1e-12 || u.values()[i] > 1e-12) {

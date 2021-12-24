@@ -7,6 +7,6 @@
 #ifndef __NONOPTVERSION_HPP__
 #define __NONOPTVERSION_HPP__
 
-#define NONOPT_VERSION "1.0rc2"
+#define NONOPT_VERSION "1.0rc3"
 
 #endif /* __NONOPTVERSION_HPP__ */

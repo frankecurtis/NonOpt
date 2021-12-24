@@ -479,6 +479,9 @@ void NonOptSolver::printHeader()
   // Print quantities header
   quantities_.printHeader(&reporter_);
 
+  // Print break
+  reporter_.printf(R_NL,R_BASIC,"\n");
+
   // Print strategies header
   strategies_.printHeader(&reporter_);
 

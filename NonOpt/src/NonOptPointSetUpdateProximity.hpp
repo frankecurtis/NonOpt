@@ -114,6 +114,7 @@ private:
   //@{
   double envelope_factor_;
   double size_factor_;
+  int size_maximum_;
   //@}
 
 }; // end PointSetUpdateProximity

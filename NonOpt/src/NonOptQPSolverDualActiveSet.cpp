@@ -202,7 +202,7 @@ void QPSolverDualActiveSet::initializeData(int gamma_length)
   // Set length parameters
   gamma_length_ = gamma_length;
   system_solution_length_ = 3 * gamma_length_ + 1;
-  factor_length_ = system_solution_length_ * system_solution_length_;
+  factor_length_ = 2*system_solution_length_; // system_solution_length_ * system_solution_length_;
 
   // Initialize problem data
   matrix_ = nullptr;
@@ -263,23 +263,6 @@ void QPSolverDualActiveSet::initializeData(int gamma_length)
   system_solution_ = new double[system_solution_length_];
   system_solution_best_ = new double[system_solution_length_];
   factor_ = new double[factor_length_];
-
-  // Set inputs for BLASLAPACK
-  double value = 0.0;
-  int increment1 = 0;
-  int increment2 = 1;
-
-  // Initialize values
-  dcopy_(&system_solution_length_, &value, &increment1, inner_solution_1_, &increment2);
-  dcopy_(&system_solution_length_, &value, &increment1, inner_solution_2_, &increment2);
-  dcopy_(&system_solution_length_, &value, &increment1, inner_solution_3_, &increment2);
-  dcopy_(&system_solution_length_, &value, &increment1, inner_solution_ls_, &increment2);
-  dcopy_(&system_solution_length_, &value, &increment1, inner_solution_trial_, &increment2);
-  dcopy_(&system_solution_length_, &value, &increment1, new_system_vector_, &increment2);
-  dcopy_(&system_solution_length_, &value, &increment1, right_hand_side_, &increment2);
-  dcopy_(&system_solution_length_, &value, &increment1, system_solution_, &increment2);
-  dcopy_(&system_solution_length_, &value, &increment1, system_solution_best_, &increment2);
-  dcopy_(&factor_length_, &value, &increment1, factor_, &increment2);
 
   // Set status
   setStatus(QP_UNSET);
@@ -442,13 +425,13 @@ double QPSolverDualActiveSet::KKTErrorDual()
 {
 
   // Evaluate gradient combination
-  Vector Gomega(gamma_length_);
+  Vector Gomega(gamma_length_, 0.0);
   for (int i = 0; i < (int)vector_list_.size(); i++) {
     Gomega.addScaledVector(omega_.values()[i], *vector_list_[i].get());
   }
 
   // Declare dual vector
-  Vector d0(gamma_length_);
+  Vector d0(gamma_length_, 0.0);
   d0.addScaledVector(-1.0, Gomega);
   d0.addScaledVector(-1.0, gamma_);
   Vector d(gamma_length_);
@@ -1614,6 +1597,32 @@ bool QPSolverDualActiveSet::choleskyAugment(double system_vector[],
   // Set new length
   int length = (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size();
 
+  // Resize factor_?
+  while ((length - 1) * (system_solution_length_ + 1) >= factor_length_ + 1) {
+
+    // Declare temporary vector
+    double* factor_temp = new double[factor_length_];
+
+    // Set inputs for BLASLAPACK
+    int increment = 1;
+
+    // Copy factor_ to temporary vector
+    dcopy_(&factor_length_, factor_, &increment, factor_temp, &increment);
+
+    // Delete factor_ and resize
+    delete[] factor_;
+    factor_ = nullptr;
+    int factor_length_new = 2*factor_length_;
+    factor_ = new double[factor_length_new];
+
+    // Copy temporary vector back to factor_
+    dcopy_(&factor_length_, factor_temp, &increment, factor_, &increment);
+
+    // Set new factor length
+    factor_length_ = factor_length_new;
+
+  } // end while
+
   // "Add" zero values to R by shifting values
   for (int i = 0; i < length; i++) {
     for (int j = length - 1; j > index; j--) {
@@ -2004,18 +2013,14 @@ void QPSolverDualActiveSet::evaluateSystemVector(int set,
   if (set == 1) {
 
     // Declare temporary vector
-    double* temporary_vector = new double[gamma_length_];
+    Vector temporary_vector(gamma_length_);
 
     // Evaluate temporary vector
-    for (int i = 0; i < gamma_length_; i++) {
-      Vector col(gamma_length_, 0.0);
-      matrix_->columnOfInverse(i, col);
-      temporary_vector[i] = vector_list_[index]->innerProduct(col);
-    } // end for
+    matrix_->matrixVectorProductOfInverse(*vector_list_[index],temporary_vector);
 
     // Set "omega" values, i.e.,
     for (int i = 0; i < (int)omega_positive_.size(); i++) {
-      system_vector[i] = system_vector[i] + ddot_(&gamma_length_, vector_list_[omega_positive_[i]]->values(), &increment1, temporary_vector, &increment1) + 1.0;
+      system_vector[i] = system_vector[i] + ddot_(&gamma_length_, vector_list_[omega_positive_[i]]->values(), &increment1, temporary_vector.values(), &increment1) + 1.0;
     }
 
     // Set "gamma positive" values, i.e.,
@@ -2031,12 +2036,6 @@ void QPSolverDualActiveSet::evaluateSystemVector(int set,
       matrix_->columnOfInverse(gamma_negative_[i], col);
       system_vector[(int)omega_positive_.size() + (int)gamma_positive_.size() + i] = vector_list_[index]->innerProduct(col);
     } // end for
-
-    // Delete temporary vector
-    if (temporary_vector != nullptr) {
-      delete[] temporary_vector;
-      temporary_vector = nullptr;
-    } // end if
 
   } // end if
 
@@ -2069,7 +2068,9 @@ void QPSolverDualActiveSet::finalizeSolution()
 
   // Set sizes
   omega_.setLength((int)vector_.size());
+  omega_.scale(0.0);
   gamma_.setLength(gamma_length_);
+  gamma_.scale(0.0);
 
   // Set final omega values
   for (int i = 0; i < (int)omega_positive_best_.size(); i++) {
@@ -2110,7 +2111,6 @@ void QPSolverDualActiveSet::resizeSystemSolution()
   double* right_hand_side_temp = new double[system_solution_length_];
   double* system_solution_temp = new double[system_solution_length_];
   double* system_solution_best_temp = new double[system_solution_length_];
-  double* factor_temp = new double[factor_length_];
 
   // Set inputs for BLASLAPACK
   int increment = 1;
@@ -2125,7 +2125,6 @@ void QPSolverDualActiveSet::resizeSystemSolution()
   dcopy_(&system_solution_length_, right_hand_side_, &increment, right_hand_side_temp, &increment);
   dcopy_(&system_solution_length_, system_solution_, &increment, system_solution_temp, &increment);
   dcopy_(&system_solution_length_, system_solution_best_, &increment, system_solution_best_temp, &increment);
-  dcopy_(&factor_length_, factor_, &increment, factor_temp, &increment);
 
   // Delete arrays (in case they exist)
   if (inner_solution_1_ != nullptr) {
@@ -2164,14 +2163,9 @@ void QPSolverDualActiveSet::resizeSystemSolution()
     delete[] system_solution_best_;
     system_solution_best_ = nullptr;
   } // end if
-  if (factor_ != nullptr) {
-    delete[] factor_;
-    factor_ = nullptr;
-  } // end if
 
   // Set new system solution length
   int system_solution_length_new = 2 * system_solution_length_;
-  int factor_length_new = system_solution_length_new * system_solution_length_new;
 
   // Declare temp vectors
   inner_solution_1_ = new double[system_solution_length_new];
@@ -2183,7 +2177,6 @@ void QPSolverDualActiveSet::resizeSystemSolution()
   right_hand_side_ = new double[system_solution_length_new];
   system_solution_ = new double[system_solution_length_new];
   system_solution_best_ = new double[system_solution_length_new];
-  factor_ = new double[factor_length_new];
 
   // Initialize values
   dcopy_(&system_solution_length_, inner_solution_1_temp, &increment, inner_solution_1_, &increment);
@@ -2195,7 +2188,6 @@ void QPSolverDualActiveSet::resizeSystemSolution()
   dcopy_(&system_solution_length_, right_hand_side_temp, &increment, right_hand_side_, &increment);
   dcopy_(&system_solution_length_, system_solution_temp, &increment, system_solution_, &increment);
   dcopy_(&system_solution_length_, system_solution_best_temp, &increment, system_solution_best_, &increment);
-  dcopy_(&factor_length_, factor_temp, &increment, factor_, &increment);
 
   // Delete arrays (in case they exist)
   if (inner_solution_1_temp != nullptr) {
@@ -2234,14 +2226,9 @@ void QPSolverDualActiveSet::resizeSystemSolution()
     delete[] system_solution_best_temp;
     system_solution_best_temp = nullptr;
   } // end if
-  if (factor_temp != nullptr) {
-    delete[] factor_temp;
-    factor_temp = nullptr;
-  } // end if
 
   // Update lengths
   system_solution_length_ = system_solution_length_new;
-  factor_length_ = factor_length_new;
 
 } // end resizeSystemSolution
 

@@ -16,28 +16,15 @@ namespace NonOpt
 // Constructor with given length; values initialized to zero
 Vector::Vector(int length)
   : length_(length),
-    max_computed_(true),
-    min_computed_(true),
-    norm1_computed_(true),
-    norm2_computed_(true),
-    normInf_computed_(true),
-    max_value_(0.0),
-    min_value_(0.0),
-    norm1_value_(0.0),
-    norm2_value_(0.0),
-    normInf_value_(0.0)
+    max_computed_(false),
+    min_computed_(false),
+    norm1_computed_(false),
+    norm2_computed_(false),
+    normInf_computed_(false)
 {
 
   // Allocate array
   values_ = new double[length];
-
-  // Set inputs for BLASLAPACK
-  double value = 0.0;
-  int increment1 = 0;
-  int increment2 = 1;
-
-  // Initialize values
-  dcopy_(&length, &value, &increment1, values_, &increment2);
 
 } // end constructor
 
@@ -143,25 +130,12 @@ void Vector::setLength(int length)
   // Allocate array
   values_ = new double[length];
 
-  // Set inputs for BLASLAPACK
-  double value = 0.0;
-  int increment1 = 0;
-  int increment2 = 1;
-
-  // Initialize values
-  dcopy_(&length, &value, &increment1, values_, &increment2);
-
-  // Compute scalar values
-  max_computed_ = true;
-  min_computed_ = true;
-  norm1_computed_ = true;
-  norm2_computed_ = true;
-  normInf_computed_ = true;
-  max_value_ = 0.0;
-  min_value_ = 0.0;
-  norm1_value_ = 0.0;
-  norm2_value_ = 0.0;
-  normInf_value_ = 0.0;
+  // Reset scalar value bools
+  max_computed_ = false;
+  min_computed_ = false;
+  norm1_computed_ = false;
+  norm2_computed_ = false;
+  normInf_computed_ = false;
 
 } // end setLength
 

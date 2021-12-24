@@ -37,6 +37,14 @@ void PointSetUpdateProximity::addOptions(Options* options)
                            "Default     : 2e+00.");
 
   // Add integer options
+  options->addIntegerOption("PSP_size_maximum",
+                           NONOPT_INT_INFINITY,
+                           0.0,
+                           NONOPT_INT_INFINITY,
+                           "Size maximum for removing points from point set.  If size of\n"
+                           "              point set exceeds this number, then the oldest members are\n"
+                           "              removed.\n"
+                           "Default     : Infinity.");
 
 } // end addOptions
 
@@ -51,6 +59,7 @@ void PointSetUpdateProximity::setOptions(Options* options)
   options->valueAsDouble("PSP_size_factor", size_factor_);
 
   // Read integer options
+  options->valueAsInteger("PSP_size_maximum", size_maximum_);
 
 } // end setOptions
 
@@ -70,7 +79,7 @@ void PointSetUpdateProximity::updatePointSet(const Options* options,
   setStatus(PS_UNSET);
 
   // Remove old points
-  while ((double)quantities->pointSet()->size() > size_factor_ * (double)quantities->numberOfVariables()) {
+  while ((double)quantities->pointSet()->size() > size_factor_ * (double)quantities->numberOfVariables() || quantities->pointSet()->size() > size_maximum_) {
     quantities->pointSet()->erase(quantities->pointSet()->begin());
   }
 

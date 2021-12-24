@@ -255,8 +255,13 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
       // Check distance between point and current iterate
       if (difference->normInf() <= quantities->stationarityRadius()) {
 
-        // Evaluate gradient
-        evaluation_success = (*quantities->pointSet())[point_count]->evaluateGradient(*quantities);
+        // Evaluate objective and gradient
+        if (quantities->evaluateFunctionWithGradient()) {
+          evaluation_success = (*quantities->pointSet())[point_count]->evaluateObjectiveAndGradient(*quantities);
+        }
+        else {
+          evaluation_success = ((*quantities->pointSet())[point_count]->evaluateObjective(*quantities) && (*quantities->pointSet())[point_count]->evaluateGradient(*quantities));
+        }
 
         // Check for successful evaluation
         if (evaluation_success) {
@@ -416,7 +421,9 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
         if (evaluation_success) {
 
           // Evaluate trial iterate gradient
-          evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
+          if (!quantities->evaluateFunctionWithGradient()) {
+            evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
+          }
 
           // Check for gradient successful evaluation
           if (evaluation_success) {
@@ -482,7 +489,9 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
         if (evaluation_success) {
 
           // Evaluate trial gradient
-          evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
+          if (!quantities->evaluateFunctionWithGradient()) {
+            evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
+          }
 
           // Check for gradient successful evaluation
           if (evaluation_success) {

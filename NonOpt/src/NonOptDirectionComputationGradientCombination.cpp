@@ -103,11 +103,11 @@ void DirectionComputationGradientCombination::addOptions(Options* options)
 
   // Add integer options
   options->addIntegerOption("DCGC_inner_iteration_limit",
-                            20,
+                            2,
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of inner iterations that will be performed.\n"
-                            "Default     : 20.");
+                            "Default     : 2.");
 
 } // end addOptions
 
@@ -424,7 +424,9 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       if (add_far_points_ || strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius()) {
 
         // Evaluate trial point gradient
-        evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
+        if (!quantities->evaluateFunctionWithGradient()) {
+          evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
+        }
 
         // Check for successful evaluation
         if (evaluation_success) {
@@ -459,8 +461,11 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       // Try shortened step?
       if (try_shortened_step_) {
 
+        // Set shortened stepsize
+        double shortened_stepsize = shortened_stepsize_ * fmin(quantities->stationarityRadius(), strategies->qpSolver()->primalSolutionNormInf()) / strategies->qpSolver()->primalSolutionNormInf();
+
         // Compute shortened trial iterate
-        quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, shortened_stepsize_, *quantities->direction()));
+        quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, shortened_stepsize, *quantities->direction()));
 
         // Evaluate trial objective
         if (quantities->evaluateFunctionWithGradient()) {
@@ -475,13 +480,15 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
 
         // Check for sufficient decrease
         if (evaluation_success &&
-            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize_ * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
+            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
              strategies->termination()->updateRadiiDirectionComputation())) {
           THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
         }
 
         // Evaluate trial gradient
-        evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
+        if (!quantities->evaluateFunctionWithGradient()) {
+          evaluation_success = quantities->trialIterate()->evaluateGradient(*quantities);
+        }
 
         // Check for objective successful evaluation
         if (evaluation_success) {
@@ -592,7 +599,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       reporter->printf(R_NL, R_PER_INNER_ITERATION, "%s\n%s", blank_solve.c_str(), quantities->iterationNullValues().c_str());
 
       // Set QP data and solve
-      if (try_aggregation_ && !switched_to_full && (int)quantities->pointSet()->size() < (int)(aggregation_size_threshold_ * (double)quantities->numberOfVariables())) {
+      if (try_aggregation_ && !switched_to_full && (int)QP_gradient_list.size() < (int)(aggregation_size_threshold_ * (double)quantities->numberOfVariables())) {
         strategies->qpSolver()->setVectorList(QP_gradient_list_aggregated);
         strategies->qpSolver()->setVector(QP_vector_aggregated);
         strategies->qpSolver()->solveQP(options, reporter, quantities);

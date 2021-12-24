@@ -437,7 +437,7 @@ void SymmetricMatrixLimitedMemory::matrixVectorProductBFGS(const Vector& vector,
     dsytrs_(&u, &factor_size, &rhs, compact_form_factorization_, &factor_size, v, right_product.valuesModifiable(), &factor_size, &flag);
 
     // Complete outer product
-    Vector outer_product(size_);
+    Vector outer_product(size_, 0.0);
     for (int i = 0; i < factor_size; i++) {
       if (i < factor_size / 2) {
         outer_product.addScaledVector(initial_diagonal_value_ * right_product.values()[i], *s_[i]);
@@ -665,7 +665,7 @@ void SymmetricMatrixLimitedMemory::matrixVectorProductOfInverseDFP(const Vector&
     dsytrs_(&u, &factor_size, &rhs, compact_form_factorization_, &factor_size, v, right_product.valuesModifiable(), &factor_size, &flag);
 
     // Complete outer product
-    Vector outer_product(size_);
+    Vector outer_product(size_, 0.0);
     for (int i = 0; i < factor_size; i++) {
       if (i < factor_size / 2) {
         outer_product.addScaledVector((1.0 / initial_diagonal_value_) * right_product.values()[i], *y_[i]);

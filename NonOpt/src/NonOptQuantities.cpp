@@ -94,13 +94,13 @@ void Quantities::addOptions(Options* options)
                            "              (unknown) projection of origin onto convex hull of gradients.\n"
                            "Default     : sqrt(2.0)-1.0");
   options->addDoubleOption("inexact_termination_update_factor",
-                           0.9999,
+                           0.5,
                            0.0,
                            1.0,
                            "Factor for updating the inexact termination factor.  If the\n"
                            "              conditions for updating the inexact termination factor are met,\n"
                            "              then the inexact termination factor is multiplied by this fraction.\n"
-                           "Default     : 0.9999");
+                           "Default     : 0.5");
   options->addDoubleOption("inexact_termination_update_stepsize_threshold",
                            1e-10,
                            0.0,
@@ -413,7 +413,12 @@ void Quantities::printHeader(const Reporter* reporter)
 {
 
   // Print header
-  reporter->printf(R_NL, R_BASIC, "Number of variables.................. : %d\n", number_of_variables_);
+  reporter->printf(R_NL, R_BASIC, "Number of variables.................. : %d\n"
+                                  "Initial objective.................... : %e\n"
+                                  "Initial objective (unscaled)......... : %e\n",
+                   number_of_variables_,
+                   current_iterate_->objective(),
+                   current_iterate_->objectiveUnscaled());
 
 } // end printHeader
 

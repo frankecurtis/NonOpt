@@ -34,7 +34,7 @@ void ApproximateHessianUpdateBFGS::addOptions(Options* options)
                            "              call it s, is such that <s,v>/<s,s> is at least this threshold.\n"
                            "Default     : 1e-20.");
   options->addDoubleOption("BFGS_correction_threshold_2",
-                           1e+02,
+                           1e+08,
                            1.0,
                            NONOPT_DOUBLE_INFINITY,
                            "BFGS correction threshold.  If BFGS update is corrected, then\n"

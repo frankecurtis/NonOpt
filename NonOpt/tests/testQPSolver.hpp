@@ -100,7 +100,7 @@ int testQPSolverImplementation(int option)
      */
 
     // Initialize linear vector term
-    Vector gen_maxLinearVector(numberAffine);
+    Vector gen_maxLinearVector(numberAffine, 0.0);
 
     // Set random elements of linear vector term
     for (int i = numberActive; i < numberAffine; i++) {
@@ -114,7 +114,7 @@ int testQPSolverImplementation(int option)
     }
 
     // Initialize weights
-    Vector gen_weights(numberAffine);
+    Vector gen_weights(numberAffine, 0.0);
 
     // Set weights and normalize
     for (int i = 0; i < numberActive; i++) {

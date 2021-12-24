@@ -39,7 +39,7 @@ int main()
   NonOptSolver nonopt;
 
   // Modify options from file
-  nonopt.options()->modifyOptionsFromFile("nonopt_experiment.opt");
+  nonopt.options()->modifyOptionsFromFile("nonopt.opt");
 
   // Set print level to 0
   nonopt.options()->modifyIntegerValue("print_level", 0);
@@ -160,7 +160,7 @@ int main()
                   char out_file[200];
 
                   // Declare problem dimension
-                  int const dimension = 10;
+                  int const dimension = 100;
 
                   // Switch on problems
                   switch (problem_count) {
