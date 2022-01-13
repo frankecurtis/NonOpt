@@ -62,7 +62,7 @@ bool Test29_11::evaluateObjective(int n,
   } // end for
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -92,7 +92,7 @@ bool Test29_11::evaluateObjectiveAndGradient(int n,
       sign = ((term >= 0.0) ? 1.0 : -1.0);
       g[i - 1] += sign * (1.0);
       g[i] += sign * (-3.0 * x[i] * x[i] + 10.0 * x[i] - 2.0);
-      if (isnan(g[i - 1]) || isnan(g[i])) {
+      if (std::isnan(g[i - 1]) || std::isnan(g[i])) {
         success = false;
       }
     } // end if
@@ -102,14 +102,14 @@ bool Test29_11::evaluateObjectiveAndGradient(int n,
       sign = ((term >= 0.0) ? 1.0 : -1.0);
       g[i - 1] += sign * (1.0);
       g[i] += sign * (3.0 * x[i] * x[i] + 2.0 * x[i] - 14.0);
-      if (isnan(g[i - 1]) || isnan(g[i])) {
+      if (std::isnan(g[i - 1]) || std::isnan(g[i])) {
         success = false;
       }
     } // end else
   }   // end for
 
   // Return
-  return !isnan(f) && success;
+  return !std::isnan(f) && success;
 
 } // end evaluateObjectiveAndGradient
 
@@ -136,7 +136,7 @@ bool Test29_11::evaluateGradient(int n,
       sign = ((term >= 0.0) ? 1.0 : -1.0);
       g[i - 1] += sign * (1.0);
       g[i] += sign * (-3.0 * x[i] * x[i] + 10.0 * x[i] - 2.0);
-      if (isnan(g[i - 1]) || isnan(g[i])) {
+      if (std::isnan(g[i - 1]) || std::isnan(g[i])) {
         success = false;
       }
     } // end if
@@ -145,7 +145,7 @@ bool Test29_11::evaluateGradient(int n,
       sign = ((term >= 0.0) ? 1.0 : -1.0);
       g[i - 1] += sign * (1.0);
       g[i] += sign * (3.0 * x[i] * x[i] + 2.0 * x[i] - 14.0);
-      if (isnan(g[i - 1]) || isnan(g[i])) {
+      if (std::isnan(g[i - 1]) || std::isnan(g[i])) {
         success = false;
       }
     } // end else

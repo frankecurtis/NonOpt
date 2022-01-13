@@ -288,7 +288,7 @@ double QPSolverDualActiveSet::combinationNormInf()
   double combination_norm_inf = fabs(combination_.values()[i - 1]);
 
   // Set maximum
-  if (isnan(combination_norm_inf) || combination_norm_inf > NONOPT_DOUBLE_INFINITY) {
+  if (std::isnan(combination_norm_inf) || combination_norm_inf > NONOPT_DOUBLE_INFINITY) {
     combination_norm_inf = NONOPT_DOUBLE_INFINITY;
   }
 
@@ -313,7 +313,7 @@ double QPSolverDualActiveSet::combinationTranslatedNormInf()
   double combination_translated_norm_inf = fabs(combination_translated_.values()[i - 1]);
 
   // Set maximum
-  if (isnan(combination_translated_norm_inf) || combination_translated_norm_inf > NONOPT_DOUBLE_INFINITY) {
+  if (std::isnan(combination_translated_norm_inf) || combination_translated_norm_inf > NONOPT_DOUBLE_INFINITY) {
     combination_translated_norm_inf = NONOPT_DOUBLE_INFINITY;
   }
 
@@ -334,7 +334,7 @@ double QPSolverDualActiveSet::combinationTranslatedNorm2Squared()
   double combination_translated_norm_2 = dnrm2_(&length, combination_translated_.values(), &increment);
 
   // Set maximum
-  if (isnan(combination_translated_norm_2) || combination_translated_norm_2 > NONOPT_DOUBLE_INFINITY) {
+  if (std::isnan(combination_translated_norm_2) || combination_translated_norm_2 > NONOPT_DOUBLE_INFINITY) {
     combination_translated_norm_2 = NONOPT_DOUBLE_INFINITY;
   }
 
@@ -355,7 +355,7 @@ double QPSolverDualActiveSet::dualObjectiveQuadraticValue()
   double dual_objective_quadratic_value = -ddot_(&length, primal_solution_.values(), &increment, combination_translated_.values(), &increment);
 
   // Set maximum
-  if (isnan(dual_objective_quadratic_value) || dual_objective_quadratic_value > NONOPT_DOUBLE_INFINITY) {
+  if (std::isnan(dual_objective_quadratic_value) || dual_objective_quadratic_value > NONOPT_DOUBLE_INFINITY) {
     dual_objective_quadratic_value = NONOPT_DOUBLE_INFINITY;
   }
 
@@ -379,7 +379,7 @@ double QPSolverDualActiveSet::dualObjectiveQuadraticValueScaled()
   dual_objective_quadratic_value_scaled *= pow(primal_solution_projection_scalar_, 2.0);
 
   // Set maximum
-  if (isnan(dual_objective_quadratic_value_scaled) || dual_objective_quadratic_value_scaled > NONOPT_DOUBLE_INFINITY) {
+  if (std::isnan(dual_objective_quadratic_value_scaled) || dual_objective_quadratic_value_scaled > NONOPT_DOUBLE_INFINITY) {
     dual_objective_quadratic_value_scaled = NONOPT_DOUBLE_INFINITY;
   }
 
@@ -497,7 +497,7 @@ double QPSolverDualActiveSet::KKTErrorDual()
   } // end for
 
   // Set maximum
-  if (isnan(kkt_error) || kkt_error > NONOPT_DOUBLE_INFINITY) {
+  if (std::isnan(kkt_error) || kkt_error > NONOPT_DOUBLE_INFINITY) {
     kkt_error = NONOPT_DOUBLE_INFINITY;
   }
 
@@ -548,7 +548,7 @@ double QPSolverDualActiveSet::primalSolutionNormInf()
   double primal_solution_norm_inf = fabs(primal_solution_.values()[i - 1]);
 
   // Set maximum
-  if (isnan(primal_solution_norm_inf) || primal_solution_norm_inf > NONOPT_DOUBLE_INFINITY) {
+  if (std::isnan(primal_solution_norm_inf) || primal_solution_norm_inf > NONOPT_DOUBLE_INFINITY) {
     primal_solution_norm_inf = NONOPT_DOUBLE_INFINITY;
   }
 
@@ -569,7 +569,7 @@ double QPSolverDualActiveSet::primalSolutionNorm2Squared()
   double primal_solution_norm_2 = dnrm2_(&length, primal_solution_.values(), &increment);
 
   // Set maximum
-  if (isnan(primal_solution_norm_2) || primal_solution_norm_2 > NONOPT_DOUBLE_INFINITY) {
+  if (std::isnan(primal_solution_norm_2) || primal_solution_norm_2 > NONOPT_DOUBLE_INFINITY) {
     primal_solution_norm_2 = NONOPT_DOUBLE_INFINITY;
   }
 
@@ -594,7 +594,7 @@ double QPSolverDualActiveSet::primalSolutionFeasibleNormInf()
   double primal_solution_feasible_norm_inf = fabs(primal_solution_feasible_.values()[i - 1]);
 
   // Set maximum
-  if (isnan(primal_solution_feasible_norm_inf) || primal_solution_feasible_norm_inf > NONOPT_DOUBLE_INFINITY) {
+  if (std::isnan(primal_solution_feasible_norm_inf) || primal_solution_feasible_norm_inf > NONOPT_DOUBLE_INFINITY) {
     primal_solution_feasible_norm_inf = NONOPT_DOUBLE_INFINITY;
   }
 
@@ -1557,7 +1557,7 @@ bool QPSolverDualActiveSet::updateBestSolution()
 
   // Loop through solution
   for (int i = 0; i < (int)omega_positive_.size() + (int)gamma_positive_.size() + (int)gamma_negative_.size(); i++) {
-    if (isnan(system_solution_[i])) {
+    if (std::isnan(system_solution_[i])) {
       real_solution = false;
     }
   }

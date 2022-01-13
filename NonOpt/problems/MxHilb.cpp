@@ -75,7 +75,7 @@ bool MxHilb::evaluateObjective(int n,
   } // end for
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -101,13 +101,13 @@ bool MxHilb::evaluateObjectiveAndGradient(int n,
   }   // end for
 
   // Declare success
-  bool success = !isnan(f);
+  bool success = !std::isnan(f);
 
   // Evaluate gradient
   if (sum_[index] >= 0.0) {
     for (int j = 0; j < n; j++) {
       g[j] = 1.0 / ((double)index + (double)j + 1.0);
-      if (isnan(g[j])) {
+      if (std::isnan(g[j])) {
         success = false;
       }
     } // end for
@@ -115,7 +115,7 @@ bool MxHilb::evaluateObjectiveAndGradient(int n,
   else {
     for (int j = 0; j < n; j++) {
       g[j] = -1.0 / ((double)index + (double)j + 1.0);
-      if (isnan(g[j])) {
+      if (std::isnan(g[j])) {
         success = false;
       }
     } // end for
@@ -153,7 +153,7 @@ bool MxHilb::evaluateGradient(int n,
   if (sum_[index] >= 0.0) {
     for (int j = 0; j < n; j++) {
       g[j] = 1.0 / ((double)index + (double)j + 1.0);
-      if (isnan(g[j])) {
+      if (std::isnan(g[j])) {
         success = false;
       }
     } // end for
@@ -161,7 +161,7 @@ bool MxHilb::evaluateGradient(int n,
   else {
     for (int j = 0; j < n; j++) {
       g[j] = -1.0 / ((double)index + (double)j + 1.0);
-      if (isnan(g[j])) {
+      if (std::isnan(g[j])) {
         success = false;
       }
     } // end for

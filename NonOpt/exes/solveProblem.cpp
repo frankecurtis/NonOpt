@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
   }
 
   // Declare problem dimension
-  int const dimension = 10000;
+  int const dimension = 1000;
 
   // Declare problem
   std::shared_ptr<Problem> problem;

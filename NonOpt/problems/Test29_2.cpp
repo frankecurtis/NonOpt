@@ -58,7 +58,7 @@ bool Test29_2::evaluateObjective(int n,
   } // end for
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -82,7 +82,7 @@ bool Test29_2::evaluateObjectiveAndGradient(int n,
   g[index] = ((x[index] > 0.0) ? 1.0 : ((x[index] < 0.0) ? -1.0 : 0.0));
 
   // Return
-  return !isnan(f) && !isnan(g[index]);
+  return !std::isnan(f) && !std::isnan(g[index]);
 
 } // end evaluateObjectiveAndGradient
 
@@ -105,7 +105,7 @@ bool Test29_2::evaluateGradient(int n,
   g[index] = ((x[index] > 0.0) ? 1.0 : ((x[index] < 0.0) ? -1.0 : 0.0));
 
   // Return
-  return !isnan(g[index]);
+  return !std::isnan(g[index]);
 
 } // end evaluateGradient
 

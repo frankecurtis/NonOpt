@@ -79,7 +79,7 @@ void PointSetUpdateProximity::updatePointSet(const Options* options,
   setStatus(PS_UNSET);
 
   // Remove old points
-  while ((double)quantities->pointSet()->size() > size_factor_ * (double)quantities->numberOfVariables() || quantities->pointSet()->size() > size_maximum_) {
+  while ((double)quantities->pointSet()->size() > size_factor_ * (double)quantities->numberOfVariables() || (int)quantities->pointSet()->size() > size_maximum_) {
     quantities->pointSet()->erase(quantities->pointSet()->begin());
   }
 
