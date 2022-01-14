@@ -1,24 +1,98 @@
-Name        : check_derivatives
+Name        : print_level
+Type        : integer
+Value       : 2
+Lower bound : 0
+Upper bound : 3
+Description : Print level to standard output.
+Default     : 1
+
+Name        : print_level_file
+Type        : integer
+Value       : 0
+Lower bound : 0
+Upper bound : 3
+Description : Print level to file specified by print_file_name.
+Default     : 0
+
+Name        : qp_print_level
+Type        : integer
+Value       : 0
+Lower bound : 0
+Upper bound : 3
+Description : Print level for QP solver to standard output.
+Default     : 0
+
+Name        : qp_print_level_file
+Type        : integer
+Value       : 0
+Lower bound : 0
+Upper bound : 3
+Description : Print level for QP solver to file specified qp_print_file_name.
+Default     : 0
+
+Name        : print_file_name
+Type        : string
+Value       : nonopt.out
+Description : File name for printing if print_level_file > 0.
+Default     : nonopt.out
+
+Name        : qp_print_file_name
+Type        : string
+Value       : nonopt_qp.out
+Description : File name for printing for QP solver if qp_print_level_file > 0.
+Default     : nonopt_qp.out
+
+Name        : approximate_hessian_initial_scaling
 Type        : bool
 Value       : false
-Description : Determines whether to check derivatives at iterates.
-Default     : false.
+Description : Indicator of whether to scale initial matrix for approximate Hessian.
+Default     : false
 
-Name        : derivative_checker_increment
+Name        : evaluate_function_with_gradient
+Type        : bool
+Value       : false
+Description : Determines whether to evaluate function and gradient
+              at the same time (or separately).
+Default     : false
+
+Name        : cpu_time_limit
 Type        : double
-Value       : +1.000000e-08
+Value       : +1.000000e+04
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
-Description : Increment for derivative checker.
-Default     : 1e-08.
+Description : Limit on the number of CPU seconds.  This limit is only checked
+              at the beginning of an iteration, so the true CPU time limit
+              also depends on the time required to a complete an iteration.
+Default     : 1e+04
 
-Name        : derivative_checker_tolerance
+Name        : inexact_termination_factor_initial
 Type        : double
-Value       : +1.000000e-04
+Value       : +4.142136e-01
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
-Description : Tolerance for derivative checker.
-Default     : 1e-04.
+Description : Initial inexact termination factor.  Factor by which norm of
+              inexact subproblem solution needs to be within norm of true
+              (unknown) projection of origin onto convex hull of gradients.
+Default     : sqrt(2.0)-1.0
+
+Name        : inexact_termination_update_factor
+Type        : double
+Value       : +5.000000e-01
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+00
+Description : Factor for updating the inexact termination factor.  If the
+              conditions for updating the inexact termination factor are met,
+              then the inexact termination factor is multiplied by this fraction.
+Default     : 0.5
+
+Name        : inexact_termination_update_stepsize_threshold
+Type        : double
+Value       : +1.000000e-10
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Stepsize threshold for determining whether to reduce the
+              inexact termination factor.
+Default     : 1e-10
 
 Name        : iterate_norm_tolerance
 Type        : double
@@ -29,83 +103,7 @@ Description : Tolerance for determining divergence of the algorithm iterates.
               If the norm of an iterate is larger than this tolerance times
               the maximum of 1.0 and the norm of the initial iterate, then
               the algorithm terminates with a message of divergence.
-Default     : 1e+20.
-
-Name        : stationarity_tolerance
-Type        : double
-Value       : +1.000000e-04
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+50
-Description : Tolerance for determining stationarity.  If the stationarity
-              radius falls below this tolerance and a computed convex
-              combination of gradients has norm below this tolerance times
-              the parameter stationarity_tolerance_factor, then the algorithm
-              terminates with a message of stationarity.
-Default     : 1e-04.
-
-Name        : stationarity_tolerance_factor
-Type        : double
-Value       : +1.000000e+00
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+50
-Description : Factor for checking termination with respect to stationarity.
-              For further explanation, see description for the parameter
-              stationarity_tolerance.
-Default     : 1e+00.
-
-Name        : iteration_limit
-Type        : integer
-Value       : 10000
-Lower bound : 0
-Upper bound : 2147483647
-Description : Limit on the number of iterations that will be performed.
-              Note that each iteration might involve inner iterations.
-Default     : 1e+04.
-
-Name        : approximate_hessian_initial_scaling
-Type        : bool
-Value       : false
-Description : Indicator of whether to scale initial matrix for approximate Hessian.
-Default     : false.
-
-Name        : cpu_time_limit
-Type        : double
-Value       : +1.000000e+04
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+50
-Description : Limit on the number of CPU seconds.  This limit is only checked
-              at the beginning of an iteration, so the true CPU time limit
-              also depends on the time required to a complete an iteration.
-Default     : 1e+04.
-
-Name        : inexact_termination_factor_initial
-Type        : double
-Value       : +4.142136e-01
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+50
-Description : Initial inexact termination factor.  Factor by which norm of
-              inexact subproblem solution needs to be within norm of true
-              (unknown) projection of origin onto convex hull of gradients.
-Default     : sqrt(2.0)-1.0.
-
-Name        : inexact_termination_update_factor
-Type        : double
-Value       : +9.999000e-01
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+00
-Description : Factor for updating the inexact termination factor.  If the
-              conditions for updating the inexact termination factor are met,
-              then the inexact termination factor is multiplied by this fraction.
-Default     : 0.9999.
-
-Name        : inexact_termination_update_stepsize_threshold
-Type        : double
-Value       : +1.000000e-10
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+50
-Description : Stepsize threshold for determining whether to reduce the
-              inexact termination factor.
-Default     : 1e-10.
+Default     : 1e+20
 
 Name        : scaling_threshold
 Type        : double
@@ -115,7 +113,7 @@ Upper bound : +1.000000e+50
 Description : Threshold for determining objective scaling.  If norm of gradient
               at the initial point is greater than this value, then the objective
               is scaled so that the initial gradient norm is at this value.
-Default     : 1e+02.
+Default     : 1e+02
 
 Name        : stationarity_radius_initialization_factor
 Type        : double
@@ -126,7 +124,7 @@ Description : Factor for initializing the stationarity radius.  The initial
               stationarity radius is the maximum of this value times the
               inf-norm of the gradient at the initial point and
               stationarity_radius_initialization_minimum.
-Default     : 1e-01.
+Default     : 1e-01
 
 Name        : stationarity_radius_initialization_minimum
 Type        : double
@@ -134,7 +132,7 @@ Value       : +1.000000e-02
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Minimum initial value for stationarity radius.
-Default     : 1e-02.
+Default     : 1e-02
 
 Name        : stationarity_radius_update_factor
 Type        : double
@@ -144,7 +142,18 @@ Upper bound : +1.000000e+00
 Description : Factor for updating the stationarity radius.  If the conditions
               for updating the stationarity and trust region radii are met,
               then the stationarity radius is multiplied by this fraction.
-Default     : 1e-01.
+Default     : 1e-01
+
+Name        : stationarity_tolerance
+Type        : double
+Value       : +1.000000e-04
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Tolerance for determining stationarity.  If the stationarity
+              radius falls below this tolerance and other factors determined
+              by the termination strategy are met, then the algorithm
+              terminates with a message of stationarity.
+Default     : 1e-04
 
 Name        : trust_region_radius_initialization_factor
 Type        : double
@@ -155,7 +164,7 @@ Description : Factor for initializing the trust region radius.  The initial
               trust region radius is the maximum of this value times the
               inf-norm of the gradient at the initial point and
               trust_region_radius_initialization_minimum.
-Default     : 1e+04.
+Default     : 1e+04
 
 Name        : trust_region_radius_initialization_minimum
 Type        : double
@@ -163,7 +172,7 @@ Value       : +1.000000e-01
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Minimum initial value for trust region radius.
-Default     : 1e-01.
+Default     : 1e-01
 
 Name        : trust_region_radius_update_factor
 Type        : double
@@ -173,7 +182,7 @@ Upper bound : +1.000000e+00
 Description : Factor for updating the trust region radius.  If the conditions
               for updating the stationarity and trust region radii are met,
               then the trust region radius is multiplied by this fraction.
-Default     : 1e-01.
+Default     : 1e-01
 
 Name        : function_evaluation_limit
 Type        : integer
@@ -181,7 +190,7 @@ Value       : 100000
 Lower bound : 0
 Upper bound : 2147483647
 Description : Limit on the number of function evaluations performed.
-Default     : 1e+05.
+Default     : 1e+05
 
 Name        : gradient_evaluation_limit
 Type        : integer
@@ -189,19 +198,34 @@ Value       : 100000
 Lower bound : 0
 Upper bound : 2147483647
 Description : Limit on the number of gradient evaluations performed.
-Default     : 1e+05.
+Default     : 1e+05
 
-Name        : direction_computation
-Type        : string
-Value       : CuttingPlane
-Description : Direction computation strategy to use.
-Default     : CuttingPlane.
+Name        : iteration_limit
+Type        : integer
+Value       : 10000
+Lower bound : 0
+Upper bound : 2147483647
+Description : Limit on the number of iterations that will be performed.
+              Note that each iteration might involve inner iterations.
+Default     : 1e+04
 
 Name        : approximate_hessian_update
 Type        : string
 Value       : BFGS
 Description : Approximate Hessian update strategy to use.
 Default     : BFGS.
+
+Name        : derivative_checker
+Type        : string
+Value       : FiniteDifference
+Description : Derivative checker strategy to use.
+Default     : FiniteDifference.
+
+Name        : direction_computation
+Type        : string
+Value       : CuttingPlane
+Description : Direction computation strategy to use.
+Default     : CuttingPlane.
 
 Name        : line_search
 Type        : string
@@ -227,183 +251,11 @@ Value       : Dense
 Description : Symmetric matrix strategy to use.
 Default     : Dense.
 
-Name        : DCCP_add_far_points
-Type        : bool
-Value       : false
-Description : Determines whether to add points far outside stationarity
-              radius to point set during subproblem solve.
-Default     : false.
-
-Name        : DCCP_fail_on_iteration_limit
-Type        : bool
-Value       : false
-Description : Determines whether to fail if iteration limit exceeded.
-Default     : false.
-
-Name        : DCCP_fail_on_QP_failure
-Type        : bool
-Value       : false
-Description : Determines whether to fail if QP solver ever fails.
-Default     : false.
-
-Name        : DCCP_try_aggregation
-Type        : bool
-Value       : false
-Description : Determines whether to consider aggregating subgradients.
-Default     : false.
-
-Name        : DCCP_try_shortened_step
-Type        : bool
-Value       : true
-Description : Determines whether to consider shortened step if subproblem
-              solver does not terminate after considering full QP step.
-              Shortened stepsize set by DCCP_shortened_stepsize parameter.
-Default     : true.
-
-Name        : DCCP_aggregation_size_threshold
-Type        : double
-Value       : +1.000000e+01
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+50
-Description : Threshold for switching from aggregation to full point set.
-Default     : 1e+01.
-
-Name        : DCCP_downshift_constant
-Type        : double
-Value       : +1.000000e-02
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+50
-Description : Downshifting constant.  The linear term corresponding to an
-              added cut is set as the minimum of the linearization value
-              corresponding to the bundle point and the negative of this value
-              times the squared norm difference between the bundle point and
-              the current iterate.
-Default     : 1e-02.
-
-Name        : DCCP_shortened_stepsize
-Type        : double
-Value       : +1.000000e+00
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+50
-Description : Shortened stepsize.  If full QP step does not offer desired
-              objective reduction, then a shortened step corresponding to
-              this stepsize is considered if DCCP_try_shortened_step == true.
-              In particular, the shortened stepsize that is considered is
-              DCCP_shortened_stepsize*min(stat. rad.,||qp_step||_inf)/||qp_step||_inf.
-Default     : 1e+00.
-
-Name        : DCCP_step_acceptance_tolerance
-Type        : double
-Value       : +1.000000e-08
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+00
-Description : Tolerance for step acceptance.
-Default     : 1e-08.
-
-Name        : DCCP_inner_iteration_limit
-Type        : integer
-Value       : 20
-Lower bound : 0
-Upper bound : 2147483647
-Description : Limit on the number of inner iterations that will be performed.
-Default     : 20.
-
-Name        : DCG_fail_on_QP_failure
-Type        : bool
-Value       : false
-Description : Determines whether to fail if QP solver ever fails.
-Default     : false.
-
-Name        : DCGC_add_far_points
-Type        : bool
-Value       : false
-Description : Determines whether to add points far outside stationarity
-              radius to point set during subproblem solve.
-Default     : false.
-
-Name        : DCGC_fail_on_iteration_limit
-Type        : bool
-Value       : false
-Description : Determines whether to fail if iteration limit exceeded.
-Default     : false.
-
-Name        : DCGC_fail_on_QP_failure
-Type        : bool
-Value       : false
-Description : Determines whether to fail if QP solver ever fails.
-Default     : false.
-
-Name        : DCGC_try_aggregation
-Type        : bool
-Value       : false
-Description : Determines whether to consider aggregating subgradients.
-Default     : false.
-
-Name        : DCGC_try_shortened_step
-Type        : bool
-Value       : true
-Description : Determines whether to consider shortened step if subproblem
-              solver does not terminate after considering full QP step.
-              Shortened stepsize set by DCGC_shortened_stepsize parameter.
-Default     : true.
-
-Name        : DCGC_aggregation_size_threshold
-Type        : double
-Value       : +1.000000e+01
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+50
-Description : Threshold for switching from aggregation to full point set.
-Default     : 1e+01.
-
-Name        : DCGC_downshift_constant
-Type        : double
-Value       : +1.000000e-02
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+50
-Description : Downshifting constant.  The linear term corresponding to an
-              added cut is set as the objective value at the current iterate
-              minus this value times the squared norm difference between the
-              sampled point and the current iterate.
-Default     : 1e-02.
-
-Name        : DCGC_random_sample_factor
-Type        : double
-Value       : +1.000000e-02
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+50
-Description : Determines number of points to sample randomly in adaptive
-              gradient sampling scheme.  If >= 1, then factor is number
-              of points that will be sampled; otherwise, if < 1, then
-              number sampled is factor times number of variables (rounded up).
-Default     : 1e-02.
-
-Name        : DCGC_shortened_stepsize
-Type        : double
-Value       : +1.000000e+00
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+50
-Description : Shortened stepsize.  If full QP step does not offer desired
-              objective reduction, then a shortened step corresponding to
-              this stepsize is considered if DCGC_try_shortened_step == true.
-              In particular, the shortened stepsize that is considered is
-              DCGC_shortened_stepsize*min(stat. rad.,||qp_step||_inf)/||qp_step||_inf.
-Default     : 1e+00.
-
-Name        : DCGC_step_acceptance_tolerance
-Type        : double
-Value       : +1.000000e-08
-Lower bound : +0.000000e+00
-Upper bound : +1.000000e+00
-Description : Tolerance for step acceptance.
-Default     : 1e-08.
-
-Name        : DCGC_inner_iteration_limit
-Type        : integer
-Value       : 20
-Lower bound : 0
-Upper bound : 2147483647
-Description : Limit on the number of inner iterations that will be performed.
-Default     : 20.
+Name        : termination
+Type        : string
+Value       : Basic
+Description : Termination strategy to use.
+Default     : Basic.
 
 Name        : BFGS_fail_on_tolerance_violation
 Type        : bool
@@ -423,7 +275,7 @@ Default     : 1e-20.
 
 Name        : BFGS_correction_threshold_2
 Type        : double
-Value       : +1.000000e+02
+Value       : +1.000000e+08
 Lower bound : +1.000000e+00
 Upper bound : +1.000000e+50
 Description : BFGS correction threshold.  If BFGS update is corrected, then
@@ -500,6 +352,244 @@ Description : Tolerance for allowing a DFP update to occur.  If the inner
               least this tolerance times the product of the 2-norms of the
               displacements, then a DFP update occurs; else, it is skipped.
 Default     : 1e-20.
+
+Name        : DEFD_check_derivatives
+Type        : bool
+Value       : false
+Description : Determines whether to check derivatives at iterates.
+Default     : false.
+
+Name        : DEFD_increment
+Type        : double
+Value       : +1.000000e-08
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Increment for derivative checker.
+Default     : 1e-08.
+
+Name        : DEFD_tolerance
+Type        : double
+Value       : +1.000000e-04
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Tolerance for derivative checker.
+Default     : 1e-04.
+
+Name        : DCCP_add_far_points
+Type        : bool
+Value       : false
+Description : Determines whether to add points far outside stationarity
+              radius to point set during subproblem solve.
+Default     : false.
+
+Name        : DCCP_fail_on_iteration_limit
+Type        : bool
+Value       : false
+Description : Determines whether to fail if iteration limit exceeded.
+Default     : false.
+
+Name        : DCCP_fail_on_QP_failure
+Type        : bool
+Value       : false
+Description : Determines whether to fail if QP solver ever fails.
+Default     : false.
+
+Name        : DCCP_try_aggregation
+Type        : bool
+Value       : false
+Description : Determines whether to consider aggregating subgradients.
+Default     : false.
+
+Name        : DCCP_try_gradient_step
+Type        : bool
+Value       : true
+Description : Determines whether to consider gradient step before solving
+              cutting plane subproblem.
+              Gradient step stepsize set by DCCP_gradient_stepsize parameter.
+Default     : true.
+
+Name        : DCCP_try_shortened_step
+Type        : bool
+Value       : true
+Description : Determines whether to consider shortened step if subproblem
+              solver does not terminate after considering full QP step.
+              Shortened stepsize set by DCCP_shortened_stepsize parameter.
+Default     : true.
+
+Name        : DCCP_aggregation_size_threshold
+Type        : double
+Value       : +1.000000e+01
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Threshold for switching from aggregation to full point set.
+Default     : 1e+01.
+
+Name        : DCCP_downshift_constant
+Type        : double
+Value       : +1.000000e-02
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Downshifting constant.  The linear term corresponding to an
+              added cut is set as the minimum of the linearization value
+              corresponding to the bundle point and the negative of this value
+              times the squared norm difference between the bundle point and
+              the current iterate.
+Default     : 1e-02.
+
+Name        : DCCP_gradient_stepsize
+Type        : double
+Value       : +1.000000e-04
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Gradient stepsize.  If step computed using only the gradient
+              at the current iterate and this stepsize is acceptable,
+              then full cutting plane subproblem is avoided.  This scheme
+              is only considered if DCCP_try_gradient_step == true.
+Default     : 1e-04.
+
+Name        : DCCP_shortened_stepsize
+Type        : double
+Value       : +1.000000e-02
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Shortened stepsize.  If full QP step does not offer desired
+              objective reduction, then a shortened step corresponding to
+              this stepsize is considered if DCCP_try_shortened_step == true.
+              In particular, the shortened stepsize that is considered is
+              DCCP_shortened_stepsize*min(stat. rad.,||qp_step||_inf)/||qp_step||_inf.
+Default     : 1e-02.
+
+Name        : DCCP_step_acceptance_tolerance
+Type        : double
+Value       : +1.000000e-08
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+00
+Description : Tolerance for step acceptance.
+Default     : 1e-08.
+
+Name        : DCCP_inner_iteration_limit
+Type        : integer
+Value       : 20
+Lower bound : 0
+Upper bound : 2147483647
+Description : Limit on the number of inner iterations that will be performed.
+Default     : 20.
+
+Name        : DCG_fail_on_QP_failure
+Type        : bool
+Value       : false
+Description : Determines whether to fail if QP solver ever fails.
+Default     : false.
+
+Name        : DCGC_add_far_points
+Type        : bool
+Value       : false
+Description : Determines whether to add points far outside stationarity
+              radius to point set during subproblem solve.
+Default     : false.
+
+Name        : DCGC_fail_on_iteration_limit
+Type        : bool
+Value       : false
+Description : Determines whether to fail if iteration limit exceeded.
+Default     : false.
+
+Name        : DCGC_fail_on_QP_failure
+Type        : bool
+Value       : false
+Description : Determines whether to fail if QP solver ever fails.
+Default     : false.
+
+Name        : DCGC_try_aggregation
+Type        : bool
+Value       : false
+Description : Determines whether to consider aggregating subgradients.
+Default     : false.
+
+Name        : DCGC_try_gradient_step
+Type        : bool
+Value       : true
+Description : Determines whether to consider gradient step before solving
+              gradient combination subproblem.
+              Gradient step stepsize set by DCGC_gradient_stepsize parameter.
+Default     : true.
+
+Name        : DCGC_try_shortened_step
+Type        : bool
+Value       : true
+Description : Determines whether to consider shortened step if subproblem
+              solver does not terminate after considering full QP step.
+              Shortened stepsize set by DCGC_shortened_stepsize parameter.
+Default     : true.
+
+Name        : DCGC_aggregation_size_threshold
+Type        : double
+Value       : +1.000000e+01
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Threshold for switching from aggregation to full point set.
+Default     : 1e+01.
+
+Name        : DCGC_downshift_constant
+Type        : double
+Value       : +1.000000e-02
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Downshifting constant.  The linear term corresponding to an
+              added cut is set as the objective value at the current iterate
+              minus this value times the squared norm difference between the
+              sampled point and the current iterate.
+Default     : 1e-02.
+
+Name        : DCGC_gradient_stepsize
+Type        : double
+Value       : +1.000000e-04
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Gradient stepsize.  If step computed using only the gradient
+              at the current iterate and this stepsize is acceptable,
+              then full gradient combination subproblem is avoided.  This scheme
+              is only considered if DCGC_try_gradient_step == true.
+Default     : 1e-04.
+
+Name        : DCGC_random_sample_factor
+Type        : double
+Value       : +1.000000e-02
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Determines number of points to sample randomly in adaptive
+              gradient sampling scheme.  If >= 1, then factor is number
+              of points that will be sampled; otherwise, if < 1, then
+              number sampled is factor times number of variables (rounded up).
+Default     : 1e-02.
+
+Name        : DCGC_shortened_stepsize
+Type        : double
+Value       : +1.000000e-02
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Shortened stepsize.  If full QP step does not offer desired
+              objective reduction, then a shortened step corresponding to
+              this stepsize is considered if DCGC_try_shortened_step == true.
+              In particular, the shortened stepsize that is considered is
+              DCGC_shortened_stepsize*min(stat. rad.,||qp_step||_inf)/||qp_step||_inf.
+Default     : 1e-02.
+
+Name        : DCGC_step_acceptance_tolerance
+Type        : double
+Value       : +1.000000e-08
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+00
+Description : Tolerance for step acceptance.
+Default     : 1e-08.
+
+Name        : DCGC_inner_iteration_limit
+Type        : integer
+Value       : 2
+Lower bound : 0
+Upper bound : 2147483647
+Description : Limit on the number of inner iterations that will be performed.
+Default     : 2.
 
 Name        : LSB_fail_on_small_stepsize
 Type        : bool
@@ -675,6 +765,16 @@ Description : Size factor for removing points from point set.  If size of
               then the oldest members are removed.
 Default     : 2e+00.
 
+Name        : PSP_size_maximum
+Type        : integer
+Value       : 2147483647
+Lower bound : 0
+Upper bound : 2147483647
+Description : Size maximum for removing points from point set.  If size of
+              point set exceeds this number, then the oldest members are
+              removed.
+Default     : Infinity.
+
 Name        : QPDAS_fail_on_factorization_error
 Type        : bool
 Value       : false
@@ -772,8 +872,106 @@ Default     : 1e+06.
 
 Name        : SMLM_history
 Type        : integer
-Value       : 100
+Value       : 20
 Lower bound : 0
 Upper bound : 2147483647
 Description : Limited-memory history length.
-Default     : 100.
+Default     : 20.
+
+Name        : TB_objective_similarity_tolerance
+Type        : double
+Value       : +1.000000e-05
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Tolerance for determining objective similarity.  If the
+              difference between two consecutive objective values is less
+              than this tolerance times max{1,objective value}, then a
+              counter is increased.  If the counter exceeds
+              objective_similarity_limit, then the stationarity radius
+              is decreased or the algorithm terminates.
+Default     : 1e-05.
+
+Name        : TB_objective_tolerance
+Type        : double
+Value       : -1.000000e+50
+Lower bound : -1.000000e+50
+Upper bound : +1.000000e+50
+Description : Tolerance for objective function value.  Algorithm terminates
+              if unscaled objective falls below this tolerance.
+Default     : -Infinity.
+
+Name        : TB_stationarity_tolerance_factor
+Type        : double
+Value       : +1.000000e+00
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Factor for checking termination with respect to stationarity.
+              For further explanation, see description for the parameter
+              stationarity_tolerance.
+Default     : 1e+00.
+
+Name        : TB_objective_similarity_limit
+Type        : integer
+Value       : 10
+Lower bound : 0
+Upper bound : 2147483647
+Description : Limit on an objective similarity counter.  If the difference
+              between two consecutive objective values is less than
+              objective_similarity_tolerance times max{1,objective value},
+              then a counter is increased.  If the counter exceeds
+              objective_similarity_limit, then the stationarity
+              radius is decreased or the algorithm terminates.
+Default     : 10.
+
+Name        : TS_objective_similarity_tolerance
+Type        : double
+Value       : +1.000000e-05
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Tolerance for determining objective similarity.  If the
+              difference between two consecutive objective values is less
+              than this tolerance times max{1,objective value}, then a
+              counter is increased.  If the counter exceeds
+              objective_similarity_limit, then the stationarity radius
+              is decreased or the algorithm terminates.
+Default     : 1e-05.
+
+Name        : TS_objective_tolerance
+Type        : double
+Value       : -1.000000e+50
+Lower bound : -1.000000e+50
+Upper bound : +1.000000e+50
+Description : Tolerance for objective function value.  Algorithm terminates
+              if unscaled objective falls below this tolerance.
+Default     : -Infinity.
+
+Name        : TS_stationarity_tolerance_factor
+Type        : double
+Value       : +1.000000e+00
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Factor for checking termination with respect to stationarity.
+              For further explanation, see description for the parameter
+              stationarity_tolerance.
+Default     : 1e+00.
+
+Name        : TS_objective_similarity_limit
+Type        : integer
+Value       : 10
+Lower bound : 0
+Upper bound : 2147483647
+Description : Limit on an objective similarity counter.  If the difference
+              between two consecutive objective values is less than
+              objective_similarity_tolerance times max{1,objective value},
+              then a counter is increased.  If the counter exceeds
+              objective_similarity_limit, then the stationarity
+              radius is decreased or the algorithm terminates.
+Default     : 10.
+
+Name        : TS_solve_QP_every
+Type        : integer
+Value       : 10
+Lower bound : 1
+Upper bound : 2147483647
+Description : Dictates that QP should be solved every how many iterations.
+Default     : 10.
