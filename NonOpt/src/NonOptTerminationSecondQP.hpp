@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Frank E. Curtis
+// Copyright (C) 2022 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -13,8 +13,8 @@ namespace NonOpt
 {
 
 /**
-  * TerminationSecondQP class
-  */
+ * TerminationSecondQP class
+ */
 class TerminationSecondQP : public Termination
 {
 
@@ -22,16 +22,16 @@ public:
   /** @name Constructors */
   //@{
   /**
-    * Construct TerminationSecondQP
-    */
+   * Construct TerminationSecondQP
+   */
   TerminationSecondQP(){};
   //@}
 
   /** @name Destructor */
   //@{
   /**
-    * Destruct
-    */
+   * Destruct
+   */
   ~TerminationSecondQP(){};
   //@}
 
@@ -112,16 +112,16 @@ public:
 
 private:
   /** @name Default compiler generated methods
-    * (Hidden to avoid implicit creation/calling.)
-    */
+   * (Hidden to avoid implicit creation/calling.)
+   */
   //@{
   /**
-    * Copy constructor
-    */
+   * Copy constructor
+   */
   TerminationSecondQP(const TerminationSecondQP&);
   /**
-    * Overloaded equals operator
-    */
+   * Overloaded equals operator
+   */
   void operator=(const TerminationSecondQP&);
   //@}
 

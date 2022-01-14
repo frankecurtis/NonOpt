@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Frank E. Curtis
+// Copyright (C) 2022 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -26,8 +26,8 @@ class FileReport;
 class StreamReport;
 
 /**
-  * Reporter class
-  */
+ * Reporter class
+ */
 class Reporter
 {
 
@@ -35,27 +35,27 @@ public:
   /** @name Constructors */
   //@{
   /**
-    * Declare Reporter
-    */
+   * Declare Reporter
+   */
   Reporter();
   //@}
 
   /** @name Destructor */
   //@{
   /**
-    * Delete Reporter
-    */
+   * Delete Reporter
+   */
   ~Reporter();
   //@}
 
   /** @name Print methods */
   //@{
   /**
-    * printf
-    * \param[in] type is ReportType at which to print
-    * \param[in] level is ReportLevel at which to print
-    * \param[in] format is formatting string
-    */
+   * printf
+   * \param[in] type is ReportType at which to print
+   * \param[in] level is ReportLevel at which to print
+   * \param[in] format is formatting string
+   */
   void printf(ReportType type,
               ReportLevel level,
               const char* format,
@@ -65,19 +65,19 @@ public:
   /** @name Add methods */
   //@{
   /**
-    * Add Report
-    * \param[in] report is pointer to Report to add
-    * \return indicator of success (true) or failure (false)
-    */
+   * Add Report
+   * \param[in] report is pointer to Report to add
+   * \return indicator of success (true) or failure (false)
+   */
   bool addReport(const std::shared_ptr<Report> report);
   /**
-    * Add FileReport
-    * \param[in] report_name is name of FileReport to add
-    * \param[in] file_name is name of file for FileReport to add
-    * \param[in] type is ReportType to set for FileReport
-    * \param[in] default_level is ReportLevel to set for FileReport
-    * \return indicator of success (true) or failure (false)
-    */
+   * Add FileReport
+   * \param[in] report_name is name of FileReport to add
+   * \param[in] file_name is name of file for FileReport to add
+   * \param[in] type is ReportType to set for FileReport
+   * \param[in] default_level is ReportLevel to set for FileReport
+   * \return indicator of success (true) or failure (false)
+   */
   bool addFileReport(std::string report_name,
                      std::string file_name,
                      ReportType type,
@@ -87,41 +87,41 @@ public:
   /** @name Get methods */
   //@{
   /**
-    * Get Report
-    * \param[in] name is name of report to get
-    * \return pointer to Report with report_name, if it exists; else, it is null
-    */
+   * Get Report
+   * \param[in] name is name of report to get
+   * \return pointer to Report with report_name, if it exists; else, it is null
+   */
   std::shared_ptr<Report> report(std::string name);
   //@}
 
   /** @name Flush buffer method */
   //@{
   /**
-    * Flush buffer
-    */
+   * Flush buffer
+   */
   void flushBuffer() const;
   //@}
 
   /** @name Delete method */
   //@{
   /**
-    * Delete Reports
-    */
+   * Delete Reports
+   */
   void deleteReports();
   //@}
 
 private:
   /** @name Default compiler generated methods
-    * (Hidden to avoid implicit creation/calling.)
-    */
+   * (Hidden to avoid implicit creation/calling.)
+   */
   //@{
   /**
-    * Copy constructor
-    */
+   * Copy constructor
+   */
   Reporter(const Reporter&);
   /**
-    * Overloaded equals operator
-    */
+   * Overloaded equals operator
+   */
   void operator=(const Reporter&);
   //@}
 
@@ -133,12 +133,12 @@ private:
   /** @name Private methods */
   //@{
   /**
-    * Print list
-    * \param[in] type is ReportType at which to print
-    * \param[in] level is ReportLevel at which to print
-    * \param[in] format is formatting string
-    * \param[in] lst is list of strings to print
-    */
+   * Print list
+   * \param[in] type is ReportType at which to print
+   * \param[in] level is ReportLevel at which to print
+   * \param[in] format is formatting string
+   * \param[in] lst is list of strings to print
+   */
   void printList(ReportType type,
                  ReportLevel level,
                  const char* format,
@@ -148,8 +148,8 @@ private:
 }; // end Reporter
 
 /**
-  * Report class
-  */
+ * Report class
+ */
 class Report
 {
 
@@ -157,11 +157,11 @@ public:
   /** @name Constructors */
   //@{
   /**
-    * Construct Report
-    * \param[in] name is name of report
-    * \param[in] type is ReportType of report
-    * \param[in] level is ReportLevel of report
-    */
+   * Construct Report
+   * \param[in] name is name of report
+   * \param[in] type is ReportType of report
+   * \param[in] level is ReportLevel of report
+   */
   Report(std::string name,
          ReportType type,
          ReportLevel level)
@@ -173,27 +173,27 @@ public:
   /** @name Destructor */
   //@{
   /**
-    * Delete Report
-    */
+   * Delete Report
+   */
   virtual ~Report(){};
   //@}
 
   /** @name Get methods */
   //@{
   /**
-    * Get name
-    * \return is name of Report as string
-    */
+   * Get name
+   * \return is name of Report as string
+   */
   inline std::string name() { return name_; };
   //@}
 
   /** @name Set methods */
   //@{
   /**
-    * Set type and level
-    * \param[in] type is ReportType of print level to set
-    * \param[in] level is ReportLevel of print level to set
-    */
+   * Set type and level
+   * \param[in] type is ReportType of print level to set
+   * \param[in] level is ReportLevel of print level to set
+   */
   inline void setTypeAndLevel(ReportType type,
                               ReportLevel level)
   {
@@ -205,11 +205,11 @@ public:
   /** @name Acceptance method */
   //@{
   /**
-    * Checks if (type,level) pair is accepted by report
-    * \param[in] type is ReportType of query
-    * \param[in] level is ReportLevel of query
-    * \return indicator of success (true) or failure (false)
-    */
+   * Checks if (type,level) pair is accepted by report
+   * \param[in] type is ReportType of query
+   * \param[in] level is ReportLevel of query
+   * \return indicator of success (true) or failure (false)
+   */
   bool isAccepted(ReportType type,
                   ReportLevel level) const;
   //@}
@@ -217,12 +217,12 @@ public:
   /** @name Print method */
   //@{
   /**
-    * Print list
-    * \param[in] type is ReportType at which to print
-    * \param[in] level is ReportLevel at which to print
-    * \param[in] format is formatting string
-    * \param[in] lst is list of strings to print
-    */
+   * Print list
+   * \param[in] type is ReportType at which to print
+   * \param[in] level is ReportLevel at which to print
+   * \param[in] format is formatting string
+   * \param[in] lst is list of strings to print
+   */
   virtual void printList(ReportType type,
                          ReportLevel level,
                          const char* format,
@@ -232,35 +232,35 @@ public:
   /** @name Flush buffer method */
   //@{
   /**
-    * Flush buffer
-    */
+   * Flush buffer
+   */
   virtual void flushBuffer() = 0;
   //@}
 
   /** @name Close report method */
   //@{
   /**
-    * Close report
-    */
+   * Close report
+   */
   virtual void close() = 0;
   //@}
 
 private:
   /** @name Default compiler generated methods
-    * (Hidden to avoid implicit creation/calling.)
-    */
+   * (Hidden to avoid implicit creation/calling.)
+   */
   //@{
   /**
-    * Constructor with no arguments
-    */
+   * Constructor with no arguments
+   */
   Report();
   /**
-    * Copy constructor
-    */
+   * Copy constructor
+   */
   Report(const Report&);
   /**
-    * Overloaded equals operator
-    */
+   * Overloaded equals operator
+   */
   void operator=(const Report&);
   //@}
 
@@ -276,8 +276,8 @@ private:
 }; // end Report
 
 /**
-  * FileReport class
-  */
+ * FileReport class
+ */
 class FileReport : public Report
 {
 
@@ -285,11 +285,11 @@ public:
   /** @name Constructors */
   //@{
   /**
-    * Construct FileReport
-    * \param[in] name is name of report
-    * \param[in] type is ReportType of report
-    * \param[in] level is ReportLevel of report
-    */
+   * Construct FileReport
+   * \param[in] name is name of report
+   * \param[in] type is ReportType of report
+   * \param[in] level is ReportLevel of report
+   */
   FileReport(std::string name,
              ReportType type,
              ReportLevel level)
@@ -300,30 +300,30 @@ public:
   /** @name Destructor */
   //@{
   /**
-    * Delete FileReport
-    */
+   * Delete FileReport
+   */
   ~FileReport();
   //@}
 
   /** @name Open methods */
   //@{
   /**
-    * Open file
-    * \param[in] name is name of file to open
-    * \return indicator of success (true) or failure (false)
-    */
+   * Open file
+   * \param[in] name is name of file to open
+   * \return indicator of success (true) or failure (false)
+   */
   bool open(const char* name);
   //@}
 
   /** @name Print method */
   //@{
   /**
-    * Print list
-    * \param[in] type is ReportType at which to print
-    * \param[in] level is ReportLevel at which to print
-    * \param[in] format is formatting string
-    * \param[in] lst is list of strings to print
-    */
+   * Print list
+   * \param[in] type is ReportType at which to print
+   * \param[in] level is ReportLevel at which to print
+   * \param[in] format is formatting string
+   * \param[in] lst is list of strings to print
+   */
   void printList(ReportType type,
                  ReportLevel level,
                  const char* format,
@@ -333,35 +333,35 @@ public:
   /** @name Flush buffer methods */
   //@{
   /**
-    * Flush buffer
-    */
+   * Flush buffer
+   */
   void flushBuffer();
   //@}
 
   /** @name Close report methods */
   //@{
   /**
-    * Close report
-    */
+   * Close report
+   */
   void close();
   //@}
 
 private:
   /** @name Default compiler generated methods
-    * (Hidden to avoid implicit creation/calling.)
-    */
+   * (Hidden to avoid implicit creation/calling.)
+   */
   //@{
   /**
-    * Constructor with no arguments
-    */
+   * Constructor with no arguments
+   */
   FileReport();
   /**
-    * Copy constructor
-    */
+   * Copy constructor
+   */
   FileReport(const FileReport&);
   /**
-    * Overloaded equals operator
-    */
+   * Overloaded equals operator
+   */
   void operator=(const FileReport&);
   //@}
 
@@ -375,8 +375,8 @@ private:
 }; // end FileReport
 
 /**
-  * StreamReport class
-  */
+ * StreamReport class
+ */
 class StreamReport : public Report
 {
 
@@ -384,11 +384,11 @@ public:
   /** @name Constructors */
   //@{
   /**
-    * Declare StreamReport
-    * \param[in] name is name of report
-    * \param[in] type is ReportType of report
-    * \param[in] level is ReportLevel of report
-    */
+   * Declare StreamReport
+   * \param[in] name is name of report
+   * \param[in] type is ReportType of report
+   * \param[in] level is ReportLevel of report
+   */
   StreamReport(std::string name,
                ReportType type,
                ReportLevel level)
@@ -399,29 +399,29 @@ public:
   /** @name Destructor */
   //@{
   /**
-    * Delete StreamReport
-    */
+   * Delete StreamReport
+   */
   ~StreamReport(){};
   //@}
 
   /** @name Set methods */
   //@{
   /**
-    * Set stream
-    * \param[in] os is ostream at which to set stream for report
-    */
+   * Set stream
+   * \param[in] os is ostream at which to set stream for report
+   */
   inline void setStream(std::ostream* os) { os_ = os; };
   //@}
 
   /** @name Print method */
   //@{
   /**
-    * Print list
-    * \param[in] type is ReportType at which to print
-    * \param[in] level is ReportLevel at which to print
-    * \param[in] format is formatting string
-    * \param[in] lst is list of strings to print
-    */
+   * Print list
+   * \param[in] type is ReportType at which to print
+   * \param[in] level is ReportLevel at which to print
+   * \param[in] format is formatting string
+   * \param[in] lst is list of strings to print
+   */
   void printList(ReportType type,
                  ReportLevel level,
                  const char* format,
@@ -431,35 +431,35 @@ public:
   /** @name Flush buffer methods */
   //@{
   /**
-    * Flush buffer
-    */
+   * Flush buffer
+   */
   void flushBuffer();
   //@}
 
   /** @name Close report methods */
   //@{
   /**
-    * Close report
-    */
+   * Close report
+   */
   void close(){};
   //@}
 
 private:
   /** @name Default compiler generated methods
-    * (Hidden to avoid implicit creation/calling.)
-    */
+   * (Hidden to avoid implicit creation/calling.)
+   */
   //@{
   /**
-    * Constructor with no arguments
-    */
+   * Constructor with no arguments
+   */
   StreamReport();
   /**
-    * Copy constructor
-    */
+   * Copy constructor
+   */
   StreamReport(const StreamReport&);
   /**
-    * Overloaded equals operator
-    */
+   * Overloaded equals operator
+   */
   void operator=(const StreamReport&);
   //@}
 

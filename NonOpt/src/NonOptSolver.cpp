@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Frank E. Curtis
+// Copyright (C) 2022 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -480,7 +480,7 @@ void NonOptSolver::printHeader()
   quantities_.printHeader(&reporter_);
 
   // Print break
-  reporter_.printf(R_NL,R_BASIC,"\n");
+  reporter_.printf(R_NL, R_BASIC, "\n");
 
   // Print strategies header
   strategies_.printHeader(&reporter_);

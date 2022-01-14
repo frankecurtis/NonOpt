@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Frank E. Curtis
+// Copyright (C) 2022 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -38,13 +38,13 @@ void PointSetUpdateProximity::addOptions(Options* options)
 
   // Add integer options
   options->addIntegerOption("PSP_size_maximum",
-                           NONOPT_INT_INFINITY,
-                           0.0,
-                           NONOPT_INT_INFINITY,
-                           "Size maximum for removing points from point set.  If size of\n"
-                           "              point set exceeds this number, then the oldest members are\n"
-                           "              removed.\n"
-                           "Default     : Infinity.");
+                            NONOPT_INT_INFINITY,
+                            0.0,
+                            NONOPT_INT_INFINITY,
+                            "Size maximum for removing points from point set.  If size of\n"
+                            "              point set exceeds this number, then the oldest members are\n"
+                            "              removed.\n"
+                            "Default     : Infinity.");
 
 } // end addOptions
 

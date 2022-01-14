@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Frank E. Curtis
+// Copyright (C) 2022 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -13,8 +13,8 @@ namespace NonOpt
 {
 
 /**
-  * SymmetricMatrixLimitedMemory class
-  */
+ * SymmetricMatrixLimitedMemory class
+ */
 class SymmetricMatrixLimitedMemory : public SymmetricMatrix
 {
 
@@ -22,8 +22,8 @@ public:
   /** @name Constructors */
   //@{
   /**
-    * Construct SymmetricMatrixLimitedMemory
-    */
+   * Construct SymmetricMatrixLimitedMemory
+   */
   SymmetricMatrixLimitedMemory()
     : compact_form_factorized_(false),
       size_(-1),
@@ -47,8 +47,8 @@ public:
   /** @name Destructor */
   //@{
   /**
-    * Delete array
-    */
+   * Delete array
+   */
   ~SymmetricMatrixLimitedMemory();
   //@}
 
@@ -96,19 +96,19 @@ public:
   void const columnOfInverse(int column_index,
                              Vector& column);
   /**
-    * Get element of symmetric matrix
-    * \param[in] row_index is row index number
-    * \param[in] column_index is column index number
-    * \return (row_index,column_index) element of matrix
-    */
+   * Get element of symmetric matrix
+   * \param[in] row_index is row index number
+   * \param[in] column_index is column index number
+   * \return (row_index,column_index) element of matrix
+   */
   double const element(int row_index,
                        int column_index);
   /**
-    * Get element of symmetric matrix inverse
-    * \param[in] row_index is row index number
-    * \param[in] column_index is column index number
-    * \return (row_index,column_index) element of matrix
-    */
+   * Get element of symmetric matrix inverse
+   * \param[in] row_index is row index number
+   * \param[in] column_index is column index number
+   * \return (row_index,column_index) element of matrix
+   */
   double const elementOfInverse(int row_index,
                                 int column_index);
   /**
@@ -143,26 +143,26 @@ public:
    */
   std::string name() { return "LimitedMemory"; };
   /**
-    * Get number of rows
-    * \return number of rows of the matrix
-    */
+   * Get number of rows
+   * \return number of rows of the matrix
+   */
   inline int const size() const { return size_; };
   //@}
 
   /** @name Modify methods */
   //@{
   /**
-    * Set as diagonal matrix
-    * \param[in] size is size of matrix to create
-    * \param[in] value is value to set in diagonal elements (and set all else zero)
-    */
+   * Set as diagonal matrix
+   * \param[in] size is size of matrix to create
+   * \param[in] value is value to set in diagonal elements (and set all else zero)
+   */
   void setAsDiagonal(int size,
                      double value);
   /**
-    * Update approximation
-    * \param[in] s is reference to Vector representing iteration displacement
-    * \param[in] y is reference to Vector representing gradient displacement
-    */
+   * Update approximation
+   * \param[in] s is reference to Vector representing iteration displacement
+   * \param[in] y is reference to Vector representing gradient displacement
+   */
   void update(const Vector& s,
               const Vector& y);
   //@}
@@ -170,26 +170,26 @@ public:
   /** @name Print methods */
   //@{
   /**
-    * Print array
-    * \param[in] reporter is pointer to Reporter object from NonOpt
-    * \param[in] name is name of Symmetric Matrix to print
-    */
+   * Print array
+   * \param[in] reporter is pointer to Reporter object from NonOpt
+   * \param[in] name is name of Symmetric Matrix to print
+   */
   void print(const Reporter* reporter,
              std::string name) const;
   //@}
 
 private:
   /** @name Default compiler generated methods
-    * (Hidden to avoid implicit creation/calling.)
-    */
+   * (Hidden to avoid implicit creation/calling.)
+   */
   //@{
   /**
-    * Copy constructor
-    */
+   * Copy constructor
+   */
   SymmetricMatrixLimitedMemory(const SymmetricMatrixLimitedMemory&);
   /**
-    * Overloaded equals operator
-    */
+   * Overloaded equals operator
+   */
   void operator=(const SymmetricMatrixLimitedMemory&);
   //@}
 

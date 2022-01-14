@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Frank E. Curtis
+// Copyright (C) 2022 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -202,7 +202,7 @@ void QPSolverDualActiveSet::initializeData(int gamma_length)
   // Set length parameters
   gamma_length_ = gamma_length;
   system_solution_length_ = 3 * gamma_length_ + 1;
-  factor_length_ = 2*system_solution_length_; // system_solution_length_ * system_solution_length_;
+  factor_length_ = 2 * system_solution_length_; // system_solution_length_ * system_solution_length_;
 
   // Initialize problem data
   matrix_ = nullptr;
@@ -1612,7 +1612,7 @@ bool QPSolverDualActiveSet::choleskyAugment(double system_vector[],
     // Delete factor_ and resize
     delete[] factor_;
     factor_ = nullptr;
-    int factor_length_new = 2*factor_length_;
+    int factor_length_new = 2 * factor_length_;
     factor_ = new double[factor_length_new];
 
     // Copy temporary vector back to factor_
@@ -2016,7 +2016,7 @@ void QPSolverDualActiveSet::evaluateSystemVector(int set,
     Vector temporary_vector(gamma_length_);
 
     // Evaluate temporary vector
-    matrix_->matrixVectorProductOfInverse(*vector_list_[index],temporary_vector);
+    matrix_->matrixVectorProductOfInverse(*vector_list_[index], temporary_vector);
 
     // Set "omega" values, i.e.,
     for (int i = 0; i < (int)omega_positive_.size(); i++) {

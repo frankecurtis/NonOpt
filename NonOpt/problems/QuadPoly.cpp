@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Frank E. Curtis
+// Copyright (C) 2022 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -61,7 +61,7 @@ QuadPoly::QuadPoly(int n,
 
   // Set random elements of constant
   for (int i = number_of_active_affine_; i < number_of_affine_; i++) {
-    constant_[i] = -pow(normal(generator),2.0);
+    constant_[i] = -pow(normal(generator), 2.0);
   }
 
   // Initialize and set matrix

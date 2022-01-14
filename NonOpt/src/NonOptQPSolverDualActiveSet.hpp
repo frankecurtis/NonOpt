@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Frank E. Curtis
+// Copyright (C) 2022 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -174,8 +174,8 @@ public:
     primal_solution_feasible_best_.scale(0.0);
   };
   /**
-  * Set matrix
-  * \param[in] matrix is pointer to SymmetricMatrix, for which "W" is the "Inverse"
+   * Set matrix
+   * \param[in] matrix is pointer to SymmetricMatrix, for which "W" is the "Inverse"
    */
   void setMatrix(const std::shared_ptr<SymmetricMatrix> matrix) { matrix_ = matrix; };
   /**

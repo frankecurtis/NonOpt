@@ -1,4 +1,4 @@
-// Copyright (C) 2019 Frank E. Curtis
+// Copyright (C) 2022 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -97,19 +97,19 @@ public:
   virtual void const columnOfInverse(int column_index,
                                      Vector& column) = 0;
   /**
-    * Get element of symmetric matrix
-    * \param[in] row_index is row index number
-    * \param[in] column_index is column index number
-    * \return (row_index,column_index) element of matrix
-    */
+   * Get element of symmetric matrix
+   * \param[in] row_index is row index number
+   * \param[in] column_index is column index number
+   * \return (row_index,column_index) element of matrix
+   */
   virtual double const element(int row_index,
                                int column_index) = 0;
   /**
-    * Get element of symmetric matrix inverse
-    * \param[in] row_index is row index number
-    * \param[in] column_index is column index number
-    * \return (row_index,column_index) element of matrix
-    */
+   * Get element of symmetric matrix inverse
+   * \param[in] row_index is row index number
+   * \param[in] column_index is column index number
+   * \return (row_index,column_index) element of matrix
+   */
   virtual double const elementOfInverse(int row_index,
                                         int column_index) = 0;
   /**
@@ -144,9 +144,9 @@ public:
    */
   virtual std::string name() = 0;
   /**
-    * Get number of rows
-    * \return number of rows of the matrix
-    */
+   * Get number of rows
+   * \return number of rows of the matrix
+   */
   virtual int const size() const = 0;
   /**
    * Get status
@@ -158,10 +158,10 @@ public:
   /** @name Modify methods */
   //@{
   /**
-    * Set as diagonal matrix
-    * \param[in] size is size of matrix to create
-    * \param[in] value is value to set in diagonal elements (and set all else zero)
-    */
+   * Set as diagonal matrix
+   * \param[in] size is size of matrix to create
+   * \param[in] value is value to set in diagonal elements (and set all else zero)
+   */
   virtual void setAsDiagonal(int size,
                              double value) = 0;
   /**
@@ -170,10 +170,10 @@ public:
    */
   inline void setStatus(SM_Status status) { status_ = status; };
   /**
-    * Update approximation
-    * \param[in] s is reference to Vector representing iteration displacement
-    * \param[in] y is reference to Vector representing gradient displacement
-    */
+   * Update approximation
+   * \param[in] s is reference to Vector representing iteration displacement
+   * \param[in] y is reference to Vector representing gradient displacement
+   */
   virtual void update(const Vector& s,
                       const Vector& y) = 0;
   //@}
@@ -181,10 +181,10 @@ public:
   /** @name Print methods */
   //@{
   /**
-    * Print array
-    * \param[in] reporter is pointer to Reporter object from NonOpt
-    * \param[in] name is name of Symmetric Matrix to print
-    */
+   * Print array
+   * \param[in] reporter is pointer to Reporter object from NonOpt
+   * \param[in] name is name of Symmetric Matrix to print
+   */
   virtual void print(const Reporter* reporter,
                      std::string name) const = 0;
   //@}
