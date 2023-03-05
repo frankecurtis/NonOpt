@@ -272,7 +272,7 @@ void StreamReport::printList(ReportType type,
 
   // Print string list
   if (os_) {
-    vsprintf(buffer_, format, lst);
+    vsnprintf(buffer_, 1024, format, lst);
     *os_ << buffer_;
   }
 

@@ -30,7 +30,7 @@ all: $(EXES)
 
 # Dependence for executable
 $(EXES): % : %.o
-	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(NonOptProblemsLIB) -L "$(LAPACKDIR)" -ldl -lblas -llapack
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -o $@ $< $(NonOptLIB) $(NonOptProblemsLIB) -ldl -lblas -llapack
 
 # Dependencies for executable
 $(EXES): $(NonOptLIB) $(NonOptProblemsLIB)

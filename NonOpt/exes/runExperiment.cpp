@@ -293,7 +293,7 @@ int main()
                   } // end switch
 
                   // Set rest of output file name
-                  sprintf(out_file, "%s_%s_%s_%s_%s_%s_%s_%s.out", out_file, direction_computation_name.c_str(), approximate_hessian_update_name.c_str(), line_search_name.c_str(), point_set_update_name.c_str(), qp_solver_name.c_str(), symmetric_matrix_name.c_str(), termination_name.c_str());
+                  snprintf(out_file, 200, "%s_%s_%s_%s_%s_%s_%s_%s.out", out_file, direction_computation_name.c_str(), approximate_hessian_update_name.c_str(), line_search_name.c_str(), point_set_update_name.c_str(), qp_solver_name.c_str(), symmetric_matrix_name.c_str(), termination_name.c_str());
 
                   // Open output file
                   r->open(out_file);
