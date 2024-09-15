@@ -17,6 +17,7 @@ extern "C"
   void dsymv_(char* u, int* n, double* a, double* A, int* m, double* x, int* incx, double* b, double* y, int* incy);
   void dsyr_(char* u, int* n, double* a, double* x, int* incx, double* A, int* m);
   void dsyr2_(char* u, int* n, double* a, double* x, int* incx, double* y, int* incy, double* A, int* m);
+  void dsysv_(char* u, int* n, int* r, double* a, int* la, int* piv, double* b, int* lb, double* work, int* lw, int* info);
   void dsytrf_(char* u, int* n, double* a, int* m, int* o, double* w, int* l, int* f);
   void dsytrs_(char* u, int* n, int* r, double* a, int* m, int* o, double* b, int* d, int* f);
   void dtrsv_(char* u, char* t, char* d, int* n, double* A, int* m, double* x, int* incx);

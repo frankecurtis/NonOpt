@@ -165,6 +165,15 @@ public:
   void setAsDiagonal(int size,
                      double value);
   /**
+   * Set element
+   * \param[in] row_index is row index number
+   * \param[in] column_index is column index number
+   * \param[in] value is value to set (row_index,column_index) element
+   */
+  void setElement(int row_index,
+                  int column_index,
+                  double value);                  
+  /**
    * Update approximation
    * \param[in] s is reference to Vector representing iteration displacement
    * \param[in] y is reference to Vector representing gradient displacement

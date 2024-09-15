@@ -12,7 +12,7 @@
 #include <cmath>
 #include <random>
 
-#include "NonOptQPSolverDualActiveSet.hpp"
+#include "NonOptQPSolverInteriorPoint.hpp"
 #include "NonOptSymmetricMatrix.hpp"
 #include "NonOptSymmetricMatrixDense.hpp"
 
@@ -60,7 +60,7 @@ int testQPSolverImplementation(int option)
   Options options;
 
   // Declare QP solver object
-  QPSolverDualActiveSet q;
+  QPSolverInteriorPoint q;
 
   // Add options
   q.addOptions(&options);
