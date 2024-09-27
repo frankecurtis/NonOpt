@@ -1080,38 +1080,74 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
         printf("%e\n", product.values()[i] - test_rhs.values()[i]);
       }
       */
-      std::cout << "Hi0!!" << std::endl;
+
 
       Vector delta( 2 * total_length + 1);
       solveLinearSystem( 2 * total_length + 1, matrix_J_.valuesModifiable(), residual.valuesModifiable(), delta.valuesModifiable() );
-      std::cout << "Hi1!!" << std::endl;
 
       Vector delta_x(total_length);
       Vector delta_z(total_length);
-      //double delta_y;
-      std::cout << "Hi2!!" << std::endl;
 
       for (int i = 0; i < total_length; i++){
         delta_x.set(i, delta.values()[i]);
         delta_z.set(i, delta.values()[i+ total_length + 1]);
       }
-      //delta_y = delta.values()[total_length];
-      std::cout << "Hi3!!" << std::endl;
+      double delta_y = delta.values()[total_length];
 
-      delta.print(reporter, "delta=");
-      delta_x.print(reporter, "deltax=");
-      delta_z.print(reporter, "deltaz=");
+      //delta.print(reporter, "delta=");
+      //delta_x.print(reporter, "deltax=");
+      //delta_z.print(reporter, "deltaz=");
+      //std::cout << "deltay=" << delta_y << std::endl;
 
-      std::cout << "Hi4!!" << std::endl;
+      double alpha_x;
+      double alpha_z;
+      double bar_alpha;
+      double alpha;
 
-     }
+      Vector vectorCompare1(total_length + 1);
+      Vector vectorCompare2(total_length + 1);
+      for (int i = 0; i < total_length; i++){
+        vectorCompare1.set(i, -delta_x.values()[i] / ( beta_ * vector_x_.values()[i]));
+        vectorCompare2.set(i, -delta_z.values()[i] / ( beta_ * vector_z_.values()[i]));
+      }      
+      vectorCompare1.set(total_length, 1.0);
+      vectorCompare2.set(total_length, 1.0);
+
+      alpha_x = vectorCompare1.max();
+      alpha_z = vectorCompare2.max();
+      bar_alpha = fmin( alpha_x, alpha_z);
+      
+
+      // ****SOLVE QP****
+
+
+      alpha=0.5;
+      vector_x_.addScaledVector(alpha, delta_x);
+      scalar_y_ += alpha*delta_y;
+      vector_z_.addScaledVector(alpha, delta_z);
+
+      if (residual.normInf() < tol_in_){
+        break;
+      }
+      
+     }//end in-while
      
-    }
+      Vector residual_Out( 2 * total_length + 1);
+      for (int i = 0; i < total_length; i++){
+        residual_Out.set(i, r_dual_.values()[i]);
+        residual_Out.set(i + total_length +1, r_cent_.values()[i] );
+      }
+      residual_Out.set(total_length, r_pri_);
+
+      if (residual_Out.normInf() < tol_out_){
+        break;
+      }
+    }//end out-while
     
 
 
 
-    /**
+    /*
      * END for Lara
     */
 
@@ -2696,7 +2732,7 @@ void QPSolverInteriorPoint::solveLinearSystem(int size,
   int nrhs = 1;
   int increment = 1;
   int info;
-  int piv_info [3];
+  int piv_info [size];
   int lw;
   double matrix_copy [length_squared];
   double work;
