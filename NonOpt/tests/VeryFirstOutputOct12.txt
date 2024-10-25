@@ -1,0 +1,1056 @@
+gamma length:  20
+omega length:  10
+total length:  50
+Out_Ite              In_Ite           Min_Val_x           Min_Val_z             mu          Inf||r_p||          Inf||r_d||          Inf||r_c||        Inf||r_c+G||          Inf||d_x||          Inf||d_y||          Inf||d_z||          Bar_alph_x          Bar_alph_z              alph_x              alph_y              alph_z
+scalar delta:  1.000000e+00
+1                   1                 0.6                 0.6                   1                   9                   1            0.602604            0.592604            0.921718            0.887893                   1            0.433972                 0.4            0.433972            0.922083                 0.4
+1                   2                0.36                0.36                   1             5.09425                 0.6             0.36437             0.35437            0.512922           0.0192705                 0.6            0.467907                 0.4            0.467907          -0.0312374                 0.4
+1                   3               0.216               0.216                   1             2.71061                0.36            0.221833            0.211833            0.272589            0.152584                0.36            0.535129                 0.4            0.535129            0.342618                 0.4
+1                   4              0.1296              0.1296                   1             1.26008               0.216            0.137271            0.127271            0.127117            0.288397            0.322312            0.695295                 0.4            0.695295            0.369222                 0.4
+1                   5           0.0958371             0.07776                   1            0.383954              0.1296            0.087562            0.077562           0.0771601            0.418732             0.43015                   1                 0.4            0.866532            0.389686                 0.4
+1                   6           0.0927925            0.046656                   1           0.0512454           0.0777599           0.0549372           0.0449372              0.1286             0.39899            0.401405                   1                 0.4                 0.4                 0.4                 0.4
+1                   7           0.0902469           0.0279936                   1           0.0307472           0.0466559           0.0353623           0.0253623            0.214333             0.25184            0.253192                   1            0.400001            0.400001            0.400001            0.400001
+1                   8           0.0879859           0.0167962                   1           0.0184483           0.0279935           0.0236175           0.0136175            0.357221            0.155678            0.157357                   1            0.400001            0.400001            0.400001            0.400001
+1                   9           0.0859936           0.0100777                   1            0.011069           0.0167961           0.0165705          0.00657055            0.595367           0.0949567           0.0968536                   1            0.400002            0.400002            0.400002            0.400002
+1                  10           0.0843362          0.00604662                   1          0.00664136           0.0100776           0.0136042          0.00360421            0.992271           0.0574409           0.0592256                   1            0.400005            0.400005            0.400005            0.400005
+1                  11           0.0830588          0.00362797                   1          0.00398479          0.00604653            0.012171          0.00217095             1.65376           0.0345823           0.0360492                   1            0.400011            0.400011            0.400011            0.400011
+1                  12           0.0821432          0.00217678                   1          0.00239083          0.00362785           0.0113074          0.00171681             2.75618           0.0207707           0.0218595                   1            0.400027            0.400027            0.400027            0.400027
+1                  13           0.0815241          0.00130607                   1          0.00143443          0.00217661           0.0107866          0.00263001             4.59329           0.0124626           0.0132134                   1            0.400068            0.400068            0.400068            0.400068
+1                  14           0.0811228         0.000783642                   1         0.000860562          0.00130582           0.0104727          0.00317773             7.65403          0.00747499          0.00796701                   1             0.40018             0.40018             0.40018             0.40018
+1                  15             0.08087         0.000470185                   1         0.000516183         0.000783258           0.0102838          0.00350571             12.7504          0.00448249          0.00479433                   1            0.400483            0.400483            0.400483            0.400483
+1                  16           0.0807135         0.000282111                   1          0.00030946         0.000469576             0.01017          0.00370066             21.2229          0.00268679          0.00288017                   1            0.401317            0.401317            0.401317            0.401317
+1                  17           0.0806175         0.000169267                   1         0.000185269         0.000281127           0.0101015          0.00381234             35.2463          0.00160831           0.0017265                   1            0.403628            0.403628            0.403628            0.403628
+1                  18           0.0805587          0.00010156                   1         0.000110489         0.000167656           0.0100599          0.00386428             58.1774          0.00095906          0.00103044                   1            0.410108            0.410108            0.410108            0.410108
+1                  19           0.0805222          6.0936e-05                   1         6.51765e-05         9.88991e-05           0.0100342          0.00385183             94.4081         0.000565708         0.000608141                   1            0.428786            0.428786            0.428786            0.428786
+Out_Ite              In_Ite           Min_Val_x           Min_Val_z             mu          Inf||r_p||          Inf||r_d||          Inf||r_c||        Inf||r_c+G||          Inf||d_x||          Inf||d_y||          Inf||d_z||          Bar_alph_x          Bar_alph_z              alph_x              alph_y              alph_z
+1                  20           0.0804984         3.65616e-05                   1         3.72297e-05         5.64925e-05           0.0100176          0.00371023             146.097         0.000323128         0.000347485                   1            0.486912            0.486912            0.486912            0.486912
+1                  21           0.0804803          2.1937e-05                   1         1.91021e-05         2.89856e-05           0.0100049          0.00311354             197.039         0.000165789         0.000178328                   1            0.720105            0.720105            0.720105            0.720105
+1                  22           0.0804732         2.07941e-05                   1         5.34659e-06         8.11294e-06                0.01         0.000180895             158.286          4.6402e-05         4.99258e-05                   1                   1                   1                   1                   1
+2                   1            0.070444         1.70481e-05          0.00993739                   0         1.38778e-17          0.00652791          0.00642854             233.717           0.0969171            0.103865            0.808067            0.363985            0.808067            0.357923            0.363985
+2                   2           0.0585189         1.35732e-05          0.00993739                   0          0.00249787          0.00441719          0.00431781              116.38           0.0606603           0.0700151            0.973553            0.358417            0.973553            0.343399            0.358417
+2                   3           0.0484459         1.04994e-05          0.00993739         1.11022e-16          0.00490953          0.00300475          0.00290538             55.7427           0.0385556           0.0491039                   1            0.359959                   1            0.336871            0.359959
+2                   4           0.0410201         7.97999e-06          0.00993739                   0          0.00586122          0.00201034          0.00191096             30.6455           0.0249236           0.0349417                   1             0.36968                   1            0.341141             0.36968
+2                   5            0.036052         6.00713e-06          0.00993739                   0           0.0056033          0.00130299          0.00120361             17.9057           0.0162385           0.0246229                   1            0.388046                   1            0.358279            0.388046
+2                   6           0.0331087         4.53347e-06          0.00993739         2.22045e-16          0.00464749         0.000815396         0.000716022             10.2257           0.0104339            0.016729                   1            0.413771                   1            0.387693            0.413771
+2                   7           0.0316494         3.49772e-06          0.00993739         1.11022e-16          0.00341829         0.000497527         0.000398153             5.21875          0.00642893           0.0106641                   1            0.446892                   1            0.428197            0.446892
+2                   8           0.0311002         2.81438e-06          0.00993739                   0          0.00222232         0.000299918         0.000200544             2.11718          0.00369492          0.00622471                   1             0.49692                   1            0.486792             0.49692
+2                   9           0.0309626         2.38554e-06          0.00993739                   0          0.00123527         0.000180104           8.073e-05            0.589793          0.00190073            0.003213                   1            0.597448                   1            0.593936            0.597448
+2                  10           0.0309432         2.12403e-06          0.00993739                   0         0.000521581         0.000108072         8.69813e-06           0.0944631         0.000772367          0.00130484                   1            0.892198                   1            0.891909            0.892198
+3                   1           0.0282027         1.70879e-06         0.000101908                   0         5.71775e-05         6.64138e-05         6.53947e-05             23.3359          0.00101423          0.00295536            0.814285            0.392036            0.814285             0.20553            0.392036
+Entering main iteration loop
+======================================================================================================
+Starting iteration      0 and Inner iteration      0
+======================================================================================================
+=======================================
+Starting iteration        0 of       60
+=======================================
+omega_positive (     1 elements): 3
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Set of minimum KKT element is 1
+Index of minimum KKT element is 9 with value -1.4491911686431015e+08
+Index 9 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     2 elements): 3 9
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration        1 of       60
+=======================================
+omega_positive (     2 elements): 3 9
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Set of minimum KKT element is 1
+Index of minimum KKT element is 2 with value -1.7105180767945117e+08
+Index 2 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     3 elements): 3 9 2
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration        2 of       60
+=======================================
+omega_positive (     3 elements): 3 9 2
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Set of minimum KKT element is 1
+Index of minimum KKT element is 5 with value -6.1659873591367111e+07
+Index 5 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     4 elements): 3 9 2 5
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration        3 of       60
+=======================================
+omega_positive (     4 elements): 3 9 2 5
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Set of minimum KKT element is 1
+Index of minimum KKT element is 4 with value -2.7566502140009776e+07
+Index 4 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     5 elements): 3 9 2 5 4
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 3 will be deleted from omega's positive set
+omega_positive (     4 elements): 9 2 5 4
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration        4 of       60
+=======================================
+omega_positive (     4 elements): 9 2 5 4
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Set of minimum KKT element is 1
+Index of minimum KKT element is 1 with value -1.1296656661778588e+07
+Index 1 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     5 elements): 9 2 5 4 1
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 5 will be deleted from omega's positive set
+omega_positive (     4 elements): 9 2 4 1
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration        5 of       60
+=======================================
+omega_positive (     4 elements): 9 2 4 1
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Set of minimum KKT element is 1
+Index of minimum KKT element is 3 with value -2.1325030442318842e+06
+Index 3 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     5 elements): 9 2 4 1 3
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration        6 of       60
+=======================================
+omega_positive (     5 elements): 9 2 4 1 3
+gamma_positive (     0 elements):
+gamma_negative (     0 elements):
+Set of minimum KKT element is 3
+Index of minimum KKT element is 16 with value -6.2538627579809538e+04
+Index 16 will be added to index set 3
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 3
+omega_positive (     5 elements): 9 2 4 1 3
+gamma_positive (     0 elements):
+gamma_negative (     1 elements): 16
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration        7 of       60
+=======================================
+omega_positive (     5 elements): 9 2 4 1 3
+gamma_positive (     0 elements):
+gamma_negative (     1 elements): 16
+Set of minimum KKT element is 3
+Index of minimum KKT element is 13 with value -2.6623667587208758e+04
+Index 13 will be added to index set 3
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 3
+omega_positive (     5 elements): 9 2 4 1 3
+gamma_positive (     0 elements):
+gamma_negative (     2 elements): 16 13
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration        8 of       60
+=======================================
+omega_positive (     5 elements): 9 2 4 1 3
+gamma_positive (     0 elements):
+gamma_negative (     2 elements): 16 13
+Set of minimum KKT element is 1
+Index of minimum KKT element is 7 with value -6.0542884105083570e+06
+Index 7 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     6 elements): 9 2 4 1 3 7
+gamma_positive (     0 elements):
+gamma_negative (     2 elements): 16 13
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 4 will be deleted from omega's positive set
+omega_positive (     5 elements): 9 2 1 3 7
+gamma_positive (     0 elements):
+gamma_negative (     2 elements): 16 13
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration        9 of       60
+=======================================
+omega_positive (     5 elements): 9 2 1 3 7
+gamma_positive (     0 elements):
+gamma_negative (     2 elements): 16 13
+Set of minimum KKT element is 1
+Index of minimum KKT element is 5 with value -9.3455922171202581e+05
+Index 5 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     6 elements): 9 2 1 3 7 5
+gamma_positive (     0 elements):
+gamma_negative (     2 elements): 16 13
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       10 of       60
+=======================================
+omega_positive (     6 elements): 9 2 1 3 7 5
+gamma_positive (     0 elements):
+gamma_negative (     2 elements): 16 13
+Set of minimum KKT element is 2
+Index of minimum KKT element is 9 with value -1.4782030448297124e+04
+Index 9 will be added to index set 2
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 2
+omega_positive (     6 elements): 9 2 1 3 7 5
+gamma_positive (     1 elements): 9
+gamma_negative (     2 elements): 16 13
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 3 will be deleted from omega's positive set
+omega_positive (     5 elements): 9 2 1 7 5
+gamma_positive (     1 elements): 9
+gamma_negative (     2 elements): 16 13
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 5 will be deleted from omega's positive set
+omega_positive (     4 elements): 9 2 1 7
+gamma_positive (     1 elements): 9
+gamma_negative (     2 elements): 16 13
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       11 of       60
+=======================================
+omega_positive (     4 elements): 9 2 1 7
+gamma_positive (     1 elements): 9
+gamma_negative (     2 elements): 16 13
+Set of minimum KKT element is 3
+Index of minimum KKT element is 14 with value -1.9776481025539520e+04
+Index 14 will be added to index set 3
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 3
+omega_positive (     4 elements): 9 2 1 7
+gamma_positive (     1 elements): 9
+gamma_negative (     3 elements): 16 13 14
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       12 of       60
+=======================================
+omega_positive (     4 elements): 9 2 1 7
+gamma_positive (     1 elements): 9
+gamma_negative (     3 elements): 16 13 14
+Set of minimum KKT element is 1
+Index of minimum KKT element is 4 with value -1.4067369613247775e+06
+Index 4 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     5 elements): 9 2 1 7 4
+gamma_positive (     1 elements): 9
+gamma_negative (     3 elements): 16 13 14
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       13 of       60
+=======================================
+omega_positive (     5 elements): 9 2 1 7 4
+gamma_positive (     1 elements): 9
+gamma_negative (     3 elements): 16 13 14
+Set of minimum KKT element is 3
+Index of minimum KKT element is 8 with value -1.2662379759953345e+04
+Index 8 will be added to index set 3
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 3
+omega_positive (     5 elements): 9 2 1 7 4
+gamma_positive (     1 elements): 9
+gamma_negative (     4 elements): 16 13 14 8
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       14 of       60
+=======================================
+omega_positive (     5 elements): 9 2 1 7 4
+gamma_positive (     1 elements): 9
+gamma_negative (     4 elements): 16 13 14 8
+Set of minimum KKT element is 3
+Index of minimum KKT element is 5 with value -8.0189362444601566e+03
+Index 5 will be added to index set 3
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 3
+omega_positive (     5 elements): 9 2 1 7 4
+gamma_positive (     1 elements): 9
+gamma_negative (     5 elements): 16 13 14 8 5
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       15 of       60
+=======================================
+omega_positive (     5 elements): 9 2 1 7 4
+gamma_positive (     1 elements): 9
+gamma_negative (     5 elements): 16 13 14 8 5
+Set of minimum KKT element is 1
+Index of minimum KKT element is 6 with value -1.3572595533497967e+06
+Index 6 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     6 elements): 9 2 1 7 4 6
+gamma_positive (     1 elements): 9
+gamma_negative (     5 elements): 16 13 14 8 5
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       16 of       60
+=======================================
+omega_positive (     6 elements): 9 2 1 7 4 6
+gamma_positive (     1 elements): 9
+gamma_negative (     5 elements): 16 13 14 8 5
+Set of minimum KKT element is 3
+Index of minimum KKT element is 18 with value -5.3245567607883513e+03
+Index 18 will be added to index set 3
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 3
+omega_positive (     6 elements): 9 2 1 7 4 6
+gamma_positive (     1 elements): 9
+gamma_negative (     6 elements): 16 13 14 8 5 18
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 4 will be deleted from omega's positive set
+omega_positive (     5 elements): 9 2 1 7 6
+gamma_positive (     1 elements): 9
+gamma_negative (     6 elements): 16 13 14 8 5 18
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       17 of       60
+=======================================
+omega_positive (     5 elements): 9 2 1 7 6
+gamma_positive (     1 elements): 9
+gamma_negative (     6 elements): 16 13 14 8 5 18
+Set of minimum KKT element is 3
+Index of minimum KKT element is 10 with value -7.3139310775692456e+03
+Index 10 will be added to index set 3
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 3
+omega_positive (     5 elements): 9 2 1 7 6
+gamma_positive (     1 elements): 9
+gamma_negative (     7 elements): 16 13 14 8 5 18 10
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       18 of       60
+=======================================
+omega_positive (     5 elements): 9 2 1 7 6
+gamma_positive (     1 elements): 9
+gamma_negative (     7 elements): 16 13 14 8 5 18 10
+Set of minimum KKT element is 1
+Index of minimum KKT element is 3 with value -8.4924937931424333e+05
+Index 3 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     6 elements): 9 2 1 7 6 3
+gamma_positive (     1 elements): 9
+gamma_negative (     7 elements): 16 13 14 8 5 18 10
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       19 of       60
+=======================================
+omega_positive (     6 elements): 9 2 1 7 6 3
+gamma_positive (     1 elements): 9
+gamma_negative (     7 elements): 16 13 14 8 5 18 10
+Set of minimum KKT element is 1
+Index of minimum KKT element is 5 with value -2.6911796316058550e+05
+Index 5 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     7 elements): 9 2 1 7 6 3 5
+gamma_positive (     1 elements): 9
+gamma_negative (     7 elements): 16 13 14 8 5 18 10
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       20 of       60
+=======================================
+omega_positive (     7 elements): 9 2 1 7 6 3 5
+gamma_positive (     1 elements): 9
+gamma_negative (     7 elements): 16 13 14 8 5 18 10
+Set of minimum KKT element is 2
+Index of minimum KKT element is 6 with value -3.0919466219610272e+03
+Index 6 will be added to index set 2
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 2
+omega_positive (     7 elements): 9 2 1 7 6 3 5
+gamma_positive (     2 elements): 9 6
+gamma_negative (     7 elements): 16 13 14 8 5 18 10
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 8 will be deleted from gamma's negative set
+omega_positive (     7 elements): 9 2 1 7 6 3 5
+gamma_positive (     2 elements): 9 6
+gamma_negative (     6 elements): 16 13 14 5 18 10
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       21 of       60
+=======================================
+omega_positive (     7 elements): 9 2 1 7 6 3 5
+gamma_positive (     2 elements): 9 6
+gamma_negative (     6 elements): 16 13 14 5 18 10
+Set of minimum KKT element is 1
+Index of minimum KKT element is 0 with value -5.3036539941255876e+05
+Index 0 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     8 elements): 9 2 1 7 6 3 5 0
+gamma_positive (     2 elements): 9 6
+gamma_negative (     6 elements): 16 13 14 5 18 10
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       22 of       60
+=======================================
+omega_positive (     8 elements): 9 2 1 7 6 3 5 0
+gamma_positive (     2 elements): 9 6
+gamma_negative (     6 elements): 16 13 14 5 18 10
+Set of minimum KKT element is 1
+Index of minimum KKT element is 8 with value -1.9056285543798428e+05
+Index 8 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     9 elements): 9 2 1 7 6 3 5 0 8
+gamma_positive (     2 elements): 9 6
+gamma_negative (     6 elements): 16 13 14 5 18 10
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       23 of       60
+=======================================
+omega_positive (     9 elements): 9 2 1 7 6 3 5 0 8
+gamma_positive (     2 elements): 9 6
+gamma_negative (     6 elements): 16 13 14 5 18 10
+Set of minimum KKT element is 2
+Index of minimum KKT element is 4 with value -2.2001820010548818e+03
+Index 4 will be added to index set 2
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 2
+omega_positive (     9 elements): 9 2 1 7 6 3 5 0 8
+gamma_positive (     3 elements): 9 6 4
+gamma_negative (     6 elements): 16 13 14 5 18 10
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 2 will be deleted from omega's positive set
+omega_positive (     8 elements): 9 1 7 6 3 5 0 8
+gamma_positive (     3 elements): 9 6 4
+gamma_negative (     6 elements): 16 13 14 5 18 10
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       24 of       60
+=======================================
+omega_positive (     8 elements): 9 1 7 6 3 5 0 8
+gamma_positive (     3 elements): 9 6 4
+gamma_negative (     6 elements): 16 13 14 5 18 10
+Set of minimum KKT element is 3
+Index of minimum KKT element is 2 with value -1.3322196915477352e+03
+Index 2 will be added to index set 3
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 3
+omega_positive (     8 elements): 9 1 7 6 3 5 0 8
+gamma_positive (     3 elements): 9 6 4
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 5 will be deleted from omega's positive set
+omega_positive (     7 elements): 9 1 7 6 3 0 8
+gamma_positive (     3 elements): 9 6 4
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       25 of       60
+=======================================
+omega_positive (     7 elements): 9 1 7 6 3 0 8
+gamma_positive (     3 elements): 9 6 4
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Set of minimum KKT element is 1
+Index of minimum KKT element is 2 with value -1.4012203767450165e+05
+Index 2 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     8 elements): 9 1 7 6 3 0 8 2
+gamma_positive (     3 elements): 9 6 4
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       26 of       60
+=======================================
+omega_positive (     8 elements): 9 1 7 6 3 0 8 2
+gamma_positive (     3 elements): 9 6 4
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Set of minimum KKT element is 1
+Index of minimum KKT element is 4 with value -1.6136594461750187e+05
+Index 4 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     9 elements): 9 1 7 6 3 0 8 2 4
+gamma_positive (     3 elements): 9 6 4
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 0 will be deleted from omega's positive set
+omega_positive (     8 elements): 9 1 7 6 3 8 2 4
+gamma_positive (     3 elements): 9 6 4
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       27 of       60
+=======================================
+omega_positive (     8 elements): 9 1 7 6 3 8 2 4
+gamma_positive (     3 elements): 9 6 4
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Set of minimum KKT element is 2
+Index of minimum KKT element is 8 with value -9.5978977004609624e+02
+Index 8 will be added to index set 2
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 2
+omega_positive (     8 elements): 9 1 7 6 3 8 2 4
+gamma_positive (     4 elements): 9 6 4 8
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 3 will be deleted from omega's positive set
+omega_positive (     7 elements): 9 1 7 6 8 2 4
+gamma_positive (     4 elements): 9 6 4 8
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 2 will be deleted from omega's positive set
+omega_positive (     6 elements): 9 1 7 6 8 4
+gamma_positive (     4 elements): 9 6 4 8
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       28 of       60
+=======================================
+omega_positive (     6 elements): 9 1 7 6 8 4
+gamma_positive (     4 elements): 9 6 4 8
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Set of minimum KKT element is 2
+Index of minimum KKT element is 12 with value -9.8139440462072935e+02
+Index 12 will be added to index set 2
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 2
+omega_positive (     6 elements): 9 1 7 6 8 4
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 8 will be deleted from omega's positive set
+omega_positive (     5 elements): 9 1 7 6 4
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       29 of       60
+=======================================
+omega_positive (     5 elements): 9 1 7 6 4
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Set of minimum KKT element is 1
+Index of minimum KKT element is 0 with value -1.4509819212217597e+05
+Index 0 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     6 elements): 9 1 7 6 4 0
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       30 of       60
+=======================================
+omega_positive (     6 elements): 9 1 7 6 4 0
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Set of minimum KKT element is 1
+Index of minimum KKT element is 2 with value -3.1433264023053649e+04
+Index 2 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     7 elements): 9 1 7 6 4 0 2
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       31 of       60
+=======================================
+omega_positive (     7 elements): 9 1 7 6 4 0 2
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     7 elements): 16 13 14 5 18 10 2
+Set of minimum KKT element is 3
+Index of minimum KKT element is 3 with value -4.9514915219026398e+02
+Index 3 will be added to index set 3
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 3
+omega_positive (     7 elements): 9 1 7 6 4 0 2
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     8 elements): 16 13 14 5 18 10 2 3
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 2 will be deleted from omega's positive set
+omega_positive (     6 elements): 9 1 7 6 4 0
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     8 elements): 16 13 14 5 18 10 2 3
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       32 of       60
+=======================================
+omega_positive (     6 elements): 9 1 7 6 4 0
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     8 elements): 16 13 14 5 18 10 2 3
+Set of minimum KKT element is 1
+Index of minimum KKT element is 3 with value -1.1479952936541408e+05
+Index 3 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     7 elements): 9 1 7 6 4 0 3
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     8 elements): 16 13 14 5 18 10 2 3
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 4 will be deleted from omega's positive set
+omega_positive (     6 elements): 9 1 7 6 0 3
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     8 elements): 16 13 14 5 18 10 2 3
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       33 of       60
+=======================================
+omega_positive (     6 elements): 9 1 7 6 0 3
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     8 elements): 16 13 14 5 18 10 2 3
+Set of minimum KKT element is 3
+Index of minimum KKT element is 0 with value -6.6587615089640303e+02
+Index 0 will be added to index set 3
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 3
+omega_positive (     6 elements): 9 1 7 6 0 3
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     9 elements): 16 13 14 5 18 10 2 3 0
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       34 of       60
+=======================================
+omega_positive (     6 elements): 9 1 7 6 0 3
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     9 elements): 16 13 14 5 18 10 2 3 0
+Set of minimum KKT element is 1
+Index of minimum KKT element is 4 with value -1.1304319852807906e+04
+Index 4 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     7 elements): 9 1 7 6 0 3 4
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     9 elements): 16 13 14 5 18 10 2 3 0
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 0 will be deleted from omega's positive set
+omega_positive (     6 elements): 9 1 7 6 3 4
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     9 elements): 16 13 14 5 18 10 2 3 0
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       35 of       60
+=======================================
+omega_positive (     6 elements): 9 1 7 6 3 4
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (     9 elements): 16 13 14 5 18 10 2 3 0
+Set of minimum KKT element is 3
+Index of minimum KKT element is 17 with value -2.0360730326775388e+02
+Index 17 will be added to index set 3
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 3
+omega_positive (     6 elements): 9 1 7 6 3 4
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 17
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 3 will be deleted from omega's positive set
+omega_positive (     5 elements): 9 1 7 6 4
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 17
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       36 of       60
+=======================================
+omega_positive (     5 elements): 9 1 7 6 4
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 17
+Set of minimum KKT element is 1
+Index of minimum KKT element is 8 with value -7.8886214081313428e+03
+Index 8 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     6 elements): 9 1 7 6 4 8
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 17
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       37 of       60
+=======================================
+omega_positive (     6 elements): 9 1 7 6 4 8
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 17
+Set of minimum KKT element is 3
+Index of minimum KKT element is 7 with value -1.6981520043584101e+01
+Index 7 will be added to index set 3
+Solving intermediate system for least squares
+Solving least squares system
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 3
+omega_positive (     6 elements): 9 1 7 6 4 8
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    11 elements): 16 13 14 5 18 10 2 3 0 17 7
+Re-doing Cholesky factorization from scratch!
+Re-doing Cholesky of size 22
+ARGH! Replacing Cholesky diagonal of -4.5474735088646412e-13 with +9.9999999999999998e-13.
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 8 will be deleted from omega's positive set
+omega_positive (     5 elements): 9 1 7 6 4
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    11 elements): 16 13 14 5 18 10 2 3 0 17 7
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       38 of       60
+=======================================
+omega_positive (     5 elements): 9 1 7 6 4
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    11 elements): 16 13 14 5 18 10 2 3 0 17 7
+Set of minimum KKT element is 1
+Index of minimum KKT element is 3 with value -6.3433889919466083e+02
+Index 3 will be added to index set 1
+Solving intermediate system for least squares
+Solving least squares system
+Linear independence check yields 0
+Exchange! Looking for index to delete
+Index 4 will be deleted from omega's positive set
+omega_positive (     4 elements): 9 1 7 6
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    11 elements): 16 13 14 5 18 10 2 3 0 17 7
+Performing set augmentation
+Augmenting set 1
+omega_positive (     5 elements): 9 1 7 6 3
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    11 elements): 16 13 14 5 18 10 2 3 0 17 7
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 17 will be deleted from gamma's negative set
+omega_positive (     5 elements): 9 1 7 6 3
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 7
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       39 of       60
+=======================================
+omega_positive (     5 elements): 9 1 7 6 3
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 7
+Set of minimum KKT element is 1
+Index of minimum KKT element is 0 with value -3.0472886422262185e+04
+Index 0 will be added to index set 1
+Solving intermediate system for least squares
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     6 elements): 9 1 7 6 3 0
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 7
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       40 of       60
+=======================================
+omega_positive (     6 elements): 9 1 7 6 3 0
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 7
+Set of minimum KKT element is 1
+Index of minimum KKT element is 2 with value -3.6874311745396585e+03
+Index 2 will be added to index set 1
+Solving intermediate system for least squares
+Solving least squares system
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 1
+omega_positive (     7 elements): 9 1 7 6 3 0 2
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 7
+Re-doing Cholesky factorization from scratch!
+Re-doing Cholesky of size 22
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 0 will be deleted from omega's positive set
+omega_positive (     6 elements): 9 1 7 6 3 2
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 7
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       41 of       60
+=======================================
+omega_positive (     6 elements): 9 1 7 6 3 2
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 7
+Set of minimum KKT element is 3
+Index of minimum KKT element is 19 with value -1.6465007563625380e+00
+Index 19 will be added to index set 3
+Solving intermediate system for least squares
+Solving least squares system
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 3
+omega_positive (     6 elements): 9 1 7 6 3 2
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    11 elements): 16 13 14 5 18 10 2 3 0 7 19
+Re-doing Cholesky factorization from scratch!
+Re-doing Cholesky of size 22
+ARGH! Replacing Cholesky diagonal of -1.9895196601282805e-13 with +9.9999999999999998e-13.
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 7 will be deleted from gamma's negative set
+omega_positive (     6 elements): 9 1 7 6 3 2
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 19
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       42 of       60
+=======================================
+omega_positive (     6 elements): 9 1 7 6 3 2
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 19
+Set of minimum KKT element is 1
+Index of minimum KKT element is 5 with value -4.3529261209718265e+02
+Index 5 will be added to index set 1
+Solving intermediate system for least squares
+Solving least squares system
+Linear independence check yields 0
+Exchange! Looking for index to delete
+Index 7 will be deleted from omega's positive set
+omega_positive (     5 elements): 9 1 6 3 2
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 19
+Performing set augmentation
+Augmenting set 1
+omega_positive (     6 elements): 9 1 6 3 2 5
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 19
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       43 of       60
+=======================================
+omega_positive (     6 elements): 9 1 6 3 2 5
+gamma_positive (     5 elements): 9 6 4 8 12
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 19
+Set of minimum KKT element is 2
+Index of minimum KKT element is 15 with value -8.0743569830600279e+00
+Index 15 will be added to index set 2
+Solving intermediate system for least squares
+Solving least squares system
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 2
+omega_positive (     6 elements): 9 1 6 3 2 5
+gamma_positive (     6 elements): 9 6 4 8 12 15
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 19
+Re-doing Cholesky factorization from scratch!
+Re-doing Cholesky of size 22
+ARGH! Replacing Cholesky diagonal of -3.4390268410788849e-12 with +9.9999999999999998e-13.
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 5 will be deleted from omega's positive set
+omega_positive (     5 elements): 9 1 6 3 2
+gamma_positive (     6 elements): 9 6 4 8 12 15
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 19
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       44 of       60
+=======================================
+omega_positive (     5 elements): 9 1 6 3 2
+gamma_positive (     6 elements): 9 6 4 8 12 15
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 19
+Set of minimum KKT element is 2
+Index of minimum KKT element is 11 with value -2.9296659160886040e-01
+Index 11 will be added to index set 2
+Solving intermediate system for least squares
+Solving least squares system
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 2
+omega_positive (     5 elements): 9 1 6 3 2
+gamma_positive (     7 elements): 9 6 4 8 12 15 11
+gamma_negative (    10 elements): 16 13 14 5 18 10 2 3 0 19
+Re-doing Cholesky factorization from scratch!
+Re-doing Cholesky of size 22
+ARGH! Replacing Cholesky diagonal of -4.0927261579781771e-12 with +9.9999999999999998e-13.
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 3 will be deleted from gamma's negative set
+omega_positive (     5 elements): 9 1 6 3 2
+gamma_positive (     7 elements): 9 6 4 8 12 15 11
+gamma_negative (     9 elements): 16 13 14 5 18 10 2 0 19
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       45 of       60
+=======================================
+omega_positive (     5 elements): 9 1 6 3 2
+gamma_positive (     7 elements): 9 6 4 8 12 15 11
+gamma_negative (     9 elements): 16 13 14 5 18 10 2 0 19
+Set of minimum KKT element is 2
+Index of minimum KKT element is 17 with value -5.1148690707837408e-01
+Index 17 will be added to index set 2
+Solving intermediate system for least squares
+Solving least squares system
+Linear independence check yields 1
+Performing set augmentation
+Augmenting set 2
+omega_positive (     5 elements): 9 1 6 3 2
+gamma_positive (     8 elements): 9 6 4 8 12 15 11 17
+gamma_negative (     9 elements): 16 13 14 5 18 10 2 0 19
+Solving subproblem
+Infeasible subproblem solution! Looking for index to delete
+Index 8 will be deleted from gamma's positive set
+omega_positive (     5 elements): 9 1 6 3 2
+gamma_positive (     7 elements): 9 6 4 12 15 11 17
+gamma_negative (     9 elements): 16 13 14 5 18 10 2 0 19
+Solving subproblem
+Feasible subproblem solution! Breaking loop
+=======================================
+Starting iteration       46 of       60
+=======================================
+omega_positive (     5 elements): 9 1 6 3 2
+gamma_positive (     7 elements): 9 6 4 12 15 11 17
+gamma_negative (     9 elements): 16 13 14 5 18 10 2 0 19
+Set of minimum KKT element is 1
+Index of minimum KKT element is 1 with value +0.0000000000000000e+00
+Finalizing solution

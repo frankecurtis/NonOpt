@@ -1,4 +1,4 @@
-SUBDIRS = src problems exes tests
+SUBDIRS = src problems exes tests mpc
 
 .PHONY: subdirs $(SUBDIRS)
 

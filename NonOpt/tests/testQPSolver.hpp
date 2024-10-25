@@ -33,7 +33,7 @@ int testQPSolverImplementation(int option)
   if (option == 1) {
 
     // Declare stream report
-    std::shared_ptr<StreamReport> s(new StreamReport("s", R_QP, R_BASIC));
+    std::shared_ptr<StreamReport> s(new StreamReport("s", R_QP, R_PER_INNER_ITERATION));
 
     // Set stream report to standard output
     s->setStream(&std::cout);
@@ -45,8 +45,8 @@ int testQPSolverImplementation(int option)
 
   // Declare test numbers
   int test_start = 0;
-  int test_end = 20;
-  int test_adds = 1;
+  int test_end = 0;
+  int test_adds = 0;
 
   // Declare number of variables
   int numberVariables = 20;

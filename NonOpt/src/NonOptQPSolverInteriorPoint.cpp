@@ -1,13 +1,14 @@
-// Copyright (C) 2022 Frank E. Curtis
+// Copyright (C) 2024 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
-// Author(s) : Frank E. Curtis, Baoyu Zhou
+// Author(s) : Frank E. Curtis, Lara Zebiane
 
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <iterator>
+#include <iomanip> // Added by Lara (?)
 
 #include "NonOptBLASLAPACK.hpp"
 #include "NonOptDeclarations.hpp"
@@ -141,13 +142,13 @@ void QPSolverInteriorPoint::addOptions(Options* options)
                            "              linear independence of the augmented matrix.\n"
                            "Default     : 1e-12.");
   options->addDoubleOption("QPIPM_beta",
-                           0.5,
+                           0.4,
                            0.0,
                            1.0,
                            "beta has to be 0 and 1. TBC...\n"
                            "Default     : 0.5.");
   options->addDoubleOption("QPIPM_sigma",
-                           0.005,
+                           0.01,
                            0.0,
                            1.0,
                            "sigma has to be 0 and 1. TBC...\n"
@@ -474,90 +475,90 @@ void QPSolverInteriorPoint::dualSolutionOmega(double omega[])
 } // end dualSolutionOmega
 
 // Get KKT error from dual solution
-double QPSolverInteriorPoint::KKTErrorDual()
-{
+// double QPSolverInteriorPoint::KKTErrorDual() //remove
+// {
 
-  // Evaluate gradient combination
-  Vector Gomega(gamma_length_, 0.0);
-  for (int i = 0; i < (int)vector_list_.size(); i++) {
-    Gomega.addScaledVector(omega_.values()[i], *vector_list_[i].get());
-  }
+//   // Evaluate gradient combination
+//   Vector Gomega(gamma_length_, 0.0);
+//   for (int i = 0; i < (int)vector_list_.size(); i++) {
+//     Gomega.addScaledVector(omega_.values()[i], *vector_list_[i].get());
+//   }
 
-  // Declare dual vector
-  Vector d0(gamma_length_, 0.0);
-  d0.addScaledVector(-1.0, Gomega);
-  d0.addScaledVector(-1.0, gamma_);
-  Vector d(gamma_length_);
-  matrix_->matrixVectorProductOfInverse(d0, d);
+//   // Declare dual vector
+//   Vector d0(gamma_length_, 0.0);
+//   d0.addScaledVector(-1.0, Gomega);
+//   d0.addScaledVector(-1.0, gamma_);
+//   Vector d(gamma_length_);
+//   matrix_->matrixVectorProductOfInverse(d0, d);
 
-  // Evaluate gradient inner products
-  Vector Gtd;
-  Gtd.setLength((int)vector_.size());
-  for (int i = 0; i < (int)vector_list_.size(); i++) {
-    Gtd.values()[i] = vector_list_[i]->innerProduct(d);
-  }
+//   // Evaluate gradient inner products
+//   Vector Gtd;
+//   Gtd.setLength((int)vector_.size());
+//   for (int i = 0; i < (int)vector_list_.size(); i++) {
+//     Gtd.values()[i] = vector_list_[i]->innerProduct(d);
+//   }
 
-  // Evaluate dual scalar
-  double z = omega_.innerProduct(Gtd);
-  for (int i = 0; i < (int)vector_list_.size(); i++) {
-    z = z + omega_.values()[i] * vector_[i];
-  }
+//   // Evaluate dual scalar
+//   double z = omega_.innerProduct(Gtd);
+//   for (int i = 0; i < (int)vector_list_.size(); i++) {
+//     z = z + omega_.values()[i] * vector_[i];
+//   }
 
-  // Initialize KKT error
-  double kkt_error = 0.0;
+//   // Initialize KKT error
+//   double kkt_error = 0.0;
 
-  // Loop through KKT conditions, update error
-  for (int j = 0; j < (int)vector_.size(); j++) {
-    double term = -z + vector_[j] + Gtd.values()[j];
-    if (term > 0.0 && term > kkt_error) {
-      kkt_error = term;
-    }
-  } // end for
-  for (int i = 0; i < gamma_length_; i++) {
-    double term = -scalar_ + d.values()[i];
-    if (term > 0.0 && term > kkt_error) {
-      kkt_error = term;
-    }
-    term = -scalar_ - d.values()[i];
-    if (term > 0.0 && term > kkt_error) {
-      kkt_error = term;
-    }
-  } // end for
-  for (int j = 0; j < (int)vector_.size(); j++) {
-    double term = -omega_.values()[j];
-    if (term > 0.0 && term > kkt_error) {
-      kkt_error = term;
-    }
-  } // end for
-  double sum = 0.0;
-  for (int j = 0; j < (int)vector_.size(); j++) {
-    sum = sum + omega_.values()[j];
-  }
-  if (fabs(sum - 1.0) > kkt_error) {
-    kkt_error = fabs(sum - 1.0);
-  }
-  for (int i = 0; i < gamma_length_; i++) {
-    double term1 = gamma_.values()[i];
-    double term2 = scalar_ - d.values()[i];
-    if (term1 > 0.0 && term1 * term2 > kkt_error) {
-      kkt_error = term1 * term2;
-    }
-    term1 = -gamma_.values()[i];
-    term2 = scalar_ + d.values()[i];
-    if (term1 > 0.0 && term1 * term2 > kkt_error) {
-      kkt_error = term1 * term2;
-    }
-  } // end for
+//   // Loop through KKT conditions, update error
+//   for (int j = 0; j < (int)vector_.size(); j++) {
+//     double term = -z + vector_[j] + Gtd.values()[j];
+//     if (term > 0.0 && term > kkt_error) {
+//       kkt_error = term;
+//     }
+//   } // end for
+//   for (int i = 0; i < gamma_length_; i++) {
+//     double term = -scalar_ + d.values()[i];
+//     if (term > 0.0 && term > kkt_error) {
+//       kkt_error = term;
+//     }
+//     term = -scalar_ - d.values()[i];
+//     if (term > 0.0 && term > kkt_error) {
+//       kkt_error = term;
+//     }
+//   } // end for
+//   for (int j = 0; j < (int)vector_.size(); j++) {
+//     double term = -omega_.values()[j];
+//     if (term > 0.0 && term > kkt_error) {
+//       kkt_error = term;
+//     }
+//   } // end for
+//   double sum = 0.0;
+//   for (int j = 0; j < (int)vector_.size(); j++) {
+//     sum = sum + omega_.values()[j];
+//   }
+//   if (fabs(sum - 1.0) > kkt_error) {
+//     kkt_error = fabs(sum - 1.0);
+//   }
+//   for (int i = 0; i < gamma_length_; i++) {
+//     double term1 = gamma_.values()[i];
+//     double term2 = scalar_ - d.values()[i];
+//     if (term1 > 0.0 && term1 * term2 > kkt_error) {
+//       kkt_error = term1 * term2;
+//     }
+//     term1 = -gamma_.values()[i];
+//     term2 = scalar_ + d.values()[i];
+//     if (term1 > 0.0 && term1 * term2 > kkt_error) {
+//       kkt_error = term1 * term2;
+//     }
+//   } // end for
 
-  // Set maximum
-  if (std::isnan(kkt_error) || kkt_error > NONOPT_DOUBLE_INFINITY) {
-    kkt_error = NONOPT_DOUBLE_INFINITY;
-  }
+//   // Set maximum
+//   if (std::isnan(kkt_error) || kkt_error > NONOPT_DOUBLE_INFINITY) {
+//     kkt_error = NONOPT_DOUBLE_INFINITY;
+//   }
 
-  // Return
-  return kkt_error;
+//   // Return
+//   return kkt_error;
 
-} // end KKTErrorDual
+// } // end KKTErrorDual
 
 // Get primal solution
 void QPSolverInteriorPoint::primalSolution(double d[])
@@ -863,6 +864,28 @@ bool QPSolverInteriorPoint::inexactTerminationCondition(const Quantities* quanti
 
 } // end inexactTerminationCondition
 
+// Lara's header
+
+void printHeader() {
+    std::cout << "Out_Ite" 
+              << std::setw(20) << "In_Ite"
+              << std::setw(20) << "Min_Val_x"
+              << std::setw(20) << "Min_Val_z"
+              << std::setw(15) << "mu"
+              << std::setw(20) << "Inf||r_p||"
+              << std::setw(20) << "Inf||r_d||"
+              << std::setw(20) << "Inf||r_c||"
+              << std::setw(20) << "Inf||r_c+G||"
+              << std::setw(20) << "Inf||d_x||"
+              << std::setw(20) << "Inf||d_y||"
+              << std::setw(20) << "Inf||d_z||"
+              << std::setw(20) << "Bar_alph_x"
+              << std::setw(20) << "Bar_alph_z"
+              << std::setw(20) << "alph_x"
+              << std::setw(20) << "alph_y"
+              << std::setw(20) << "alph_z" << std::endl;
+}
+
 // Solve
 void QPSolverInteriorPoint::solveQP(const Options* options,
                                     const Reporter* reporter,
@@ -886,8 +909,22 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     /**
      * Lara
      */
+
+
     int omega_length= (int)vector_.size();
+    
+    reporter->printf(R_QP, R_PER_INNER_ITERATION, "gamma length:  %d\n", gamma_length_);
+    reporter->printf(R_QP, R_PER_INNER_ITERATION, "vector list size length:  %d\n", vector_list_.size());
+
+    reporter->printf(R_QP, R_PER_INNER_ITERATION, "omega length:  %d\n", omega_length);
+
     int total_length=2*gamma_length_+omega_length;
+
+    reporter->printf(R_QP, R_PER_INNER_ITERATION, "total length:  %d\n", total_length);
+
+    printHeader();
+
+    Vector r_cent_In(total_length);
 
     matrix_At_.setLength(total_length);
 
@@ -913,8 +950,9 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     for (int i = omega_length ; i < total_length; i++){
         vector_c_.set(i,scalar_);
 
-    }    
- 
+    }   
+     reporter->printf(R_QP, R_PER_INNER_ITERATION, "scalar delta:  %e\n", scalar_);
+
     // Declare WG vectors
     std::vector<std::shared_ptr<Vector>> WG;
 
@@ -926,7 +964,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       WG.push_back(product);
     } // end for
 
-    matrix_Q_.setAsDiagonal(total_length,0.0);
+    matrix_Q_.setAsDiagonal(total_length,1.0);
 
     for (int i = 0; i < omega_length; i++){
           for (int j = i; j < omega_length; j++){
@@ -953,8 +991,18 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
               matrix_Q_.setElement(j + gamma_length_, i, -value);
             }
           }
-    }  
-    
+    } 
+
+
+
+    // reporter->printf(R_QP, R_PER_INNER_ITERATION,"Matrix Q values:\n", "", 0); // Header
+
+    // for (int i = 0; i < total_length; ++i) {
+    //     for (int j = 0; j < total_length; ++j) {
+    //         reporter->printf(R_QP, R_PER_INNER_ITERATION,"Q[%d][%d] = %+23.16e\n", i, j, matrix_Q_.element(i,j));
+    //     }
+    // }
+
     // std::cout << "Hi!!" << std::endl;
 
     /**
@@ -974,11 +1022,30 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
     for (int i = 0; i < total_length; i++){
       vector_x_.set(i, 1.0);
-      vector_c_.set(i, 1.0);
+      vector_z_.set(i, 1.0);
     }
+
     //std::cout << "Hi2!!" << std::endl;
     mu_=vector_x_.innerProduct(vector_z_) / total_length;   //gamma_length is guaranteed to be > 0 ? Correct use of inner?
 
+    // **************************************
+    Vector gradient(total_length);
+
+    matrix_Q_.matrixVectorProduct(vector_x_, gradient);
+    gradient.addScaledVector(1, vector_c_);
+
+    double max_gradient = gradient.normInf();
+    double scalar_tau = 1 / ( max_gradient);
+
+    for (int i = 0; i < total_length; i++){
+      for (int j = 0; j < total_length; j++){
+        matrix_Q_.setElement(i, j, scalar_tau * matrix_Q_.element(i,j));
+      }
+    }
+    
+    vector_c_.scale(scalar_tau);
+    // **************************************
+    
     matrix_J_.setAsDiagonal(2 * total_length + 1, 0);
 
     for (int i = 0; i < total_length; i++){
@@ -1004,10 +1071,14 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
      {
       inner_iter_count_++;
 
+      if (inner_iter_count_ % 20 == 0) {
+            printHeader();
+        }
+
       //r_dual_ = ( QX.addScaledVector(-scalar_y_, matrix_At_) ).addScaledVector(1, c.addScaledVector(-1, vector_z_) );
       Vector QX(total_length);
       matrix_Q_.matrixVectorProduct(vector_x_, QX);
-
+    
       Vector oper1(total_length);
       oper1.copy(QX);
       oper1.addScaledVector(-scalar_y_, matrix_At_);
@@ -1027,8 +1098,8 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       r_pri_=-matrix_At_.innerProduct(vector_x_)+scalar_b_;
       //std::cout << "Hi7!!" << std::endl;
 
-      for (int i = total_length + 1; i < 2 * total_length + 1; i++){
-        matrix_J_.setElement(i, i, vector_x_.values()[i] / vector_z_.values()[i]);
+      for (int i = 0; i < total_length; i++){
+        matrix_J_.setElement(i + total_length + 1, i + total_length + 1, vector_x_.values()[i] / vector_z_.values()[i]);
       }
       //matrix_J_.print(reporter, "J=");
 
@@ -1085,6 +1156,18 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       Vector delta( 2 * total_length + 1);
       solveLinearSystem( 2 * total_length + 1, matrix_J_.valuesModifiable(), residual.valuesModifiable(), delta.valuesModifiable() );
 
+      // Vector prod(2 * total_length + 1 );
+
+      // matrix_J_.matrixVectorProduct(delta, prod);
+
+      // reporter->printf(R_QP, R_PER_INNER_ITERATION, "norm prod = :  %e\n", prod.normInf() );
+
+      // prod.addScaledVector(-1, residual);
+      
+
+      // reporter->printf(R_QP, R_PER_INNER_ITERATION, "norm diff = :  %e\n", prod.normInf() );
+
+
       Vector delta_x(total_length);
       Vector delta_z(total_length);
 
@@ -1097,12 +1180,10 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       //delta.print(reporter, "delta=");
       //delta_x.print(reporter, "deltax=");
       //delta_z.print(reporter, "deltaz=");
-      //std::cout << "deltay=" << delta_y << std::endl;
-
-      double alpha_x;
-      double alpha_z;
+      double bar_alpha_x;
+      double bar_alpha_z;
       double bar_alpha;
-      double alpha;
+      //double alpha;
 
       Vector vectorCompare1(total_length + 1);
       Vector vectorCompare2(total_length + 1);
@@ -1113,37 +1194,285 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       vectorCompare1.set(total_length, 1.0);
       vectorCompare2.set(total_length, 1.0);
 
-      alpha_x = vectorCompare1.max();
-      alpha_z = vectorCompare2.max();
-      bar_alpha = fmin( alpha_x, alpha_z);
-      
-
-      // ****SOLVE QP****
+      bar_alpha_x = 1 / vectorCompare1.max();
+      bar_alpha_z = 1 / vectorCompare2.max();
+      bar_alpha = fmin( bar_alpha_x, bar_alpha_z);
 
 
-      alpha=0.5;
-      vector_x_.addScaledVector(alpha, delta_x);
-      scalar_y_ += alpha*delta_y;
-      vector_z_.addScaledVector(alpha, delta_z);
-
-      if (residual.normInf() < tol_in_){
-        break;
+      // ****SOLVE QP**** NEW!!
+      Vector vector_r(total_length+1);
+      vector_r.set(0, r_pri_);
+      for (int i = 1; i < total_length + 1; i++){
+        vector_r.set(i, r_dual_.values()[i-1]);
       }
       
+      Vector vector_sf(total_length);
+      SymmetricMatrixDense matrix_for_s;
+      matrix_for_s.setAsDiagonal(total_length, 0);
+
+      for (int i = 0; i < total_length; i++){
+        for (int j = i; j < total_length; j++){
+        matrix_for_s.setElement(i, j, matrix_Q_.element(i, j));
+        }
+      }
+
+      matrix_for_s.matrixVectorProduct(delta_x, vector_sf);
+
+      Vector vector_s(total_length+1);
+      vector_s.set(0, - matrix_At_.innerProduct(delta_x));
+      for (int i=1; i < total_length + 1; i++){
+        vector_s.set(i, vector_sf.values()[i-1]);
+      }
+             
+      Vector vector_t(total_length + 1, 0);
+      for (int i = 1; i < omega_length + 1; i++){
+        vector_t.set(i, -1.0);
+      }
+      vector_t.scale(delta_y);
+
+
+      Vector vector_u(total_length + 1 , 0);
+      for (int i=1; i < total_length+1; i++){
+        vector_u.set(i, -delta_z.values()[i-1]);
+      }
+
+      double alpha_x;
+      double alpha_y;
+      double alpha_z;
+      double alpha_x1;
+      double alpha_y1;
+      double alpha_z1;
+     
+      Vector s_plus_u(total_length+1);
+      s_plus_u.copy(vector_s);
+      s_plus_u.addScaledVector(1,vector_u);
+      double Q1_11 = s_plus_u.innerProduct(s_plus_u)+delta_x.innerProduct(delta_z);
+      double Q1_12 = s_plus_u.innerProduct(vector_t);
+      double Q1_22 = vector_t.innerProduct(vector_t);
+      double c1_1 = vector_r.innerProduct(s_plus_u)+0.5*(delta_x.innerProduct(vector_z_)+vector_x_.innerProduct(delta_z));
+      double c1_2 = vector_r.innerProduct(vector_t);
+
+      alpha_x1 = ( c1_2 * Q1_12 / Q1_22 - c1_1 ) / ( Q1_11 - Q1_12 * Q1_12 / Q1_22);
+      if (alpha_x1 < 0) {
+        alpha_x1 = 0;  //should I use different variable?
+      } else if (alpha_x1 > bar_alpha) {
+            alpha_x1 = bar_alpha;
+      } else {
+            // alpha_x1 remains unchanged
+      }
+
+      alpha_y1 = ( -c1_2 - alpha_x1 * Q1_12 ) / Q1_22;
+      alpha_z1 = alpha_x1;
+
+      double alpha_x2;
+      double alpha_y2;
+      double alpha_z2;
+
+      if (bar_alpha_x <= bar_alpha_z){
+      double Q2_11 = vector_t.innerProduct(vector_t);
+      double Q2_12 = vector_t.innerProduct(vector_u);
+      double Q2_22 = vector_u.innerProduct(vector_u);
+      double c2_1 = {vector_r.innerProduct(vector_t) + bar_alpha_x * vector_s.innerProduct(vector_t)};
+      double c2_2 = {vector_r.innerProduct(vector_u) + 0.5 * vector_x_.innerProduct(delta_z) 
+                     + bar_alpha_x * ( vector_s.innerProduct(vector_u)
+                     +0.5 * delta_x.innerProduct(delta_z))};
+      
+      alpha_x2 = bar_alpha_x;
+      alpha_z2 = ( c2_1 * Q2_12 / Q2_11 - c2_2) / (Q2_22 - Q2_12 * Q2_12 / Q2_11);
+      if (alpha_z2 < bar_alpha) {
+        alpha_z2 = bar_alpha;  
+      } else if (alpha_z2 > bar_alpha_z) {
+            alpha_z2 = bar_alpha_z;
+      } else {
+      }      
+
+      alpha_y2 = ( -c2_1 - alpha_z2 * Q2_12) / Q2_11;
+      }
+      else{
+      double Q2_11 = vector_s.innerProduct(vector_s);
+      double Q2_12 = vector_s.innerProduct(vector_t);
+      double Q2_22 = vector_t.innerProduct(vector_t);
+      double c2_1 = {vector_r.innerProduct(vector_s) +0.5*delta_x.innerProduct(vector_z_)+
+                      bar_alpha_z * (vector_s.innerProduct(vector_u)+0.5*delta_x.innerProduct(delta_z))};
+      double c2_2 = {vector_r.innerProduct(vector_t) + bar_alpha_z * vector_t.innerProduct(vector_u)};   
+
+      alpha_x2 = ( c2_2 * Q2_12 / Q2_22 - c2_1 ) / ( Q2_11 - Q2_12 * Q2_12 / Q2_22);
+      if (alpha_x2 < bar_alpha) {
+        alpha_x2 = bar_alpha;  //should I use different variable?
+      } else if (alpha_x2 > bar_alpha_x) {
+            alpha_x2 = bar_alpha_x;
+      } else {
+            // alpha_x1 remains unchanged
+      }
+
+      alpha_y2 = ( -c2_2 - alpha_x2 * Q2_12 ) / Q2_22;
+      alpha_z2 = bar_alpha_z; 
+      }
+     
+      Vector vector_x1(total_length), vector_z1(total_length), vector_x2(total_length), vector_z2(total_length);
+      double scalar_y1, scalar_y2;
+
+      vector_x1.copy(vector_x_);
+      vector_z1.copy(vector_z_);
+      vector_x1.addScaledVector(alpha_x1,delta_x);
+      vector_z1.addScaledVector(alpha_z1,delta_z);
+      scalar_y1 = scalar_y_ + alpha_y1 * delta_y;
+
+      vector_x2.copy(vector_x_);
+      vector_z2.copy(vector_z_);
+      vector_x2.addScaledVector(alpha_x2,delta_x);
+      vector_z2.addScaledVector(alpha_z2,delta_z);
+      scalar_y2 = scalar_y_ + alpha_y2 * delta_y;
+
+
+      Vector QX1(total_length);
+      matrix_Q_.matrixVectorProduct(vector_x1, QX1);
+
+      Vector oper11(total_length);
+      oper11.copy(QX1);
+      oper11.addScaledVector(-scalar_y1, matrix_At_);
+      //std::cout << "Hi5!!" << std::endl;
+
+      Vector secondnorm1(total_length), secondnorm2(total_length);
+      secondnorm1.copy(vector_c_);   
+      secondnorm1.addScaledVector(-1, vector_z1);
+      secondnorm1.addScaledVector(1, oper11);      
+
+      Vector QX2(total_length);
+      matrix_Q_.matrixVectorProduct(vector_x2, QX2);
+
+      Vector oper12(total_length);
+      oper12.copy(QX2);
+      oper12.addScaledVector(-scalar_y2, matrix_At_);
+
+
+      secondnorm2.copy(vector_c_);   // or better to use a new oper2? do I need to initialize r_dual_ first?
+      secondnorm2.addScaledVector(-1, vector_z2);
+      secondnorm2.addScaledVector(1, oper12);
+
+
+      double firstnorm1, firstnorm2;
+      firstnorm1 = matrix_At_.innerProduct(vector_x1)-scalar_b_;
+      firstnorm2 = matrix_At_.innerProduct(vector_x2)-scalar_b_;
+
+
+       
+     if ( (firstnorm1)*(firstnorm1) + (secondnorm1.norm2())*(secondnorm1.norm2())
+                          + vector_x1.innerProduct(vector_z1)
+                         <
+            (firstnorm2)*(firstnorm2) + (secondnorm2.norm2())*(secondnorm2.norm2())
+                          + vector_x2.innerProduct(vector_z2)
+                         ){
+                          alpha_x=alpha_x1;
+                          alpha_y=alpha_y1;
+                          alpha_z=alpha_z1;
+                         }
+      else{
+                          alpha_x=alpha_x2;
+                          alpha_y=alpha_y2;
+                          alpha_z=alpha_z2;        
+      }
+
+      // reporter->printf(R_QP, R_PER_INNER_ITERATION, "alpha_x:  %d\n", alpha_x);
+      // reporter->printf(R_QP, R_PER_INNER_ITERATION, "alpha_y:  %d\n", alpha_y);
+      // reporter->printf(R_QP, R_PER_INNER_ITERATION, "alpha_z:  %d\n", alpha_z);
+
+      vector_x_.addScaledVector(alpha_x, delta_x);
+      scalar_y_ += alpha_y*delta_y;
+      vector_z_.addScaledVector(alpha_z, delta_z);
+
+      for ( int i=0 ; i < total_length; i++){
+        r_cent_In.set(i, -vector_x_.values()[i]*vector_z_.values()[i]);
+      }
+
+      Vector r_cent_In_plus_mu(total_length);
+      for (int i = 0; i < total_length; i++){
+        r_cent_In_plus_mu.set( i, r_cent_In.values()[i] + sigma_ * mu_);
+      }
+
+      Vector residual_In( 2 * total_length + 1);
+      for (int i = 0; i < total_length; i++){
+        residual_In.set(i, r_dual_.values()[i]);
+        residual_In.set(i + total_length +1, r_cent_In_plus_mu.values()[i]);
+      }
+      residual_In.set(total_length, r_pri_);
+
+
+      
+      // reporter->printf(R_QP, R_PER_INNER_ITERATION, "mu: %e\n", mu_);
+
+      std::cout << outer_iter_count_
+                      << std::setw(20) << inner_iter_count_
+                      << std::setw(20) << vector_x_.min()
+                      << std::setw(20) << vector_z_.min()
+                      << std::setw(20) << mu_
+                      << std::setw(20) << abs(r_pri_)
+                      << std::setw(20) << r_dual_.normInf()
+                      << std::setw(20) << r_cent_In.normInf()
+                      << std::setw(20) << (r_cent_In_plus_mu).normInf()
+                      << std::setw(20) << delta_x.normInf()
+                      << std::setw(20) << abs(delta_y)
+                      << std::setw(20) << delta_z.normInf()
+                      << std::setw(20) << bar_alpha_x
+                      << std::setw(20) << bar_alpha_z
+                      << std::setw(20) << alpha_x
+                      << std::setw(20) << alpha_y
+                      << std::setw(20) << alpha_z << std::endl;
+      
+      if (residual_In.normInf() < tol_in_){
+        break;
+      }
+
      }//end in-while
      
       Vector residual_Out( 2 * total_length + 1);
       for (int i = 0; i < total_length; i++){
         residual_Out.set(i, r_dual_.values()[i]);
-        residual_Out.set(i + total_length +1, r_cent_.values()[i] );
+        residual_Out.set(i + total_length +1, r_cent_In.values()[i] );
       }
       residual_Out.set(total_length, r_pri_);
 
-      if (residual_Out.normInf() < tol_out_){
+      if (residual_Out.normInf() < tol_out_){ //kkterror
         break;
       }
+      
+
+      // Throw
+
+
+      // Check for successful solve
+      kkt_error_ = 0;
+      kkt_error_ = residual_Out.normInf();
+      // if (kkt_error_ >= -tol_out_) {
+      //   THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
+      // }
+      // // why -tol?
+      // // inexact termination?
+
+      // // Check for iteration limit ** use for outer **
+      // if (outer_iter_count_ >= max_iter_out_) { 
+      //   THROW_EXCEPTION(QP_ITERATION_LIMIT_EXCEPTION, "QP solve unsuccessful. Iteration limit reached.");
+      // }
+      
+      // // Check for CPU time limit ** Stay the same?
+      // if ((clock() - quantities->startTime()) / (double)CLOCKS_PER_SEC >= quantities->cpuTimeLimit()) {
+      //   THROW_EXCEPTION(QP_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
+      // }
+
+
+      // success!
+      
+      mu_=fmin( vector_x_.innerProduct(vector_z_) / total_length, mu_factor_ * mu_ );
+
+
+
     }//end out-while
+
+    std::cout << "Hi!!" << std::endl;
     
+
+
+
 
 
 
@@ -1151,7 +1480,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
      * END for Lara
     */
 
-
+    // ********** TO BE ERASED FROM HERE ************
 
     // Initialize minimum index and value
     int index = -1;
@@ -1357,8 +1686,8 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
         THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
       }
 
-      // Check for iteration limit
-      if (iteration_count_ >= iteration_limit) {
+      // Check for iteration limit ** use for outer **
+      if (iteration_count_ >= iteration_limit) { 
         THROW_EXCEPTION(QP_ITERATION_LIMIT_EXCEPTION, "QP solve unsuccessful. Iteration limit reached.");
       }
 
@@ -1746,20 +2075,33 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
   } // end try
 
   // catch exceptions
-  catch (QP_SUCCESS_EXCEPTION& exec) {
+  // catch (QP_SUCCESS_EXCEPTION& exec) { //this
+  //   setStatus(QP_SUCCESS);
+  // } catch (QP_CPU_TIME_LIMIT_EXCEPTION& exec) { //this
+  //   setStatus(QP_CPU_TIME_LIMIT);
+  //   THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
+  // }  catch (QP_ITERATION_LIMIT_EXCEPTION& exec) {  //this
+  //   setStatus(QP_ITERATION_LIMIT);
+  // }
+
+  catch (QP_SUCCESS_EXCEPTION& exec) { //this
     setStatus(QP_SUCCESS);
-  } catch (QP_CPU_TIME_LIMIT_EXCEPTION& exec) {
+  } catch (QP_CPU_TIME_LIMIT_EXCEPTION& exec) { //this
     setStatus(QP_CPU_TIME_LIMIT);
     THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
   } catch (QP_FACTORIZATION_ERROR_EXCEPTION& exec) {
     setStatus(QP_FACTORIZATION_ERROR);
   } catch (QP_INPUT_ERROR_EXCEPTION& exec) {
     setStatus(QP_INPUT_ERROR);
-  } catch (QP_ITERATION_LIMIT_EXCEPTION& exec) {
+  } catch (QP_ITERATION_LIMIT_EXCEPTION& exec) {  //this
     setStatus(QP_ITERATION_LIMIT);
   } catch (QP_NAN_ERROR_EXCEPTION& exec) {
     setStatus(QP_NAN_ERROR);
   }
+
+
+
+
 
   // Print new line
   reporter->printf(R_QP, R_PER_ITERATION, "\n");
@@ -1768,7 +2110,9 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
   reporter->printf(R_QP, R_PER_INNER_ITERATION, "Finalizing solution\n");
 
   // Finalize solution
-  finalizeSolution();
+  finalizeSolution(); // put Gw + gamma
+
+  reporter->printf(R_QP, R_PER_ITERATION, "hi\n");
 
 } // end solveQPHot
 
@@ -2362,34 +2706,29 @@ void QPSolverInteriorPoint::evaluateSystemVector(int set,
 void QPSolverInteriorPoint::finalizeSolution()
 {
 
-  // Set sizes
-  omega_.setLength((int)vector_.size());
-  omega_.scale(0.0);
-  gamma_.setLength(gamma_length_);
+  int omega_length = (int)vector_.size();
   gamma_.scale(0.0);
 
-  // Set final omega values
-  for (int i = 0; i < (int)omega_positive_best_.size(); i++) {
-    omega_.set(omega_positive_best_[i], system_solution_best_[i]);
+  for (int i = 0; i < gamma_length_; i++)
+  {
+    gamma_.set(i, vector_x_.values()[i + omega_length + gamma_length_] - vector_x_.values()[i + omega_length]);
+  }
+  
+
+  // Evaluate gradient combination
+  Vector Gomega(gamma_length_, 0.0);
+  for (int i = 0; i < (int)vector_list_.size(); i++) {
+    Gomega.addScaledVector(vector_x_.values()[i], *vector_list_[i].get());
   }
 
-  // Set final gamma values
-  for (int i = 0; i < (int)gamma_positive_best_.size(); i++) {
-    gamma_.set(gamma_positive_best_[i], system_solution_best_[(int)omega_positive_best_.size() + i]);
-  }
-  for (int i = 0; i < (int)gamma_negative_best_.size(); i++) {
-    gamma_.set(gamma_negative_best_[i], system_solution_best_[(int)omega_positive_best_.size() + (int)gamma_positive_best_.size() + i]);
-  }
+  primal_solution_.scale(0.0);
+  primal_solution_.addScaledVector(-1.0, Gomega);
 
-  // Set solution to best
-  omega_positive_ = omega_positive_best_;
-  gamma_positive_ = gamma_positive_best_;
-  gamma_negative_ = gamma_negative_best_;
+  
+  primal_solution_.addScaledVector(-1.0, gamma_);
 
-  // Update solution
-  for (int i = 0; i < (int)omega_positive_best_.size() + (int)gamma_positive_best_.size() + (int)gamma_negative_best_.size(); i++) {
-    system_solution_[i] = system_solution_best_[i];
-  }
+
+
 
 } // end finalizeSolution
 

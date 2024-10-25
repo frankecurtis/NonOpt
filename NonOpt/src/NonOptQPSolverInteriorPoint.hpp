@@ -112,17 +112,17 @@ public:
    * Get KKT error
    * \return solver's KKT error
    */
-  double KKTError() { return kkt_error_; };
+  double KKTError() { return kkt_error_; };  //residual r
   /**
    * Get KKT error full
    * \return full KKT error corresponding to dual solution
    */
-  double KKTErrorDual();
+  double KKTErrorDual() { return kkt_error_; };  // Lara done
   /**
    * Get iteration count
    * \return number of iterations performed
    */
-  int numberOfIterations() { return iteration_count_; };
+  int numberOfIterations() { return outer_iter_count_; };  //change to the outer iteration
   /**
    * Get primal solution
    * \param[out] "d" (equal to "-W*(G*omega + gamma)" if solution is exact)
@@ -316,6 +316,8 @@ private:
   double scalar_y_; 
   Vector vector_z_;
   double mu_;
+  Vector primal_solution_; 
+
 
   int inner_iter_count_;
   int outer_iter_count_;
@@ -361,7 +363,6 @@ private:
   Vector combination_translated_;
   Vector gamma_;
   Vector omega_;
-  Vector primal_solution_;
   Vector primal_solution_feasible_;
   Vector primal_solution_feasible_best_;
   Vector primal_solution_simple_;
