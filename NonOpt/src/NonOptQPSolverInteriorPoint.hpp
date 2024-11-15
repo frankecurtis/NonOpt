@@ -117,7 +117,7 @@ public:
    * Get KKT error full
    * \return full KKT error corresponding to dual solution
    */
-  double KKTErrorDual() { return kkt_error_; };  // Lara done
+  double KKTErrorDual() { return kkt_error_; };  
   /**
    * Get iteration count
    * \return number of iterations performed
@@ -305,7 +305,7 @@ private:
    * Lara
    */
   Vector matrix_At_;  /**< "A transpose" */
-  double scalar_b_; 
+  double scalar_b_;
   SymmetricMatrixDense matrix_Q_;
   Vector vector_c_;
   SymmetricMatrixDense matrix_J_;
@@ -317,6 +317,7 @@ private:
   Vector vector_z_;
   double mu_;
   Vector primal_solution_; 
+  double scalar_tau_;
 
 
   int inner_iter_count_;
@@ -362,6 +363,7 @@ private:
   Vector combination_;
   Vector combination_translated_;
   Vector gamma_;
+  Vector Gomega_;
   Vector omega_;
   Vector primal_solution_feasible_;
   Vector primal_solution_feasible_best_;

@@ -142,7 +142,7 @@ void QPSolverInteriorPoint::addOptions(Options* options)
                            "              linear independence of the augmented matrix.\n"
                            "Default     : 1e-12.");
   options->addDoubleOption("QPIPM_beta",
-                           0.4,
+                           0.3,
                            0.0,
                            1.0,
                            "beta has to be 0 and 1. TBC...\n"
@@ -160,13 +160,13 @@ void QPSolverInteriorPoint::addOptions(Options* options)
                            "eps is a very small number. TBC...\n"
                            "Default     : 1e-16.");                 
   options->addDoubleOption("QPIPM_tol_in",
-                           1e-3,
+                           1e-5,
                            0.0,
                            1.0,
                            "Tolerance of inner loop. TBC...\n"
                            "Default     : 1e-3.");    
   options->addDoubleOption("QPIPM_tol_out",
-                           1e-4,
+                           1e-5,
                            0.0,
                            1.0,
                            "Tolerance of outer loop. TBC...\n"
@@ -915,6 +915,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     
     reporter->printf(R_QP, R_PER_INNER_ITERATION, "gamma length:  %d\n", gamma_length_);
     reporter->printf(R_QP, R_PER_INNER_ITERATION, "vector list size length:  %d\n", vector_list_.size());
+    reporter->printf(R_QP, R_PER_INNER_ITERATION, "vector size length:  %d\n", vector_.size());
 
     reporter->printf(R_QP, R_PER_INNER_ITERATION, "omega length:  %d\n", omega_length);
 
@@ -938,19 +939,21 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
     }
 
+
+
     scalar_b_ = 1.0;
  
     vector_c_.setLength(total_length);
     
-    for (int i = 0; i < omega_length; i++){
-        vector_c_.set(i,-vector_[i]);
+    // for (int i = 0; i < omega_length; i++){
+    //     vector_c_.set(i,-vector_[i]);
 
-    }
+    // }
 
-    for (int i = omega_length ; i < total_length; i++){
-        vector_c_.set(i,scalar_);
+    // for (int i = omega_length ; i < total_length; i++){
+    //     vector_c_.set(i,scalar_);
 
-    }   
+    // }   
      reporter->printf(R_QP, R_PER_INNER_ITERATION, "scalar delta:  %e\n", scalar_);
 
     // Declare WG vectors
@@ -995,6 +998,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
 
 
+
     // reporter->printf(R_QP, R_PER_INNER_ITERATION,"Matrix Q values:\n", "", 0); // Header
 
     // for (int i = 0; i < total_length; ++i) {
@@ -1020,13 +1024,226 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     vector_z_.setLength(total_length);
     scalar_y_= 0.0;
 
+
+
     for (int i = 0; i < total_length; i++){
       vector_x_.set(i, 1.0);
       vector_z_.set(i, 1.0);
     }
 
+    Vector Theta(total_length);
+    // Vector Omeg(omega_length);
+    // for (int i =0; i< omega_length; i++){
+    //   Omeg.set(i, vector_x_.values()[i]);
+    // }
+
+    // Gomega_.setLength(gamma_length_);
+    
+    // for (int i = 0; i < omega_length; i++) {
+    //   Gomega_.addScaledVector(Omeg.values()[i], *vector_list_[i].get());
+    // }
+
+    // for (int i = 0; i < gamma_length_; i++) {
+    //   if ( Gomega_.values()[i] > 0){
+    //     Gomega_.set(i, -Gomega_.values()[i]);
+    //   }
+    // }
+    // std::cout << "Gomega:" << std::endl;
+
+    // for (int i = 0; i < gamma_length_; i++) {
+    //   std::cout << Gomega_.values()[i] << std::endl;
+    // }
+
+    // std::cout << "End of Gomega" << std::endl;
+
+
+    std::cout << "Hi0" << std::endl;
+
+    // for (int i=0; i<total_length; i++){
+    //   Theta.set(i, i);
+    // }
+    // Theta.scale(1 / Theta.norm1());
+
+    Theta.set(0,0.1306);
+    Theta.set(1,0.1452);
+    Theta.set(2,0.0204);
+    Theta.set(3,0.1464);
+    Theta.set(4,0.1014);
+    Theta.set(5,0.0156 );
+    Theta.set(6,0.0446);
+    Theta.set(7,0.0877);
+    Theta.set(8,0.1535);
+    Theta.set(9,0.1546);
+    
+    Gomega_.setLength(gamma_length_);
+    
+    for (int i = 0; i < omega_length; i++) {
+      Gomega_.addScaledVector(Theta.values()[i], *vector_list_[i].get());
+    }
+
+    // for (int i = 0; i < gamma_length_/2; i++) {
+    //   if ( Gomega_.values()[i] < 0){
+    //     Gomega_.set(i, -Gomega_.values()[i]);
+    //   }
+    //   if ( Gomega_.values()[i + gamma_length_/2] > 0){
+    //     Gomega_.set(i + gamma_length_/2, -Gomega_.values()[i + gamma_length_/2]);
+    //   }
+    // }
+
+    for (int i = 0; i < gamma_length_; i++) {
+      if ( Gomega_.values()[i] <= 0){
+        Theta.set(i+omega_length+gamma_length_, -Gomega_.values()[i]);
+      }
+      if ( Gomega_.values()[i] > 0){
+        Theta.set(i+omega_length, Gomega_.values()[i]);
+      }
+    }
+
+
+
+    std::cout << "Hi1" << std::endl;
+
+    // for (int i=omega_length; i< omega_length + gamma_length_; i++){
+    //   Theta.set(i, 0);
+    // }
+
+    // for (int i=omega_length; i< omega_length + gamma_length_/2; i++){
+    //   Theta.set(i, Gomega_.values()[i-gamma_length_/2]);
+    //   Theta.set(i+gamma_length_+gamma_length_/2, -Gomega_.values()[i]);
+    // }
+
+    std::cout << "Hi2" << std::endl;
+
+    // for (int i=0; i < gamma_length_; i++){
+    //   Theta.set(i+omega_length+gamma_length_, -Gomega_.values()[i]);
+    // }
+    std::cout << "Hi3" << std::endl;
+
+
+
+
+    for (int i=0; i<total_length; i++){
+      std::cout << Theta.values()[i] << std::endl;
+    }
+
+    // Print a custom message after the loop
+    std::cout << "End of Theta values." << std::endl;
+    std::cout << std::endl; // This prints an empty line
+
+
+
+
+    std::cout << "Gomega:" << std::endl;
+
+    for (int i = 0; i < gamma_length_; i++) {
+      std::cout << Gomega_.values()[i] << std::endl;
+    }
+
+    std::cout << "End of Gomega" << std::endl;
+
+
+    Vector Myvector_v(total_length);
+
+    for (int i=0; i<total_length; i++){
+      if (Theta.values()[i] ==0 ){
+        Myvector_v.set(i, 0.5);
+      }
+    }
+
+
+    // Myvector_v.set(0, 5);
+    // Myvector_v.set(1, 0.5);
+
+    // for (int i = omega_length; i < omega_length + gamma_length_; i++){
+    //   Myvector_v.set(i, 0.5);
+    // }
+
+    // for (int i = omega_length+ gamma_length_/2; i < omega_length + gamma_length_+ gamma_length_/2; i++){
+    //   Myvector_v.set(i, 0.5);
+    // }
+
+    for (int i=0; i<total_length; i++){
+      std::cout << Myvector_v.values()[i] << std::endl;
+    }
+
+    std::cout << "End of Myvector_v values." << std::endl;
+
+
+    double Myvector_u = 5;
+    SymmetricMatrixDense QTheta;
+    Vector QThetaVec(total_length);
+
+    QTheta.setAsDiagonal(total_length, 0);
+    for (int i = 0; i < total_length; i++){
+        for (int j = i; j < total_length; j++){
+        QTheta.setElement(i, j, matrix_Q_.element(i, j));
+        }
+    }
+
+
+
+    QTheta.matrixVectorProduct(Theta, QThetaVec);
+
+    QThetaVec.scale(-1.0);
+
+    std::cout <<"vector Q theta:" << std::endl;
+    
+    for (int i=0; i < total_length; i++){
+      std::cout << QThetaVec.values()[i] << std::endl;
+    }
+
+
+    std::cout <<"End of vector Q theta." << std::endl;
+
+
+    QThetaVec.addScaledVector(1,Myvector_v);
+    vector_c_.addScaledVector(1,QThetaVec);
+    vector_c_.addScaledVector(Myvector_u, matrix_At_);
+
+
+    std::cout <<"vector c:" << std::endl;
+    
+    for (int i=0; i < total_length; i++){
+      std::cout << vector_c_.values()[i] << std::endl;
+    }
+
+
+    std::cout <<"End of vector c." << std::endl;
+
+    std::cout <<"vector b_k vector_:" << std::endl;
+    
+    // for (int i=0; i < omega_length; i++){
+    //   std::cout << vector_ << std::endl;
+    // }
+
+
+    // std::cout <<"End of vector b_k vector_." << std::endl;
+
+    std::cout <<"Gomega+sigma-rho:" << std::endl;
+    
+    for (int i=0; i < gamma_length_; i++){
+      std::cout <<Gomega_.values()[i]+Theta.values()[i+omega_length+gamma_length_]-Theta.values()[i+omega_length] << std::endl;
+    }
+
+
+    std::cout <<"End of Gomega_+sigma-rho:" << std::endl;
+
+    // ^^^^^^^^^^^^
+
+    std::cout <<"c+Qtheta-A^Tu-v:" << std::endl;
+    
+    for (int i=0; i < total_length; i++){
+      std::cout <<vector_c_.values()[i]+QThetaVec.values()[i]-matrix_At_.values()[i]*Myvector_u-Myvector_v.values()[i] << std::endl;
+    }
+
+
+    std::cout <<"End of c+Qtheta-A^Tu-v::" << std::endl;
+
+
+
+
+
     //std::cout << "Hi2!!" << std::endl;
-    mu_=vector_x_.innerProduct(vector_z_) / total_length;   //gamma_length is guaranteed to be > 0 ? Correct use of inner?
 
     // **************************************
     Vector gradient(total_length);
@@ -1034,18 +1251,59 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     matrix_Q_.matrixVectorProduct(vector_x_, gradient);
     gradient.addScaledVector(1, vector_c_);
 
-    double max_gradient = gradient.normInf();
-    double scalar_tau = 1 / ( max_gradient);
+    double max_gradient = gradient.normInf();  //max with 1
+    double scalar_tau_ = 1 / ( max_gradient);
 
     for (int i = 0; i < total_length; i++){
       for (int j = 0; j < total_length; j++){
-        matrix_Q_.setElement(i, j, scalar_tau * matrix_Q_.element(i,j));
+        matrix_Q_.setElement(i, j, scalar_tau_ * matrix_Q_.element(i,j));
       }
     }
+
+  
+    // Myvector_u = Myvector_u * scalar_tau_;
+    // Myvector_v.scale( scalar_tau_);
     
-    vector_c_.scale(scalar_tau);
+    vector_c_.scale(scalar_tau_);
+    std::cout << "scalar_tau_: " << scalar_tau_<< std::endl;
+
+
+
+    SymmetricMatrixDense QTheta1;
+    Vector QThetaVec1(total_length);
+
+    QTheta1.setAsDiagonal(total_length, 0);
+    for (int i = 0; i < total_length; i++){
+        for (int j = i; j < total_length; j++){
+        QTheta1.setElement(i, j, matrix_Q_.element(i, j));
+        }
+    }
+
+
+
+    QTheta1.matrixVectorProduct(Theta, QThetaVec1);
+
+
+
+
+    vector_c_.scale(0.0);
+    vector_c_.addScaledVector(-1,QThetaVec1);
+    vector_c_.addScaledVector(Myvector_u, matrix_At_);
+    vector_c_.addScaledVector(1, Myvector_v);
+
+    // std::cout <<"New c+Qtheta-A^Tu-v:" << std::endl;
+    
+    // for (int i=0; i < total_length; i++){
+    //   std::cout <<vector_c_.values()[i]+QThetaVec1.values()[i]-matrix_At_.values()[i]*Myvector_u-Myvector_v.values()[i] << std::endl;
+    // }
+
+
+    // std::cout <<" End of New c+Qtheta-A^Tu-v::" << std::endl;
+
     // **************************************
     
+    mu_=vector_x_.innerProduct(vector_z_) / total_length;   //gamma_length is guaranteed to be > 0 ? Correct use of inner?
+
     matrix_J_.setAsDiagonal(2 * total_length + 1, 0);
 
     for (int i = 0; i < total_length; i++){
@@ -1059,7 +1317,11 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     }
 
     //std::cout << "Hi3!!" << std::endl;
-    
+
+    // std::cout << "Stopping program here for debugging purposes." << std::endl;
+    // std::exit(0); 
+
+
     outer_iter_count_ = 0;  // Should I put it above as for the iteration_count_?
     while (outer_iter_count_ < max_iter_out_)
     {
@@ -1381,6 +1643,8 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       scalar_y_ += alpha_y*delta_y;
       vector_z_.addScaledVector(alpha_z, delta_z);
 
+      std::cout << "y="<<scalar_y_ << std::endl;
+
       for ( int i=0 ; i < total_length; i++){
         r_cent_In.set(i, -vector_x_.values()[i]*vector_z_.values()[i]);
       }
@@ -1433,6 +1697,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       residual_Out.set(total_length, r_pri_);
 
       if (residual_Out.normInf() < tol_out_){ //kkterror
+        std::cout << "x[3]="<< vector_x_.values()[3] << std::endl;
         break;
       }
       
@@ -1441,24 +1706,9 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
 
       // Check for successful solve
+
       kkt_error_ = 0;
       kkt_error_ = residual_Out.normInf();
-      // if (kkt_error_ >= -tol_out_) {
-      //   THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
-      // }
-      // // why -tol?
-      // // inexact termination?
-
-      // // Check for iteration limit ** use for outer **
-      // if (outer_iter_count_ >= max_iter_out_) { 
-      //   THROW_EXCEPTION(QP_ITERATION_LIMIT_EXCEPTION, "QP solve unsuccessful. Iteration limit reached.");
-      // }
-      
-      // // Check for CPU time limit ** Stay the same?
-      // if ((clock() - quantities->startTime()) / (double)CLOCKS_PER_SEC >= quantities->cpuTimeLimit()) {
-      //   THROW_EXCEPTION(QP_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
-      // }
-
 
       // success!
       
@@ -1468,8 +1718,23 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
     }//end out-while
 
-    std::cout << "Hi!!" << std::endl;
-    
+    // std::cout << "Hi!!" << std::endl;
+
+    if (kkt_error_ >= -tol_out_) {
+      THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
+    }
+      // why -tol?
+      // inexact termination?
+
+      // Check for iteration limit ** use for outer **
+    if (outer_iter_count_ >= max_iter_out_) { 
+      THROW_EXCEPTION(QP_ITERATION_LIMIT_EXCEPTION, "QP solve unsuccessful. Iteration limit reached.");
+    }
+      
+      // Check for CPU time limit ** Stay the same?
+    if ((clock() - quantities->startTime()) / (double)CLOCKS_PER_SEC >= quantities->cpuTimeLimit()) {
+      THROW_EXCEPTION(QP_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
+    }
 
 
 
@@ -2112,7 +2377,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
   // Finalize solution
   finalizeSolution(); // put Gw + gamma
 
-  reporter->printf(R_QP, R_PER_ITERATION, "hi\n");
+  std::cout << "Hi!!" << std::endl;
 
 } // end solveQPHot
 
@@ -2706,26 +2971,85 @@ void QPSolverInteriorPoint::evaluateSystemVector(int set,
 void QPSolverInteriorPoint::finalizeSolution()
 {
 
-  int omega_length = (int)vector_.size();
+  int omega_length = (int)vector_.size(); //same as vector_list_
+  gamma_.setLength(gamma_length_);
   gamma_.scale(0.0);
 
   for (int i = 0; i < gamma_length_; i++)
   {
     gamma_.set(i, vector_x_.values()[i + omega_length + gamma_length_] - vector_x_.values()[i + omega_length]);
   }
-  
 
-  // Evaluate gradient combination
-  Vector Gomega(gamma_length_, 0.0);
-  for (int i = 0; i < (int)vector_list_.size(); i++) {
-    Gomega.addScaledVector(vector_x_.values()[i], *vector_list_[i].get());
+  std::cout << "Beg of gamma_ values." << std::endl;    
+
+  for (int i=0; i<gamma_length_; i++){
+    std::cout << gamma_.values()[i] << std::endl;
   }
 
-  primal_solution_.scale(0.0);
-  primal_solution_.addScaledVector(-1.0, Gomega);
+  // Print a custom message after the loop
+  std::cout << "End of gamma_ values." << std::endl;    
 
+  std::cout << "Beg of Gomega values." << std::endl;    
+
+  for (int i=0; i<gamma_length_; i++){
+    std::cout << Gomega_.values()[i] << std::endl;
+  }
+
+  // Print a custom message after the loop
+  std::cout << "End of Gomega values." << std::endl;    
+
+  // Evaluate gradient combination ***CHECK***
+  // Vector Gomega(gamma_length_, 0.0);
+  // for (int i = 0; i < (int)vector_list_.size(); i++) {
+  //   Gomega.addScaledVector(vector_x_.values()[i], *vector_list_[i].get());
+  // }
+
+
+  // for (int i=0; i < gamma_length_; i++){
+  //   std::cout <<Gomega_.values()[i]+Theta.values()[i+omega_length+gamma_length_]-Theta.values()[i+omega_length] << std::endl;
+  // }
   
+
+  primal_solution_.scale(0.0);
+  primal_solution_.addScaledVector(-1.0, Gomega_);
+
+  std::cout << "hi" << Gomega_.values()[3] << std::endl;
+
+
   primal_solution_.addScaledVector(-1.0, gamma_);
+
+  std::cout << "Beg of PM values." << std::endl;    
+
+  for (int i=0; i<gamma_length_; i++){
+    std::cout << primal_solution_.values()[i] << std::endl;
+  }
+
+  // Print a custom message after the loop
+  std::cout << "End of PM values." << std::endl; 
+  
+  Vector PM(gamma_length_);
+
+  matrix_->matrixVectorProductOfInverse(primal_solution_, PM);
+
+  for (int i=0; i < gamma_length_; i++){
+    std::cout << PM.values()[i] << std::endl;
+  }
+  std::cout << "Final Vector x (theta):" << std::endl;
+
+  for (int i=0; i < omega_length + 2*gamma_length_; i++){
+    std::cout << vector_x_.values()[i] << std::endl;
+  }
+
+  // std::cout << scalar_tau_ << std::endl;
+  std::cout << "Final Vector z (v):" << std::endl;
+
+
+  for (int i=0; i < omega_length + 2*gamma_length_; i++){
+    std::cout << vector_z_.values()[i] << std::endl;
+  }
+  
+  std::cout << "Final Vector y (u):" << std::endl;
+  std::cout << scalar_y_<< std::endl;
 
 
 
