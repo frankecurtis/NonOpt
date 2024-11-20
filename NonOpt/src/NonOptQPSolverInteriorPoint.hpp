@@ -322,6 +322,7 @@ private:
 
   int inner_iter_count_;
   int outer_iter_count_;
+  int sum_inner_iter_count_;
 
   /**
    * Algorithm parameters
