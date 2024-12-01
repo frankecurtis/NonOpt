@@ -273,6 +273,8 @@ int testQPSolverImplementation(int option)
       }
     } // end for
 
+    matrix->setAsDiagonal(numberVariables, 1.0);
+
     // Loop over cold and hot solves
     for (int solve_count = 0; solve_count < test_adds + 1; solve_count++) {
 

@@ -1109,12 +1109,12 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     
 
 
-    for (int i=0; i < omega_length; i++){
+    for (int i=0; i < gamma_length_; i++){
       if (WGomega.values()[i] < -scalar_delta){
-        Theta.set(i+omega_length+gamma_length_, -DeltaH.values()[i]);
+        Theta.set(i+omega_length+gamma_length_, -DeltaH.values()[i]-Gomega_.values()[i]);
       }
-      if (WGomega.values()[i] < -scalar_delta){
-        Theta.set(i+omega_length, DeltaH.values()[i]);
+      if (WGomega.values()[i] > scalar_delta){
+        Theta.set(i+omega_length, -DeltaH.values()[i] + Gomega_.values()[i]);
       }
     }
 
@@ -1239,8 +1239,17 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
     std::cout <<"End of Vector d." << std::endl;
 
+    Vector vector_WD(gamma_length_);
+    matrix_->matrixVectorProductOfInverse(vector_d, vector_WD);
+
+    std::cout <<"W(Gomega+sigma-rho):" << std::endl;
+    
+    for (int i=0; i < gamma_length_; i++){
+      std::cout <<vector_WD.values()[i] << std::endl;
+    }
 
 
+    std::cout <<"End of W(Gomega_+sigma-rho)." << std::endl;
 
     for (int i=omega_length; i < total_length; i++){
       vector_c_.set(i, scalar_delta);
@@ -1266,7 +1275,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
         vector_c_.set(i, -vector_Gtd.values()[i]+Myvector_u);
       }
       else{
-        vector_c_.set(i, -vector_Gtd.values()[i]+Myvector_u);
+        vector_c_.set(i, 0);
       }
     }
 
