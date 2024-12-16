@@ -13,6 +13,7 @@
 #include <random>
 
 #include "NonOptQPSolverInteriorPoint.hpp"
+#include "NonOptQPSolverDualActiveSet.hpp"
 #include "NonOptSymmetricMatrix.hpp"
 #include "NonOptSymmetricMatrixDense.hpp"
 
@@ -23,7 +24,8 @@ int testQPSolverImplementation(int option)
 {
 
   // Initialize output
-  int result = 0;
+  int result_DAS = 0;
+  int result_IPM = 0;
 
   // Declare reporter
   Reporter reporter;
@@ -33,7 +35,8 @@ int testQPSolverImplementation(int option)
   if (option == 1) {
 
     // Declare stream report
-    std::shared_ptr<StreamReport> s(new StreamReport("s", R_QP, R_PER_INNER_ITERATION));
+    // std::shared_ptr<StreamReport> s(new StreamReport("s", R_QP, R_PER_INNER_ITERATION));
+    std::shared_ptr<StreamReport> s(new StreamReport("s", R_QP, R_BASIC));
 
     // Set stream report to standard output
     s->setStream(&std::cout);
@@ -43,311 +46,362 @@ int testQPSolverImplementation(int option)
 
   } // end if
 
-  // Declare test numbers
-  int test_start = 0;
-  int test_end = 0;
-  int test_adds = 0;
-
-  // Declare number of variables
-  int numberVariables = 20;
-
   // Declare random number generator
   std::default_random_engine generator;
   std::uniform_real_distribution<double> uniform(0.0, 1.0);
   std::normal_distribution<double> normal(0.0, 1.0);
 
+  // Set random seeds
+  generator.seed(0); // Instead of test that was 0...
+
+for (int size_n : {10, 50, 100, 200, 500}) {
+  std::cout << "\n" << "\n"<< "\n" << "\n" << "Outer loop (n = " << size_n << "):\n";
+  
+  // Inner loop for m = n + 1 and m = 2n
+  for (int size_m : {size_n + 1, 2 * size_n}) {
+    std::cout << "\n" << "    m = " << size_m << std::endl;
+
+
+
   // Declare options
   Options options;
 
   // Declare QP solver object
-  QPSolverInteriorPoint q;
+  QPSolverInteriorPoint q_IPM; //add here
+  QPSolverDualActiveSet q_DAS; //add here
 
   // Add options
-  q.addOptions(&options);
+  q_IPM.addOptions(&options);
+  q_DAS.addOptions(&options);
 
   // Use exact solves
-  options.modifyBoolValue("QPDAS_allow_inexact_termination", false);
+  options.modifyBoolValue("QPDAS_allow_inexact_termination", false);  // Check this!!
 
   // Set options
-  q.setOptions(&options);
+  q_IPM.setOptions(&options);
+  q_DAS.setOptions(&options);
 
   // Initialize data
-  q.initializeData(numberVariables);
+  q_IPM.initializeData(size_n);
+  q_DAS.initializeData(size_n);
 
-  // Loop over number of tests
-  for (int test = test_start; test < test_end + 1; test++) {
 
     // Print test number
-    reporter.printf(R_QP, R_BASIC, "Running test %8d... ", test);
+    // reporter.printf(R_QP, R_BASIC, "Running test %8d... ", test);
 
     // Set random seeds
-    generator.seed(test);
+    generator.seed(0); // Instead of test that was 0...
 
-    // Declare problem parameters
-    int numberAffine = 2 * (test + 1);
-    int numberActive = (test + 1);
-    int numberPoints = 10 * (test + 1);
-    int numberPointsAdd = 50;
-
-    // Declare scaling factors
-    double hess_scaling = 10;
-
-    // Declare regularization
-    double regularization = 1.0 / ((double)(test) + 1.0);
-
-    /*
-     * Set up generator function
+ 
+    /**
+     * Lara 
      */
+    
+    double scalar_ = 1;  // this is my delta!!
+    Vector vector_ones_n(size_n, 1.0);
+    Vector vector_ones_m(size_m, 1.0);
 
-    // Initialize linear vector term
-    Vector gen_maxLinearVector(numberAffine, 0.0);
 
-    // Set random elements of linear vector term
-    for (int i = numberActive; i < numberAffine; i++) {
-      gen_maxLinearVector.set(i, -pow(uniform(generator), 2.0));
+
+    Vector vector_d_star(size_n, 0); //for now, d=delta
+
+    Vector vector_d_unc(size_n);
+    if (vector_d_star.normInf() == scalar_){    //not good because it only work for our case only
+      vector_d_unc.addScaledVector(2*scalar_, vector_ones_n);
     }
 
-    // Initialize and set linear matrix term
-    double* gen_maxLinearMatrix = new double[numberAffine * numberVariables];
-    for (int i = 0; i < numberAffine * numberVariables; i++) {
-      gen_maxLinearMatrix[i] = normal(generator);
+    Vector vector_t(size_n);
+    vector_t.addScaledVector(-1,vector_d_unc);
+
+
+    std::shared_ptr<SymmetricMatrixDense> matrix = std::make_shared<SymmetricMatrixDense>();
+    matrix->setAsDiagonal(size_n, 1.0);  // W is the identity matrix
+
+    std::vector<std::shared_ptr<Vector>> vector_list_G_hat;
+
+    // Generate the outer vector with 'numberVectors' inner vectors
+    for (int i = 0; i < size_n-1; i++) {
+        // Create a new Vector with random components directly
+        std::shared_ptr<Vector> new_vector = std::make_shared<Vector>(size_n);
+
+        for (int j = 0; j < size_n; j++) {
+            new_vector->set(j, normal(generator));  // Set random component directly
+        }
+
+        // Add it to the vector list
+        vector_list_G_hat.push_back(new_vector);
     }
 
-    // Initialize weights
-    Vector gen_weights(numberAffine, 0.0);
+    // // Initialize weights
+    Vector omega_hat(size_n-1, 0.0);
 
     // Set weights and normalize
-    for (int i = 0; i < numberActive; i++) {
-      gen_weights.set(i, uniform(generator));
-    }
-    gen_weights.scale(1.0 / gen_weights.norm1());
-
-    // Initialize and set linear term
-    Vector gen_linear(numberVariables);
-    for (int i = 0; i < numberVariables; i++) {
-      for (int j = 0; j < numberAffine; j++) {
-        gen_linear.set(i, gen_linear.values()[i] - gen_maxLinearMatrix[j * numberVariables + i] * gen_weights.values()[j]);
-      }
-    } // end for
-
-    // Initialize quadratic term
-    double* gen_quadratic_init = new double[numberVariables * numberVariables];
-    for (int i = 0; i < numberVariables * numberVariables; i++) {
-      gen_quadratic_init[i] = normal(generator);
+    for (int i = 0; i < size_n-1; i++) {
+      omega_hat.set(i, uniform(generator));
     }
 
-    // Set quadratic term
-    double* gen_quadratic = new double[numberVariables * numberVariables];
-    for (int i = 0; i < numberVariables * numberVariables; i++) {
-      gen_quadratic[i] = 0.0;
+
+    Vector vector_g_hat(size_n);
+    
+    Vector vector_Ghat_omegaHat(size_n);
+    
+    for (int i = 0; i < size_n-1; i++) {
+      vector_Ghat_omegaHat.addScaledVector(omega_hat.values()[i], *vector_list_G_hat[i].get());
     }
-    for (int i = 0; i < numberVariables; i++) {
-      for (int j = 0; j < numberVariables; j++) {
-        for (int k = 0; k < numberVariables; k++) {
-          gen_quadratic[i * numberVariables + j] = gen_quadratic[i * numberVariables + j] + gen_quadratic_init[i * numberVariables + k] * gen_quadratic_init[j * numberVariables + k];
+
+    vector_g_hat.linearCombination(1, vector_t, -1, vector_Ghat_omegaHat);
+
+    // std::vector<std::shared_ptr<Vector>> vector_list_G_bar;
+    
+
+    // Create a new vector with the same size as vector_g_hat
+    std::shared_ptr<Vector> g_hat_ptr = std::make_shared<Vector>(size_n);
+
+    // Manually copy the data from vector_g_hat to the new vector
+    for (int i = 0; i < size_n; ++i) {
+        g_hat_ptr->set(i, vector_g_hat.values()[i]);  // Assuming 'set' and 'get' methods exist
+    }
+
+    // Add the shared pointer to the list
+    vector_list_G_hat.push_back(g_hat_ptr);
+
+
+
+    Vector omega_bar(size_n);
+    for (int i=0; i<size_n-1; i++){
+      omega_bar.set(i, omega_hat.values()[i]);
+    }
+    omega_bar.set(size_n-1, 1);
+    // omega_bar.scale(1.0 / omega_bar.norm1());
+
+    // Scale all vectors in vector_list_G_hat by 2
+    for (auto& vec_ptr : vector_list_G_hat) {
+        vec_ptr->scale(omega_bar.norm1());  // Scale each vector by a factor of 2
+    }
+
+    
+    // Extend vector_list_G_hat by adding m - n random vectors of size n
+    for (int i = 0; i < size_m - size_n; i++) {
+        // Step 1: Create a shared pointer to a new vector with the specified size
+        std::shared_ptr<Vector> new_vector = std::make_shared<Vector>(size_n);
+
+        // Step 2: Generate random components and populate the vector
+        for (int j = 0; j < size_n; j++) {
+            // Assuming `normal(generator)` generates a random number
+            new_vector->set(j, normal(generator));  // Set the random value at position 'j'
         }
-      } // end for
-    }   // end for
-    for (int i = 0; i < numberVariables * numberVariables; i++) {
-      gen_quadratic[i] = hess_scaling * gen_quadratic[i];
+
+        // Step 3: Add the shared pointer to the vector list
+        vector_list_G_hat.push_back(new_vector);
     }
 
-    // Set center point
-    Vector gen_center(numberVariables);
-    for (int i = 0; i < numberVariables; i++) {
-      gen_center.set(i, normal(generator));
+    Vector vector_omega_star(size_m, 0.0);
+    for (int i = 0; i < size_n; i++){
+      vector_omega_star.set(i, omega_bar.values()[i]);
     }
 
-    /*
-     * Set up problem data from generator function
-     */
+    Vector vector_q(size_n);
 
-    // Initialize vector list
-    std::vector<std::shared_ptr<Vector>> vector_list;
-    std::vector<std::shared_ptr<Vector>> new_vector_list;
-
-    // Initialize vector
-    std::vector<double> vector;
-    std::vector<double> new_vector;
-
-    // Loop over number of points
-    for (int points = 0; points < numberPoints + numberPointsAdd; points++) {
-
-      // Declare point
-      std::shared_ptr<Vector> point(new Vector(numberVariables));
-
-      // Set point values
-      for (int i = 0; i < numberVariables; i++) {
-        point->set(i, gen_center.values()[i] + normal(generator));
-      }
-
-      // Declare affine vector
-      Vector affine(numberAffine);
-
-      // Set affine vector values
-      for (int i = 0; i < numberAffine; i++) {
-        double sum = 0.0;
-        for (int j = 0; j < numberVariables; j++) {
-          sum = sum + gen_maxLinearMatrix[i * numberVariables + j] * point->values()[j];
-        }
-        affine.set(i, sum + gen_maxLinearVector.values()[i]);
-      } // end for
-
-      // Initialize maximum of affine functions
-      int index = 0;
-      double maxAffine = affine.values()[0];
-
-      // Determine maximum of affine functions
-      for (int i = 1; i < numberAffine; i++) {
-        if (affine.values()[i] > maxAffine) {
-          index = i;
-          maxAffine = affine.values()[i];
-        }
-      } // end for
-
-      // Declare and set generator function value
-      double gen_f = maxAffine + point->innerProduct(gen_linear);
-      double* temp = new double[numberVariables];
-      for (int i = 0; i < numberVariables; i++) {
-        temp[i] = 0.0;
-      }
-      for (int i = 0; i < numberVariables; i++) {
-        for (int j = 0; j < numberVariables; j++) {
-          temp[i] = temp[i] + gen_quadratic[i * numberVariables + j] * point->values()[j];
-        }
-      } // end for
-      for (int i = 0; i < numberVariables; i++) {
-        gen_f = gen_f + 0.5 * point->values()[i] * temp[i];
-      }
-
-      // Declare and set generator gradient value
-      std::shared_ptr<Vector> gen_g(new Vector(numberVariables));
-      for (int i = 0; i < numberVariables; i++) {
-        gen_g->set(i, temp[i] + gen_linear.values()[i] + gen_maxLinearMatrix[index * numberVariables + i]);
-      }
-
-      // Push vector into list
-      if (points < numberPoints) {
-        vector_list.push_back(gen_g);
-      }
-      else {
-        new_vector_list.push_back(gen_g);
-      }
-
-      // Declare temporary scalar
-      double junk = 0.0;
-      for (int i = 0; i < numberVariables; i++) {
-        junk = junk + gen_g->values()[i] * (gen_center.values()[i] - point->values()[i]);
-      }
-      if (points < numberPoints) {
-        vector.push_back(gen_f + junk);
-      }
-      else {
-        new_vector.push_back(gen_f + junk);
-      }
-
-      // Delete temporary vector
-      delete[] temp;
-
-    } // end for
-
-    // Initialize inverse Hessian
-    double* hessianInverse_init = new double[numberVariables * numberVariables];
-    for (int i = 0; i < numberVariables * numberVariables; i++) {
-      hessianInverse_init[i] = normal(generator);
+    Vector vector_G_omegaStar(size_n);
+    
+    for (int i = 0; i < size_m ; i++) {
+      vector_G_omegaStar.addScaledVector(vector_omega_star.values()[i], *vector_list_G_hat[i].get());
     }
 
-    // Set quadratic term
-    std::shared_ptr<SymmetricMatrixDense> matrix = std::make_shared<SymmetricMatrixDense>();
-    matrix->setAsDiagonal(numberVariables, 1.0);
-    for (int i = 0; i < numberVariables; i++) {
-      for (int j = 0; j < numberVariables; j++) {
-        for (int k = 0; k < numberVariables; k++) {
-          matrix->valuesOfInverseModifiable()[i * numberVariables + j] = matrix->valuesOfInverse()[i * numberVariables + j] + hessianInverse_init[i * numberVariables + k] * hessianInverse_init[j * numberVariables + k];
-        }
-      } // end for
-    }   // end for
-    for (int i = 0; i < numberVariables; i++) {
-      for (int j = 0; j < numberVariables; j++) {
-        matrix->valuesOfInverseModifiable()[i * numberVariables + j] = hess_scaling * matrix->valuesOfInverse()[i * numberVariables + j];
+    vector_q.linearCombination(-1, vector_d_star, -1, vector_G_omegaStar);
+
+    Vector vector_sigma(size_n);
+    Vector vector_rho(size_n);
+
+    for (int i = 0; i < size_n; i++){
+      if (vector_q.values()[i] > 0){
+        vector_sigma.set(i, vector_q.values()[i]);
       }
-    } // end for
-
-    matrix->setAsDiagonal(numberVariables, 1.0);
-
-    // Loop over cold and hot solves
-    for (int solve_count = 0; solve_count < test_adds + 1; solve_count++) {
-
-      // Check solve counter
-      if (solve_count == 0) {
-
-        // Set QP data
-        q.setMatrix(matrix);
-        q.setVectorList(vector_list);
-        q.setVector(vector);
-        q.setScalar(regularization);
-
-        // Solve QP
-        q.solveQP(&options, &reporter, &quantities);
-
-      } // end if
-
-      else {
-
-        // Add vectors
-        q.addData(new_vector_list, new_vector);
-
-        // Solve QP hot
-        q.solveQP(&options, &reporter, &quantities);
-
-        // Print new line
-        reporter.printf(R_QP, R_BASIC, "... adding %2d vectors... ", numberPointsAdd);
-
-      } // end else
-
-      // Check for pass or fail
-      if (q.status() == QP_SUCCESS) {
-        reporter.printf(R_QP, R_BASIC, "pass");
+      else{
+        vector_rho.set(i, -vector_q.values()[i]);
       }
-      else {
-        reporter.printf(R_QP, R_BASIC, "fail");
+    }
+
+    double my_scalar_u = 5;
+
+
+    Vector vector_d(size_n);  // Gomega + sigma - rho
+    
+    vector_d.linearCombination(1, vector_G_omegaStar, 1, vector_sigma);
+    vector_d.addScaledVector(-1, vector_rho);
+
+
+    Vector vector_v_sigma(size_n);
+    Vector vector_v_rho(size_n);
+
+
+    vector_sigma.linearCombination(1, vector_d, scalar_, vector_ones_n);
+    vector_rho.linearCombination(-1, vector_d, scalar_, vector_ones_n);
+
+
+
+    Vector vector_v_omega(size_m); 
+
+    for (int i = 0; i < size_m; i++){
+      if (vector_omega_star.values()[i] == 0){
+        vector_v_omega.set(i, 2 * abs(uniform(generator)) );
       }
+    }
 
-      // Get primal solution
-      Vector primal_solution(numberVariables);
-      q.primalSolution(primal_solution.valuesModifiable());
+    Vector vector_Gtd(size_m);
+    for (int i = 0; i < size_m; i++) {
+      vector_Gtd.values()[i] = vector_list_G_hat[i]->innerProduct(vector_d);
+    }
 
-      // Check results
-      if (q.status() != QP_SUCCESS || q.KKTError() > 1e-03 || q.KKTErrorDual() > 1e-03 || primal_solution.normInf() > 1.0 / ((double)(test) + 1.0) + 1e-03) {
-        result = 1;
-      }
 
-      // Print solve status information
-      reporter.printf(R_QP, R_BASIC, "  status: %d  iters: %6d  kkt error: %+.4e  kkt error (dual): %+.4e  ||step||_inf: %+.4e\n", q.status(), q.numberOfIterations(), q.KKTError(), q.KKTErrorDual(), primal_solution.normInf());
+    // std::vector<double> vector_b;
 
-    } // end for
+  
 
-    // Delete matrix
-    delete[] gen_maxLinearMatrix;
-    delete[] gen_quadratic_init;
-    delete[] gen_quadratic;
-    delete[] hessianInverse_init;
+    // vector_b.linearCombination(my_scalar_u, vector_ones_m, -1, vector_v_omega);
+    // vector_b.addScaledVector(1, vector_Gtd);
+
+    // Step 1: Initialize vector_b as a std::vector<double> of size size_n
+    std::vector<double> vector_bk(size_m, 0.0);  // Initialize with zeroes
+
+
+    // Step 2: Perform linearCombination(my_scalar_u, vector_ones_m, -1, vector_v_omega)
+    for (int i = 0; i < size_m; i++) {
+        vector_bk[i] += my_scalar_u * 1 - vector_v_omega.values()[i];
+    }
+
+    // Step 3: Perform addScaledVector(1, vector_Gtd)
+    for (int i = 0; i < size_m; i++) {
+        vector_bk[i] += vector_Gtd.values()[i];  // Add vector_Gtd directly (scaled by 1)
+    }
+
+
+    // // Set QP data
+    // q.setMatrix(matrix);
+    // q.setVectorList(vector_list);
+    // q.setVector(vector);
+    // q.setScalar(regularization);
+
+    q_IPM.setMatrix(matrix);
+    q_IPM.setVectorList(vector_list_G_hat);
+    q_IPM.setVector(vector_bk);
+    q_IPM.setScalar(scalar_);
+
+    q_DAS.setMatrix(matrix);
+    q_DAS.setVectorList(vector_list_G_hat);
+    q_DAS.setVector(vector_bk);
+    q_DAS.setScalar(scalar_);
+
+
+    // Solve QP
+    // Measure time for q_IPM.solveQP
+    std::clock_t start_IPM = std::clock();
+    q_IPM.solveQP(&options, &reporter, &quantities);
+    std::clock_t end_IPM = std::clock();
+    double time_IPM = static_cast<double>(end_IPM - start_IPM) / CLOCKS_PER_SEC;
+
+    // Measure time for q_DAS.solveQP
+    std::clock_t start_DAS = std::clock();
+    q_DAS.solveQP(&options, &reporter, &quantities);
+    std::clock_t end_DAS = std::clock();
+    double time_DAS = static_cast<double>(end_DAS - start_DAS) / CLOCKS_PER_SEC;
+
+
+      // std::cout << "Stopping program here for debugging purposes." << std::endl;
+      // std::exit(0); 
+
+
+    // Check for pass or fail
+    if (q_IPM.status() == QP_SUCCESS) {
+      reporter.printf(R_QP, R_PER_INNER_ITERATION, "pass");  //Lara changed to R_PER...
+    }
+    else {
+      reporter.printf(R_QP, R_PER_INNER_ITERATION, "fail");
+    }
+
+     // Check for pass or fail
+    if (q_DAS.status() == QP_SUCCESS) {
+      reporter.printf(R_QP, R_PER_INNER_ITERATION, "pass");
+    }
+    else {
+      reporter.printf(R_QP, R_PER_INNER_ITERATION, "fail");
+    }
+
+    // Get primal solution
+    Vector primal_solution_IPM(size_n);
+    q_IPM.primalSolution(primal_solution_IPM.valuesModifiable());   // This is -W(G*omega + gamma) right?
+
+    Vector vector_d_dstar_diff_IPM(size_n);
+    vector_d_dstar_diff_IPM.linearCombination(1, vector_d_star, -1, primal_solution_IPM);  // Difference between d and d_star
+  
+
+    // Check results CHECK LAST COMPONENT
+    if (q_IPM.status() != QP_SUCCESS || q_IPM.KKTError() > 1e-03 || q_IPM.KKTErrorDual() > 1e-03 || primal_solution_IPM.normInf() > 1.0 / ((double)(0) + 1.0) + 1e-04) {
+      result_IPM = 1;
+    }
+
+
+    // Get primal solution
+    Vector primal_solution_DAS(size_n);
+    q_DAS.primalSolution(primal_solution_DAS.valuesModifiable());   // This is -W(G*omega + gamma) right?
+
+    Vector vector_d_dstar_diff_DAS(size_n);
+    vector_d_dstar_diff_DAS.linearCombination(1, vector_d_star, -1, primal_solution_DAS);  // Difference between d and d_star
+  
+
+    // Check results CHECK LAST COMPONENT
+    if (q_DAS.status() != QP_SUCCESS || q_DAS.KKTError() > 1e-03 || q_DAS.KKTErrorDual() > 1e-03 || primal_solution_DAS.normInf() > 1.0 / ((double)(0) + 1.0) + 1e-04) {
+      result_DAS = 1;
+    }
+
+    reporter.printf(R_QP, R_BASIC, 
+        "IPM:  KKT error = %+.4e  d error = %+.4e  Total time = %.7f  iters = %6d\n", 
+        q_IPM.KKTError(), vector_d_dstar_diff_IPM.normInf(),time_IPM, q_IPM.numberOfIterations());
+
+    reporter.printf(R_QP, R_BASIC, 
+        "DAS:  KKT error = %+.16e  d error = %+.4e  Total time = %.7f  iters = %6d\n", 
+        q_DAS.KKTError(), vector_d_dstar_diff_DAS.normInf(),time_DAS, q_DAS.numberOfIterations());
+
+    // // Print solve status information
+    // reporter.printf(R_QP, R_BASIC, "  status: %d  iters: %6d  kkt error: %+.4e  kkt error (dual): %+.4e  ||step||_inf: %+.4e\n", q.status(), q.numberOfIterations(), q.KKTError(), q.KKTErrorDual(), primal_solution.normInf());
+    // reporter.printf(R_QP, R_BASIC, "  status: %d  iters: %6d  kkt error: %+.4e  kkt error (dual): %+.4e  ||step||_inf: %+.4e\n", q.status(), q.numberOfIterations(), q.KKTError(), q.KKTErrorDual(), primal_solution.normInf());
+    // std::cout << "Hi Lara Hi 2"<< std::endl;
+    // // std::cout << "time = " << q.elapsedCPUtime() << std::endl;
+    // reporter.printf(R_QP, R_BASIC, "time = %.14f\n", q.elapsedCPUtime());
+    // reporter.printf(R_QP, R_BASIC, "kkt_error = %.14f\n", q.KKTError());
+    // reporter.printf(R_QP, R_BASIC, "d_error = %.14f\n", vector_d_dstar_diff.normInf() );
+
+    //   // Print solve status information
+    // reporter.printf(R_QP, R_PER_INNER_ITERATION, "  status: %d  iters: %6d  kkt error: %+.4e  kkt error (dual): %+.4e  ||step||_inf: %+.4e\n", q.status(), q.numberOfIterations(), q.KKTError(), q.KKTErrorDual(), primal_solution.normInf());
+    // // std::cout << "Hi Lara Hi 2"<< std::endl;
+    // // std::cout << "time = " << q.elapsedCPUtime() << std::endl;
+    // reporter.printf(R_QP, R_PER_INNER_ITERATION, "time = %.14f\n", q.elapsedCPUtime());
+    // reporter.printf(R_QP, R_PER_INNER_ITERATION, "kkt_error = %.14f\n", q.KKTError());
+    // reporter.printf(R_QP, R_PER_INNER_ITERATION, "d_error = %.14f\n", vector_d_dstar_diff.normInf() );
 
   } // end for
 
+}
+  
+
   // Check option
   if (option == 1) {
-    // Print final message
-    if (result == 0) {
-      reporter.printf(R_QP, R_BASIC, "TEST WAS SUCCESSFUL.\n");
-    }
-    else {
-      reporter.printf(R_QP, R_BASIC, "TEST FAILED.\n");
-    }
+      // Print final messages
+      if (result_IPM == 0) {
+          reporter.printf(R_QP, R_BASIC, "IPM TEST WAS SUCCESSFUL.\n");
+      } else {
+          reporter.printf(R_QP, R_BASIC, "IPM TEST FAILED.\n");
+      }
+
+      if (result_DAS == 0) {
+          reporter.printf(R_QP, R_BASIC, "DAS TEST WAS SUCCESSFUL.\n");
+      } else {
+          reporter.printf(R_QP, R_BASIC, "DAS TEST FAILED.\n");
+      }
   } // end if
 
   // Return
-  return result;
+  return result_IPM;
 
 } // end testQPSolverImplementation
 

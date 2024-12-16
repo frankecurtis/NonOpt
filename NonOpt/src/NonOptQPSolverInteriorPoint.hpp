@@ -122,7 +122,7 @@ public:
    * Get iteration count
    * \return number of iterations performed
    */
-  int numberOfIterations() { return outer_iter_count_; };  //change to the outer iteration
+  int numberOfIterations() { return sum_inner_iter_count_; };  //change to the outer iteration NO sum of iteration :)
   /**
    * Get primal solution
    * \param[out] "d" (equal to "-W*(G*omega + gamma)" if solution is exact)
@@ -409,7 +409,7 @@ private:
   void evaluateSystemVector(int set,
                             int index,
                             double system_vector[]);
-  void finalizeSolution();
+  void finalizeSolution(const Reporter* reporter);
   void resizeSystemSolution();
   bool setAugment(const Reporter* reporter,
                   int set,

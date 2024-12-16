@@ -142,13 +142,13 @@ void QPSolverInteriorPoint::addOptions(Options* options)
                            "              linear independence of the augmented matrix.\n"
                            "Default     : 1e-12.");
   options->addDoubleOption("QPIPM_beta",
-                           0.3,
+                           0.5,
                            0.0,
                            1.0,
                            "beta has to be 0 and 1. TBC...\n"
                            "Default     : 0.5.");
   options->addDoubleOption("QPIPM_sigma",
-                           0.01,
+                           0.002,
                            0.0,
                            1.0,
                            "sigma has to be 0 and 1. TBC...\n"
@@ -166,13 +166,13 @@ void QPSolverInteriorPoint::addOptions(Options* options)
                            "Tolerance of inner loop. TBC...\n"
                            "Default     : 1e-3.");    
   options->addDoubleOption("QPIPM_tol_out",
-                           1e-4,
+                           1e-3,
                            0.0,
                            1.0,
                            "Tolerance of outer loop. TBC...\n"
                            "Default     : 1e-4.");            
   options->addDoubleOption("QPIPM_mu_factor",
-                           0.5,
+                           0.2,
                            0.0,
                            1.0,
                            "The mu factor has to be 0 and 1. TBC...\n"
@@ -263,6 +263,8 @@ void QPSolverInteriorPoint::initializeData(int gamma_length)
   vector_list_.clear();
   vector_.clear();
   scalar_ = -1.0;
+  
+  // std::cout << "Hi1!!" << std::endl;
 
   // Delete arrays (in case they exist)
   if (inner_solution_1_ != nullptr) {
@@ -716,7 +718,7 @@ bool QPSolverInteriorPoint::inexactTerminationCondition(const Quantities* quanti
 {
 
   // Finalize solution to set omega and gamma
-  finalizeSolution();
+  finalizeSolution(reporter);
 
   /////////////////////////////////////////////////////////////////////////////
   // EVALUATE DUAL OBJECTIVE CORRESPONDING TO CURRENT DUAL SOLUTION ESTIMATE //
@@ -866,25 +868,37 @@ bool QPSolverInteriorPoint::inexactTerminationCondition(const Quantities* quanti
 
 // Lara's header
 
-void printHeader() {
-    std::cout << "Out_Ite" 
-              << std::setw(20) << "In_Ite"
-              << std::setw(20) << "Min_Val_x"
-              << std::setw(20) << "Min_Val_z"
-              << std::setw(15) << "mu"
-              << std::setw(20) << "Inf||r_p||"
-              << std::setw(20) << "Inf||r_d||"
-              << std::setw(20) << "Inf||r_c||"
-              << std::setw(20) << "Inf||r_c+G||"
-              << std::setw(20) << "Inf||d_x||"
-              << std::setw(20) << "Inf||d_y||"
-              << std::setw(20) << "Inf||d_z||"
-              << std::setw(20) << "Bar_alph_x"
-              << std::setw(20) << "Bar_alph_z"
-              << std::setw(20) << "alph_x"
-              << std::setw(20) << "alph_y"
-              << std::setw(20) << "alph_z" << std::endl;
+// void printHeader() {
+//     std::cout << "Out_Ite" 
+//               << std::setw(20) << "In_Ite"
+//               << std::setw(20) << "Min_Val_x"
+//               << std::setw(20) << "Min_Val_z"
+//               << std::setw(15) << "mu"
+//               << std::setw(20) << "Inf||r_p||"
+//               << std::setw(20) << "Inf||r_d||"
+//               << std::setw(20) << "Inf||r_c||"
+//               << std::setw(20) << "Inf||r_c+G||"
+//               << std::setw(20) << "Inf||d_x||"
+//               << std::setw(20) << "Inf||d_y||"
+//               << std::setw(20) << "Inf||d_z||"
+//               << std::setw(20) << "Bar_alph_x"
+//               << std::setw(20) << "Bar_alph_z"
+//               << std::setw(20) << "alph_x"
+//               << std::setw(20) << "alph_y"
+//               << std::setw(20) << "alph_z" << std::endl;
+// }
+
+void printHeader(const Reporter* reporter) {
+    reporter->printf(R_QP, R_PER_INNER_ITERATION,
+        "%-20s%-20s%-20s%-25s%-15s%-20s%-20s%-20s%-20s%-20s%-20s%-20s%-20s%-20s%-20s%-20s%-20s\n",
+        "Out_Ite", "In_Ite", "Min_Val_x", "Min_Val_z", "mu", 
+        "Inf||r_p||", "Inf||r_d||", "Inf||r_c||", "Inf||r_c+G||",
+        "Inf||d_x||", "Inf||d_y||", "Inf||d_z||", 
+        "Bar_alph_x", "Bar_alph_z", "alph_x", "alph_y", "alph_z"
+    );
 }
+
+
 
 // Solve
 void QPSolverInteriorPoint::solveQP(const Options* options,
@@ -909,6 +923,25 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     /**
      * Lara 
      */
+    // std::cout << "Hi1!!" << std::endl;
+
+
+    // Vector vector__d_star(gamma_length_, scalar_);
+
+    // Vector vector_d_unc(gamma_length_);
+    // if (vector__d_star.normInf() == scalar_){    //not good because it only work for our case only
+    //   vector__d_star.addScaledVector(2, scalar_);
+    // }
+
+    // Vector vector_t(gamma_length_);
+    // vector_t.addScaledVector(-1,vector_d_unc);
+
+    // std::cout << "HI lara ";  // Print with a single space between elements
+
+
+
+
+    // std::cout << "Hi1!!" << std::endl;
 
 
     int omega_length= (int)vector_.size();
@@ -921,9 +954,12 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
     int total_length=2*gamma_length_+omega_length;
 
+    // std::cout << "Hi1!!" << std::endl;
+
+
     reporter->printf(R_QP, R_PER_INNER_ITERATION, "total length:  %d\n", total_length);
 
-    printHeader();
+    printHeader(reporter);
 
     Vector r_cent_In(total_length);
 
@@ -939,22 +975,23 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
     }
 
+    // std::cout << "Hi1!!" << std::endl;
 
 
     scalar_b_ = 1.0;
  
     vector_c_.setLength(total_length);
     
-    // for (int i = 0; i < omega_length; i++){
-    //     vector_c_.set(i,-vector_[i]);
+    for (int i = 0; i < omega_length; i++){
+        vector_c_.set(i,-vector_[i]);
 
-    // }
+    }
 
-    // for (int i = omega_length ; i < total_length; i++){
-    //     vector_c_.set(i,scalar_);
+    for (int i = omega_length ; i < total_length; i++){
+        vector_c_.set(i,scalar_);
 
-    // }   
-     reporter->printf(R_QP, R_PER_INNER_ITERATION, "scalar delta:  %e\n", scalar_);
+    }   
+    //  reporter->printf(R_QP, R_PER_INNER_ITERATION, "scalar delta:  %e\n", scalar_);
 
     // Declare WG vectors
     std::vector<std::shared_ptr<Vector>> WG;
@@ -996,8 +1033,17 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
           }
     }
 
-    std::cout << "hi" << vector_list_[0]->innerProduct(*WG[0]) << std::endl;
+    // std::cout << "hi" << vector_list_[0]->innerProduct(*WG[0]) << std::endl;
 
+    SymmetricMatrixDense matrix_L;
+    matrix_L.setAsDiagonal(total_length + 1, 0);
+
+    for (int i = 0; i < total_length; i++){
+      for (int j = i; j < total_length; j++){
+        matrix_L.setElement(i, j, -matrix_Q_.element(i,j));
+      }
+      matrix_L.setElement(i, total_length, matrix_At_.values()[i] );  //correct way to access elements in At?
+    }
 
     
 
@@ -1034,7 +1080,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       * Update J.
       * Solve the linear system.
     */
-    //std::cout << "Hi1!!" << std::endl;
+    // std::cout << "Hi1!!" << std::endl;
 
     vector_x_.setLength(total_length);
     vector_z_.setLength(total_length);
@@ -1047,7 +1093,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       vector_z_.set(i, 0.5);
     }
 
-    Vector Theta(total_length);
+    // Vector Theta(total_length);
     // Vector Omeg(omega_length);
     // for (int i =0; i< omega_length; i++){
     //   Omeg.set(i, vector_x_.values()[i]);
@@ -1073,50 +1119,50 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     // std::cout << "End of Gomega" << std::endl;
 
 
-    std::cout << "Hi0" << std::endl;
+    // std::cout << "Hi0" << std::endl;
 
     // for (int i=0; i<total_length; i++){
     //   Theta.set(i, i);
     // }
     // Theta.scale(1 / Theta.norm1());
 
-    Theta.set(0,0.1306);
-    Theta.set(1,0.1452);
-    Theta.set(2,0.0204);
-    Theta.set(3,0.1464);
-    Theta.set(4,0.1014);
-    Theta.set(5,0.0156 );
-    Theta.set(6,0.0446);
-    Theta.set(7,0.0877);
-    Theta.set(8,0.1535);
-    Theta.set(9,0.1546);
+    // Theta.set(0,0.1306);
+    // Theta.set(1,0.1452);
+    // Theta.set(2,0.0204);
+    // Theta.set(3,0.1464);
+    // Theta.set(4,0.1014);
+    // Theta.set(5,0.0156 );
+    // Theta.set(6,0.0446);
+    // Theta.set(7,0.0877);
+    // Theta.set(8,0.1535);
+    // Theta.set(9,0.1546);
     
-    double scalar_delta = 0.03;
+    // double scalar_delta = 0.03;
 
-    Gomega_.setLength(gamma_length_);
+    // Gomega_.setLength(gamma_length_);
     
-    for (int i = 0; i < omega_length; i++) {
-      Gomega_.addScaledVector(Theta.values()[i], *vector_list_[i].get());
-    }
+    // for (int i = 0; i < omega_length; i++) {
+    //   Gomega_.addScaledVector(Theta.values()[i], *vector_list_[i].get());
+    // }
 
 
 
-    Vector WGomega(gamma_length_);
-    matrix_->matrixVectorProductOfInverse(Gomega_, WGomega);
-    Vector DeltaH(gamma_length_);
-    Vector vector_delta(gamma_length_, scalar_delta);
-    matrix_->matrixVectorProduct(vector_delta, DeltaH);
+    // Vector WGomega(gamma_length_);
+    // matrix_->matrixVectorProductOfInverse(Gomega_, WGomega);
+    // Vector DeltaH(gamma_length_);
+    // Vector vector_delta(gamma_length_, scalar_delta);
+    // matrix_->matrixVectorProduct(vector_delta, DeltaH);
     
 
 
-    for (int i=0; i < gamma_length_; i++){
-      if (WGomega.values()[i] < -scalar_delta){
-        Theta.set(i+omega_length+gamma_length_, -DeltaH.values()[i]-Gomega_.values()[i]);
-      }
-      if (WGomega.values()[i] > scalar_delta){
-        Theta.set(i+omega_length, -DeltaH.values()[i] + Gomega_.values()[i]);
-      }
-    }
+    // for (int i=0; i < gamma_length_; i++){
+    //   if (WGomega.values()[i] < -scalar_delta){
+    //     Theta.set(i+omega_length+gamma_length_, -DeltaH.values()[i]-Gomega_.values()[i]);
+    //   }
+    //   if (WGomega.values()[i] > scalar_delta){
+    //     Theta.set(i+omega_length, -DeltaH.values()[i] + Gomega_.values()[i]);
+    //   }
+    // }
 
 
     // for (int i = 0; i < gamma_length_/2; i++) {
@@ -1146,7 +1192,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     //   }
     // }
 
-    std::cout << "Hi1" << std::endl;
+    // std::cout << "Hi1" << std::endl;
 
     // for (int i=omega_length; i< omega_length + gamma_length_; i++){
     //   Theta.set(i, 0);
@@ -1157,37 +1203,37 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     //   Theta.set(i+gamma_length_+gamma_length_/2, -Gomega_.values()[i]);
     // }
 
-    std::cout << "Hi2" << std::endl;
+    // std::cout << "Hi2" << std::endl;
 
     // for (int i=0; i < gamma_length_; i++){
     //   Theta.set(i+omega_length+gamma_length_, -Gomega_.values()[i]);
     // }
-    std::cout << "Hi3" << std::endl;
+    // std::cout << "Hi3" << std::endl;
 
 
 
 
-    for (int i=0; i<total_length; i++){
-      std::cout << Theta.values()[i] << std::endl;
-    }
+    // for (int i=0; i<total_length; i++){
+    //   std::cout << Theta.values()[i] << std::endl;
+    // }
 
-    // Print a custom message after the loop
-    std::cout << "End of Theta values." << std::endl;
-    std::cout << std::endl; // This prints an empty line
-
-
+    // // Print a custom message after the loop
+    // std::cout << "End of Theta values." << std::endl;
+    // std::cout << std::endl; // This prints an empty line
 
 
-    std::cout << "Gomega:" << std::endl;
-
-    for (int i = 0; i < gamma_length_; i++) {
-      std::cout << Gomega_.values()[i] << std::endl;
-    }
-
-    std::cout << "End of Gomega" << std::endl;
 
 
-    Vector Myvector_v(total_length);
+    // std::cout << "Gomega:" << std::endl;
+
+    // for (int i = 0; i < gamma_length_; i++) {
+    //   std::cout << Gomega_.values()[i] << std::endl;
+    // }
+
+    // std::cout << "End of Gomega" << std::endl;
+
+
+    // Vector Myvector_v(total_length);
 
     // for (int i=0; i<total_length; i++){
     //   if (Theta.values()[i] ==0 ){
@@ -1214,88 +1260,88 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     // std::cout << "End of Myvector_v values." << std::endl;
 
 
-    double Myvector_u = 3;
+    // double Myvector_u = 3;
 
-    Vector vector_d(gamma_length_);
-    for (int i=0; i<gamma_length_; i++){
-      vector_d.set(i, Gomega_.values()[i]+Theta.values()[i+omega_length+gamma_length_]-Theta.values()[i+omega_length]);
-    }
+    // Vector vector_d(gamma_length_);
+    // for (int i=0; i<gamma_length_; i++){
+    //   vector_d.set(i, Gomega_.values()[i]+Theta.values()[i+omega_length+gamma_length_]-Theta.values()[i+omega_length]);
+    // }
 
-    std::cout <<"Gomega+sigma-rho:" << std::endl;
+    // std::cout <<"Gomega+sigma-rho:" << std::endl;
     
-    for (int i=0; i < gamma_length_; i++){
-      std::cout <<Gomega_.values()[i]+Theta.values()[i+omega_length+gamma_length_]-Theta.values()[i+omega_length] << std::endl;
-    }
+    // for (int i=0; i < gamma_length_; i++){
+    //   std::cout <<Gomega_.values()[i]+Theta.values()[i+omega_length+gamma_length_]-Theta.values()[i+omega_length] << std::endl;
+    // }
 
 
-    std::cout <<"End of Gomega_+sigma-rho:" << std::endl;
+    // std::cout <<"End of Gomega_+sigma-rho:" << std::endl;
 
-    std::cout <<"Vector d:" << std::endl;
+    // std::cout <<"Vector d:" << std::endl;
     
-    for (int i=0; i < gamma_length_; i++){
-      std::cout <<vector_d.values()[i] << std::endl;
-    }
+    // for (int i=0; i < gamma_length_; i++){
+    //   std::cout <<vector_d.values()[i] << std::endl;
+    // }
 
 
-    std::cout <<"End of Vector d." << std::endl;
+    // std::cout <<"End of Vector d." << std::endl;
 
-    Vector vector_WD(gamma_length_);
-    matrix_->matrixVectorProductOfInverse(vector_d, vector_WD);
+    // Vector vector_WD(gamma_length_);
+    // matrix_->matrixVectorProductOfInverse(vector_d, vector_WD);
 
-    std::cout <<"W(Gomega+sigma-rho):" << std::endl;
+    // std::cout <<"W(Gomega+sigma-rho):" << std::endl;
     
-    for (int i=0; i < gamma_length_; i++){
-      std::cout <<vector_WD.values()[i] << std::endl;
-    }
+    // for (int i=0; i < gamma_length_; i++){
+    //   std::cout <<vector_WD.values()[i] << std::endl;
+    // }
 
 
-    std::cout <<"End of W(Gomega_+sigma-rho)." << std::endl;
+    // std::cout <<"End of W(Gomega_+sigma-rho)." << std::endl;
 
-    for (int i=omega_length; i < total_length; i++){
-      vector_c_.set(i, scalar_delta);
-    }
+    // for (int i=omega_length; i < total_length; i++){
+    //   vector_c_.set(i, scalar_delta);
+    // }
 
-    //   // Evaluate gradient inner products
-    Vector vector_Gtd(omega_length);
-    for (int i = 0; i < (int)vector_list_.size(); i++) {
-      vector_Gtd.values()[i] = vector_list_[i]->innerProduct(vector_d);
-    }
+    // //   // Evaluate gradient inner products
+    // Vector vector_Gtd(omega_length);
+    // for (int i = 0; i < (int)vector_list_.size(); i++) {
+    //   vector_Gtd.values()[i] = vector_list_[i]->innerProduct(vector_d);
+    // }
 
-    std::cout <<"Vector Gtd:" << std::endl;
+    // std::cout <<"Vector Gtd:" << std::endl;
     
-    for (int i=0; i < omega_length; i++){
-      std::cout <<vector_Gtd.values()[i] << std::endl;
-    }
+    // for (int i=0; i < omega_length; i++){
+    //   std::cout <<vector_Gtd.values()[i] << std::endl;
+    // }
 
 
-    std::cout <<"End of Gtd." << std::endl;
+    // std::cout <<"End of Gtd." << std::endl;
 
-    for (int i=0; i<omega_length; i++){
-      if (vector_Gtd.values()[i]-Myvector_u > 0){
-        vector_c_.set(i, -vector_Gtd.values()[i]+Myvector_u);
-      }
-      else{
-        vector_c_.set(i, 0);
-      }
-    }
+    // for (int i=0; i<omega_length; i++){
+    //   if (vector_Gtd.values()[i]-Myvector_u > 0){
+    //     vector_c_.set(i, -vector_Gtd.values()[i]+Myvector_u);
+    //   }
+    //   else{
+    //     vector_c_.set(i, 0);
+    //   }
+    // }
 
-    std::cout <<"vector c:" << std::endl;
+    // std::cout <<"vector c:" << std::endl;
     
-    for (int i=0; i < total_length; i++){
-      std::cout << vector_c_.values()[i] << std::endl;
-    }
+    // for (int i=0; i < total_length; i++){
+    //   std::cout << vector_c_.values()[i] << std::endl;
+    // }
 
 
-    std::cout <<"End of vector c." << std::endl;
+    // std::cout <<"End of vector c." << std::endl;
 
-    std::cout <<"vector Gtd+cbar-u1:" << std::endl;
+    // std::cout <<"vector Gtd+cbar-u1:" << std::endl;
     
-    for (int i=0; i < omega_length; i++){
-      std::cout << vector_Gtd.values()[i]+vector_c_.values()[i]-Myvector_u << std::endl;
-    }
+    // for (int i=0; i < omega_length; i++){
+    //   std::cout << vector_Gtd.values()[i]+vector_c_.values()[i]-Myvector_u << std::endl;
+    // }
 
 
-    std::cout <<"End of vector Gtd+cbar-u1." << std::endl;
+    // std::cout <<"End of vector Gtd+cbar-u1." << std::endl;
 
 
 
@@ -1335,19 +1381,19 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
     // std::cout <<"End of c+Qtheta-A^Tu-v::" << std::endl;
 
-    SymmetricMatrixDense QTheta;
-    Vector QThetaVec(total_length);
+    // SymmetricMatrixDense QTheta;
+    // Vector QThetaVec(total_length);
 
-    QTheta.setAsDiagonal(total_length, 0);
-    for (int i = 0; i < total_length; i++){
-        for (int j = i; j < total_length; j++){
-        QTheta.setElement(i, j, matrix_Q_.element(i, j));
-        }
-    }
+    // QTheta.setAsDiagonal(total_length, 0);
+    // for (int i = 0; i < total_length; i++){
+    //     for (int j = i; j < total_length; j++){
+    //     QTheta.setElement(i, j, matrix_Q_.element(i, j));
+    //     }
+    // }
 
 
 
-    QTheta.matrixVectorProduct(Theta, QThetaVec);
+    // QTheta.matrixVectorProduct(Theta, QThetaVec);
 
     // // QThetaVec.scale(-1.0);
 
@@ -1361,42 +1407,45 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     // std::cout <<"End of vector Q theta." << std::endl;
 
 
-    QThetaVec.addScaledVector(1,vector_c_);
-    Myvector_v.addScaledVector(1,QThetaVec);
-    Myvector_v.addScaledVector(-Myvector_u, matrix_At_);
+    // QThetaVec.addScaledVector(1,vector_c_);
+    // Myvector_v.addScaledVector(1,QThetaVec);
+    // Myvector_v.addScaledVector(-Myvector_u, matrix_At_);
 
     // // for (int i=0; i < omega_length; i++){
     // //   Myvector_v.set(i, 0);
     // // }
 
-    std::cout <<"vector v:" << std::endl;
+    // std::cout <<"vector v:" << std::endl;
     
-    for (int i=0; i < total_length; i++){
-      std::cout << Myvector_v.values()[i] << std::endl;
-    }
+    // for (int i=0; i < total_length; i++){
+    //   std::cout << Myvector_v.values()[i] << std::endl;
+    // }
 
 
 
-    std::cout << "Hi2!!" << std::endl;
+    // std::cout << "Hi2!!" << std::endl;
 
-    // // **************************************
+    // **************************************
     // Vector gradient(total_length);
 
     // matrix_Q_.matrixVectorProduct(vector_x_, gradient);
     // gradient.addScaledVector(1, vector_c_);
 
     // double max_gradient = fmax(1,gradient.normInf());  //max with 1
-    // // // std::cout << "max gradient: " << max_gradient<< std::endl;
-    // // // double scalar_tau_ = 0.5;
-
     // scalar_tau_ = 1/ max_gradient;
 
 
-    // // for (int i = 0; i < total_length; i++){
-    // //   for (int j = 0; j < total_length; j++){
-    // //     matrix_Q_.setElement(i, j, scalar_tau_ * matrix_Q_.element(i,j));
-    // //   }
-    // // }
+    // for (int i = 0; i < total_length; i++){
+    //   for (int j = 0; j < total_length; j++){
+    //     matrix_Q_.setElement(i, j, scalar_tau_ * matrix_Q_.element(i,j));
+    //   }
+    // }
+
+    // vector_c_.scale(scalar_tau_);
+
+    // **************************************
+    
+
 
     // // // // for (int i = 0; i < total_length; ++i) {
     // // // //     for (int j = 0; j < total_length; ++j) {
@@ -1483,6 +1532,8 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
     
     mu_=vector_x_.innerProduct(vector_z_) / total_length;   //gamma_length is guaranteed to be > 0 ? Correct use of inner?
 
+
+    // Lara Remove J
     matrix_J_.setAsDiagonal(2 * total_length + 1, 0);
 
     for (int i = 0; i < total_length; i++){
@@ -1503,6 +1554,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
     outer_iter_count_ = 0;  // Should I put it above as for the iteration_count_?
     sum_inner_iter_count_ = 0;
+    double total_time_spent = 0.0;
     while (outer_iter_count_ < max_iter_out_)
     {
      outer_iter_count_++;
@@ -1515,7 +1567,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       sum_inner_iter_count_++;
 
       if (inner_iter_count_ % 20 == 0) {
-            printHeader();
+            printHeader(reporter);
         }
 
       //r_dual_ = ( QX.addScaledVector(-scalar_y_, matrix_At_) ).addScaledVector(1, c.addScaledVector(-1, vector_z_) );
@@ -1540,7 +1592,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
       r_pri_=-matrix_At_.innerProduct(vector_x_)+scalar_b_;
       //std::cout << "Hi7!!" << std::endl;
-
+      // Lara remove J
       for (int i = 0; i < total_length; i++){
         matrix_J_.setElement(i + total_length + 1, i + total_length + 1, vector_x_.values()[i] / vector_z_.values()[i]);
       }
@@ -1594,21 +1646,44 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
         printf("%e\n", product.values()[i] - test_rhs.values()[i]);
       }
       */
+      std::clock_t start_time = std::clock();
+      SymmetricMatrixDense LHS_matrix;
+      LHS_matrix.setAsDiagonal(total_length + 1, 0);
+      for (int i = 0; i < total_length + 1; i++){
+        for (int j = i; j < total_length + 1; j++){
+          LHS_matrix.setElement(i, j, matrix_L.element(i, j));
+        }
+        if ( i < total_length){
+          LHS_matrix.setElement(i, i, LHS_matrix.element(i,i)-vector_z_.values()[i]/vector_x_.values()[i]);
+        }
+      }
+
+      Vector RHS_vector(total_length + 1);
+      for (int i = 0; i < total_length; i++){
+        RHS_vector.set( i, r_dual_.values()[i] - (r_cent_.values()[i]*vector_z_.values()[i] + sigma_* mu_) / vector_x_.values()[i]);
+      }
+      RHS_vector.set(total_length, r_pri_);
 
 
-      Vector delta( 2 * total_length + 1);
-      solveLinearSystem( 2 * total_length + 1, matrix_J_.valuesModifiable(), residual.valuesModifiable(), delta.valuesModifiable() );
 
-      // Vector prod(2 * total_length + 1 );
+      Vector delta( total_length + 1);
 
-      // matrix_J_.matrixVectorProduct(delta, prod);
+      // Minimal debug version
+      // std::cout << "Starting solveLinearSystem..." << std::endl;
 
-      // reporter->printf(R_QP, R_PER_INNER_ITERATION, "norm prod = :  %e\n", prod.normInf() );
+      solveLinearSystem(total_length + 1, LHS_matrix.valuesModifiable(),
+                        RHS_vector.valuesModifiable(), delta.valuesModifiable());
 
-      // prod.addScaledVector(-1, residual);
-      
+      // std::cout << "Completed solveLinearSystem." << std::endl;
 
-      // reporter->printf(R_QP, R_PER_INNER_ITERATION, "norm diff = :  %e\n", prod.normInf() );
+      // Stop clock for this iteration
+      std::clock_t end_time = std::clock();
+
+      // Accumulate the time spent in seconds
+      total_time_spent += static_cast<double>(end_time - start_time) / CLOCKS_PER_SEC;
+
+
+
 
 
       Vector delta_x(total_length);
@@ -1616,9 +1691,183 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
       for (int i = 0; i < total_length; i++){
         delta_x.set(i, delta.values()[i]);
-        delta_z.set(i, delta.values()[i+ total_length + 1]);
+        delta_z.set(i, (r_cent_.values()[i]*vector_z_.values()[i] +sigma_ * mu_ -vector_z_.values()[i]*delta_x.values()[i])/vector_x_.values()[i] );
       }
       double delta_y = delta.values()[total_length];
+
+    //   // 1. Print the size of LHS_matrix
+    //   std::cout << "Size of LHS matrix: " << total_length + 1 << " x " << total_length + 1 << std::endl;
+
+    //   // 2. Print the size of RHS_vector
+    //   std::cout << "Size of RHS vector: " << total_length + 1 << std::endl;
+
+    //   // 3. Print the element Q[5,7] (LHS_matrix(5,7))
+    //   if (total_length + 1 > 7) { // Ensure indices are within bounds
+    //       std::cout << "Element LHS(5,7): " << LHS_matrix.element(5, 7) << std::endl;
+    //   } else {
+    //       std::cout << "Element LHS(5,7) is out of bounds." << std::endl;
+    //   }
+          
+    //   std::cout << "Element LHS(1,1): " << LHS_matrix.element(2, 0) << std::endl;
+    //   std::cout << "Element Q(1,1): " << matrix_Q_.element(2, 0) << std::endl;
+
+    //   // 3. Print the element Q[5,7] (LHS_matrix(5,7))
+    //   if (total_length + 1 > 7) { // Ensure indices are within bounds
+    //       std::cout << "Element Q(5,7): " << matrix_Q_.element(5, 7) << std::endl;
+    //   } else {
+    //       std::cout << "Element LHS(5,7) is out of bounds." << std::endl;
+    //   }
+
+    //   // // 4. Print the second element of the last column of LHS_matrix
+    //   // if (total_length + 1 > 1) { // Ensure there are at least two rows
+    //   //     int last_col = total_length; // Last column index
+    //   //     std::cout << "Second element of the last column of Q: " << matrix_Q_.element(1, )
+    //   //               << matrix_Q_.element(1, last_col) << std::endl;
+    //   // } else {
+    //   //     std::cout << "Not enough rows for the second element of the last column of Q." << std::endl;
+    //   // }
+
+
+    //   // 4. Print the second element of the last column of LHS_matrix
+    //   if (total_length + 1 > 1) { // Ensure there are at least two rows
+    //       int last_col = total_length; // Last column index
+    //       std::cout << "Second element of the last column of LHS: " 
+    //                 << LHS_matrix.element(1, last_col) << std::endl;
+    //   } else {
+    //       std::cout << "Not enough rows for the second element of the last column of LHS." << std::endl;
+    //   }
+
+    //   // Print all elements in the last column of LHS_matrix (column index = total_length)
+    //   std::cout << "Elements of the last column of LHS_matrix:" << std::endl;
+    //   for (int i = 0; i < total_length + 1; i++) {
+    //       // Access element LHS(i, total_length)
+    //       double value = LHS_matrix.element(i, total_length); // Assuming setElement ensures symmetry
+    //       std::cout << "LHS(" << i << ", " << total_length << ") = " << value << std::endl;
+    //   }
+    //       std::cout << "R_p(" << ", "  << r_pri_ << std::endl;
+
+    //   // Print all elements in the last column of LHS_matrix (column index = total_length)
+    //   std::cout << "Elements of RHS_matrix:" << std::endl;
+    //   for (int i = 0; i < total_length + 1; i++) {
+    //       // Access element LHS(i, total_length)
+          
+    //       std::cout << "LHS(" << i << ", " << ") = " << RHS_vector.values()[i] << std::endl;
+    //   }
+
+
+    //   std::cout << "TL by TL LHS: " 
+    //                 << LHS_matrix.element(total_length-1, total_length-1) << std::endl;
+
+    //   std::cout << "TL+1 by TL+1 LHS: " 
+    //                 << LHS_matrix.element(total_length, total_length) << std::endl;
+
+    //   std::cout << "TL-1 by TL-1 LHS: " 
+    //                 << LHS_matrix.element(total_length-2, total_length-2) << std::endl;
+
+    //   std::cout << "Element Q(TL,TL): " << matrix_Q_.element(total_length-1, total_length-1) << std::endl;
+    //   std::cout << "Element Q(1,1): " << matrix_Q_.element(0,0) << std::endl;
+
+
+
+    //   std::cout << "12 by 12 LHS: " 
+    //                 << LHS_matrix.element(20,20) << std::endl;
+
+    //   std::cout << "Element Q(12,12): " << matrix_Q_.element(20,20) << std::endl;
+
+    //   // Print all elements in the last row of LHS_matrix (row index = total_length)
+    //   std::cout << "Elements of the last row of LHS_matrix:" << std::endl;
+    //   for (int j = 0; j < total_length + 1; ++j) {
+    //       // Access element LHS(total_length, j)
+    //       double value = LHS_matrix.element(total_length, j); // Assuming setElement ensures symmetry
+    //       std::cout << "LHS(" << total_length << ", " << j << ") = " << value << std::endl;
+    //   }
+
+        
+    //   std::cout << "delta y" << delta_y << std::endl;
+
+
+
+
+    //   // std::cout << "Stopping program here for debugging purposes." << std::endl;
+    //   // std::exit(0); 
+
+
+
+    // //  // Declare a variable to store the accumulated time
+    // //   static double accumulated_time = 0.0;
+
+    // //   // Check total_length
+    // //   if (total_length == 200) {
+    // //       clock_t start = clock();
+          
+    // //       // Your function call
+    // //       solveLinearSystem(2 * total_length + 1, matrix_J_.valuesModifiable(), residual.valuesModifiable(), delta.valuesModifiable());
+          
+    // //       clock_t end = clock();
+          
+    // //       // Calculate elapsed time for this iteration
+    // //       double elapsed_time = static_cast<double>(end - start) / CLOCKS_PER_SEC;
+    // //       accumulated_time += elapsed_time; // Add to accumulated time
+          
+    // //       std::cout << "Time taken by this iteration: " << elapsed_time << " seconds" << std::endl;
+    // //       std::cout << "Total accumulated time: " << accumulated_time << " seconds" << std::endl;
+    // //   } else {
+    // //       // Call the function without timing
+    // //       solveLinearSystem(2 * total_length + 1, matrix_J_.valuesModifiable(), residual.valuesModifiable(), delta.valuesModifiable());
+    // //   }
+
+
+
+
+    //   // Vector prod(2 * total_length + 1 );
+
+    //   // matrix_J_.matrixVectorProduct(delta, prod);
+
+    //   // reporter->printf(R_QP, R_PER_INNER_ITERATION, "norm prod = :  %e\n", prod.normInf() );
+
+    //   // prod.addScaledVector(-1, residual);
+      
+
+    //   // reporter->printf(R_QP, R_PER_INNER_ITERATION, "norm diff = :  %e\n", prod.normInf() );
+
+    //   //******************************* */
+    //   Vector deltaa( 2 * total_length + 1);
+    //   solveLinearSystem( 2 * total_length + 1, matrix_J_.valuesModifiable(), residual.valuesModifiable(), deltaa.valuesModifiable() );
+
+
+    //   Vector deltaa_x(total_length);
+    //   Vector deltaa_z(total_length);
+
+    //   for (int i = 0; i < total_length; i++){
+    //     deltaa_x.set(i, deltaa.values()[i]);
+    //     deltaa_z.set(i, deltaa.values()[i+ total_length + 1]);
+    //   }
+    //   double deltaa_y = deltaa.values()[total_length];
+
+    //   std::cout << "other delta_y" << deltaa_y << " seconds" << std::endl;
+    //   std::cout << "deltaa_x(first)" << deltaa_x.values()[25] << " seconds" << std::endl;
+    //   std::cout << "first delta x" << delta_x.values()[25] << std::endl;
+
+    //   // Print all elements in the last column of LHS_matrix (column index = total_length)
+    //   std::cout << "Elements of delta x:" << std::endl;
+    //   for (int i = 0; i < total_length; i++) {
+    //       // Access element LHS(i, total_length)
+          
+    //       std::cout << "delta (" << i << ", " << ") = " << delta_x.values()[i] << std::endl;
+    //   }
+
+    //   // Print all elements in the last column of LHS_matrix (column index = total_length)
+    //   std::cout << "Elements of deltaa x:" << std::endl;
+    //   for (int i = 0; i < total_length; i++) {
+    //       // Access element LHS(i, total_length)
+          
+    //       std::cout << "deltaa (" << i << ", " << ") = " << deltaa_x.values()[i] << std::endl;
+    //   }
+
+
+    //   std::cout << "Stopping program here for debugging purposes." << std::endl;
+    //   std::exit(0); 
+    //   //******************************* */
 
       //delta.print(reporter, "delta=");
       //delta_x.print(reporter, "deltax=");
@@ -1824,7 +2073,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       scalar_y_ += alpha_y*delta_y;
       vector_z_.addScaledVector(alpha_z, delta_z);
 
-      std::cout << "y="<<scalar_y_ << std::endl;
+      // std::cout << "y="<<scalar_y_ << std::endl;
 
       for ( int i=0 ; i < total_length; i++){
         r_cent_In.set(i, -vector_x_.values()[i]*vector_z_.values()[i]);
@@ -1846,25 +2095,48 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       
       // reporter->printf(R_QP, R_PER_INNER_ITERATION, "mu: %e\n", mu_);
 
-      std::cout << outer_iter_count_
-                      << std::setw(20) << inner_iter_count_
-                      << std::setw(20) << vector_x_.min()
-                      << std::setw(20) << vector_z_.min()
-                      << std::setw(20) << mu_
-                      << std::setw(20) << abs(r_pri_)
-                      << std::setw(20) << r_dual_.normInf()
-                      << std::setw(20) << r_cent_In.normInf()
-                      << std::setw(20) << (r_cent_In_plus_mu).normInf()
-                      << std::setw(20) << delta_x.normInf()
-                      << std::setw(20) << abs(delta_y)
-                      << std::setw(20) << delta_z.normInf()
-                      << std::setw(20) << bar_alpha_x
-                      << std::setw(20) << bar_alpha_z
-                      << std::setw(20) << alpha_x
-                      << std::setw(20) << alpha_y
-                      << std::setw(20) << alpha_z << std::endl;
+      // std::cout << outer_iter_count_
+      //                 << std::setw(20) << inner_iter_count_
+      //                 << std::setw(20) << vector_x_.min()
+      //                 << std::setw(20) << vector_z_.min()
+      //                 << std::setw(20) << mu_
+      //                 << std::setw(20) << abs(r_pri_)
+      //                 << std::setw(20) << r_dual_.normInf()
+      //                 << std::setw(20) << r_cent_In.normInf()
+      //                 << std::setw(20) << (r_cent_In_plus_mu).normInf()
+      //                 << std::setw(20) << delta_x.normInf()
+      //                 << std::setw(20) << abs(delta_y)
+      //                 << std::setw(20) << delta_z.normInf()
+      //                 << std::setw(20) << bar_alpha_x
+      //                 << std::setw(20) << bar_alpha_z
+      //                 << std::setw(20) << alpha_x
+      //                 << std::setw(20) << alpha_y
+      //                 << std::setw(20) << alpha_z << std::endl;
+
+
       
-      std::cout << "hi" << sum_inner_iter_count_<< std::endl;
+      reporter->printf(R_QP, R_PER_INNER_ITERATION,
+              "%-20d%-20d%-20.6e%-20.6e%-20.6e%-20.6e%-20.6e%-20.6e%-20.6e%-20.6e%-20.6e%-20.6e%-20.6e%-20.6e%-20.6e%-20.6e%-20.6e\n",
+              outer_iter_count_,
+              inner_iter_count_,
+              vector_x_.min(),
+              vector_z_.min(),
+              mu_,
+              abs(r_pri_),
+              r_dual_.normInf(),
+              r_cent_In.normInf(),
+              (r_cent_In_plus_mu).normInf(),
+              delta_x.normInf(),
+              abs(delta_y),
+              delta_z.normInf(),
+              bar_alpha_x,
+              bar_alpha_z,
+              alpha_x,
+              alpha_y,
+              alpha_z
+          );
+            
+      // std::cout << "hi" << sum_inner_iter_count_<< std::endl;
 
       if (residual_In.normInf() < tol_in_){
         break;
@@ -1879,10 +2151,13 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       }
       residual_Out.set(total_length, r_pri_);
 
-      std::cout << "x[9]="<< vector_x_.values()[9] << std::endl;
+      // std::cout << "x[9]="<< vector_x_.values()[9] << std::endl;
 
       if (residual_Out.normInf() < tol_out_){ //kkterror
-        std::cout << "x[3]="<< vector_x_.values()[3] << std::endl;
+        // std::cout << "x[3]="<< vector_x_.values()[3] << std::endl;
+        // std::cout << "res out="<< residual_Out.normInf() << std::endl;
+        kkt_error_ = 0;
+        kkt_error_ = residual_Out.normInf();
         break;
       }
       
@@ -1892,12 +2167,12 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
       // Check for successful solve
 
-      kkt_error_ = 0;
-      kkt_error_ = residual_Out.normInf();
+
 
       // success!
       
       mu_=fmin( vector_x_.innerProduct(vector_z_) / total_length, mu_factor_ * mu_ );
+
 
 
 
@@ -1941,6 +2216,11 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       //               << std::endl;
       // }
 
+    std::cout << "Total time spent in solveLinearSystem: " << total_time_spent << " seconds" << std::endl;
+
+    // std::cout << "kkt_error="<< kkt_error_ << std::endl;
+    
+
 
     if (kkt_error_ >= -tol_out_) {
       THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
@@ -1953,12 +2233,14 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
       THROW_EXCEPTION(QP_ITERATION_LIMIT_EXCEPTION, "QP solve unsuccessful. Iteration limit reached.");
     }
       
-      // Check for CPU time limit ** Stay the same?
+    
+    // Check for CPU time limit
     if ((clock() - quantities->startTime()) / (double)CLOCKS_PER_SEC >= quantities->cpuTimeLimit()) {
       THROW_EXCEPTION(QP_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
     }
 
 
+    // std::exit(0); 
 
 
 
@@ -2597,9 +2879,9 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
   reporter->printf(R_QP, R_PER_INNER_ITERATION, "Finalizing solution\n");
 
   // Finalize solution
-  finalizeSolution(); // put Gw + gamma
+  finalizeSolution(reporter); // put Gw + gamma
 
-  std::cout << "Hi!!" << std::endl;
+  // std::cout << "Hi!!" << std::endl;
   
 
 } // end solveQPHot
@@ -3191,7 +3473,7 @@ void QPSolverInteriorPoint::evaluateSystemVector(int set,
 } // end evaluateSystemVector
 
 // Finalize solution
-void QPSolverInteriorPoint::finalizeSolution()
+void QPSolverInteriorPoint::finalizeSolution(const Reporter* reporter)
 {
 
   int omega_length = (int)vector_.size(); //same as vector_list_
@@ -3203,14 +3485,16 @@ void QPSolverInteriorPoint::finalizeSolution()
     gamma_.set(i, vector_x_.values()[i + omega_length + gamma_length_] - vector_x_.values()[i + omega_length]);
   }
 
-  std::cout << "Beg of gamma_ values." << std::endl;    
+  reporter->printf(R_QP, R_PER_INNER_ITERATION, "Beg of gamma_ values.\n");
 
-  for (int i=0; i<gamma_length_; i++){
-    std::cout << gamma_.values()[i] << std::endl;
-  }
+    // Print each gamma_ value in the loop
+    for (int i = 0; i < gamma_length_; i++) {
+        reporter->printf(R_QP, R_PER_INNER_ITERATION, "%20.5f\n", gamma_.values()[i]);
+    }
 
-  // Print a custom message after the loop
-  std::cout << "End of gamma_ values." << std::endl;    
+    // Print ending message
+    reporter->printf(R_QP, R_PER_INNER_ITERATION, "End of gamma_ values.\n");
+
 
   Vector Gomega_new;
 
@@ -3223,14 +3507,14 @@ void QPSolverInteriorPoint::finalizeSolution()
 
 
 
-  std::cout << "Beg of Gomega values." << std::endl;    
+  // std::cout << "Beg of Gomega values." << std::endl;    
 
-  for (int i=0; i<gamma_length_; i++){
-    std::cout << Gomega_new.values()[i] << std::endl;
-  }
+  // for (int i=0; i<gamma_length_; i++){
+  //   std::cout << Gomega_new.values()[i] << std::endl;
+  // }
 
-  // Print a custom message after the loop
-  std::cout << "End of Gomega values." << std::endl;    
+  // // Print a custom message after the loop
+  // std::cout << "End of Gomega values." << std::endl;    
 
   // Evaluate gradient combination ***CHECK***
   // Vector Gomega(gamma_length_, 0.0);
@@ -3244,50 +3528,81 @@ void QPSolverInteriorPoint::finalizeSolution()
   // }
   
 
+  primal_solution_.setLength(gamma_length_);
   primal_solution_.scale(0.0);
   primal_solution_.addScaledVector(-1.0, Gomega_new);
 
-  std::cout << "hi" << Gomega_.values()[3] << std::endl;
+  // std::cout << "hi" << Gomega_.values()[3] << std::endl;
 
 
   primal_solution_.addScaledVector(-1.0, gamma_);
 
 
-  std::cout << "Beg of PM values." << std::endl;    
+  matrix_->matrixVectorProductOfInverse(primal_solution_, primal_solution_);
 
-  for (int i=0; i<gamma_length_; i++){
-    std::cout << primal_solution_.values()[i] << std::endl;
+
+  reporter->printf(R_QP, R_PER_INNER_ITERATION, "Beg of Primal Solution values ( -W ( Gomega+Gamma ) ).\n");
+
+  // Print each primal_solution value in the loop
+  for (int i = 0; i < gamma_length_; i++) {
+    reporter->printf(R_QP, R_PER_INNER_ITERATION, "%20.5f\n", primal_solution_.values()[i]);
   }
 
-  // Print a custom message after the loop
-  std::cout << "End of PM values." << std::endl; 
+  // Print ending message for PM values
+  reporter->printf(R_QP, R_PER_INNER_ITERATION, "End of Primal Solution values ( -W ( Gomega+Gamma ) ).\n");
+
   
-  Vector PM(gamma_length_);
+  // Vector PM(gamma_length_);
 
-  matrix_->matrixVectorProductOfInverse(primal_solution_, PM);
+  // matrix_->matrixVectorProductOfInverse(primal_solution_, PM);
 
-  for (int i=0; i < gamma_length_; i++){
-    std::cout << PM.values()[i] << std::endl;
-  }
-  std::cout << "Final Vector x (theta):" << std::endl;
+  // for (int i=0; i < gamma_length_; i++){
+  //   std::cout << PM.values()[i] << std::endl;
+  // }
+  // std::cout << "Final Vector x (theta):" << std::endl;
 
-  for (int i=0; i < omega_length + 2*gamma_length_; i++){
-    std::cout << vector_x_.values()[i] << std::endl;
-  }
+  // for (int i=0; i < omega_length + 2*gamma_length_; i++){
+  //   std::cout << vector_x_.values()[i] << std::endl;
+  // }
 
-  std::cout << "scalar tau:" << scalar_tau_ << std::endl;
-
-
-  // std::cout << scalar_tau_ << std::endl;
-  std::cout << "Final Vector z (v):" << std::endl;
+  // std::cout << "scalar tau:" << scalar_tau_ << std::endl;
 
 
-  for (int i=0; i < omega_length + 2*gamma_length_; i++){
-    std::cout << vector_z_.values()[i] << std::endl;
-  }
+  // // std::cout << scalar_tau_ << std::endl;
+  // std::cout << "Final Vector z (v):" << std::endl;
+
+
+  // for (int i=0; i < omega_length + 2*gamma_length_; i++){
+  //   std::cout << vector_z_.values()[i] << std::endl;
+  // }
   
-  std::cout << "Final Vector y (u):" << std::endl;
-  std::cout << scalar_y_ << std::endl;
+  // std::cout << "Final Vector y (u):" << std::endl;
+  // std::cout << scalar_y_ << std::endl;
+
+  // Print "Final Vector x (theta):"
+  reporter->printf(R_QP, R_PER_INNER_ITERATION, "Final Vector x (theta):\n");
+
+  // Print each value in vector_x_
+  for (int i = 0; i < omega_length + 2 * gamma_length_; i++) {
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "%20.6e\n", vector_x_.values()[i]);
+  }
+
+  // Print "scalar tau:"
+  reporter->printf(R_QP, R_PER_INNER_ITERATION, "scalar tau: %20.5f\n", scalar_tau_);
+
+  // Print "Final Vector z (v):"
+  reporter->printf(R_QP, R_PER_INNER_ITERATION, "Final Vector z (v):\n");
+
+  // Print each value in vector_z_
+  for (int i = 0; i < omega_length + 2 * gamma_length_; i++) {
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "%20.5f\n", vector_z_.values()[i]);
+  }
+
+  // Print "Final Vector y (u):"
+  reporter->printf(R_QP, R_PER_INNER_ITERATION, "Final Vector y (u):\n");
+
+  // Print scalar_y_
+  reporter->printf(R_QP, R_PER_INNER_ITERATION, "%20.5f\n", scalar_y_);
 
 
 
@@ -3633,10 +3948,14 @@ void QPSolverInteriorPoint::solveLinearSystem(int size,
   int nrhs = 1;
   int increment = 1;
   int info;
-  int piv_info [size];
+  // std::cout << "Hi night!!" << std::endl;
+  int* piv_info = new int[size];
   int lw;
-  double matrix_copy [length_squared];
+  // std::cout << "Hi night 1!!" << std::endl;
+  double* matrix_copy = new double[length_squared];
+  // double matrix_copy [length_squared];
   double work;
+  // std::cout << "Hi night 2!!" << std::endl;
 
   // Copy right_hand_side to solution
   dcopy_(&length_squared, matrix, &increment, matrix_copy, &increment);
@@ -3644,6 +3963,7 @@ void QPSolverInteriorPoint::solveLinearSystem(int size,
 
   // Solve system
   dsysv_(&upper_lower, &length, &nrhs, matrix_copy, &length, piv_info, solution, &length, &work, &lw, &info);
+  // std::cout << "Hi night 3!!" << std::endl;
 
 } // end solveLinearSystem
 

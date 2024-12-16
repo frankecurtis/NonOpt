@@ -1,0 +1,77 @@
+
+
+
+
+Outer loop (n = 10):
+
+    m = 11
+Total time spent in solveLinearSystem: 0.000962 seconds
+IPM:  KKT error = +5.1464e-04  d error = +3.3215e-03  Total time = 0.0014670  iters =      6
+DAS:  KKT error = +0.0000e+00  d error = +1.9970e-15  Total time = 0.0002220  iters =     11
+
+    m = 20
+Total time spent in solveLinearSystem: 0.00035 seconds
+IPM:  KKT error = +9.5825e-04  d error = +1.1654e-02  Total time = 0.0008530  iters =      6
+DAS:  KKT error = +0.0000e+00  d error = +2.4687e-15  Total time = 0.0002130  iters =     11
+
+
+
+
+Outer loop (n = 50):
+
+    m = 51
+Total time spent in solveLinearSystem: 0.003017 seconds
+IPM:  KKT error = +5.8949e-04  d error = +3.9376e-03  Total time = 0.0058880  iters =      5
+DAS:  KKT error = +0.0000e+00  d error = +1.4665e-13  Total time = 0.0024980  iters =     56
+
+    m = 100
+Total time spent in solveLinearSystem: 0.00616 seconds
+IPM:  KKT error = +7.1991e-04  d error = +7.9530e-03  Total time = 0.0113080  iters =      6
+DAS:  KKT error = +0.0000e+00  d error = +3.0828e-14  Total time = 0.0018750  iters =     52
+
+
+
+
+Outer loop (n = 100):
+
+    m = 101
+Total time spent in solveLinearSystem: 0.013532 seconds
+IPM:  KKT error = +5.2424e-04  d error = +3.8659e-03  Total time = 0.0220300  iters =      6
+DAS:  KKT error = +0.0000e+00  d error = +2.8378e-13  Total time = 0.0073300  iters =    112
+
+    m = 200
+Total time spent in solveLinearSystem: 0.032913 seconds
+IPM:  KKT error = +5.0557e-04  d error = +4.1093e-03  Total time = 0.0480790  iters =      7
+DAS:  KKT error = +0.0000e+00  d error = +2.2386e-07  Total time = 0.0085470  iters =    109
+
+
+
+
+Outer loop (n = 200):
+
+    m = 201
+Total time spent in solveLinearSystem: 0.342755 seconds
+IPM:  KKT error = +5.0201e-04  d error = +3.0893e-01  Total time = 0.4388940  iters =     24
+DAS:  KKT error = +0.0000e+00  d error = +5.0109e-01  Total time = 0.0361320  iters =    206
+
+    m = 400
+Total time spent in solveLinearSystem: 0.223984 seconds
+IPM:  KKT error = +6.7119e-04  d error = +2.7921e+02  Total time = 0.2970320  iters =      7
+DAS:  KKT error = +0.0000e+00  d error = +1.6381e-13  Total time = 0.0448140  iters =    212
+
+
+
+
+Outer loop (n = 500):
+
+    m = 501
+Total time spent in solveLinearSystem: 47.7957 seconds
+IPM:  KKT error = +8.8956e-04  d error = +9.9918e-01  Total time = 54.0955660  iters =    191
+DAS:  KKT error = +0.0000e+00  d error = +1.0000e+00  Total time = 0.4073410  iters =    446
+
+    m = 1000
+Total time spent in solveLinearSystem: 8.47569 seconds
+IPM:  KKT error = +6.6739e-04  d error = +5.3352e+02  Total time = 9.5549200  iters =      8
+DAS:  KKT error = +0.0000e+00  d error = +3.7402e-13  Total time = 1.6631780  iters =    542
+IPM TEST FAILED.
+DAS TEST WAS SUCCESSFUL.
