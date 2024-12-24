@@ -431,6 +431,22 @@ private:
                          double matrix[],
                          double right_hand_side[],
                          double solution[]);
+  void calculate_step_sizes(const Vector& delta_x, 
+                            const double& delta_y, 
+                            const Vector& delta_z, 
+                            const double& r_pri_, 
+                            const Vector& r_dual_, 
+                            const Vector& vector_x_, 
+                            const Vector& vector_z_,
+                            const Vector& vector_c_, 
+                            SymmetricMatrixDense& matrix_Q_, 
+                            const Vector& matrix_At_, 
+                            double scalar_y_, 
+                            double scalar_b_, 
+                            double beta_,  // Assuming beta is another parameter needed
+                            double& alpha_x, 
+                            double& alpha_y, 
+                            double& alpha_z);
   //@}
 
 }; // end QPSolverInteriorPoint

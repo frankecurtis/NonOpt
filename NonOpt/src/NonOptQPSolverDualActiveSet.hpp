@@ -108,11 +108,6 @@ public:
    */
   int dualSolutionOmegaLength() { return (int)vector_.size(); };
   /**
-   * Get elapsed CPU time
-   * \return CPU time
-   */
-  double elapsedCPUtime() { return elapsed_CPUtime_; };  //residual r
-  /**
    * Get KKT error
    * \return solver's KKT error
    */
@@ -295,7 +290,6 @@ private:
   int iteration_count_;
   double kkt_error_;
   double dual_objective_reference_;
-  double elapsed_CPUtime_;
   double primal_directional_derivative_feasible_best_;
   double primal_objective_feasible_best_;
   double primal_objective_reference_;
