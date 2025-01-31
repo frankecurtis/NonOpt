@@ -122,7 +122,7 @@ public:
    * Get iteration count
    * \return number of iterations performed
    */
-  int numberOfIterations() { return sum_inner_iter_count_; };  //change to the outer iteration NO sum of iteration :)
+  int numberOfIterations() { return iter_count_; };  //change to the outer iteration NO sum of iteration :)
   /**
    * Get primal solution
    * \param[out] "d" (equal to "-W*(G*omega + gamma)" if solution is exact)
@@ -179,6 +179,15 @@ public:
    * \param[in] matrix is pointer to SymmetricMatrix, for which "W" is the "Inverse"
    */
   void setMatrix(const std::shared_ptr<SymmetricMatrix> matrix) { matrix_ = matrix; };
+
+  /**
+   * Lara: Set mu aff factor for testing
+   * \param[in] ....
+   */
+  void setMuAffFactor(double mu_aff_factor) { mu_aff_factor_ = mu_aff_factor; };
+
+  void setInitParam(double init_param) { init_param_ = init_param; };
+
   /**
    * Set null solution
    */
@@ -318,11 +327,11 @@ private:
   double mu_;
   Vector primal_solution_; 
   double scalar_tau_;
+  double mu_aff_factor_;
+  double init_param_;
 
 
-  int inner_iter_count_;
-  int outer_iter_count_;
-  int sum_inner_iter_count_;
+  int iter_count_;
 
   /**
    * Algorithm parameters
@@ -448,6 +457,12 @@ private:
                             double& alpha_y, 
                             double& alpha_z);
   //@}
+  void solveLinearSystemFactorized(int size,
+                                  double matrix[],
+                                  int ipiv[],
+                                  bool factorize,
+                                  double right_hand_side[],
+                                  double solution[]);
 
 }; // end QPSolverInteriorPoint
 
