@@ -253,7 +253,7 @@ void SymmetricMatrixDense::setAsDiagonal(int size,
 {
 
   // Assert
-  ASSERT_EXCEPTION(value > 0.0, NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Value is nonpositive.");
+  ASSERT_EXCEPTION(value >= 0.0, NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Value is nonpositive.");
 
   // Check current size
   if (size_ != size) {
@@ -296,6 +296,26 @@ void SymmetricMatrixDense::setAsDiagonal(int size,
   } // end for
 
 } // end setAsDiagonal
+
+// Set element to value
+void SymmetricMatrixDense::setElement(int row_index,
+                                      int column_index,
+                                      double value)
+{
+  // Asserts
+  ASSERT_EXCEPTION(row_index >= 0, NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Row index is negative.");
+  ASSERT_EXCEPTION(row_index < size_, NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Row index is too large.");
+  ASSERT_EXCEPTION(column_index >= 0, NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Column index is negative.");
+  ASSERT_EXCEPTION(column_index < size_, NONOPT_SYMMETRIC_MATRIX_ASSERT_EXCEPTION, "Symmetric matrix assert failed.  Column index is too large.");
+  // Adjust indices, if necessary
+  if (row_index > column_index) {
+    int temp = row_index;
+    row_index = column_index;
+    column_index = temp;
+  } // end if
+  // Set element
+  values_[row_index * size_ + column_index] = value;
+} // end setElement
 
 // Symmetric update
 void SymmetricMatrixDense::update(const Vector& s,
