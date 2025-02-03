@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Frank E. Curtis
+# Copyright (C) 2025 Frank E. Curtis
 #
 # This code is published under the MIT License.
 #
@@ -20,7 +20,7 @@ depends = $(sources:.cpp=.d)
 EXES = $(sources:.cpp=)
 
 # Libraries
-NonOptLIB         = "$(NONOPTDIR)"/NonOpt/src/libNonOpt.a
+NonOptLIB = "$(NONOPTDIR)"/NonOpt/src/libNonOpt.a
 NonOptProblemsLIB = "$(NONOPTDIR)"/NonOpt/problems/libNonOptProblems.a
 
 # Includes

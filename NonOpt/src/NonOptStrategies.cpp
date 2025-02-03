@@ -15,6 +15,7 @@
 #include "NonOptLineSearchWeakWolfe.hpp"
 #include "NonOptPointSetUpdateProximity.hpp"
 #include "NonOptQPSolverDualActiveSet.hpp"
+#include "NonOptQPSolverInteriorPoint.hpp"
 #include "NonOptSymmetricMatrixDense.hpp"
 #include "NonOptSymmetricMatrixLimitedMemory.hpp"
 #include "NonOptTerminationBasic.hpp"
@@ -49,9 +50,9 @@ void Strategies::addOptions(Options* options)
                            "Point set update strategy to use.\n"
                            "Default     : Proximity.");
   options->addStringOption("qp_solver",
-                           "DualActiveSet",
+                           "InteriorPoint",
                            "QP solver strategy to use.\n"
-                           "Default     : DualActiveSet.");
+                           "Default     : InteriorPoint.");
   options->addStringOption("symmetric_matrix",
                            "Dense",
                            "Symmetric matrix strategy to use.\n"
@@ -102,6 +103,8 @@ void Strategies::addOptions(Options* options)
   // Add options for QP solver strategies
   std::shared_ptr<QPSolver> qp_solver;
   qp_solver = std::make_shared<QPSolverDualActiveSet>();
+  qp_solver->addOptions(options);
+  qp_solver = std::make_shared<QPSolverInteriorPoint>();
   qp_solver->addOptions(options);
   // ADD NEW QP SOLVER STRATEGIES HERE //
 
@@ -204,9 +207,13 @@ void Strategies::setOptions(Options* options)
     qp_solver_ = std::make_shared<QPSolverDualActiveSet>();
     qp_solver_termination_ = std::make_shared<QPSolverDualActiveSet>();
   }
+  else if (qp_solver_name.compare("InteriorPoint") == 0) {
+    qp_solver_ = std::make_shared<QPSolverInteriorPoint>();
+    qp_solver_termination_ = std::make_shared<QPSolverInteriorPoint>();
+  }
   else {
-    qp_solver_ = std::make_shared<QPSolverDualActiveSet>();
-    qp_solver_termination_ = std::make_shared<QPSolverDualActiveSet>();
+    qp_solver_ = std::make_shared<QPSolverInteriorPoint>();
+    qp_solver_termination_ = std::make_shared<QPSolverInteriorPoint>();
   }
 
   // Set symmetric matrix strategy

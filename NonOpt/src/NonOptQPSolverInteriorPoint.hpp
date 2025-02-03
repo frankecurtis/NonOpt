@@ -112,7 +112,7 @@ public:
    * Get KKT error
    * \return solver's KKT error
    */
-  double KKTError() { return kkt_error_; };  //residual r
+  double KKTError() { return kkt_error_; };
   /**
    * Get KKT error full
    * \return full KKT error corresponding to dual solution
@@ -122,7 +122,7 @@ public:
    * Get iteration count
    * \return number of iterations performed
    */
-  int numberOfIterations() { return iter_count_; };  //change to the outer iteration NO sum of iteration :)
+  int numberOfIterations() { return iteration_count_; };  //change to the outer iteration NO sum of iteration :)
   /**
    * Get primal solution
    * \param[out] "d" (equal to "-W*(G*omega + gamma)" if solution is exact)
@@ -179,15 +179,6 @@ public:
    * \param[in] matrix is pointer to SymmetricMatrix, for which "W" is the "Inverse"
    */
   void setMatrix(const std::shared_ptr<SymmetricMatrix> matrix) { matrix_ = matrix; };
-
-  /**
-   * Lara: Set mu aff factor for testing
-   * \param[in] ....
-   */
-  void setMuAffFactor(double mu_aff_factor) { mu_aff_factor_ = mu_aff_factor; };
-
-  void setInitParam(double init_param) { init_param_ = init_param; };
-
   /**
    * Set null solution
    */
@@ -237,10 +228,7 @@ public:
    */
   void solveQPHot(const Options* options,
                   const Reporter* reporter,
-                  Quantities* quantities){
-                    solveQP(options,reporter,quantities
-                    );
-                  }
+                  Quantities* quantities);
   //@}
 
   /** @name Print methods */
@@ -272,36 +260,24 @@ private:
   /**
    * Length parameters
    */
-  int factor_length_;
-  int gamma_length_; /*n
-  */
-  int system_solution_length_;
+  int gamma_length_;
   /**
    * Input parameters
    */
-  bool fail_on_factorization_error_;
   bool allow_inexact_termination_;
-  double cholesky_tolerance_;
+  double barrier_parameter_factor_;
+  double barrier_parameter_initial_;
+  double barrier_parameter_maximum_;
+  double barrier_parameter_minimum_;
+  double fraction_to_boundary_tolerance_;
   double kkt_tolerance_;
   double inexact_solution_tolerance_;
   double inexact_termination_descent_tolerance_;
   double inexact_termination_initialization_factor_;
   double inexact_termination_ratio_minimum_;
-  double linear_independence_tolerance_;
+  double solution_initialization_factor_;
   int inexact_termination_check_interval_;
-  int iteration_limit_minimum_;
-  int iteration_limit_maximum_;
-  /**
-   * Lara
-   */
-  double beta_;
-  double sigma_;
-  double eps_;
-  double tol_in_;
-  double tol_out_;
-  double mu_factor_;
-  int max_iter_in_;
-  int max_iter_out_;
+  int iteration_limit_;
 
   /**
    * QP data quantities
@@ -310,28 +286,21 @@ private:
   std::shared_ptr<SymmetricMatrix> matrix_;          /**< "H" */
   std::vector<std::shared_ptr<Vector>> vector_list_; /**< "G" */
   std::vector<double> vector_;                       /**< "b_k" */
+
   /**
-   * Lara
+   * Interior-point system quantities
    */
-  Vector matrix_At_;  /**< "A transpose" */
-  double scalar_b_;
-  SymmetricMatrixDense matrix_Q_;
-  Vector vector_c_;
-  SymmetricMatrixDense matrix_J_;
+  Vector At_;
+  double b_;
+  SymmetricMatrixDense Q_;
+  Vector c_;
   Vector r_dual_;
-  Vector r_cent_;
-  double r_pri_;
-  Vector vector_x_;
-  double scalar_y_; 
-  Vector vector_z_;
+  Vector r_comp_;
+  double r_prim_;
+  Vector theta_;
+  double u_; 
+  Vector v_;
   double mu_;
-  Vector primal_solution_; 
-  double scalar_tau_;
-  double mu_aff_factor_;
-  double init_param_;
-
-
-  int iter_count_;
 
   /**
    * Algorithm parameters
@@ -345,36 +314,17 @@ private:
   double primal_objective_simple_;
   double primal_quadratic_feasible_best_;
   double primal_solution_feasible_best_norm_inf_;
-  /**
-   * Algorithm quantities
-   */
-  double* factor_;
-  std::deque<int> gamma_negative_;
-  std::deque<int> gamma_negative_best_;
-  std::deque<int> gamma_positive_;
-  std::deque<int> gamma_positive_best_;
-  double* inner_solution_1_;
-  double* inner_solution_2_;
-  double* inner_solution_3_;
-  double* inner_solution_ls_;
-  double* inner_solution_trial_;
-  double* new_system_vector_;
-  double* right_hand_side_;
-  std::deque<int> omega_positive_;
-  std::deque<int> omega_positive_best_;
-  double* system_solution_;
-  double* system_solution_best_;
 
   /**
    * Solution quantities
    */
-  double multiplier_;
   double primal_solution_projection_scalar_;
   Vector combination_;
   Vector combination_translated_;
   Vector gamma_;
   Vector Gomega_;
   Vector omega_;
+  Vector primal_solution_;
   Vector primal_solution_feasible_;
   Vector primal_solution_feasible_best_;
   Vector primal_solution_simple_;
@@ -391,78 +341,41 @@ private:
    */
   double dualObjectiveQuadraticValueScaled();
   /**
-   * Update best solution
-   */
-  bool updateBestSolution();
-  /**
    * Termination condition for inexact solution
    */
   bool inexactTerminationCondition(const Quantities* quantities,
                                    const Reporter* reporter);
   /**
-   * Internal solve methods
+   * Evaluate primal vectors
    */
-  bool choleskyAugment(double system_vector[],
-                       int index,
-                       double solution1[],
-                       double value1,
-                       double solution2[],
-                       double value2);
-  void choleskyDelete(int index,
-                      double solution1[],
-                      double solution2[]);
-  void choleskyFromScratch(const Reporter* reporter);
   void evaluatePrimalVectors();
-  void evaluatePrimalMultiplier(double solution1[],
-                                double solution2[]);
-  void evaluateSystemVector(int set,
-                            int index,
-                            double system_vector[]);
-  void finalizeSolution(const Reporter* reporter);
-  void resizeSystemSolution();
-  bool setAugment(const Reporter* reporter,
-                  int set,
-                  int index,
-                  double system_vector[],
-                  double solution1[],
-                  double solution2[],
-                  double augmentation_value);
-  void setDelete(const Reporter* reporter,
-                 int set,
-                 int index,
-                 double solution1[],
-                 double solution2[]);
-  void solveSystem(double right_hand_side[],
-                   double solution[]);
-  void solveSystemTranspose(double right_hand_side[],
-                            double solution[]);
+  /**
+   * Finalize solution
+   */
+  void finalizeSolution();
+  /**
+   * Solve linear system
+   */
   void solveLinearSystem(int size,
                          double matrix[],
                          double right_hand_side[],
+                         int ipiv[],
                          double solution[]);
-  void calculate_step_sizes(const Vector& delta_x, 
-                            const double& delta_y, 
-                            const Vector& delta_z, 
-                            const double& r_pri_, 
-                            const Vector& r_dual_, 
-                            const Vector& vector_x_, 
-                            const Vector& vector_z_,
-                            const Vector& vector_c_, 
-                            SymmetricMatrixDense& matrix_Q_, 
-                            const Vector& matrix_At_, 
-                            double scalar_y_, 
-                            double scalar_b_, 
-                            double beta_,  // Assuming beta is another parameter needed
-                            double& alpha_x, 
-                            double& alpha_y, 
-                            double& alpha_z);
+  void solveLinearSystemReuseFactorization(int size,
+                                           double matrix[],
+                                           double right_hand_side[],
+                                           int ipiv[],
+                                           double solution[]);
+  /**
+   * Compute step sizes
+   */
+  void computeStepSizes(const Vector& dtheta,
+                        const double& du,
+                        const Vector& dv,
+                        double& atheta,
+                        double& au,
+                        double& av);
   //@}
-  void solveLinearSystemFactorized(int size,
-                                  double matrix[],
-                                  int ipiv[],
-                                  bool factorize,
-                                  double right_hand_side[],
-                                  double solution[]);
 
 }; // end QPSolverInteriorPoint
 

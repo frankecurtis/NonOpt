@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Frank E. Curtis
+// Copyright (C) 2025 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -13,6 +13,7 @@
 #include <random>
 
 #include "NonOptQPSolverDualActiveSet.hpp"
+#include "NonOptQPSolverInteriorPoint.hpp"
 #include "NonOptSymmetricMatrix.hpp"
 #include "NonOptSymmetricMatrixDense.hpp"
 
@@ -25,6 +26,14 @@ int testQPSolverImplementation(int option)
   // Initialize output
   int result = 0;
 
+  // Declare test numbers
+  int test_start = 0;
+  int test_end = 20;
+  int test_adds = 1;
+
+  // Declare number of variables
+  int numberVariables = 20;
+
   // Declare reporter
   Reporter reporter;
   Quantities quantities;
@@ -33,7 +42,7 @@ int testQPSolverImplementation(int option)
   if (option == 1) {
 
     // Declare stream report
-    std::shared_ptr<StreamReport> s(new StreamReport("s", R_QP, R_PER_INNER_ITERATION));
+    std::shared_ptr<StreamReport> s(new StreamReport("s", R_QP, R_BASIC));
 
     // Set stream report to standard output
     s->setStream(&std::cout);
@@ -43,14 +52,6 @@ int testQPSolverImplementation(int option)
 
   } // end if
 
-  // Declare test numbers
-  int test_start = 0;
-  int test_end = 0;
-  int test_adds = 0;
-
-  // Declare number of variables
-  int numberVariables = 20;
-
   // Declare random number generator
   std::default_random_engine generator;
   std::uniform_real_distribution<double> uniform(0.0, 1.0);
@@ -59,28 +60,35 @@ int testQPSolverImplementation(int option)
   // Declare options
   Options options;
 
-  // Declare QP solver object
-  QPSolverDualActiveSet q;
+  // Declare QP solver objects
+  QPSolverDualActiveSet qDAS;
+  QPSolverInteriorPoint qIPM;
 
   // Add options
-  q.addOptions(&options);
+  qDAS.addOptions(&options);
+  qIPM.addOptions(&options);
 
   // Use exact solves
   options.modifyBoolValue("QPDAS_allow_inexact_termination", false);
+  options.modifyBoolValue("QPIPM_allow_inexact_termination", false);
+  options.modifyDoubleValue("QPDAS_kkt_tolerance", 1e-06);
+  options.modifyDoubleValue("QPIPM_kkt_tolerance", 1e-06);
 
   // Set options
-  q.setOptions(&options);
+  qDAS.setOptions(&options);
+  qIPM.setOptions(&options);
 
   // Initialize data
-  q.initializeData(numberVariables);
+  qDAS.initializeData(numberVariables);
+  qIPM.initializeData(numberVariables);
 
   // Loop over number of tests
-  for (int test = test_start; test < test_end + 1; test++) {
+  for (int test = test_start; test <= test_end; test++) {
 
     // Print test number
     reporter.printf(R_QP, R_BASIC, "Running test %8d... ", test);
 
-    // Set random seeds
+    // Set random seed
     generator.seed(test);
 
     // Declare problem parameters
@@ -276,52 +284,107 @@ int testQPSolverImplementation(int option)
     // Loop over cold and hot solves
     for (int solve_count = 0; solve_count < test_adds + 1; solve_count++) {
 
-      // Check solve counter
-      if (solve_count == 0) {
+      // Loop over solvers
+      for (int solver = 0; solver < 2; solver++) {
 
-        // Set QP data
-        q.setMatrix(matrix);
-        q.setVectorList(vector_list);
-        q.setVector(vector);
-        q.setScalar(regularization);
+        // Check solve counter
+        if (solve_count == 0 && solver == 0) {
 
-        // Solve QP
-        q.solveQP(&options, &reporter, &quantities);
+          // Set QP data for dual active-set solver
+          qDAS.setMatrix(matrix);
+          qDAS.setVectorList(vector_list);
+          qDAS.setVector(vector);
+          qDAS.setScalar(regularization);
 
-      } // end if
+          // Solve QP
+          qDAS.solveQP(&options, &reporter, &quantities);
 
-      else {
+        } // end if
 
-        // Add vectors
-        q.addData(new_vector_list, new_vector);
+        else if (solve_count == 1 && solver == 0) {
 
-        // Solve QP hot
-        q.solveQPHot(&options, &reporter, &quantities);
+          // Add vectors
+          qDAS.addData(new_vector_list, new_vector);
 
-        // Print new line
-        reporter.printf(R_QP, R_BASIC, "... adding %2d vectors... ", numberPointsAdd);
+          // Solve QP hot
+          qDAS.solveQPHot(&options, &reporter, &quantities);
 
-      } // end else
+          // Print new line
+          reporter.printf(R_QP, R_BASIC, "... adding %2d vectors... ", numberPointsAdd);
 
-      // Check for pass or fail
-      if (q.status() == QP_SUCCESS) {
-        reporter.printf(R_QP, R_BASIC, "pass");
-      }
-      else {
-        reporter.printf(R_QP, R_BASIC, "fail");
-      }
+        } // end else if
 
-      // Get primal solution
-      Vector primal_solution(numberVariables);
-      q.primalSolution(primal_solution.valuesModifiable());
+        else if (solve_count == 0 && solver == 1) {
 
-      // Check results
-      if (q.status() != QP_SUCCESS || q.KKTError() > 1e-03 || q.KKTErrorDual() > 1e-03 || primal_solution.normInf() > 1.0 / ((double)(test) + 1.0) + 1e-03) {
-        result = 1;
-      }
+          // Set QP data for interior-point solver
+          qIPM.setMatrix(matrix);
+          qIPM.setVectorList(vector_list);
+          qIPM.setVector(vector);
+          qIPM.setScalar(regularization);
 
-      // Print solve status information
-      reporter.printf(R_QP, R_BASIC, "  status: %d  iters: %6d  kkt error: %+.4e  kkt error (dual): %+.4e  ||step||_inf: %+.4e\n", q.status(), q.numberOfIterations(), q.KKTError(), q.KKTErrorDual(), primal_solution.normInf());
+          // Solve QP
+          qIPM.solveQP(&options, &reporter, &quantities);
+
+          // Print new line
+          reporter.printf(R_QP, R_BASIC, "........................ ", numberPointsAdd);
+
+        } // end else if
+
+        else {
+
+          // Add vectors
+          qIPM.addData(new_vector_list, new_vector);
+
+          // Solve QP (no hot start!)
+          qIPM.solveQP(&options, &reporter, &quantities);
+
+          // Print new line
+          reporter.printf(R_QP, R_BASIC, "........................ ", numberPointsAdd);
+
+        } // end else
+
+        // Check for pass or fail
+        if (solver == 0 && qDAS.status() == QP_SUCCESS) {
+          reporter.printf(R_QP, R_BASIC, "DAS pass");
+        }
+        else if (solver == 0 && qDAS.status() != QP_SUCCESS) {
+          reporter.printf(R_QP, R_BASIC, "DAS fail");
+        }
+        else if (solver == 1 && qIPM.status() == QP_SUCCESS) {
+          reporter.printf(R_QP, R_BASIC, "IPM pass");
+        }
+        else {
+          reporter.printf(R_QP, R_BASIC, "IPM fail");
+        }
+
+        // Declare primal solution
+        Vector primal_solution(numberVariables);
+
+        // Get primal solution
+        if (solver == 0) {
+          qDAS.primalSolution(primal_solution.valuesModifiable());
+        }
+        else {
+          qIPM.primalSolution(primal_solution.valuesModifiable());
+        }
+
+        // Check results
+        if (solver == 0 && (qDAS.status() != QP_SUCCESS || qDAS.KKTError() > 1e-03 || qDAS.KKTErrorDual() > 1e-03 || primal_solution.normInf() > 1.0 / ((double)(test) + 1.0) + 1e-03)) {
+          result = 1;
+        }
+        else if (solver == 1 && (qIPM.status() != QP_SUCCESS || qIPM.KKTError() > 1e-03 || qIPM.KKTErrorDual() > 1e-03 || primal_solution.normInf() > 1.0 / ((double)(test) + 1.0) + 1e-03)) {
+          result = 1;
+        }
+
+        // Print solve status information
+        if (solver == 0) {
+          reporter.printf(R_QP, R_BASIC, "  status: %d  iters: %6d  kkt error: %+.4e  kkt error (dual): %+.4e  ||step||_inf: %+.4e\n", qDAS.status(), qDAS.numberOfIterations(), qDAS.KKTError(), qDAS.KKTErrorDual(), primal_solution.normInf());
+        }
+        else {
+          reporter.printf(R_QP, R_BASIC, "  status: %d  iters: %6d  kkt error: %+.4e  kkt error (dual): %+.4e  ||step||_inf: %+.4e\n", qIPM.status(), qIPM.numberOfIterations(), qIPM.KKTError(), qIPM.KKTErrorDual(), primal_solution.normInf());
+        }
+
+      } // end for
 
     } // end for
 

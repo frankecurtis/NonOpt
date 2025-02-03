@@ -1,13 +1,17 @@
 The main author of NonOpt is:
 
-Frank E. Curtis <frank.e.curtis@gmail.com>
+Frank E. Curtis [(e-mail)](mailto:frank.e.curtis@gmail.com)
 
 Other authors:
 
 - Dual active-set subproblem solver:
 
-  Baoyu Zhou <baz216@lehigh.edu>
+  Baoyu Zhou [(LinkedIn)](https://www.linkedin.com/in/baoyu-zhou-817abba2/)
 
 - Inexactness conditions for dual active-set subproblem solver and TEST29 problems:
 
-  Minhan Li <mil417@lehigh.edu>
+  Minhan Li [(LinkedIn)](https://www.linkedin.com/in/minhan-li-830008104/)
+
+- Interior-point subproblem solver:
+
+  Lara Zebiane [(LinkedIn)](https://www.linkedin.com/in/larazebiane/)
