@@ -7,3 +7,6 @@ I = uint8(I);
 % Show recovered image
 figure(3);
 imshow(I);
+
+% Write noisy image
+imwrite(I,"croissant_recovered.png");

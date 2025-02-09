@@ -4,14 +4,15 @@ function J = addNoiseToImage
 I = imread("croissant.png");
 
 % Resize image
-I = imresize(I,[120 160]);
+I = imresize(I,[300 400]);
 
 % Show original image
 figure(1);
 imshow(I);
 
 % Add noise
-J = imnoise(I,'gaussian',0.0,0.005);
+J = I;
+J(:,1:220) = imnoise(J(:,1:220),'gaussian',0.0,0.004);
 
 % Show noisy image
 figure(2);

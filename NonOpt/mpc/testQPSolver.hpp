@@ -40,10 +40,10 @@ int testQPSolverImplementation(int option)
   std::array<int, 3> m_additions = {1, 0, 0};
 
   // Declare time array
-  int p1 = 3; // d_type values
+  int p1 = 3;  // d_type values
   int p2 = 10; // n values
-  int p3 = 3; // m values
-  int p4 = 2; // algorithms
+  int p3 = 3;  // m values
+  int p4 = 2;  // algorithms
   int p5 = 10; // runs
   double time_array[3][10][3][2][10];
   for (int i = 0; i < p1; i++) {

@@ -18,12 +18,12 @@ int main(int argc, char* argv[])
 {
 
   // Declare image dimensions
-  int rows = 120;
-  int cols = 160;
+  int rows = 300;
+  int cols = 400;
 
   // Declare parameters
-  double regularization = 1e+04;
-  double smoothing      = 1e-06;
+  double regularization = 6e-02;
+  double smoothing      = 1e-08;
 
   // Declare input stream
   std::ifstream inputFile("croissant_matrix.txt");
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
       inputFile >> temp;
-      image[r + c*rows] = ((double)temp) / 256.0;
+      image[r*cols + c] = ((double)temp) / 256.0;
     }
   }
   inputFile.close();
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
   // Print matrix
   for (int r = 0; r < rows; r++) {
     for (int c = 0; c < cols; c++) {
-      outputFile << (int)(image[r + c*rows] * 256.0) << " ";
+      outputFile << (int)(image[r*cols + c] * 256.0) << " ";
     }
     outputFile << std::endl;
   }

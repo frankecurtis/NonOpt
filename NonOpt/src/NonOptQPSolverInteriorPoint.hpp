@@ -305,6 +305,7 @@ private:
   /**
    * Algorithm parameters
    */
+  bool predict_boundary_;
   int iteration_count_;
   double kkt_error_;
   double dual_objective_reference_;

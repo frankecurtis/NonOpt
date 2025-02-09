@@ -624,6 +624,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
   setNullSolution();
   iteration_count_ = 0;
   kkt_error_ = -NONOPT_DOUBLE_INFINITY;
+  predict_boundary_ = false;
 
   // try to solve QP, terminate on any exception
   try {
@@ -639,312 +640,329 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
 
     // Set sizes
     int omega_length = (int)vector_.size();
-    int total_length;
-    if (scalar_ < NONOPT_DOUBLE_INFINITY) {
-      total_length = 2 * gamma_length_ + omega_length;
-    }
-    else {
-      total_length = omega_length;
-    }
 
-    // Print sizes
-    reporter->printf(R_QP, R_PER_ITERATION, "========================\n"
-                                            " Problem size quantities\n"
-                                            "========================\n");
-    reporter->printf(R_QP, R_PER_ITERATION, "n (gamma length) : %8d\n", gamma_length_);
-    reporter->printf(R_QP, R_PER_ITERATION, "m (omega length) : %8d\n", omega_length);
-    reporter->printf(R_QP, R_PER_ITERATION, "KKT matrix size  : %8d\n", total_length);
+    // Loop over interior prediction
+    while(true) {
 
-    // Construct A transpose
-    At_.setLength(total_length);
-    for (int i = 0; i < omega_length; i++) {
-      At_.set(i,1.0);
-    }
-    for (int i = omega_length; i < total_length; i++) {
-      At_.set(i,0.0);
-    }
+      // Set total length
+      int total_length = omega_length;
+      if (predict_boundary_) {
+        total_length += 2 * gamma_length_;
+      }
 
-    // Set b
-    b_ = 1.0;
+      // Print sizes
+      reporter->printf(R_QP, R_PER_ITERATION, "========================\n"
+                                              " Problem size quantities\n"
+                                              "========================\n");
+      reporter->printf(R_QP, R_PER_ITERATION, "n (gamma length) : %8d\n", gamma_length_);
+      reporter->printf(R_QP, R_PER_ITERATION, "m (omega length) : %8d\n", omega_length);
+      reporter->printf(R_QP, R_PER_ITERATION, "KKT matrix size  : %8d\n", total_length);
+
+      // Construct A transpose
+      At_.setLength(total_length);
+      for (int i = 0; i < omega_length; i++) {
+        At_.set(i,1.0);
+      }
+      for (int i = omega_length; i < total_length; i++) {
+        At_.set(i,0.0);
+      }
+
+      // Set b
+      b_ = 1.0;
  
-    // Construct c
-    c_.setLength(total_length);
-    for (int i = 0; i < omega_length; i++) {
-      c_.set(i,-vector_[i]);
-    }
-    for (int i = omega_length ; i < total_length; i++) {
-      c_.set(i,scalar_);
-    }
-
-    // Construct W*G
-    std::vector<std::shared_ptr<Vector>> WG;
-    for (int i = 0; i < omega_length; i++) {
-      std::shared_ptr<Vector> product(new Vector(gamma_length_));
-      matrix_->matrixVectorProductOfInverse(*vector_list_[i], *product);
-      WG.push_back(product);
-    }
-
-    // Initialize Q
-    Q_.setAsDiagonal(total_length, 1.0);
-
-    // Set (1,1) block of Q
-    for (int i = 0; i < omega_length; i++) {
-      for (int j = i; j < omega_length; j++) {
-        Q_.setElement(i, j, vector_list_[i]->innerProduct(*WG[j]));
+      // Construct c
+      c_.setLength(total_length);
+      for (int i = 0; i < omega_length; i++) {
+        c_.set(i,-vector_[i]);
       }
-    }
+      for (int i = omega_length ; i < total_length; i++) {
+        c_.set(i,scalar_);
+      }
 
-    // Set remaining blocks of Q if scalar_ < infinity
-    if (scalar_ != NONOPT_DOUBLE_INFINITY) {
-      for (int i = omega_length; i < omega_length + gamma_length_; i++) {
-        for (int j = 0; j < omega_length; j++) {
-          double value = WG[j]->values()[i - omega_length];
-          Q_.setElement(i, j, value);
-          Q_.setElement(i + gamma_length_, j, -value);
+      // Construct W*G
+      std::vector<std::shared_ptr<Vector>> WG;
+      for (int i = 0; i < omega_length; i++) {
+        std::shared_ptr<Vector> product(new Vector(gamma_length_));
+        matrix_->matrixVectorProductOfInverse(*vector_list_[i], *product);
+        WG.push_back(product);
+      }
+
+      // Initialize Q
+      Q_.setAsDiagonal(total_length, 1.0);
+
+      // Set (1,1) block of Q
+      for (int i = 0; i < omega_length; i++) {
+        for (int j = i; j < omega_length; j++) {
+          Q_.setElement(i, j, vector_list_[i]->innerProduct(*WG[j]));
+        }
+      }
+
+      // Set remaining blocks of Q if predict on boundary
+      if (predict_boundary_) {
+        for (int i = omega_length; i < omega_length + gamma_length_; i++) {
+          for (int j = 0; j < omega_length; j++) {
+            double value = WG[j]->values()[i - omega_length];
+            Q_.setElement(i, j, value);
+            Q_.setElement(i + gamma_length_, j, -value);
+          } // end for
+        } // end for
+        for (int i = omega_length; i < omega_length + gamma_length_; i++) {
+          for (int j = i; j < omega_length  + gamma_length_; j++) {
+            double value = matrix_->elementOfInverse(i - omega_length, j - omega_length);
+            Q_.setElement(i, j, value);
+            Q_.setElement(i + gamma_length_, j + gamma_length_, value);
+            Q_.setElement(i + gamma_length_, j, -value);
+            if (i != j) {
+              Q_.setElement(j + gamma_length_, i, -value);
+            } // end if
+          } // end for
         } // end for
       } // end for
-      for (int i = omega_length; i < omega_length + gamma_length_; i++) {
-        for (int j = i; j < omega_length  + gamma_length_; j++) {
-          double value = matrix_->elementOfInverse(i - omega_length, j - omega_length);
-          Q_.setElement(i, j, value);
-          Q_.setElement(i + gamma_length_, j + gamma_length_, value);
-          Q_.setElement(i + gamma_length_, j, -value);
-          if (i != j) {
-            Q_.setElement(j + gamma_length_, i, -value);
-          } // end if
-        } // end for
-      } // end for
-    } // end for
 
-    // Initialize barrier parameter for initial iterate
-    mu_ = barrier_parameter_initial_;
+      // Initialize barrier parameter for initial iterate
+      mu_ = barrier_parameter_initial_;
 
-    // Initialize primal-dual solution
-    theta_.setLength(total_length);
-    theta_.scale(0.0);
-    u_ = 0.0;
-    v_.setLength(total_length);
-    v_.scale(0.0);
+      // Initialize primal-dual solution
+      theta_.setLength(total_length);
+      theta_.scale(0.0);
+      u_ = 0.0;
+      v_.setLength(total_length);
+      v_.scale(0.0);
 
-    // Initialize omega uniformly
-    for (int i = 0; i < omega_length; i++){
-      theta_.set(i, 1.0 / omega_length);
-      v_.set(i, mu_ / theta_.values()[i]);
-    }
+      // Initialize omega uniformly
+      for (int i = 0; i < omega_length; i++){
+        theta_.set(i, 1.0 / omega_length);
+        v_.set(i, mu_ / theta_.values()[i]);
+      }
 
-    // Initialize sigma and rho if scalar_ < infinity
-    if (scalar_ != NONOPT_DOUBLE_INFINITY) {
+      // Initialize sigma and rho if predict on boundary
+      if (predict_boundary_) {
     
-      // Compute G*omega
-      Vector Gomega;
-      Gomega.setLength(gamma_length_);
-      Gomega.scale(0.0);
-      for (int i = 0; i < gamma_length_; i++) {
-        for (int j = 0; j < omega_length; j++) {
-          Gomega.set(i, Gomega.values()[i] += theta_.values()[j] * vector_list_[j]->values()[i]);
-        }
-      }
-
-      // Initialize sigma and rho
-      for (int i = 0; i < gamma_length_; i++) {
-        if (Gomega.values()[i] <= -scalar_) {
-          theta_.set(i + omega_length, fmax(solution_initialization_factor_, scalar_ - Gomega.values()[i]));
-          v_.set(i + omega_length, mu_ / theta_.values()[i + omega_length]);
-          theta_.set(i + omega_length + gamma_length_, solution_initialization_factor_);
-          v_.set(i + omega_length + gamma_length_, mu_ / theta_.values()[i + omega_length + gamma_length_]);
-        } // end if
-        else if (Gomega.values()[i] >= scalar_) {
-          theta_.set(i + omega_length, solution_initialization_factor_);
-          v_.set(i + omega_length, mu_ / theta_.values()[i + omega_length]);
-          theta_.set(i + omega_length + gamma_length_, fmax(solution_initialization_factor_, -scalar_ - Gomega.values()[i]));
-          v_.set(i + omega_length + gamma_length_, mu_ / theta_.values()[i + omega_length + gamma_length_]);
-        } // end else if
-        else {
-          theta_.set(i + omega_length, solution_initialization_factor_);
-          theta_.set(i + omega_length + gamma_length_, solution_initialization_factor_);
-          v_.set(i + omega_length, mu_ / theta_.values()[i + omega_length]);
-          v_.set(i + omega_length + gamma_length_, mu_ / theta_.values()[i + omega_length + gamma_length_]);
-        } // end else
-      } // end for
-
-    } // end if
-
-    // Set barrier parameter
-    mu_= fmax(barrier_parameter_minimum_, fmin(theta_.innerProduct(v_) / total_length, barrier_parameter_maximum_));
-
-    // Initialize residual vectors
-    r_dual_.setLength(total_length);
-    r_comp_.setLength(total_length);
-
-    // Set linear system base matrix
-    SymmetricMatrixDense LS_matrix_base;
-    LS_matrix_base.setAsDiagonal(total_length + 1, 0.0);
-    for (int i = 0; i < total_length ; i++) {
-      for (int j = i; j < total_length ; j++) {
-        LS_matrix_base.setElement(i, j, -Q_.element(i, j));
-      } // end for
-    } // end for
-    for (int i = 0; i < omega_length; i++) {
-      LS_matrix_base.setElement(i, total_length, At_.values()[i]);
-    }
-
-    // Initialize linear system matrix
-    SymmetricMatrixDense LS_matrix;
-    LS_matrix.setAsDiagonal(total_length + 1, 0.0);
-
-    // Initialize rewritable quantities
-    Vector rhs(total_length + 1, 0.0);
-    Vector d(total_length + 1, 0.0);
-    Vector dtheta(total_length, 0.0);
-    double du = 0.0;
-    Vector dv(total_length, 0.0);
-    double atheta, au, av;
-    Vector ptheta(total_length, 0.0);
-    Vector pv(total_length, 0.0);
-    double mu_aff;
-    double mu_factor;
-
-    // Iteration loop
-    while (true) {
-
-      // Print message
-      if (iteration_count_ % 20 == 0) {
-        reporter->printf(R_QP, R_PER_ITERATION, "========================================\n"
-                                                "  Iter.   ||Dual||   ||Prim||   ||Comp||\n"
-                                                "========================================\n");
-      }
-      reporter->printf(R_QP, R_PER_ITERATION, " %6d", iteration_count_);
-
-      // Evaluate primal vectors
-      evaluatePrimalVectors();
-
-      // Increment iteration counter
-      iteration_count_++;
-
-      // Construct dual residual
-      Q_.matrixVectorProduct(theta_, r_dual_);
-      r_dual_.addScaledVector( 1.0, c_);
-      r_dual_.addScaledVector(- u_,At_);
-      r_dual_.addScaledVector(-1.0, v_);
-
-      // Construct primal residual
-      r_prim_ = b_ - At_.innerProduct(theta_);
-
-      // Construct complementarity residual
-      for (int i = 0; i < total_length; i++) {
-        r_comp_.set(i, -theta_.values()[i]*v_.values()[i]);
-      }
-
-      // Print message
-      reporter->printf(R_QP, R_PER_ITERATION, "  %+.2e  %+.2e  %+.2e", r_dual_.normInf(), fabs(r_prim_), r_comp_.normInf());
-
-      // Evaluate KKT error
-      kkt_error_ = fmax(r_dual_.normInf(), fmax(fabs(r_prim_), r_comp_.normInf()));
-
-      // Check for successful solve
-      if (kkt_error_ <= kkt_tolerance_) {
-        THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
-      }
-
-      // Check for inexact termination
-      if (allow_inexact_termination_ &&
-          iteration_count_ >= (int)ceil(inexact_termination_initialization_factor_ * (double)vector_.size()) &&
-          (iteration_count_ - (int)ceil(inexact_termination_initialization_factor_ * (double)vector_.size())) % inexact_termination_check_interval_ == 0 &&
-          inexactTerminationCondition(quantities, reporter)) {
-        THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
-      }
-
-      // Check for iteration limit
-      if (iteration_count_ >= iteration_limit_) { 
-        THROW_EXCEPTION(QP_ITERATION_LIMIT_EXCEPTION, "QP solve unsuccessful. Iteration limit reached.");
-      }
-
-      // Check for CPU time limit
-      if ((clock() - quantities->startTime()) / (double)CLOCKS_PER_SEC >= quantities->cpuTimeLimit()) {
-        THROW_EXCEPTION(QP_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
-      }
-
-      ////////////////////
-      // PREDICTOR STEP //
-      ////////////////////
-
-      // Set linear system matrix
-      for (int i = 0; i < total_length + 1; i++) {
-        for (int j = i; j < total_length + 1; j++) {
-          if (j == i && i < total_length) {
-            LS_matrix.setElement(i, i, -Q_.element(i, i) - v_.values()[i] / theta_.values()[i]);
+        // Compute G*omega
+        Vector Gomega;
+        Gomega.setLength(gamma_length_);
+        Gomega.scale(0.0);
+        for (int i = 0; i < gamma_length_; i++) {
+          for (int j = 0; j < omega_length; j++) {
+            Gomega.set(i, Gomega.values()[i] += theta_.values()[j] * vector_list_[j]->values()[i]);
           }
+        }
+
+        // Initialize sigma and rho
+        for (int i = 0; i < gamma_length_; i++) {
+          if (Gomega.values()[i] <= -scalar_) {
+            theta_.set(i + omega_length, fmax(solution_initialization_factor_, scalar_ - Gomega.values()[i]));
+            v_.set(i + omega_length, mu_ / theta_.values()[i + omega_length]);
+            theta_.set(i + omega_length + gamma_length_, solution_initialization_factor_);
+            v_.set(i + omega_length + gamma_length_, mu_ / theta_.values()[i + omega_length + gamma_length_]);
+          } // end if
+          else if (Gomega.values()[i] >= scalar_) {
+            theta_.set(i + omega_length, solution_initialization_factor_);
+            v_.set(i + omega_length, mu_ / theta_.values()[i + omega_length]);
+            theta_.set(i + omega_length + gamma_length_, fmax(solution_initialization_factor_, -scalar_ - Gomega.values()[i]));
+            v_.set(i + omega_length + gamma_length_, mu_ / theta_.values()[i + omega_length + gamma_length_]);
+          } // end else if
           else {
-            LS_matrix.setElement(i, j, LS_matrix_base.element(i,j));
+            theta_.set(i + omega_length, solution_initialization_factor_);
+            theta_.set(i + omega_length + gamma_length_, solution_initialization_factor_);
+            v_.set(i + omega_length, mu_ / theta_.values()[i + omega_length]);
+            v_.set(i + omega_length + gamma_length_, mu_ / theta_.values()[i + omega_length + gamma_length_]);
+          } // end else
+        } // end for
+
+      } // end if
+
+      // Set barrier parameter
+      mu_= fmax(barrier_parameter_minimum_, fmin(theta_.innerProduct(v_) / total_length, barrier_parameter_maximum_));
+
+      // Initialize residual vectors
+      r_dual_.setLength(total_length);
+      r_comp_.setLength(total_length);
+
+      // Set linear system base matrix
+      SymmetricMatrixDense LS_matrix_base;
+      LS_matrix_base.setAsDiagonal(total_length + 1, 0.0);
+      for (int i = 0; i < total_length ; i++) {
+        for (int j = i; j < total_length ; j++) {
+          LS_matrix_base.setElement(i, j, -Q_.element(i, j));
+        } // end for
+      } // end for
+      for (int i = 0; i < omega_length; i++) {
+        LS_matrix_base.setElement(i, total_length, At_.values()[i]);
+      }
+
+      // Initialize linear system matrix
+      SymmetricMatrixDense LS_matrix;
+      LS_matrix.setAsDiagonal(total_length + 1, 0.0);
+
+      // Initialize rewritable quantities
+      Vector rhs(total_length + 1, 0.0);
+      Vector d(total_length + 1, 0.0);
+      Vector dtheta(total_length, 0.0);
+      double du = 0.0;
+      Vector dv(total_length, 0.0);
+      double atheta, au, av;
+      Vector ptheta(total_length, 0.0);
+      Vector pv(total_length, 0.0);
+      double mu_aff;
+      double mu_factor;
+
+      // Iteration loop
+      while (true) {
+
+        // Print message
+        if (iteration_count_ % 20 == 0) {
+          reporter->printf(R_QP, R_PER_ITERATION, "========================================\n"
+                                                  "  Iter.   ||Dual||   ||Prim||   ||Comp||\n"
+                                                  "========================================\n");
+        }
+        reporter->printf(R_QP, R_PER_ITERATION, " %6d", iteration_count_);
+
+        // Evaluate primal vectors
+        evaluatePrimalVectors();
+
+        // Increment iteration counter
+        iteration_count_++;
+
+        // Construct dual residual
+        Q_.matrixVectorProduct(theta_, r_dual_);
+        r_dual_.addScaledVector( 1.0, c_);
+        r_dual_.addScaledVector(- u_,At_);
+        r_dual_.addScaledVector(-1.0, v_);
+
+        // Construct primal residual
+        r_prim_ = b_ - At_.innerProduct(theta_);
+
+        // Construct complementarity residual
+        for (int i = 0; i < total_length; i++) {
+          r_comp_.set(i, -theta_.values()[i]*v_.values()[i]);
+        }
+
+        // Print message
+        reporter->printf(R_QP, R_PER_ITERATION, "  %+.2e  %+.2e  %+.2e", r_dual_.normInf(), fabs(r_prim_), r_comp_.normInf());
+
+        // Evaluate KKT error
+        kkt_error_ = fmax(r_dual_.normInf(), fmax(fabs(r_prim_), r_comp_.normInf()));
+
+        // Check for successful solve
+        if ((kkt_error_ <= kkt_tolerance_ && predict_boundary_) ||
+            (kkt_error_ <= kkt_tolerance_ && !predict_boundary_ && primal_solution_.normInf() <= scalar_)) {
+          THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
+        }
+
+        // Check for boundary
+        if (kkt_error_ <= kkt_tolerance_ && !predict_boundary_ && primal_solution_.normInf() > scalar_) {
+          predict_boundary_ = true;
+          break;
+        }
+
+        // Check for inexact termination
+        if (allow_inexact_termination_ &&
+            iteration_count_ >= (int)ceil(inexact_termination_initialization_factor_ * (double)vector_.size()) &&
+            (iteration_count_ - (int)ceil(inexact_termination_initialization_factor_ * (double)vector_.size())) % inexact_termination_check_interval_ == 0 &&
+            inexactTerminationCondition(quantities, reporter)) {
+          THROW_EXCEPTION(QP_SUCCESS_EXCEPTION, "QP solve successful.");
+        }
+
+        // Check for iteration limit
+        if (iteration_count_ >= iteration_limit_) { 
+          THROW_EXCEPTION(QP_ITERATION_LIMIT_EXCEPTION, "QP solve unsuccessful. Iteration limit reached.");
+        }
+
+        // Check for CPU time limit
+        if ((clock() - quantities->startTime()) / (double)CLOCKS_PER_SEC >= quantities->cpuTimeLimit()) {
+          THROW_EXCEPTION(QP_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
+        }
+
+        ////////////////////
+        // PREDICTOR STEP //
+        ////////////////////
+
+        // Set linear system matrix
+        for (int i = 0; i < total_length + 1; i++) {
+          for (int j = i; j < total_length + 1; j++) {
+            if (j == i && i < total_length) {
+              LS_matrix.setElement(i, i, -Q_.element(i, i) - v_.values()[i] / theta_.values()[i]);
+            }
+            else {
+              LS_matrix.setElement(i, j, LS_matrix_base.element(i,j));
+            }
           }
         }
-      }
 
-      // Set right-hand side vector
-      for (int i = 0; i < total_length; i++) {
-        rhs.set(i, r_dual_.values()[i] + v_.values()[i]);
-      }
-      rhs.set(total_length, r_prim_);
+        // Set right-hand side vector
+        for (int i = 0; i < total_length; i++) {
+          rhs.set(i, r_dual_.values()[i] + v_.values()[i]);
+        }
+        rhs.set(total_length, r_prim_);
 
-      // Store factorization values
-      int* ipiv = new int[total_length + 1];
+        // Store factorization values
+        int* ipiv = new int[total_length + 1];
 
-      // Solve linear system
-      solveLinearSystem(total_length + 1, LS_matrix.valuesModifiable(), rhs.valuesModifiable(), ipiv, d.valuesModifiable());
+        // Solve linear system
+        solveLinearSystem(total_length + 1, LS_matrix.valuesModifiable(), rhs.valuesModifiable(), ipiv, d.valuesModifiable());
 
-      // Parse solution
-      for (int i = 0; i < total_length; i++) {
-        dtheta.set(i, d.values()[i]);
-        dv.set(i, -v_.values()[i] - v_.values()[i]*dtheta.values()[i]/theta_.values()[i]);
-      }
-      du = d.values()[total_length];
+        // Parse solution
+        for (int i = 0; i < total_length; i++) {
+          dtheta.set(i, d.values()[i]);
+          dv.set(i, -v_.values()[i] - v_.values()[i]*dtheta.values()[i]/theta_.values()[i]);
+        }
+        du = d.values()[total_length];
 
-      // Calculate step sizes
-      computeStepSizes(dtheta, du, dv, atheta, au, av);
+        // Calculate step sizes
+        computeStepSizes(dtheta, du, dv, atheta, au, av);
 
-      // Set predictor values
-      ptheta.linearCombination(1.0, theta_, atheta, dtheta);
-      pv.linearCombination(1.0, v_, av, dv);
+        // Set predictor values
+        ptheta.linearCombination(1.0, theta_, atheta, dtheta);
+        pv.linearCombination(1.0, v_, av, dv);
 
-      // Set mu_factor
-      mu_aff = barrier_parameter_factor_ * ptheta.innerProduct(pv) / (double)total_length;
-      mu_factor = fmax(barrier_parameter_minimum_ / mu_, fmin(pow(mu_aff / mu_, 3), barrier_parameter_maximum_ / mu_));
+        // Set mu_factor
+        mu_aff = barrier_parameter_factor_ * ptheta.innerProduct(pv) / (double)total_length;
+        mu_factor = fmax(barrier_parameter_minimum_ / mu_, fmin(pow(mu_aff / mu_, 3), barrier_parameter_maximum_ / mu_));
       
-      ////////////////////
-      // CORRECTOR STEP //
-      ////////////////////
+        ////////////////////
+        // CORRECTOR STEP //
+        ////////////////////
 
-      // Set right-hand side vector
-      for (int i = 0; i < total_length; i++) {
-        rhs.set(i, r_dual_.values()[i] + v_.values()[i] - mu_factor * mu_ / theta_.values()[i]);
-      }
-      rhs.set(total_length, r_prim_);
+        // Set right-hand side vector
+        for (int i = 0; i < total_length; i++) {
+          rhs.set(i, r_dual_.values()[i] + v_.values()[i] - mu_factor * mu_ / theta_.values()[i]);
+        }
+        rhs.set(total_length, r_prim_);
 
-      // Solve linear system
-      solveLinearSystemReuseFactorization(total_length + 1, LS_matrix.valuesModifiable(), rhs.valuesModifiable(), ipiv, d.valuesModifiable());
+        // Solve linear system
+        solveLinearSystemReuseFactorization(total_length + 1, LS_matrix.valuesModifiable(), rhs.valuesModifiable(), ipiv, d.valuesModifiable());
 
-      // Delete factorization info
-      delete[] ipiv;
+        // Delete factorization info
+        delete[] ipiv;
 
-      // Parse solution
-      for (int i = 0; i < total_length; i++) {
-        dtheta.set(i, d.values()[i]);
-        dv.set(i, -v_.values()[i] + mu_factor * mu_ / theta_.values()[i] - v_.values()[i] * dtheta.values()[i] / theta_.values()[i]);
-      }
-      du = d.values()[total_length];
+        // Parse solution
+        for (int i = 0; i < total_length; i++) {
+          dtheta.set(i, d.values()[i]);
+          dv.set(i, -v_.values()[i] + mu_factor * mu_ / theta_.values()[i] - v_.values()[i] * dtheta.values()[i] / theta_.values()[i]);
+        }
+        du = d.values()[total_length];
 
-      // Calculate step sizes
-      computeStepSizes(dtheta, du, dv, atheta, au, av);
+        // Calculate step sizes
+        computeStepSizes(dtheta, du, dv, atheta, au, av);
 
-      // Update the elements
-      theta_.addScaledVector(atheta, dtheta);
-      u_ += au * du;
-      v_.addScaledVector(av, dv);
+        // Update the elements
+        theta_.addScaledVector(atheta, dtheta);
+        u_ += au * du;
+        v_.addScaledVector(av, dv);
               
-      // Update barrier parameter
-      mu_ = fmax(barrier_parameter_minimum_, fmin(theta_.innerProduct(v_) / total_length, barrier_parameter_maximum_));
+        // Update barrier parameter
+        mu_ = fmax(barrier_parameter_minimum_, fmin(theta_.innerProduct(v_) / total_length, barrier_parameter_maximum_));
 
-    } //end while
+      } // end while
+
+      // Check for boundary
+      if (kkt_error_ <= kkt_tolerance_ && !predict_boundary_ && primal_solution_.normInf() > scalar_) {
+        predict_boundary_ = true;
+        break;
+      }
+
+    } // end while
 
   } // end try
 
@@ -1077,8 +1095,10 @@ void QPSolverInteriorPoint::evaluatePrimalVectors()
   }
 
   // Set gamma values
-  for (int i = 0; i < gamma_length_; i++) {
-    gamma_.set(i, theta_.values()[i + omega_length] - theta_.values()[i + omega_length + gamma_length_]);
+  if (predict_boundary_) {
+    for (int i = 0; i < gamma_length_; i++) {
+      gamma_.set(i, theta_.values()[i + omega_length] - theta_.values()[i + omega_length + gamma_length_]);
+    }
   }
 
   // Zero-out vectors

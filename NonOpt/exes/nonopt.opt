@@ -1,2 +1,8 @@
 direction_computation GradientCombination
-
+print_level 2
+iteration_limit 100
+qp_solver_small_scale DualActiveSet
+qp_solver_large_scale InteriorPoint
+trust_region_radius_initialization_factor 1e+04
+TB_objective_similarity_tolerance 0.0
+stationarity_tolerance 1e-06

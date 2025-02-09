@@ -87,8 +87,14 @@ bool ImageDenoising::evaluateObjective(int n,
   // Evaluate total variation term
   for (int r = 0; r < rows_ - 1; r++) {
     for (int c = 0; c < cols_ - 1; c++) {
-      f += regularization_ * sqrt(smoothing_ + pow(x[r*cols_ + c + 1] - x[r*cols_ + c], 2.0) + pow(x[(r+1)*cols_ + c] - x[r*cols_ + c], 2.0));
+      f += regularization_ * (fabs(x[r*cols_ + c+1] - x[r*cols_ + c]) + fabs(x[(r+1)*cols_ + c] - x[r*cols_ + c]));
     }
+  }
+  for (int r = 0; r < rows_ - 1; r++) {
+    f += regularization_ * fabs(x[r*cols_ + cols_-1] - x[(r+1)*cols_ + cols_-1]);
+  }
+  for (int c = 0; c < cols_ - 1; c++) {
+    f += regularization_ * fabs(x[(rows_-1)*cols_ + c+1] - x[(rows_-1)*cols_ + c]);
   }
 
   // Return
@@ -112,14 +118,48 @@ bool ImageDenoising::evaluateObjectiveAndGradient(int n,
     g[i] = 2 * (x[i] - image_[i]);
   }
 
-  // Evaluate total variation term
+  // Update based on total variation
   for (int r = 0; r < rows_ - 1; r++) {
     for (int c = 0; c < cols_ - 1; c++) {
-      double sum = smoothing_ + pow(x[r*cols_ + c + 1] - x[r*cols_ + c], 2.0) + pow(x[(r+1)*cols_ + c] - x[r*cols_ + c], 2.0);
-      f += regularization_ * sqrt(sum);
-      g[r*cols_ + c    ] += regularization_ * (2.0 * x[r*cols_ + c] - x[r*cols_ + c + 1] - x[(r+1)*cols_ + c]) / sqrt(sum);
-      g[r*cols_ + c + 1] += regularization_ * (x[r*cols_ + c + 1] - x[r*cols_ + c]) / sqrt(sum);
-      g[(r+1)*cols_ + c] += regularization_ * (x[(r+1)*cols_ + c] - x[r*cols_ + c]) / sqrt(sum);
+      f += regularization_ * (fabs(x[r*cols_ + c+1] - x[r*cols_ + c]) + fabs(x[(r+1)*cols_ + c] - x[r*cols_ + c]));
+      if (x[r*cols_ + c+1] > x[r*cols_ + c]) {
+        g[r*cols_ + c+1] += regularization_;
+        g[r*cols_ + c  ] -= regularization_;
+      }
+      else if (x[r*cols_ + c+1] < x[r*cols_ + c]) {
+        g[r*cols_ + c+1] -= regularization_;
+        g[r*cols_ + c  ] += regularization_;
+      }
+      if (x[(r+1)*cols_ + c] > x[r*cols_ + c]) {
+        g[(r+1)*cols_ + c] += regularization_;
+        g[ r   *cols_ + c] -= regularization_;
+      }
+      else if (x[(r+1)*cols_ + c] < x[r*cols_ + c]) {
+        g[(r+1)*cols_ + c] -= regularization_;
+        g[ r   *cols_ + c] += regularization_;
+      }
+    }
+  }
+  for (int r = 0; r < rows_ - 1; r++) {
+    f += regularization_ * fabs(x[r*cols_ + cols_-1] - x[(r+1)*cols_ + cols_-1]);
+    if (x[r*cols_ + cols_-1] > x[(r+1)*cols_ + cols_-1]) {
+      g[ r   *cols_ + cols_-1] += regularization_;
+      g[(r+1)*cols_ + cols_-1] -= regularization_;
+    }
+    else if (x[r*cols_ + cols_-1] < x[(r+1)*cols_ + cols_-1]) {
+      g[ r   *cols_ + cols_-1] -= regularization_;
+      g[(r+1)*cols_ + cols_-1] += regularization_;
+    }
+  }
+  for (int c = 0; c < cols_ - 1; c++) {
+    f += regularization_ * fabs(x[(rows_-1)*cols_ + c+1] - x[(rows_-1)*cols_ + c]);
+    if (x[(rows_-1)*cols_ + c+1] > x[(rows_-1)*cols_ + c]) {
+      g[(rows_-1)*cols_ + c+1] += regularization_;
+      g[(rows_-1)*cols_ + c  ] -= regularization_;
+    }
+    else if (x[(rows_-1)*cols_ + c+1] < x[(rows_-1)*cols_ + c]) {
+      g[(rows_-1)*cols_ + c+1] -= regularization_;
+      g[(rows_-1)*cols_ + c  ] += regularization_;
     }
   }
 
@@ -142,10 +182,42 @@ bool ImageDenoising::evaluateGradient(int n,
   // Update based on total variation
   for (int r = 0; r < rows_ - 1; r++) {
     for (int c = 0; c < cols_ - 1; c++) {
-      double sum = smoothing_ + pow(x[r*cols_ + c + 1] - x[r*cols_ + c], 2.0) + pow(x[(r+1)*cols_ + c] - x[r*cols_ + c], 2.0);
-      g[r*cols_ + c    ] += regularization_ * (2.0 * x[r*cols_ + c] - x[r*cols_ + c + 1] - x[(r+1)*cols_ + c]) / sqrt(sum);
-      g[r*cols_ + c + 1] += regularization_ * (x[r*cols_ + c + 1] - x[r*cols_ + c]) / sqrt(sum);
-      g[(r+1)*cols_ + c] += regularization_ * (x[(r+1)*cols_ + c] - x[r*cols_ + c]) / sqrt(sum);
+      if (x[r*cols_ + c+1] > x[r*cols_ + c]) {
+        g[r*cols_ + c+1] += regularization_;
+        g[r*cols_ + c  ] -= regularization_;
+      }
+      else if (x[r*cols_ + c+1] < x[r*cols_ + c]) {
+        g[r*cols_ + c+1] -= regularization_;
+        g[r*cols_ + c  ] += regularization_;
+      }
+      if (x[(r+1)*cols_ + c] > x[r*cols_ + c]) {
+        g[(r+1)*cols_ + c] += regularization_;
+        g[ r   *cols_ + c] -= regularization_;
+      }
+      else if (x[(r+1)*cols_ + c] < x[r*cols_ + c]) {
+        g[(r+1)*cols_ + c] -= regularization_;
+        g[ r   *cols_ + c] += regularization_;
+      }
+    }
+  }
+  for (int r = 0; r < rows_ - 1; r++) {
+    if (x[r*cols_ + cols_-1] > x[(r+1)*cols_ + cols_-1]) {
+      g[ r   *cols_ + cols_-1] += regularization_;
+      g[(r+1)*cols_ + cols_-1] -= regularization_;
+    }
+    else if (x[r*cols_ + cols_-1] < x[(r+1)*cols_ + cols_-1]) {
+      g[ r   *cols_ + cols_-1] -= regularization_;
+      g[(r+1)*cols_ + cols_-1] += regularization_;
+    }
+  }
+  for (int c = 0; c < cols_ - 1; c++) {
+    if (x[(rows_-1)*cols_ + c+1] > x[(rows_-1)*cols_ + c]) {
+      g[(rows_-1)*cols_ + c+1] += regularization_;
+      g[(rows_-1)*cols_ + c  ] -= regularization_;
+    }
+    else if (x[(rows_-1)*cols_ + c+1] < x[(rows_-1)*cols_ + c]) {
+      g[(rows_-1)*cols_ + c+1] -= regularization_;
+      g[(rows_-1)*cols_ + c  ] += regularization_;
     }
   }
 
