@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Frank E. Curtis
+// Copyright (C) 2025 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -43,7 +43,7 @@ void DirectionComputationGradient::initialize(const Options* options,
 // Iteration header
 std::string DirectionComputationGradient::iterationHeader()
 {
-  return "In. Its.  QP Pts.  QP Its. QP   QP KKT    |Step|   |Step|_H";
+  return "In. Its.  QP Pts.  QP Sma.  QP Its. QP   QP KKT    |Step|   |Step|_H";
 }
 
 // Iteration null values string
@@ -61,7 +61,8 @@ void DirectionComputationGradient::computeDirection(const Options* options,
 
   // Initialize values
   setStatus(DC_UNSET);
-  strategies->qpSolver()->setPrimalSolutionToZero();
+  strategies->qpSolver(false)->setPrimalSolutionToZero();
+  strategies->qpSolver(true)->setPrimalSolutionToZero();
   quantities->resetInnerIterationCounter();
   quantities->resetQPIterationCounter();
   quantities->setTrialIterateToCurrentIterate();
@@ -115,19 +116,19 @@ void DirectionComputationGradient::computeDirection(const Options* options,
     QP_vector.push_back(quantities->currentIterate()->objective());
 
     // Set QP data
-    strategies->qpSolver()->setVectorList(QP_gradient_list);
-    strategies->qpSolver()->setVector(QP_vector);
-    strategies->qpSolver()->setScalar(quantities->trustRegionRadius());
-    strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
+    strategies->qpSolver(quantities->qpIsSmall())->setVectorList(QP_gradient_list);
+    strategies->qpSolver(quantities->qpIsSmall())->setVector(QP_vector);
+    strategies->qpSolver(quantities->qpIsSmall())->setScalar(quantities->trustRegionRadius());
+    strategies->qpSolver(quantities->qpIsSmall())->setInexactSolutionTolerance(quantities->stationarityRadius());
 
     // Solve QP
-    strategies->qpSolver()->solveQP(options, reporter, quantities);
+    strategies->qpSolver(quantities->qpIsSmall())->solveQP(options, reporter, quantities);
 
     // Convert QP solution to step
     convertQPSolutionToStep(quantities, strategies);
 
     // Check for QP failure
-    if (strategies->qpSolver()->status() != QP_SUCCESS && fail_on_QP_failure_) {
+    if (strategies->qpSolver(quantities->qpIsSmall())->status() != QP_SUCCESS && fail_on_QP_failure_) {
       THROW_EXCEPTION(DC_QP_FAILURE_EXCEPTION, "Direction computation unsuccessful. QP solver failed.");
     }
     else {
@@ -146,8 +147,17 @@ void DirectionComputationGradient::computeDirection(const Options* options,
   }
 
   // Print iteration information
-  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), strategies->qpSolver()->vectorListLength(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
+  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), strategies->qpSolver(quantities->qpIsSmall())->vectorListLength(), int(quantities->qpIsSmall()), quantities->qpIterationCounter(), strategies->qpSolver(quantities->qpIsSmall())->status(), strategies->qpSolver(quantities->qpIsSmall())->KKTErrorDual(), strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNormInf(), strategies->qpSolver(quantities->qpIsSmall())->dualObjectiveQuadraticValue());
 
+  // Update QP is small indicator (for next solve)
+  //printf("\n%d %d\n",quantities->qpIterationCounter(),quantities->numberOfVariables());
+  if (quantities->qpIterationCounter() >= quantities->numberOfVariables()) {
+    quantities->setQPIsSmall(false);
+  }
+  else {
+    quantities->setQPIsSmall(true);
+  }
+  
   // Increment total inner iteration counter
   quantities->incrementTotalInnerIterationCounter();
 
@@ -165,13 +175,13 @@ void DirectionComputationGradient::convertQPSolutionToStep(Quantities* quantitie
 {
 
   // Increment QP iteration counter
-  quantities->incrementQPIterationCounter(strategies->qpSolver()->numberOfIterations());
+  quantities->incrementQPIterationCounter(strategies->qpSolver(quantities->qpIsSmall())->numberOfIterations());
 
   // Increment inner iteration counter
   quantities->incrementInnerIterationCounter(1);
 
   // Get primal solution
-  strategies->qpSolver()->primalSolution(quantities->direction()->valuesModifiable());
+  strategies->qpSolver(quantities->qpIsSmall())->primalSolution(quantities->direction()->valuesModifiable());
 
   // Set trial iterate
   quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, 1.0, *quantities->direction()));

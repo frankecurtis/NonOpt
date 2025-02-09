@@ -4,25 +4,17 @@
 //
 // Author(s) : Frank E. Curtis
 
-// Description : Implementation for NonOpt of the objective
-//                 f(x) = max_{i=1..n} |x_i|
-//               with initial point
-//                 x_i =  i/n for all i = 1..n/2
-//                 x_i = -i/n for all i = n/2+1..n
-// Notes       : THIS PROBLEM IS CONVEX
-//               Optimal value: 0.0
-
-#ifndef __TEST29_2_HPP__
-#define __TEST29_2_HPP__
+#ifndef __IMAGEDENOISING_HPP__
+#define __IMAGEDENOISING_HPP__
 
 #include "NonOptProblem.hpp"
 
 using namespace NonOpt;
 
 /**
- * Test29_2 class
+ * ImageDenoising class
  */
-class Test29_2 : public Problem
+class ImageDenoising : public Problem
 {
 
 public:
@@ -31,7 +23,11 @@ public:
   /**
    * Constructor
    */
-  Test29_2(int n);
+  ImageDenoising(int rows,
+                 int cols,
+                 double* image,
+                 double regularization,
+                 double smoothing);
   //@}
 
   /** @name Destructor */
@@ -39,7 +35,7 @@ public:
   /**
    * Destructor
    */
-  ~Test29_2();
+  ~ImageDenoising();
   //@}
 
   /** @name Get methods */
@@ -120,18 +116,23 @@ private:
   /**
    * Copy constructor
    */
-  Test29_2(const Test29_2&);
+  ImageDenoising(const ImageDenoising&);
   /**
    * Overloaded equals operator
    */
-  void operator=(const Test29_2&);
+  void operator=(const ImageDenoising&);
   //@}
 
   /** @name Private members */
   //@{
   int number_of_variables_; /**< Number of variables */
+  int rows_;                /**< Number of rows in image */
+  int cols_;                /**< Number of cols in image */
+  double* image_;           /**< Image array in grayscale */
+  double regularization_;   /**< Regularization parameter */
+  double smoothing_;        /**< Smoothing parameter */
   //@}
 
-}; // end Test29_2
+}; // end ImageDenoising
 
-#endif /* __Test29_2_HPP__ */
+#endif /* __IMAGEDENOISING_HPP__ */

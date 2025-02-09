@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Frank E. Curtis
+// Copyright (C) 2025 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -7,6 +7,6 @@
 #ifndef __NONOPTVERSION_HPP__
 #define __NONOPTVERSION_HPP__
 
-#define NONOPT_VERSION "1.0"
+#define NONOPT_VERSION "2.0"
 
 #endif /* __NONOPTVERSION_HPP__ */

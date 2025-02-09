@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Frank E. Curtis
+// Copyright (C) 2025 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -142,12 +142,12 @@ void TerminationSecondQP::checkConditions(const Options* options,
 
   // Check for termination based on stationarity
   if (quantities->stationarityRadius() <= quantities->stationarityTolerance() &&
-      strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityTolerance() * stationarity_tolerance_factor_ * reference) {
+      strategies->qpSolver(quantities->qpIsSmall())->combinationTranslatedNormInf() <= quantities->stationarityTolerance() * stationarity_tolerance_factor_ * reference) {
     terminate_stationary_ = true;
   }
   else if (quantities->stationarityRadius() <= quantities->stationarityTolerance() &&
            qp_solved &&
-           strategies->qpSolverTermination()->combinationTranslatedNormInf() <= quantities->stationarityTolerance() * stationarity_tolerance_factor_ * reference) {
+           strategies->qpSolverTermination(quantities->qpIsSmall())->combinationTranslatedNormInf() <= quantities->stationarityTolerance() * stationarity_tolerance_factor_ * reference) {
     terminate_stationary_ = true;
   }
 
@@ -187,13 +187,13 @@ void TerminationSecondQP::checkConditions(const Options* options,
   //////////////////
 
   // Check radii update conditions
-  if (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
-      strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
-      strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
+  if (strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
+      strategies->qpSolver(quantities->qpIsSmall())->combinationNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
+      strategies->qpSolver(quantities->qpIsSmall())->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
     direction_conditions = true;
   } // end if
   else if (qp_solved &&
-           strategies->qpSolverTermination()->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
+           strategies->qpSolverTermination(quantities->qpIsSmall())->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
     direction_conditions = true;
   }
 
@@ -206,10 +206,10 @@ void TerminationSecondQP::checkConditions(const Options* options,
 
   // Print check values
   if (qp_solved) {
-    reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %8d %8d %+.2e %+.2e", quantities->currentIterate()->gradient()->normInf(), strategies->qpSolverTermination()->vectorListLength(), strategies->qpSolverTermination()->numberOfIterations(), strategies->qpSolver()->combinationTranslatedNormInf(), strategies->qpSolverTermination()->combinationTranslatedNormInf());
+    reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %8d %8d %+.2e %+.2e", quantities->currentIterate()->gradient()->normInf(), strategies->qpSolverTermination(quantities->qpIsSmall())->vectorListLength(), strategies->qpSolverTermination(quantities->qpIsSmall())->numberOfIterations(), strategies->qpSolver(quantities->qpIsSmall())->combinationTranslatedNormInf(), strategies->qpSolverTermination(quantities->qpIsSmall())->combinationTranslatedNormInf());
   }
   else {
-    reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %8s %8s %+.2e %9s", quantities->currentIterate()->gradient()->normInf(), "--------", "--------", strategies->qpSolver()->combinationTranslatedNormInf(), "---------");
+    reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %8s %8s %+.2e %9s", quantities->currentIterate()->gradient()->normInf(), "--------", "--------", strategies->qpSolver(quantities->qpIsSmall())->combinationTranslatedNormInf(), "---------");
   }
 
 } // end checkConditions
@@ -232,9 +232,9 @@ void TerminationSecondQP::checkConditionsDirectionComputation(const Options* opt
   double reference = fmax(1.0, fmax(stationarity_reference_, quantities->currentIterate()->gradient()->normInf()));
 
   // Check radii update conditions
-  if (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
-      strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
-      strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
+  if (strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
+      strategies->qpSolver(quantities->qpIsSmall())->combinationNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
+      strategies->qpSolver(quantities->qpIsSmall())->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
     update_radii_direction_computation_ = true;
   } // end if
 
@@ -248,7 +248,7 @@ void TerminationSecondQP::solveQP(const Options* options,
 {
 
   // Initialize values
-  strategies->qpSolverTermination()->setPrimalSolutionToZero();
+  strategies->qpSolverTermination(quantities->qpIsSmall())->setPrimalSolutionToZero();
   quantities->resetQPIterationCounter();
 
   // try QP solve, terminate on any exception
@@ -289,8 +289,8 @@ void TerminationSecondQP::solveQP(const Options* options,
     } // end else
 
     // Set QP scalar values
-    strategies->qpSolverTermination()->setScalar(NONOPT_DOUBLE_INFINITY);
-    strategies->qpSolverTermination()->setInexactSolutionTolerance(quantities->stationarityRadius());
+    strategies->qpSolverTermination(quantities->qpIsSmall())->setScalar(NONOPT_DOUBLE_INFINITY);
+    strategies->qpSolverTermination(quantities->qpIsSmall())->setInexactSolutionTolerance(quantities->stationarityRadius());
 
     // Declare QP quantities
     std::vector<std::shared_ptr<Vector>> QP_gradient_list;
@@ -330,17 +330,17 @@ void TerminationSecondQP::solveQP(const Options* options,
     } // end for
 
     // Set QP vector list and linear term
-    strategies->qpSolverTermination()->setVectorList(QP_gradient_list);
-    strategies->qpSolverTermination()->setVector(QP_vector);
+    strategies->qpSolverTermination(quantities->qpIsSmall())->setVectorList(QP_gradient_list);
+    strategies->qpSolverTermination(quantities->qpIsSmall())->setVector(QP_vector);
 
     // Solve QP
-    strategies->qpSolverTermination()->solveQP(options, reporter, quantities);
+    strategies->qpSolverTermination(quantities->qpIsSmall())->solveQP(options, reporter, quantities);
 
     // Increment QP iteration counter
-    quantities->incrementQPIterationCounter(strategies->qpSolverTermination()->numberOfIterations());
+    quantities->incrementQPIterationCounter(strategies->qpSolverTermination(quantities->qpIsSmall())->numberOfIterations());
 
     // Get primal solution
-    strategies->qpSolverTermination()->primalSolution(quantities->directionTermination()->valuesModifiable());
+    strategies->qpSolverTermination(quantities->qpIsSmall())->primalSolution(quantities->directionTermination()->valuesModifiable());
 
     // Increment total QP iteration counter
     quantities->incrementTotalQPIterationCounter();

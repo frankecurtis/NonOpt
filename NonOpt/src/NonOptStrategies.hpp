@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Frank E. Curtis
+// Copyright (C) 2025 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -115,19 +115,19 @@ public:
    * Get pointer to QPSolver
    * \return pointer QPSolver object
    */
-  inline std::shared_ptr<QPSolver> qpSolver() { return qp_solver_; }
+  inline std::shared_ptr<QPSolver> qpSolver(bool small) { return (small) ? qp_solver_small_scale_ : qp_solver_large_scale_; }
   /**
-   * Get pointer to QPSolver
+   * Get pointer to QPSolverTermination
    * \return pointer QPSolver object
    */
-  inline std::shared_ptr<QPSolver> qpSolverTermination() { return qp_solver_termination_; }
+  inline std::shared_ptr<QPSolver> qpSolverTermination(bool small) { return (small) ? qp_solver_small_scale_termination_ : qp_solver_large_scale_termination_; }
   /**
    * Get pointer to SymmetricMatrix
    * \return pointer to SymmetricMatrix object
    */
   inline std::shared_ptr<SymmetricMatrix> symmetricMatrix() { return symmetric_matrix_; }
   /**
-   * Get pointer to SymmetricMatrix
+   * Get pointer to SymmetricMatrixTermination
    * \return pointer to SymmetricMatrix object
    */
   inline std::shared_ptr<SymmetricMatrix> symmetricMatrixTermination() { return symmetric_matrix_termination_; }
@@ -187,8 +187,10 @@ private:
   std::shared_ptr<DirectionComputation> direction_computation_;
   std::shared_ptr<LineSearch> line_search_;
   std::shared_ptr<PointSetUpdate> point_set_update_;
-  std::shared_ptr<QPSolver> qp_solver_;
-  std::shared_ptr<QPSolver> qp_solver_termination_;
+  std::shared_ptr<QPSolver> qp_solver_small_scale_;
+  std::shared_ptr<QPSolver> qp_solver_small_scale_termination_;
+  std::shared_ptr<QPSolver> qp_solver_large_scale_;
+  std::shared_ptr<QPSolver> qp_solver_large_scale_termination_;
   std::shared_ptr<SymmetricMatrix> symmetric_matrix_;
   std::shared_ptr<SymmetricMatrix> symmetric_matrix_termination_;
   std::shared_ptr<Termination> termination_;

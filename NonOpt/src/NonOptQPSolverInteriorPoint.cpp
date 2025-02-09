@@ -1,4 +1,4 @@
-// Copyright (C) 2024 Frank E. Curtis
+// Copyright (C) 2025 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //

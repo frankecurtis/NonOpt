@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Frank E. Curtis
+// Copyright (C) 2025 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -189,10 +189,15 @@ public:
    */
   inline std::shared_ptr<std::vector<std::shared_ptr<Point>>> pointSet() { return point_set_; };
   /**
+   * QP is small
+   * \return QP is small (true or false)
+   */
+  inline int const qpIsSmall() const { return qp_is_small_; };
+  /**
    * QP iteration counter
    * \return QP iterations performed so far (during current iteration)
    */
-  inline int const QPIterationCounter() const { return qp_iteration_counter_; };
+  inline int const qpIterationCounter() const { return qp_iteration_counter_; };
   /**
    * Scaling threshold
    * \return scaling threshold
@@ -256,6 +261,15 @@ public:
    */
   inline void setCurrentIterate(const std::shared_ptr<Point> iterate) { current_iterate_ = iterate; };
   /**
+   * QP is small indicator
+   */
+  inline void setQPIsSmall(bool qp_is_small) { qp_is_small_ = qp_is_small; };
+  /**
+   * Set stepsize
+   * \param[in] stepsize is new value to represent stepsize
+   */
+  inline void setStepsize(double stepsize) { stepsize_ = stepsize; };
+  /**
    * Set trial iterate pointer
    * \param[in] trial_iterate is pointer to Point to represent trial iterate
    */
@@ -264,11 +278,6 @@ public:
    * Set trial iterate pointer to current iterate pointer
    */
   inline void setTrialIterateToCurrentIterate() { trial_iterate_ = current_iterate_; };
-  /**
-   * Set stepsize
-   * \param[in] stepsize is new value to represent stepsize
-   */
-  inline void setStepsize(double stepsize) { stepsize_ = stepsize; };
   /**
    * Update inexact termination factor
    */
@@ -398,6 +407,7 @@ private:
 
   /** @name Private members */
   //@{
+  bool qp_is_small_;
   clock_t direction_computation_time_;
   clock_t end_time_;
   clock_t evaluation_time_;

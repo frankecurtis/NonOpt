@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Frank E. Curtis
+// Copyright (C) 2025 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -49,9 +49,13 @@ void Strategies::addOptions(Options* options)
                            "Proximity",
                            "Point set update strategy to use.\n"
                            "Default     : Proximity.");
-  options->addStringOption("qp_solver",
+  options->addStringOption("qp_solver_small_scale",
+                           "DualActiveSet",
+                           "QP solver strategy to use to solve small-scale QPs.\n"
+                           "Default     : DualActiveSet.");
+  options->addStringOption("qp_solver_large_scale",
                            "InteriorPoint",
-                           "QP solver strategy to use.\n"
+                           "QP solver strategy to use to solve large-scale QPs.\n"
                            "Default     : InteriorPoint.");
   options->addStringOption("symmetric_matrix",
                            "Dense",
@@ -136,7 +140,8 @@ void Strategies::setOptions(Options* options)
   std::string direction_computation_name;
   std::string line_search_name;
   std::string point_set_update_name;
-  std::string qp_solver_name;
+  std::string qp_solver_small_scale_name;
+  std::string qp_solver_large_scale_name;
   std::string symmetric_matrix_name;
   std::string termination_name;
 
@@ -146,7 +151,8 @@ void Strategies::setOptions(Options* options)
   options->valueAsString("direction_computation", direction_computation_name);
   options->valueAsString("line_search", line_search_name);
   options->valueAsString("point_set_update", point_set_update_name);
-  options->valueAsString("qp_solver", qp_solver_name);
+  options->valueAsString("qp_solver_small_scale", qp_solver_small_scale_name);
+  options->valueAsString("qp_solver_large_scale", qp_solver_large_scale_name);
   options->valueAsString("symmetric_matrix", symmetric_matrix_name);
   options->valueAsString("termination", termination_name);
 
@@ -202,20 +208,34 @@ void Strategies::setOptions(Options* options)
     point_set_update_ = std::make_shared<PointSetUpdateProximity>();
   }
 
-  // Set QP solver strategy
-  if (qp_solver_name.compare("DualActiveSet") == 0) {
-    qp_solver_ = std::make_shared<QPSolverDualActiveSet>();
-    qp_solver_termination_ = std::make_shared<QPSolverDualActiveSet>();
+  // Set small-scale QP solver strategy
+  if (qp_solver_small_scale_name.compare("DualActiveSet") == 0) {
+    qp_solver_small_scale_             = std::make_shared<QPSolverDualActiveSet>();
+    qp_solver_small_scale_termination_ = std::make_shared<QPSolverDualActiveSet>();
   }
-  else if (qp_solver_name.compare("InteriorPoint") == 0) {
-    qp_solver_ = std::make_shared<QPSolverInteriorPoint>();
-    qp_solver_termination_ = std::make_shared<QPSolverInteriorPoint>();
+  else if (qp_solver_small_scale_name.compare("InteriorPoint") == 0) {
+    qp_solver_small_scale_             = std::make_shared<QPSolverInteriorPoint>();
+    qp_solver_small_scale_termination_ = std::make_shared<QPSolverInteriorPoint>();
   }
   else {
-    qp_solver_ = std::make_shared<QPSolverInteriorPoint>();
-    qp_solver_termination_ = std::make_shared<QPSolverInteriorPoint>();
+    qp_solver_small_scale_             = std::make_shared<QPSolverDualActiveSet>();
+    qp_solver_small_scale_termination_ = std::make_shared<QPSolverDualActiveSet>();
   }
 
+  // Set large-scale QP solver strategy
+  if (qp_solver_large_scale_name.compare("DualActiveSet") == 0) {
+    qp_solver_large_scale_             = std::make_shared<QPSolverDualActiveSet>();
+    qp_solver_large_scale_termination_ = std::make_shared<QPSolverDualActiveSet>();
+  }
+  else if (qp_solver_large_scale_name.compare("InteriorPoint") == 0) {
+    qp_solver_large_scale_             = std::make_shared<QPSolverInteriorPoint>();
+    qp_solver_large_scale_termination_ = std::make_shared<QPSolverInteriorPoint>();
+  }
+  else {
+    qp_solver_large_scale_             = std::make_shared<QPSolverInteriorPoint>();
+    qp_solver_large_scale_termination_ = std::make_shared<QPSolverInteriorPoint>();
+  }
+  
   // Set symmetric matrix strategy
   if (symmetric_matrix_name.compare("Dense") == 0) {
     symmetric_matrix_ = std::make_shared<SymmetricMatrixDense>();
@@ -256,8 +276,10 @@ void Strategies::setOptions(Options* options)
   point_set_update_->setOptions(options);
 
   // Set QP solver options
-  qp_solver_->setOptions(options);
-  qp_solver_termination_->setOptions(options);
+  qp_solver_small_scale_->setOptions(options);
+  qp_solver_small_scale_termination_->setOptions(options);
+  qp_solver_large_scale_->setOptions(options);
+  qp_solver_large_scale_termination_->setOptions(options);
 
   // Set symmetric matrix options
   symmetric_matrix_->setOptions(options);
@@ -290,8 +312,10 @@ void Strategies::initialize(const Options* options,
   point_set_update_->initialize(options, quantities, reporter);
 
   // Initialize QP data
-  qp_solver_->initialize(options, quantities, reporter);
-  qp_solver_termination_->initialize(options, quantities, reporter);
+  qp_solver_small_scale_->initialize(options, quantities, reporter);
+  qp_solver_small_scale_termination_->initialize(options, quantities, reporter);
+  qp_solver_large_scale_->initialize(options, quantities, reporter);
+  qp_solver_large_scale_termination_->initialize(options, quantities, reporter);
 
   // Initialize symmetric matrix
   symmetric_matrix_->initialize(options, quantities, reporter);
@@ -301,8 +325,10 @@ void Strategies::initialize(const Options* options,
   termination_->initialize(options, quantities, reporter);
 
   // Set QP matrix as pointer to approximate Hessian
-  qp_solver_->setMatrix(symmetric_matrix_);
-  qp_solver_termination_->setMatrix(symmetric_matrix_termination_);
+  qp_solver_small_scale_->setMatrix(symmetric_matrix_);
+  qp_solver_large_scale_->setMatrix(symmetric_matrix_);
+  qp_solver_small_scale_termination_->setMatrix(symmetric_matrix_termination_);
+  qp_solver_large_scale_termination_->setMatrix(symmetric_matrix_termination_);
 
 } // end initialize
 
@@ -345,7 +371,8 @@ void Strategies::printHeader(const Reporter* reporter)
                                   "Direction computation strategy....... : %s\n"
                                   "Line search strategy................. : %s\n"
                                   "Point set update strategy............ : %s\n"
-                                  "QP solver strategy................... : %s\n"
+                                  "QP solver (small scale) strategy..... : %s\n"
+                                  "QP solver (large scale) strategy..... : %s\n"
                                   "Symmetric matrix strategy............ : %s\n"
                                   "Termination strategy................. : %s\n",
                    approximate_hessian_update_->name().c_str(),
@@ -353,7 +380,8 @@ void Strategies::printHeader(const Reporter* reporter)
                    direction_computation_->name().c_str(),
                    line_search_->name().c_str(),
                    point_set_update_->name().c_str(),
-                   qp_solver_->name().c_str(),
+                   qp_solver_small_scale_->name().c_str(),
+                   qp_solver_large_scale_->name().c_str(),
                    symmetric_matrix_->name().c_str(),
                    termination_->name().c_str());
 

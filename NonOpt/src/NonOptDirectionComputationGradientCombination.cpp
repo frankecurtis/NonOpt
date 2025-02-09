@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Frank E. Curtis
+// Copyright (C) 2025 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -165,7 +165,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
 
   // Initialize values
   setStatus(DC_UNSET);
-  strategies->qpSolver()->setPrimalSolutionToZero();
+  strategies->qpSolver(quantities->qpIsSmall())->setPrimalSolutionToZero();
   quantities->resetInnerIterationCounter();
   quantities->resetQPIterationCounter();
   quantities->setTrialIterateToCurrentIterate();
@@ -209,8 +209,8 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
     } // end else
 
     // Set QP scalars
-    strategies->qpSolver()->setScalar(quantities->trustRegionRadius());
-    strategies->qpSolver()->setInexactSolutionTolerance(quantities->stationarityRadius());
+    strategies->qpSolver(quantities->qpIsSmall())->setScalar(quantities->trustRegionRadius());
+    strategies->qpSolver(quantities->qpIsSmall())->setInexactSolutionTolerance(quantities->stationarityRadius());
 
     // Declare QP quantities
     std::vector<std::shared_ptr<Vector>> QP_gradient_list;
@@ -223,14 +223,14 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
     QP_vector.push_back(quantities->currentIterate()->objective());
 
     // Set QP data
-    strategies->qpSolver()->setVectorList(QP_gradient_list);
-    strategies->qpSolver()->setVector(QP_vector);
+    strategies->qpSolver(quantities->qpIsSmall())->setVectorList(QP_gradient_list);
+    strategies->qpSolver(quantities->qpIsSmall())->setVector(QP_vector);
 
     // Try gradient step?
     if (try_gradient_step_) {
 
       // Solve QP
-      strategies->qpSolver()->solveQP(options, reporter, quantities);
+      strategies->qpSolver(quantities->qpIsSmall())->solveQP(options, reporter, quantities);
 
       // Convert QP solution to step
       convertQPSolutionToStep(quantities, strategies);
@@ -251,7 +251,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
 
       // Check for sufficient decrease
       if (evaluation_success &&
-          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * gradient_stepsize_ * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
+          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * gradient_stepsize_ * fmin(strategies->qpSolver(quantities->qpIsSmall())->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver(quantities->qpIsSmall())->combinationTranslatedNorm2Squared(), strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNorm2Squared())) ||
            strategies->termination()->updateRadiiDirectionComputation())) {
         THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
       }
@@ -289,22 +289,22 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
     } // end for
 
     // Set QP data
-    strategies->qpSolver()->setVectorList(QP_gradient_list);
-    strategies->qpSolver()->setVector(QP_vector);
+    strategies->qpSolver(quantities->qpIsSmall())->setVectorList(QP_gradient_list);
+    strategies->qpSolver(quantities->qpIsSmall())->setVector(QP_vector);
 
     // Solve QP
-    strategies->qpSolver()->solveQP(options, reporter, quantities);
+    strategies->qpSolver(quantities->qpIsSmall())->solveQP(options, reporter, quantities);
 
     // Convert QP solution to step
     convertQPSolutionToStep(quantities, strategies);
 
     // Check for termination on QP failure
-    if (strategies->qpSolver()->status() != QP_SUCCESS && fail_on_QP_failure_) {
+    if (strategies->qpSolver(quantities->qpIsSmall())->status() != QP_SUCCESS && fail_on_QP_failure_) {
       THROW_EXCEPTION(DC_QP_FAILURE_EXCEPTION, "Direction computation unsuccessful. QP solver failed.");
     }
 
     // Check for QP failure
-    if (strategies->qpSolver()->status() != QP_SUCCESS) {
+    if (strategies->qpSolver(quantities->qpIsSmall())->status() != QP_SUCCESS) {
 
       // Clear data
       QP_gradient_list.clear();
@@ -317,11 +317,11 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       QP_vector.push_back(quantities->currentIterate()->objective());
 
       // Set QP data
-      strategies->qpSolver()->setVectorList(QP_gradient_list);
-      strategies->qpSolver()->setVector(QP_vector);
+      strategies->qpSolver(quantities->qpIsSmall())->setVectorList(QP_gradient_list);
+      strategies->qpSolver(quantities->qpIsSmall())->setVector(QP_vector);
 
       // Solve QP
-      strategies->qpSolver()->solveQP(options, reporter, quantities);
+      strategies->qpSolver(quantities->qpIsSmall())->solveQP(options, reporter, quantities);
 
       // Convert QP solution to step
       convertQPSolutionToStep(quantities, strategies);
@@ -354,7 +354,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
 
       // Check for sufficient decrease
       if (evaluation_success &&
-          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
+          (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * fmin(strategies->qpSolver(quantities->qpIsSmall())->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver(quantities->qpIsSmall())->combinationTranslatedNorm2Squared(), strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNorm2Squared())) ||
            strategies->termination()->updateRadiiDirectionComputation())) {
         THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
       }
@@ -379,10 +379,10 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       if (try_aggregation_ && !switched_to_full) {
 
         // Declare omega part of dual solution
-        double* omega = new double[strategies->qpSolver()->dualSolutionOmegaLength()];
+        double* omega = new double[strategies->qpSolver(quantities->qpIsSmall())->dualSolutionOmegaLength()];
 
         // Get omega part of dual solution
-        strategies->qpSolver()->dualSolutionOmega(omega);
+        strategies->qpSolver(quantities->qpIsSmall())->dualSolutionOmega(omega);
 
         // Declare aggregation vector
         std::shared_ptr<Vector> aggregation_vector(new Vector(quantities->numberOfVariables()));
@@ -391,7 +391,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
         double aggregation_scalar = 0.0;
 
         // Set aggregation vector and scalar values
-        for (int i = 0; i < strategies->qpSolver()->dualSolutionOmegaLength(); i++) {
+        for (int i = 0; i < strategies->qpSolver(quantities->qpIsSmall())->dualSolutionOmegaLength(); i++) {
           aggregation_vector->addScaledVector(omega[i], *QP_gradient_list_aggregated[i]);
           aggregation_scalar += omega[i] * (QP_vector_aggregated[i]);
         } // end for
@@ -421,7 +421,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       std::vector<double> QP_vector_new;
 
       // Check if adding far points
-      if (add_far_points_ || strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius()) {
+      if (add_far_points_ || strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNormInf() <= quantities->stationarityRadius()) {
 
         // Evaluate trial point gradient
         if (!quantities->evaluateFunctionWithGradient()) {
@@ -462,7 +462,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       if (try_shortened_step_) {
 
         // Set shortened stepsize
-        double shortened_stepsize = shortened_stepsize_ * fmin(quantities->stationarityRadius(), strategies->qpSolver()->primalSolutionNormInf()) / strategies->qpSolver()->primalSolutionNormInf();
+        double shortened_stepsize = shortened_stepsize_ * fmin(quantities->stationarityRadius(), strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNormInf()) / strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNormInf();
 
         // Compute shortened trial iterate
         quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, shortened_stepsize, *quantities->direction()));
@@ -480,7 +480,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
 
         // Check for sufficient decrease
         if (evaluation_success &&
-            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) ||
+            (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() < -step_acceptance_tolerance_ * shortened_stepsize * fmin(strategies->qpSolver(quantities->qpIsSmall())->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver(quantities->qpIsSmall())->combinationTranslatedNorm2Squared(), strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNorm2Squared())) ||
              strategies->termination()->updateRadiiDirectionComputation())) {
           THROW_EXCEPTION(DC_SUCCESS_EXCEPTION, "Direction computation successful.");
         }
@@ -574,7 +574,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
       } // end for
 
       // Print QP solve / step information
-      reporter->printf(R_NL, R_PER_INNER_ITERATION, " %8d %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), strategies->qpSolver()->vectorListLength(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
+      reporter->printf(R_NL, R_PER_INNER_ITERATION, " %8d %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), strategies->qpSolver(quantities->qpIsSmall())->vectorListLength(), quantities->qpIterationCounter(), strategies->qpSolver(quantities->qpIsSmall())->status(), strategies->qpSolver(quantities->qpIsSmall())->KKTErrorDual(), strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNormInf(), strategies->qpSolver(quantities->qpIsSmall())->dualObjectiveQuadraticValue());
 
       // Set blank solve string
       std::string blank_solve = "";
@@ -600,31 +600,31 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
 
       // Set QP data and solve
       if (try_aggregation_ && !switched_to_full && (int)QP_gradient_list.size() < (int)(aggregation_size_threshold_ * (double)quantities->numberOfVariables())) {
-        strategies->qpSolver()->setVectorList(QP_gradient_list_aggregated);
-        strategies->qpSolver()->setVector(QP_vector_aggregated);
-        strategies->qpSolver()->solveQP(options, reporter, quantities);
+        strategies->qpSolver(quantities->qpIsSmall())->setVectorList(QP_gradient_list_aggregated);
+        strategies->qpSolver(quantities->qpIsSmall())->setVector(QP_vector_aggregated);
+        strategies->qpSolver(quantities->qpIsSmall())->solveQP(options, reporter, quantities);
       } // end if
       else if (try_aggregation_ && !switched_to_full) {
-        strategies->qpSolver()->setVectorList(QP_gradient_list);
-        strategies->qpSolver()->setVector(QP_vector);
-        strategies->qpSolver()->solveQP(options, reporter, quantities);
+        strategies->qpSolver(quantities->qpIsSmall())->setVectorList(QP_gradient_list);
+        strategies->qpSolver(quantities->qpIsSmall())->setVector(QP_vector);
+        strategies->qpSolver(quantities->qpIsSmall())->solveQP(options, reporter, quantities);
         switched_to_full = true;
       } // end else if
       else {
-        strategies->qpSolver()->addData(QP_gradient_list_new, QP_vector_new);
-        strategies->qpSolver()->solveQPHot(options, reporter, quantities);
+        strategies->qpSolver(quantities->qpIsSmall())->addData(QP_gradient_list_new, QP_vector_new);
+        strategies->qpSolver(quantities->qpIsSmall())->solveQPHot(options, reporter, quantities);
       } // end else
 
       // Convert QP solution to step
       convertQPSolutionToStep(quantities, strategies);
 
       // Check for termination on QP failure
-      if (strategies->qpSolver()->status() != QP_SUCCESS && fail_on_QP_failure_) {
+      if (strategies->qpSolver(quantities->qpIsSmall())->status() != QP_SUCCESS && fail_on_QP_failure_) {
         THROW_EXCEPTION(DC_QP_FAILURE_EXCEPTION, "Direction computation unsuccessful. QP solver failed.");
       }
 
       // Check for QP failure
-      if (strategies->qpSolver()->status() != QP_SUCCESS) {
+      if (strategies->qpSolver(quantities->qpIsSmall())->status() != QP_SUCCESS) {
 
         // Clear data
         QP_gradient_list.clear();
@@ -637,11 +637,11 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
         QP_vector.push_back(quantities->currentIterate()->objective());
 
         // Set QP data
-        strategies->qpSolver()->setVectorList(QP_gradient_list);
-        strategies->qpSolver()->setVector(QP_vector);
+        strategies->qpSolver(quantities->qpIsSmall())->setVectorList(QP_gradient_list);
+        strategies->qpSolver(quantities->qpIsSmall())->setVector(QP_vector);
 
         // Solve QP
-        strategies->qpSolver()->solveQP(options, reporter, quantities);
+        strategies->qpSolver(quantities->qpIsSmall())->solveQP(options, reporter, quantities);
 
         // Convert QP solution to step
         convertQPSolutionToStep(quantities, strategies);
@@ -671,7 +671,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
   }
 
   // Print iteration information
-  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), strategies->qpSolver()->vectorListLength(), quantities->QPIterationCounter(), strategies->qpSolver()->status(), strategies->qpSolver()->KKTErrorDual(), strategies->qpSolver()->primalSolutionNormInf(), strategies->qpSolver()->dualObjectiveQuadraticValue());
+  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), strategies->qpSolver(quantities->qpIsSmall())->vectorListLength(), quantities->qpIterationCounter(), strategies->qpSolver(quantities->qpIsSmall())->status(), strategies->qpSolver(quantities->qpIsSmall())->KKTErrorDual(), strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNormInf(), strategies->qpSolver(quantities->qpIsSmall())->dualObjectiveQuadraticValue());
 
   // Increment total inner iteration counter
   quantities->incrementTotalInnerIterationCounter();
@@ -690,13 +690,13 @@ void DirectionComputationGradientCombination::convertQPSolutionToStep(Quantities
 {
 
   // Increment QP iteration counter
-  quantities->incrementQPIterationCounter(strategies->qpSolver()->numberOfIterations());
+  quantities->incrementQPIterationCounter(strategies->qpSolver(quantities->qpIsSmall())->numberOfIterations());
 
   // Increment inner iteration counter
   quantities->incrementInnerIterationCounter(1);
 
   // Get primal solution
-  strategies->qpSolver()->primalSolution(quantities->direction()->valuesModifiable());
+  strategies->qpSolver(quantities->qpIsSmall())->primalSolution(quantities->direction()->valuesModifiable());
 
   // Set trial iterate
   quantities->setTrialIterate(quantities->currentIterate()->makeNewLinearCombination(1.0, 1.0, *quantities->direction()));

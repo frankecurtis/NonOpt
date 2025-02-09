@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Frank E. Curtis
+// Copyright (C) 2025 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -14,7 +14,8 @@ namespace NonOpt
 
 // Constructor
 Quantities::Quantities()
-  : direction_computation_time_(0),
+  : qp_is_small_(true),
+    direction_computation_time_(0),
     evaluation_time_(0),
     line_search_time_(0),
     inexact_termination_factor_(0.0),

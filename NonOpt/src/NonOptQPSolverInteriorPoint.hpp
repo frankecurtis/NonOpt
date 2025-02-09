@@ -1,8 +1,8 @@
-// Copyright (C) 2022 Frank E. Curtis
+// Copyright (C) 2025 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
-// Author(s) : Frank E. Curtis, Baoyu Zhou
+// Author(s) : Frank E. Curtis, Lara Zebiane
 
 #ifndef __NONOPTQPSOLVERINTERIORPOINT_HPP__
 #define __NONOPTQPSOLVERINTERIORPOINT_HPP__

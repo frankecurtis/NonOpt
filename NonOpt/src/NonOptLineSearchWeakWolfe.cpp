@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Frank E. Curtis
+// Copyright (C) 2025 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -211,7 +211,7 @@ void LineSearchWeakWolfe::runLineSearch(const Options* options,
       if (evaluation_success) {
 
         // Check for sufficient decrease
-        sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * fmin(strategies->qpSolver()->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver()->combinationTranslatedNorm2Squared(), strategies->qpSolver()->primalSolutionNorm2Squared())) + stepsize_sufficient_decrease_fudge_factor_);
+        sufficient_decrease = (quantities->trialIterate()->objective() - quantities->currentIterate()->objective() <= -stepsize_sufficient_decrease_threshold_ * quantities->stepsize() * fmin(strategies->qpSolver(quantities->qpIsSmall())->dualObjectiveQuadraticValue(), fmax(strategies->qpSolver(quantities->qpIsSmall())->combinationTranslatedNorm2Squared(), strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNorm2Squared())) + stepsize_sufficient_decrease_fudge_factor_);
 
         // Check Armijo condition
         if (sufficient_decrease) {

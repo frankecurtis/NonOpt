@@ -1,4 +1,4 @@
-// Copyright (C) 2022 Frank E. Curtis
+// Copyright (C) 2025 Frank E. Curtis
 //
 // This code is published under the MIT License.
 //
@@ -118,7 +118,7 @@ void TerminationBasic::checkConditions(const Options* options,
 
   // Check for termination based on stationarity
   if (quantities->stationarityRadius() <= quantities->stationarityTolerance() &&
-      strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityTolerance() * stationarity_tolerance_factor_ * reference) {
+      strategies->qpSolver(quantities->qpIsSmall())->combinationTranslatedNormInf() <= quantities->stationarityTolerance() * stationarity_tolerance_factor_ * reference) {
     terminate_stationary_ = true;
   }
 
@@ -158,9 +158,9 @@ void TerminationBasic::checkConditions(const Options* options,
   //////////////////
 
   // Check radii update conditions
-  if (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
-      strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
-      strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
+  if (strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
+      strategies->qpSolver(quantities->qpIsSmall())->combinationNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
+      strategies->qpSolver(quantities->qpIsSmall())->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
     direction_conditions = true;
   } // end if
 
@@ -172,7 +172,7 @@ void TerminationBasic::checkConditions(const Options* options,
   }
 
   // Print check values
-  reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %+.2e", quantities->currentIterate()->gradient()->normInf(), strategies->qpSolver()->combinationTranslatedNormInf());
+  reporter->printf(R_NL, R_PER_ITERATION, " %+.2e %+.2e", quantities->currentIterate()->gradient()->normInf(), strategies->qpSolver(quantities->qpIsSmall())->combinationTranslatedNormInf());
 
 } // end checkConditions
 
@@ -194,9 +194,9 @@ void TerminationBasic::checkConditionsDirectionComputation(const Options* option
   double reference = fmax(1.0, fmax(stationarity_reference_, quantities->currentIterate()->gradient()->normInf()));
 
   // Check radii update conditions
-  if (strategies->qpSolver()->primalSolutionNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
-      strategies->qpSolver()->combinationNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
-      strategies->qpSolver()->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
+  if (strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
+      strategies->qpSolver(quantities->qpIsSmall())->combinationNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference &&
+      strategies->qpSolver(quantities->qpIsSmall())->combinationTranslatedNormInf() <= quantities->stationarityRadius() * stationarity_tolerance_factor_ * reference) {
     update_radii_direction_computation_ = true;
   } // end if
 

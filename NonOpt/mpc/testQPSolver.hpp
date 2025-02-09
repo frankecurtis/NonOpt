@@ -26,12 +26,12 @@ int testQPSolverImplementation(int option)
 {
 
   // Declare test numbers
-  int test_start = 1;
-  int test_end = 1;
+  int test_start = 0;
+  int test_end = 9;
 
   // Declare n sizes
   int n_start = 0;
-  int n_end = 0;
+  int n_end = 9;
   int n_increment = 200;
 
   // Declare m sizes
@@ -41,11 +41,11 @@ int testQPSolverImplementation(int option)
 
   // Declare time array
   int p1 = 3; // d_type values
-  int p2 = 1; // n values
+  int p2 = 10; // n values
   int p3 = 3; // m values
   int p4 = 2; // algorithms
-  int p5 = 1; // runs
-  double time_array[3][1][3][2][1];
+  int p5 = 10; // runs
+  double time_array[3][10][3][2][10];
   for (int i = 0; i < p1; i++) {
     for (int j = 0; j < p2; j++) {
       for (int k = 0; k < p3; k++) {
@@ -136,7 +136,7 @@ int testQPSolverImplementation(int option)
         for (int test = test_start; test <= test_end; test++) {
 
           // Set random seed
-          generator.seed(test);
+          generator.seed(1000*d_type + 100*n_index + 10*m_index + test);
 
           // Initialize data
           qIPM.initializeData(n);
@@ -364,17 +364,19 @@ int testQPSolverImplementation(int option)
   } // end for (over d type)
 
   // Print times
+  FILE *f = fopen("times.txt", "w");
   for (int i = 0; i < p1; i++) {
     for (int j = 0; j < p2; j++) {
       for (int k = 0; k < p3; k++) {
         for (int l = 0; l < p4; l++) {
           for (int z = 0; z < p5; z++) {
-            printf(" %1d, %4d, %4d, %1d, %1d, %.4e\n", i, (j+1)*n_increment, (int)(m_factors[k] * (j+1)*n_increment) + m_additions[k], l, z, time_array[i][j][k][l][z]);
+            fprintf(f, "%d,%d,%d,%d,%d,%e\n", i, (j+1)*n_increment, (int)(m_factors[k] * (j+1)*n_increment) + m_additions[k], l, z, time_array[i][j][k][l][z]);
           }
         }
       }
     }
   }
+  fclose(f);
 
   // Return
   return 0;
