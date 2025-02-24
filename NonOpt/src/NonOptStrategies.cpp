@@ -32,39 +32,39 @@ void Strategies::addOptions(Options* options)
   options->addStringOption("approximate_hessian_update",
                            "BFGS",
                            "Approximate Hessian update strategy to use.\n"
-                           "Default     : BFGS.");
+                           "Default     : BFGS");
   options->addStringOption("derivative_checker",
                            "FiniteDifference",
                            "Derivative checker strategy to use.\n"
-                           "Default     : FiniteDifference.");
+                           "Default     : FiniteDifference");
   options->addStringOption("direction_computation",
                            "CuttingPlane",
                            "Direction computation strategy to use.\n"
-                           "Default     : CuttingPlane.");
+                           "Default     : CuttingPlane");
   options->addStringOption("line_search",
                            "WeakWolfe",
                            "Line search strategy to use.\n"
-                           "Default     : WeakWolfe.");
+                           "Default     : WeakWolfe");
   options->addStringOption("point_set_update",
                            "Proximity",
                            "Point set update strategy to use.\n"
-                           "Default     : Proximity.");
+                           "Default     : Proximity");
   options->addStringOption("qp_solver_small_scale",
                            "DualActiveSet",
                            "QP solver strategy to use to solve small-scale QPs.\n"
-                           "Default     : DualActiveSet.");
+                           "Default     : DualActiveSet");
   options->addStringOption("qp_solver_large_scale",
                            "InteriorPoint",
                            "QP solver strategy to use to solve large-scale QPs.\n"
-                           "Default     : InteriorPoint.");
+                           "Default     : InteriorPoint");
   options->addStringOption("symmetric_matrix",
                            "Dense",
                            "Symmetric matrix strategy to use.\n"
-                           "Default     : Dense.");
+                           "Default     : Dense");
   options->addStringOption("termination",
                            "Basic",
                            "Termination strategy to use.\n"
-                           "Default     : Basic.");
+                           "Default     : Basic");
 
   // Add options for approximate Hessian update strategies
   std::shared_ptr<ApproximateHessianUpdate> approximate_hessian_update;

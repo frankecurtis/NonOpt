@@ -88,20 +88,21 @@ void QPSolverDualActiveSet::addOptions(Options* options)
   options->addBoolOption("QPDAS_fail_on_factorization_error",
                          false,
                          "Indicator for whether to indicate failure on factorization error.\n"
-                         "Default     : false.");
+                         "Default     : false");
   options->addBoolOption("QPDAS_allow_inexact_termination",
-                         false,
+                         true,
                          "Indicator for whether to allow early termination.\n"
-                         "Default     : false.");
+                         "Default     : true");
+
   // Add double options
   options->addDoubleOption("QPDAS_kkt_tolerance",
-                           1e-08,
+                           1e-07,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Tolerance for determining optimality.  If the KKT error\n"
                            "              computed by the algorithm falls below this tolerance, then\n"
                            "              the algorithm terminates with a message of success.\n"
-                           "Default     : 1e-08.");
+                           "Default     : 1e-07");
   options->addDoubleOption("QPDAS_cholesky_tolerance",
                            1e-12,
                            0.0,
@@ -111,26 +112,26 @@ void QPSolverDualActiveSet::addOptions(Options* options)
                            "              value in the factorization falls below this tolerance, then\n"
                            "              the factorization may be re-computed from scratch and/or the\n"
                            "              diagonal value may be replaced by this tolerance value.\n"
-                           "Default     : 1e-12.");
+                           "Default     : 1e-12");
   options->addDoubleOption("QPDAS_inexact_termination_descent_tolerance",
                            1e-04,
                            0.0,
                            1.0,
                            "Descent direction tolerance for inexactness conditions.\n"
-                           "Default     : 1e-04.");
+                           "Default     : 1e-04");
   options->addDoubleOption("QPDAS_inexact_termination_initialization_factor",
                            2.5e-01,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Determines number of iterations (fraction of gradient list size)\n"
                            "              to perform before inexact termination conditions are checked.\n"
-                           "Default     : 2.5e-01.");
+                           "Default     : 2.5e-01");
   options->addDoubleOption("QPDAS_inexact_termination_ratio_minimum",
                            1e-02,
                            0.0,
                            1.0,
                            "Minimum value for ratio used in inexact termination condition.\n"
-                           "Default     : 1e-02.");
+                           "Default     : 1e-02");
   options->addDoubleOption("QPDAS_linear_independence_tolerance",
                            1e-12,
                            0.0,
@@ -139,28 +140,28 @@ void QPSolverDualActiveSet::addOptions(Options* options)
                            "              vector to an augmented matrix.  If a residual value falls\n"
                            "              below this tolerance, then indices are exchanged to maintain\n"
                            "              linear independence of the augmented matrix.\n"
-                           "Default     : 1e-12.");
+                           "Default     : 1e-12");
 
   // Add integer options
   options->addIntegerOption("QPDAS_inexact_termination_check_interval",
-                            4,
+                            5,
                             1,
                             NONOPT_INT_INFINITY,
                             "Number of iterations to perform between checks of inexact\n"
                             "              termination conditions.\n"
-                            "Default     : 4.");
+                            "Default     : 5");
   options->addIntegerOption("QPDAS_iteration_limit_minimum",
-                            1e+00,
-                            0.0,
+                            1,
+                            0,
                             NONOPT_INT_INFINITY,
                             "Minimum limit on the number of iterations.\n"
-                            "Default     : 1e+00.");
+                            "Default     : 1");
   options->addIntegerOption("QPDAS_iteration_limit_maximum",
                             1e+06,
-                            0.0,
+                            0,
                             NONOPT_INT_INFINITY,
                             "Maximum limit on the number of iterations.\n"
-                            "Default     : 1e+06.");
+                            "Default     : 1e+06");
 
 } // end addOptions
 

@@ -1,6 +1,6 @@
 Name        : print_level
 Type        : integer
-Value       : 2
+Value       : 1
 Lower bound : 0
 Upper bound : 3
 Description : Print level to standard output.
@@ -157,14 +157,14 @@ Default     : 1e-04
 
 Name        : trust_region_radius_initialization_factor
 Type        : double
-Value       : +1.000000e+04
+Value       : +1.000000e+10
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Factor for initializing the trust region radius.  The initial
               trust region radius is the maximum of this value times the
               inf-norm of the gradient at the initial point and
               trust_region_radius_initialization_minimum.
-Default     : 1e+04
+Default     : 1e+10
 
 Name        : trust_region_radius_initialization_minimum
 Type        : double
@@ -186,92 +186,98 @@ Default     : 1e-01
 
 Name        : function_evaluation_limit
 Type        : integer
-Value       : 100000
+Value       : 2147483647
 Lower bound : 0
 Upper bound : 2147483647
 Description : Limit on the number of function evaluations performed.
-Default     : 1e+05
+Default     : Infinity
 
 Name        : gradient_evaluation_limit
 Type        : integer
-Value       : 100000
+Value       : 2147483647
 Lower bound : 0
 Upper bound : 2147483647
 Description : Limit on the number of gradient evaluations performed.
-Default     : 1e+05
+Default     : Infinity
 
 Name        : iteration_limit
 Type        : integer
-Value       : 10000
+Value       : 1000000
 Lower bound : 0
 Upper bound : 2147483647
 Description : Limit on the number of iterations that will be performed.
               Note that each iteration might involve inner iterations.
-Default     : 1e+04
+Default     : 1e+06
 
 Name        : approximate_hessian_update
 Type        : string
 Value       : BFGS
 Description : Approximate Hessian update strategy to use.
-Default     : BFGS.
+Default     : BFGS
 
 Name        : derivative_checker
 Type        : string
 Value       : FiniteDifference
 Description : Derivative checker strategy to use.
-Default     : FiniteDifference.
+Default     : FiniteDifference
 
 Name        : direction_computation
 Type        : string
 Value       : CuttingPlane
 Description : Direction computation strategy to use.
-Default     : CuttingPlane.
+Default     : CuttingPlane
 
 Name        : line_search
 Type        : string
 Value       : WeakWolfe
 Description : Line search strategy to use.
-Default     : WeakWolfe.
+Default     : WeakWolfe
 
 Name        : point_set_update
 Type        : string
 Value       : Proximity
 Description : Point set update strategy to use.
-Default     : Proximity.
+Default     : Proximity
 
-Name        : qp_solver
+Name        : qp_solver_small_scale
 Type        : string
 Value       : DualActiveSet
-Description : QP solver strategy to use.
-Default     : DualActiveSet.
+Description : QP solver strategy to use to solve small-scale QPs.
+Default     : DualActiveSet
+
+Name        : qp_solver_large_scale
+Type        : string
+Value       : InteriorPoint
+Description : QP solver strategy to use to solve large-scale QPs.
+Default     : InteriorPoint
 
 Name        : symmetric_matrix
 Type        : string
 Value       : Dense
 Description : Symmetric matrix strategy to use.
-Default     : Dense.
+Default     : Dense
 
 Name        : termination
 Type        : string
 Value       : Basic
 Description : Termination strategy to use.
-Default     : Basic.
+Default     : Basic
 
 Name        : BFGS_fail_on_tolerance_violation
 Type        : bool
 Value       : false
 Description : Indicator for whether to indicate failure on violated tolerance.
-Default     : false.
+Default     : false
 
 Name        : BFGS_correction_threshold_1
 Type        : double
-Value       : +1.000000e-20
+Value       : +1.000000e-08
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+00
 Description : BFGS correction threshold.  If BFGS update is corrected, then
               gradient displacement v is set so that inner product with step,
               call it s, is such that <s,v>/<s,s> is at least this threshold.
-Default     : 1e-20.
+Default     : 1e-08
 
 Name        : BFGS_correction_threshold_2
 Type        : double
@@ -281,18 +287,18 @@ Upper bound : +1.000000e+50
 Description : BFGS correction threshold.  If BFGS update is corrected, then
               gradient displacement v is set so that inner product with step,
               call it s, is such that <v,v>/<s,v> is at most this threshold.
-Default     : 1e+02.
+Default     : 1e+08
 
 Name        : BFGS_norm_tolerance
 Type        : double
-Value       : +1.000000e-20
+Value       : +1.000000e-08
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Tolerance for allowing a BFGS update to occur.  If the norm
               of the iterate displacement or the gradient displacement is
               greater than this tolerance, then the BFGS update may occur;
               else, it is skipped.
-Default     : 1e-20.
+Default     : 1e-08
 
 Name        : BFGS_product_tolerance
 Type        : double
@@ -303,44 +309,44 @@ Description : Tolerance for allowing a BFGS update to occur.  If the inner
               product between the iterate and gradient displacements is at
               least this tolerance times the product of the 2-norms of the
               displacements, then a BFGS update occurs; else, it is skipped.
-Default     : 1e-20.
+Default     : 1e-20
 
 Name        : DFP_fail_on_tolerance_violation
 Type        : bool
 Value       : false
 Description : Indicator for whether to indicate failure on violated tolerance.
-Default     : false.
+Default     : false
 
 Name        : DFP_correction_threshold_1
 Type        : double
-Value       : +1.000000e-20
+Value       : +1.000000e-08
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+00
 Description : DFP correction threshold.  If DFP update is corrected, then
               gradient displacement v is set so that inner product with step,
               call it s, is such that <s,v>/<s,s> is at least this threshold.
-Default     : 1e-20.
+Default     : 1e-08
 
 Name        : DFP_correction_threshold_2
 Type        : double
-Value       : +1.000000e+02
+Value       : +1.000000e+08
 Lower bound : +1.000000e+00
 Upper bound : +1.000000e+50
 Description : DFP correction threshold.  If DFP update is corrected, then
               gradient displacement v is set so that inner product with step,
               call it s, is such that <v,v>/<s,v> is at most this threshold.
-Default     : 1e+02.
+Default     : 1e+08
 
 Name        : DFP_norm_tolerance
 Type        : double
-Value       : +1.000000e-20
+Value       : +1.000000e-08
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Tolerance for allowing a DFP update to occur.  If the norm
               of the iterate displacement or the gradient displacement is
               greater than this tolerance, then the DFP update may occur;
               else, it is skipped.
-Default     : 1e-20.
+Default     : 1e-08
 
 Name        : DFP_product_tolerance
 Type        : double
@@ -351,7 +357,7 @@ Description : Tolerance for allowing a DFP update to occur.  If the inner
               product between the iterate and gradient displacements is at
               least this tolerance times the product of the 2-norms of the
               displacements, then a DFP update occurs; else, it is skipped.
-Default     : 1e-20.
+Default     : 1e-20
 
 Name        : DEFD_check_derivatives
 Type        : bool
@@ -380,25 +386,25 @@ Type        : bool
 Value       : false
 Description : Determines whether to add points far outside stationarity
               radius to point set during subproblem solve.
-Default     : false.
+Default     : false
 
 Name        : DCCP_fail_on_iteration_limit
 Type        : bool
 Value       : false
 Description : Determines whether to fail if iteration limit exceeded.
-Default     : false.
+Default     : false
 
 Name        : DCCP_fail_on_QP_failure
 Type        : bool
 Value       : false
 Description : Determines whether to fail if QP solver ever fails.
-Default     : false.
+Default     : false
 
 Name        : DCCP_try_aggregation
 Type        : bool
 Value       : false
 Description : Determines whether to consider aggregating subgradients.
-Default     : false.
+Default     : false
 
 Name        : DCCP_try_gradient_step
 Type        : bool
@@ -406,7 +412,7 @@ Value       : true
 Description : Determines whether to consider gradient step before solving
               cutting plane subproblem.
               Gradient step stepsize set by DCCP_gradient_stepsize parameter.
-Default     : true.
+Default     : true
 
 Name        : DCCP_try_shortened_step
 Type        : bool
@@ -414,7 +420,7 @@ Value       : true
 Description : Determines whether to consider shortened step if subproblem
               solver does not terminate after considering full QP step.
               Shortened stepsize set by DCCP_shortened_stepsize parameter.
-Default     : true.
+Default     : true
 
 Name        : DCCP_aggregation_size_threshold
 Type        : double
@@ -422,11 +428,11 @@ Value       : +1.000000e+01
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Threshold for switching from aggregation to full point set.
-Default     : 1e+01.
+Default     : 1e+01
 
 Name        : DCCP_downshift_constant
 Type        : double
-Value       : +1.000000e-02
+Value       : +1.000000e-01
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Downshifting constant.  The linear term corresponding to an
@@ -434,22 +440,22 @@ Description : Downshifting constant.  The linear term corresponding to an
               corresponding to the bundle point and the negative of this value
               times the squared norm difference between the bundle point and
               the current iterate.
-Default     : 1e-02.
+Default     : 1e-01
 
 Name        : DCCP_gradient_stepsize
 Type        : double
-Value       : +1.000000e-04
+Value       : +1.000000e-03
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Gradient stepsize.  If step computed using only the gradient
               at the current iterate and this stepsize is acceptable,
               then full cutting plane subproblem is avoided.  This scheme
               is only considered if DCCP_try_gradient_step == true.
-Default     : 1e-04.
+Default     : 1e-03
 
 Name        : DCCP_shortened_stepsize
 Type        : double
-Value       : +1.000000e-02
+Value       : +1.000000e-03
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Shortened stepsize.  If full QP step does not offer desired
@@ -457,7 +463,7 @@ Description : Shortened stepsize.  If full QP step does not offer desired
               this stepsize is considered if DCCP_try_shortened_step == true.
               In particular, the shortened stepsize that is considered is
               DCCP_shortened_stepsize*min(stat. rad.,||qp_step||_inf)/||qp_step||_inf.
-Default     : 1e-02.
+Default     : 1e-03
 
 Name        : DCCP_step_acceptance_tolerance
 Type        : double
@@ -465,46 +471,54 @@ Value       : +1.000000e-08
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+00
 Description : Tolerance for step acceptance.
-Default     : 1e-08.
+Default     : 1e-08
 
 Name        : DCCP_inner_iteration_limit
 Type        : integer
-Value       : 20
+Value       : 2
 Lower bound : 0
 Upper bound : 2147483647
 Description : Limit on the number of inner iterations that will be performed.
-Default     : 20.
+Default     : 2
+
+Name        : DCCP_qp_small_limit
+Type        : integer
+Value       : 25
+Lower bound : 0
+Upper bound : 2147483647
+Description : Limit on number of dual variables to consider QP subproblem as small.
+Default     : 25
 
 Name        : DCG_fail_on_QP_failure
 Type        : bool
 Value       : false
 Description : Determines whether to fail if QP solver ever fails.
-Default     : false.
+Default     : false
 
 Name        : DCGC_add_far_points
 Type        : bool
 Value       : false
 Description : Determines whether to add points far outside stationarity
               radius to point set during subproblem solve.
-Default     : false.
+Default     : false
 
 Name        : DCGC_fail_on_iteration_limit
 Type        : bool
 Value       : false
 Description : Determines whether to fail if iteration limit exceeded.
-Default     : false.
+Default     : false
 
 Name        : DCGC_fail_on_QP_failure
 Type        : bool
 Value       : false
 Description : Determines whether to fail if QP solver ever fails.
-Default     : false.
+Default     : false
 
 Name        : DCGC_try_aggregation
 Type        : bool
 Value       : false
 Description : Determines whether to consider aggregating subgradients.
-Default     : false.
+Default     : false
 
 Name        : DCGC_try_gradient_step
 Type        : bool
@@ -512,7 +526,7 @@ Value       : true
 Description : Determines whether to consider gradient step before solving
               gradient combination subproblem.
               Gradient step stepsize set by DCGC_gradient_stepsize parameter.
-Default     : true.
+Default     : true
 
 Name        : DCGC_try_shortened_step
 Type        : bool
@@ -520,7 +534,7 @@ Value       : true
 Description : Determines whether to consider shortened step if subproblem
               solver does not terminate after considering full QP step.
               Shortened stepsize set by DCGC_shortened_stepsize parameter.
-Default     : true.
+Default     : true
 
 Name        : DCGC_aggregation_size_threshold
 Type        : double
@@ -528,44 +542,44 @@ Value       : +1.000000e+01
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Threshold for switching from aggregation to full point set.
-Default     : 1e+01.
+Default     : 1e+01
 
 Name        : DCGC_downshift_constant
 Type        : double
-Value       : +1.000000e-02
+Value       : +1.000000e-01
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Downshifting constant.  The linear term corresponding to an
               added cut is set as the objective value at the current iterate
               minus this value times the squared norm difference between the
               sampled point and the current iterate.
-Default     : 1e-02.
+Default     : 1e-01
 
 Name        : DCGC_gradient_stepsize
 Type        : double
-Value       : +1.000000e-04
+Value       : +1.000000e-03
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Gradient stepsize.  If step computed using only the gradient
               at the current iterate and this stepsize is acceptable,
               then full gradient combination subproblem is avoided.  This scheme
               is only considered if DCGC_try_gradient_step == true.
-Default     : 1e-04.
+Default     : 1e-03
 
 Name        : DCGC_random_sample_factor
 Type        : double
-Value       : +1.000000e-02
+Value       : +1.000000e+01
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Determines number of points to sample randomly in adaptive
               gradient sampling scheme.  If >= 1, then factor is number
               of points that will be sampled; otherwise, if < 1, then
               number sampled is factor times number of variables (rounded up).
-Default     : 1e-02.
+Default     : 10
 
 Name        : DCGC_shortened_stepsize
 Type        : double
-Value       : +1.000000e-02
+Value       : +1.000000e-03
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Shortened stepsize.  If full QP step does not offer desired
@@ -573,7 +587,7 @@ Description : Shortened stepsize.  If full QP step does not offer desired
               this stepsize is considered if DCGC_try_shortened_step == true.
               In particular, the shortened stepsize that is considered is
               DCGC_shortened_stepsize*min(stat. rad.,||qp_step||_inf)/||qp_step||_inf.
-Default     : 1e-02.
+Default     : 1e-03
 
 Name        : DCGC_step_acceptance_tolerance
 Type        : double
@@ -581,7 +595,7 @@ Value       : +1.000000e-08
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+00
 Description : Tolerance for step acceptance.
-Default     : 1e-08.
+Default     : 1e-08
 
 Name        : DCGC_inner_iteration_limit
 Type        : integer
@@ -589,13 +603,21 @@ Value       : 2
 Lower bound : 0
 Upper bound : 2147483647
 Description : Limit on the number of inner iterations that will be performed.
-Default     : 2.
+Default     : 2
+
+Name        : DCGC_qp_small_limit
+Type        : integer
+Value       : 25
+Lower bound : 0
+Upper bound : 2147483647
+Description : Limit on number of dual variables to consider QP subproblem as small.
+Default     : 25
 
 Name        : LSB_fail_on_small_stepsize
 Type        : bool
 Value       : false
 Description : Indicator for whether to indicate failure on small stepsize.
-Default     : false.
+Default     : false
 
 Name        : LSB_stepsize_initial
 Type        : double
@@ -606,7 +628,7 @@ Description : Initial stepsize to be used in the first iteration.  Note that
               the initial stepsize used in the line search in subsequent
               iterations is set the minimum of this value and a factor times
               the stepsize accepted in the previous iteration.
-Default     : 1.0.
+Default     : 1.0
 
 Name        : LSB_stepsize_minimum
 Type        : double
@@ -616,7 +638,7 @@ Upper bound : +1.000000e+50
 Description : Tolerance for determining an insufficient stepsize.  If the
               line search yields a stepsize below this tolerance, then the
               algorithm may terminate with a message of a small stepsize.
-Default     : 1e-20.
+Default     : 1e-20
 
 Name        : LSB_stepsize_sufficient_decrease_threshold
 Type        : double
@@ -624,7 +646,7 @@ Value       : +1.000000e-10
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+00
 Description : Sufficient decrease constant for the weak Wolfe line search.
-Default     : 1e-10.
+Default     : 1e-10
 
 Name        : LSB_stepsize_sufficient_decrease_fudge_factor
 Type        : double
@@ -632,15 +654,15 @@ Value       : +1.000000e-10
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Sufficient decrease fudge factor.
-Default     : 1e-10.
+Default     : 1e-10
 
 Name        : LSB_stepsize_decrease_factor
 Type        : double
-Value       : +9.000000e-01
+Value       : +5.000000e-01
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+00
 Description : Factor for updating the stepsize during the line search.
-Default     : 9e-01.
+Default     : 5e-01
 
 Name        : LSB_stepsize_increase_factor
 Type        : double
@@ -648,13 +670,13 @@ Value       : +1.000000e+01
 Lower bound : +1.000000e+00
 Upper bound : +1.000000e+50
 Description : Factor for updating the stepsize before the line search.
-Default     : 1e+01.
+Default     : 1e+01
 
 Name        : LSWW_fail_on_small_interval
 Type        : bool
 Value       : false
 Description : Indicator for whether to indicate failure on small interval.
-Default     : false.
+Default     : false
 
 Name        : LSWW_stepsize_initial
 Type        : double
@@ -665,7 +687,7 @@ Description : Initial stepsize to be used in the first iteration.  Note that
               the initial stepsize used in the line search in subsequent
               iterations is set the minimum of this value and a factor times
               the stepsize accepted in the previous iteration.
-Default     : 1.0.
+Default     : 1.0
 
 Name        : LSWW_stepsize_minimum
 Type        : double
@@ -675,7 +697,7 @@ Upper bound : +1.000000e+50
 Description : Tolerance for determining an insufficient stepsize.  If the
               line search yields a stepsize below this tolerance, then the
               algorithm may terminate with a message of a small stepsize.
-Default     : 1e-20.
+Default     : 1e-20
 
 Name        : LSWW_stepsize_maximum
 Type        : double
@@ -683,7 +705,7 @@ Value       : +1.000000e+02
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Maximum stepsize allowed by the line search.
-Default     : 1e+02.
+Default     : 1e+02
 
 Name        : LSWW_stepsize_sufficient_decrease_threshold
 Type        : double
@@ -691,7 +713,7 @@ Value       : +1.000000e-10
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+00
 Description : Sufficient decrease constant for the weak Wolfe line search.
-Default     : 1e-10.
+Default     : 1e-10
 
 Name        : LSWW_stepsize_sufficient_decrease_fudge_factor
 Type        : double
@@ -699,7 +721,7 @@ Value       : +1.000000e-10
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Sufficient decrease fudge factor.
-Default     : 1e-10.
+Default     : 1e-10
 
 Name        : LSWW_stepsize_curvature_threshold
 Type        : double
@@ -707,7 +729,7 @@ Value       : +9.000000e-01
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+00
 Description : Curvature condition constant for the weak Wolfe line search.
-Default     : 9e-01.
+Default     : 9e-01
 
 Name        : LSWW_stepsize_curvature_fudge_factor
 Type        : double
@@ -715,7 +737,7 @@ Value       : +1.000000e-10
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Curvature condition fudge factor.
-Default     : 1e-10.
+Default     : 1e-10
 
 Name        : LSWW_stepsize_decrease_factor
 Type        : double
@@ -723,7 +745,7 @@ Value       : +5.000000e-01
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+00
 Description : Factor for updating the stepsize during the line search.
-Default     : 5e-01.
+Default     : 5e-01
 
 Name        : LSWW_stepsize_increase_factor
 Type        : double
@@ -731,7 +753,7 @@ Value       : +1.000000e+01
 Lower bound : +1.000000e+00
 Upper bound : +1.000000e+50
 Description : Factor for updating the stepsize before the line search.
-Default     : 1e+01.
+Default     : 1e+01
 
 Name        : LSWW_stepsize_bound_tolerance
 Type        : double
@@ -741,7 +763,7 @@ Upper bound : +1.000000e+50
 Description : Tolerance for terminating line search.  If the stepsize is
               greater than the maximum stepsize minus this tolerance,
               then the line search terminates.
-Default     : 1e-20.
+Default     : 1e-20
 
 Name        : PSP_envelope_factor
 Type        : double
@@ -757,13 +779,13 @@ Default     : 1e+02.
 
 Name        : PSP_size_factor
 Type        : double
-Value       : +2.000000e+00
+Value       : +5.000000e-02
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Size factor for removing points from point set.  If size of
               point set exceeds this factor times the number of variables,
               then the oldest members are removed.
-Default     : 2e+00.
+Default     : 5e-02.
 
 Name        : PSP_size_maximum
 Type        : integer
@@ -779,23 +801,23 @@ Name        : QPDAS_fail_on_factorization_error
 Type        : bool
 Value       : false
 Description : Indicator for whether to indicate failure on factorization error.
-Default     : false.
+Default     : false
 
 Name        : QPDAS_allow_inexact_termination
 Type        : bool
-Value       : false
+Value       : true
 Description : Indicator for whether to allow early termination.
-Default     : false.
+Default     : true
 
 Name        : QPDAS_kkt_tolerance
 Type        : double
-Value       : +1.000000e-08
+Value       : +1.000000e-07
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Tolerance for determining optimality.  If the KKT error
               computed by the algorithm falls below this tolerance, then
               the algorithm terminates with a message of success.
-Default     : 1e-08.
+Default     : 1e-07
 
 Name        : QPDAS_cholesky_tolerance
 Type        : double
@@ -807,7 +829,7 @@ Description : Tolerance for small (or negative values) when updating the
               value in the factorization falls below this tolerance, then
               the factorization may be re-computed from scratch and/or the
               diagonal value may be replaced by this tolerance value.
-Default     : 1e-12.
+Default     : 1e-12
 
 Name        : QPDAS_inexact_termination_descent_tolerance
 Type        : double
@@ -815,7 +837,7 @@ Value       : +1.000000e-04
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+00
 Description : Descent direction tolerance for inexactness conditions.
-Default     : 1e-04.
+Default     : 1e-04
 
 Name        : QPDAS_inexact_termination_initialization_factor
 Type        : double
@@ -824,7 +846,7 @@ Lower bound : +0.000000e+00
 Upper bound : +1.000000e+50
 Description : Determines number of iterations (fraction of gradient list size)
               to perform before inexact termination conditions are checked.
-Default     : 2.5e-01.
+Default     : 2.5e-01
 
 Name        : QPDAS_inexact_termination_ratio_minimum
 Type        : double
@@ -832,7 +854,7 @@ Value       : +1.000000e-02
 Lower bound : +0.000000e+00
 Upper bound : +1.000000e+00
 Description : Minimum value for ratio used in inexact termination condition.
-Default     : 1e-02.
+Default     : 1e-02
 
 Name        : QPDAS_linear_independence_tolerance
 Type        : double
@@ -843,16 +865,16 @@ Description : Tolerance for a linear independence check when adding a new
               vector to an augmented matrix.  If a residual value falls
               below this tolerance, then indices are exchanged to maintain
               linear independence of the augmented matrix.
-Default     : 1e-12.
+Default     : 1e-12
 
 Name        : QPDAS_inexact_termination_check_interval
 Type        : integer
-Value       : 4
+Value       : 5
 Lower bound : 1
 Upper bound : 2147483647
 Description : Number of iterations to perform between checks of inexact
               termination conditions.
-Default     : 4.
+Default     : 5
 
 Name        : QPDAS_iteration_limit_minimum
 Type        : integer
@@ -860,7 +882,7 @@ Value       : 1
 Lower bound : 0
 Upper bound : 2147483647
 Description : Minimum limit on the number of iterations.
-Default     : 1e+00.
+Default     : 1
 
 Name        : QPDAS_iteration_limit_maximum
 Type        : integer
@@ -868,7 +890,113 @@ Value       : 1000000
 Lower bound : 0
 Upper bound : 2147483647
 Description : Maximum limit on the number of iterations.
-Default     : 1e+06.
+Default     : 1e+06
+
+Name        : QPIPM_allow_inexact_termination
+Type        : bool
+Value       : true
+Description : Indicator for whether to allow early termination.
+Default     : true
+
+Name        : QPIPM_barrier_parameter_factor
+Type        : double
+Value       : +1.000000e+00
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Factor for setting barrier parameter in predictor-corrector method.
+Default     : 1.00
+
+Name        : QPIPM_barrier_parameter_initial
+Type        : double
+Value       : +5.000000e-01
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Initial barrier parameter.
+Default     : 5e-01
+
+Name        : QPIPM_barrier_parameter_maximum
+Type        : double
+Value       : +1.000000e+04
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Maximum barrier parameter.
+Default     : 1e+04
+
+Name        : QPIPM_barrier_parameter_minimum
+Type        : double
+Value       : +1.000000e-12
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Minimum barrier parameter.
+Default     : 1e-12
+
+Name        : QPIPM_fraction_to_boundary_tolerance
+Type        : double
+Value       : +1.000000e-03
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+00
+Description : Fraction-to-boundary parameter for line searches.
+Default     : 1e-03
+
+Name        : QPIPM_kkt_tolerance
+Type        : double
+Value       : +1.000000e-07
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Tolerance for determining optimality.  If the KKT error
+              computed by the algorithm falls below this tolerance, then
+              the algorithm terminates with a message of success.
+Default     : 1e-07
+
+Name        : QPIPM_inexact_termination_descent_tolerance
+Type        : double
+Value       : +1.000000e-04
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+00
+Description : Descent direction tolerance for inexactness conditions.
+Default     : 1e-04
+
+Name        : QPIPM_inexact_termination_initialization_factor
+Type        : double
+Value       : +2.500000e-01
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Determines number of iterations (fraction of gradient list size)
+              to perform before inexact termination conditions are checked.
+Default     : 2.5e-01
+
+Name        : QPIPM_inexact_termination_ratio_minimum
+Type        : double
+Value       : +1.000000e-02
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+00
+Description : Minimum value for ratio used in inexact termination condition.
+Default     : 1e-02
+
+Name        : QPIPM_solution_initialization_factor
+Type        : double
+Value       : +1.000000e-01
+Lower bound : +0.000000e+00
+Upper bound : +1.000000e+50
+Description : Factor for initializing interior solution vectors.
+Default     : 1e-01
+
+Name        : QPIPM_inexact_termination_check_interval
+Type        : integer
+Value       : 5
+Lower bound : 1
+Upper bound : 2147483647
+Description : Number of iterations to perform between checks of inexact
+              termination conditions.
+Default     : 5
+
+Name        : QPIPM_iteration_limit
+Type        : integer
+Value       : 200
+Lower bound : 0
+Upper bound : 2147483647
+Description : Limit on the number of iterations.
+Default     : 2e+02
 
 Name        : SMLM_history
 Type        : integer
@@ -876,7 +1004,7 @@ Value       : 20
 Lower bound : 0
 Upper bound : 2147483647
 Description : Limited-memory history length.
-Default     : 20.
+Default     : 20
 
 Name        : TB_objective_similarity_tolerance
 Type        : double
@@ -889,7 +1017,7 @@ Description : Tolerance for determining objective similarity.  If the
               counter is increased.  If the counter exceeds
               objective_similarity_limit, then the stationarity radius
               is decreased or the algorithm terminates.
-Default     : 1e-05.
+Default     : 1e-05
 
 Name        : TB_objective_tolerance
 Type        : double
@@ -898,7 +1026,7 @@ Lower bound : -1.000000e+50
 Upper bound : +1.000000e+50
 Description : Tolerance for objective function value.  Algorithm terminates
               if unscaled objective falls below this tolerance.
-Default     : -Infinity.
+Default     : -Infinity
 
 Name        : TB_stationarity_tolerance_factor
 Type        : double
@@ -908,7 +1036,7 @@ Upper bound : +1.000000e+50
 Description : Factor for checking termination with respect to stationarity.
               For further explanation, see description for the parameter
               stationarity_tolerance.
-Default     : 1e+00.
+Default     : 1e+00
 
 Name        : TB_objective_similarity_limit
 Type        : integer
@@ -921,7 +1049,7 @@ Description : Limit on an objective similarity counter.  If the difference
               then a counter is increased.  If the counter exceeds
               objective_similarity_limit, then the stationarity
               radius is decreased or the algorithm terminates.
-Default     : 10.
+Default     : 10
 
 Name        : TS_objective_similarity_tolerance
 Type        : double
@@ -934,7 +1062,7 @@ Description : Tolerance for determining objective similarity.  If the
               counter is increased.  If the counter exceeds
               objective_similarity_limit, then the stationarity radius
               is decreased or the algorithm terminates.
-Default     : 1e-05.
+Default     : 1e-05
 
 Name        : TS_objective_tolerance
 Type        : double
@@ -943,7 +1071,7 @@ Lower bound : -1.000000e+50
 Upper bound : +1.000000e+50
 Description : Tolerance for objective function value.  Algorithm terminates
               if unscaled objective falls below this tolerance.
-Default     : -Infinity.
+Default     : -Infinity
 
 Name        : TS_stationarity_tolerance_factor
 Type        : double
@@ -953,7 +1081,7 @@ Upper bound : +1.000000e+50
 Description : Factor for checking termination with respect to stationarity.
               For further explanation, see description for the parameter
               stationarity_tolerance.
-Default     : 1e+00.
+Default     : 1e+00
 
 Name        : TS_objective_similarity_limit
 Type        : integer
@@ -966,7 +1094,7 @@ Description : Limit on an objective similarity counter.  If the difference
               then a counter is increased.  If the counter exceeds
               objective_similarity_limit, then the stationarity
               radius is decreased or the algorithm terminates.
-Default     : 10.
+Default     : 10
 
 Name        : TS_solve_QP_every
 Type        : integer
@@ -974,4 +1102,4 @@ Value       : 10
 Lower bound : 1
 Upper bound : 2147483647
 Description : Dictates that QP should be solved every how many iterations.
-Default     : 10.
+Default     : 10

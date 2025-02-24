@@ -1,0 +1,31 @@
+This directory contains the executables and auxiliary files needed to reproduce the experimental results in the paper:
+
+``NonOpt: Nonconvex, Nonsmooth Optimizer,'' by Frank E. Curtis and Lara Zebiane, submitted to Mathematical Programming Computation
+
+All of the computation times mentioned below were obtained by running NonOpt version 2.0 on a Macbook Pro running Sequoia 15.3.1 with an Apple M1 Pro chip and 16GB of memory.  All of the Matlab files for image processing and figure creation were executed using Matlab 2024b.
+
+(1) "Section 6.1: Experiments with the QP subproblem solvers"
+
+Required files : runQPSolverTests.cpp, options_qp.opt, plotQPSolverResults.m
+Output files   : times.txt, das_ipm_*.png
+Instructions   : Once the software is compiled, change to this directory and run the executable:
+                 ./runQPSolverTests
+                 In our experiments, the execution time was around 11000 seconds (around 180 minutes, or 3 hours).  The resulting times for each QP solve are printed to the file named times.txt (which is overwritten each time the executable is run).  If desired, one can use Matlab to generate the plots that appear in the paper.  To do this once the file named times.txt has been generated, change to this directory and run the function plotQPSolveResults in Matlab.  The figure files das_ipm_*.png will be generated (or overwritten if they are already present).  The figure das_ipm_0.png is generated based on all runs, as explained in the paper.  The figure das_ipm_*.png for * = 1,2,3 correspond to d_* solution types (a),(b),(c) respectively that are described in the paper.  The figure das_ipm_*.png for * = 4,5,6 correspond to the different m relationships (with respect to n), namely, m = n+1,1.5n,2n respectively that are described in the paper.
+
+(2) "Section 6.2: Experiments designed for speed" AND "Section 6.3: Experiments designed for accuracy"
+
+Note: The results for these two sections are obtained by running a single executable.
+
+Required files : runSpeedAccuracyTests.cpp, options_speed.opt, options_accuracy.opt
+Output files   : Speed.tex, Accuracy.tex, output/* (a separate file for each run)
+Instructions   : Once the software is compiled, change to this directory and run the executable:
+                 ./runSpeedAccuracyTests
+                 In our experiments, the execution time was around 665 seconds (around 11 minutes).  Summary results for the two experiments are printed to Speed.tex and Accuracy.tex (which are overwritten each time the executable is run).  The contents of these files were copied and pasted to generate the tables of results that are provided in the paper.  Detailed results for each run are printed to the files in the output directory (which are overwritten each time the executable is run).
+
+(3) "Section 6.4 Experiments on large-scale image-processing problems"
+
+Required files : addNoiseToImage.m, croissant_color.png, runImageDenoisingTests.cpp, options_image.opt, recoverImages.m
+Output files   : croissant.png, croissant_original_matrix.txt, croissant_noisy.png, croissant_matrix.txt, croissant_recovered_*.txt, croissant_recovered_*.png
+Instructions   : Once the software is compiled, change to this directory and run the executable:
+                 ./runImageDenoisingTests
+                 In our experiments, the execution time was around 545 seconds (around 9 minutes).  Mean-squared-error and timing statistics are printed to standard output.  Data matrices for the recovered images are printed to the files croissant_recovered_*.txt (which are overwritten each time the executable is run), where * = 0,1,2,3 correspond to the regularizers (a),(b),(c),(d) respectively as explained in the paper.  If desired, prior to running the executable, one can use Matlab to re-generate the grayscale images and corresponding data matrices that are used for these experiments.  To do this, change to this directory and run the function addNoiseToImage in Matlab.  The files croissant.png, croissant_original_matrix.txt, croissant_noisy.png, and croissant_matrix.txt will be generated (or overwritten if they are already present).  Also, if desired, after running the executable, one can use Matlab to re-generate the grayscale recovered images.  To do this, after the executable has been run, change to this directory and run the function recoverImages in Matlab.  The files croissant_recovered_*.png, where again * = 0,1,2,3 correspond to the regularizers (a),(b),(c),(d) respectively as explained in the paper.

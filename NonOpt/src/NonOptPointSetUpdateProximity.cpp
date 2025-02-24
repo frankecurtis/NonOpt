@@ -28,13 +28,13 @@ void PointSetUpdateProximity::addOptions(Options* options)
                            "              otherwise, it is kept in the point set.\n"
                            "Default     : 1e+02.");
   options->addDoubleOption("PSP_size_factor",
-                           2e+00,
+                           5e-02,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Size factor for removing points from point set.  If size of\n"
                            "              point set exceeds this factor times the number of variables,\n"
                            "              then the oldest members are removed.\n"
-                           "Default     : 2e+00.");
+                           "Default     : 5e-02.");
 
   // Add integer options
   options->addIntegerOption("PSP_size_maximum",

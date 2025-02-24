@@ -12,11 +12,13 @@
 ImageDenoising::ImageDenoising(int rows,
                                int cols,
                                double* image,
+                               int regularizer,
                                double regularization,
                                double smoothing)
   : number_of_variables_(rows*cols),
     rows_(rows),
     cols_(cols),
+    regularizer_(regularizer),
     regularization_(regularization),
     smoothing_(smoothing)
 {
@@ -87,14 +89,14 @@ bool ImageDenoising::evaluateObjective(int n,
   // Evaluate total variation term
   for (int r = 0; r < rows_ - 1; r++) {
     for (int c = 0; c < cols_ - 1; c++) {
-      f += regularization_ * (fabs(x[r*cols_ + c+1] - x[r*cols_ + c]) + fabs(x[(r+1)*cols_ + c] - x[r*cols_ + c]));
+      f += regularization_ * (termFunction(x[r*cols_ + c+1] - x[r*cols_ + c]) + termFunction(x[(r+1)*cols_ + c] - x[r*cols_ + c]));
     }
   }
   for (int r = 0; r < rows_ - 1; r++) {
-    f += regularization_ * fabs(x[r*cols_ + cols_-1] - x[(r+1)*cols_ + cols_-1]);
+    f += regularization_ * termFunction(x[r*cols_ + cols_-1] - x[(r+1)*cols_ + cols_-1]);
   }
   for (int c = 0; c < cols_ - 1; c++) {
-    f += regularization_ * fabs(x[(rows_-1)*cols_ + c+1] - x[(rows_-1)*cols_ + c]);
+    f += regularization_ * termFunction(x[(rows_-1)*cols_ + c+1] - x[(rows_-1)*cols_ + c]);
   }
 
   // Return
@@ -121,45 +123,45 @@ bool ImageDenoising::evaluateObjectiveAndGradient(int n,
   // Update based on total variation
   for (int r = 0; r < rows_ - 1; r++) {
     for (int c = 0; c < cols_ - 1; c++) {
-      f += regularization_ * (fabs(x[r*cols_ + c+1] - x[r*cols_ + c]) + fabs(x[(r+1)*cols_ + c] - x[r*cols_ + c]));
+      f += regularization_ * (termFunction(x[r*cols_ + c+1] - x[r*cols_ + c]) + termFunction(x[(r+1)*cols_ + c] - x[r*cols_ + c]));
       if (x[r*cols_ + c+1] > x[r*cols_ + c]) {
-        g[r*cols_ + c+1] += regularization_;
-        g[r*cols_ + c  ] -= regularization_;
+        g[r*cols_ + c+1] += regularization_ * termDerivative(x[r*cols_ + c+1] - x[r*cols_ + c]);
+        g[r*cols_ + c  ] -= regularization_ * termDerivative(x[r*cols_ + c+1] - x[r*cols_ + c]);
       }
       else if (x[r*cols_ + c+1] < x[r*cols_ + c]) {
-        g[r*cols_ + c+1] -= regularization_;
-        g[r*cols_ + c  ] += regularization_;
+        g[r*cols_ + c+1] -= regularization_ * termDerivative(x[r*cols_ + c] - x[r*cols_ + c+1]);
+        g[r*cols_ + c  ] += regularization_ * termDerivative(x[r*cols_ + c] - x[r*cols_ + c+1]);
       }
       if (x[(r+1)*cols_ + c] > x[r*cols_ + c]) {
-        g[(r+1)*cols_ + c] += regularization_;
-        g[ r   *cols_ + c] -= regularization_;
+        g[(r+1)*cols_ + c] += regularization_ * termDerivative(x[(r+1)*cols_ + c] - x[r*cols_ + c]);
+        g[ r   *cols_ + c] -= regularization_ * termDerivative(x[(r+1)*cols_ + c] - x[r*cols_ + c]);
       }
       else if (x[(r+1)*cols_ + c] < x[r*cols_ + c]) {
-        g[(r+1)*cols_ + c] -= regularization_;
-        g[ r   *cols_ + c] += regularization_;
+        g[(r+1)*cols_ + c] -= regularization_ * termDerivative(x[r*cols_ + c] - x[(r+1)*cols_ + c]);
+        g[ r   *cols_ + c] += regularization_ * termDerivative(x[r*cols_ + c] - x[(r+1)*cols_ + c]);
       }
     }
   }
   for (int r = 0; r < rows_ - 1; r++) {
-    f += regularization_ * fabs(x[r*cols_ + cols_-1] - x[(r+1)*cols_ + cols_-1]);
+    f += regularization_ * termFunction(x[r*cols_ + cols_ - 1] - x[(r+1)*cols_ + cols_ - 1]);
     if (x[r*cols_ + cols_-1] > x[(r+1)*cols_ + cols_-1]) {
-      g[ r   *cols_ + cols_-1] += regularization_;
-      g[(r+1)*cols_ + cols_-1] -= regularization_;
+      g[ r   *cols_ + cols_-1] += regularization_ * termDerivative(x[r*cols_ + cols_-1] - x[(r+1)*cols_ + cols_-1]);
+      g[(r+1)*cols_ + cols_-1] -= regularization_ * termDerivative(x[r*cols_ + cols_-1] - x[(r+1)*cols_ + cols_-1]);
     }
     else if (x[r*cols_ + cols_-1] < x[(r+1)*cols_ + cols_-1]) {
-      g[ r   *cols_ + cols_-1] -= regularization_;
-      g[(r+1)*cols_ + cols_-1] += regularization_;
+      g[ r   *cols_ + cols_-1] -= regularization_ * termDerivative(x[(r+1)*cols_ + cols_-1] - x[r*cols_ + cols_-1]);
+      g[(r+1)*cols_ + cols_-1] += regularization_ * termDerivative(x[(r+1)*cols_ + cols_-1] - x[r*cols_ + cols_-1]);
     }
   }
   for (int c = 0; c < cols_ - 1; c++) {
-    f += regularization_ * fabs(x[(rows_-1)*cols_ + c+1] - x[(rows_-1)*cols_ + c]);
+    f += regularization_ * termFunction(x[(rows_-1)*cols_ + c + 1] - x[(rows_-1)*cols_ + c]);
     if (x[(rows_-1)*cols_ + c+1] > x[(rows_-1)*cols_ + c]) {
-      g[(rows_-1)*cols_ + c+1] += regularization_;
-      g[(rows_-1)*cols_ + c  ] -= regularization_;
+      g[(rows_-1)*cols_ + c+1] += regularization_ * termDerivative(x[(rows_-1)*cols_ + c+1] - x[(rows_-1)*cols_ + c]);
+      g[(rows_-1)*cols_ + c  ] -= regularization_ * termDerivative(x[(rows_-1)*cols_ + c+1] - x[(rows_-1)*cols_ + c]);
     }
     else if (x[(rows_-1)*cols_ + c+1] < x[(rows_-1)*cols_ + c]) {
-      g[(rows_-1)*cols_ + c+1] -= regularization_;
-      g[(rows_-1)*cols_ + c  ] += regularization_;
+      g[(rows_-1)*cols_ + c+1] -= regularization_ * termDerivative(x[(rows_-1)*cols_ + c] - x[(rows_-1)*cols_ + c+1]);
+      g[(rows_-1)*cols_ + c  ] += regularization_ * termDerivative(x[(rows_-1)*cols_ + c] - x[(rows_-1)*cols_ + c+1]);
     }
   }
 
@@ -183,41 +185,41 @@ bool ImageDenoising::evaluateGradient(int n,
   for (int r = 0; r < rows_ - 1; r++) {
     for (int c = 0; c < cols_ - 1; c++) {
       if (x[r*cols_ + c+1] > x[r*cols_ + c]) {
-        g[r*cols_ + c+1] += regularization_;
-        g[r*cols_ + c  ] -= regularization_;
+        g[r*cols_ + c+1] += regularization_ * termDerivative(x[r*cols_ + c+1] - x[r*cols_ + c]);
+        g[r*cols_ + c  ] -= regularization_ * termDerivative(x[r*cols_ + c+1] - x[r*cols_ + c]);
       }
       else if (x[r*cols_ + c+1] < x[r*cols_ + c]) {
-        g[r*cols_ + c+1] -= regularization_;
-        g[r*cols_ + c  ] += regularization_;
+        g[r*cols_ + c+1] -= regularization_ * termDerivative(x[r*cols_ + c] - x[r*cols_ + c+1]);
+        g[r*cols_ + c  ] += regularization_ * termDerivative(x[r*cols_ + c] - x[r*cols_ + c+1]);
       }
       if (x[(r+1)*cols_ + c] > x[r*cols_ + c]) {
-        g[(r+1)*cols_ + c] += regularization_;
-        g[ r   *cols_ + c] -= regularization_;
+        g[(r+1)*cols_ + c] += regularization_ * termDerivative(x[(r+1)*cols_ + c] - x[r*cols_ + c]);
+        g[ r   *cols_ + c] -= regularization_ * termDerivative(x[(r+1)*cols_ + c] - x[r*cols_ + c]);
       }
       else if (x[(r+1)*cols_ + c] < x[r*cols_ + c]) {
-        g[(r+1)*cols_ + c] -= regularization_;
-        g[ r   *cols_ + c] += regularization_;
+        g[(r+1)*cols_ + c] -= regularization_ * termDerivative(x[r*cols_ + c] - x[(r+1)*cols_ + c]);
+        g[ r   *cols_ + c] += regularization_ * termDerivative(x[r*cols_ + c] - x[(r+1)*cols_ + c]);
       }
     }
   }
   for (int r = 0; r < rows_ - 1; r++) {
     if (x[r*cols_ + cols_-1] > x[(r+1)*cols_ + cols_-1]) {
-      g[ r   *cols_ + cols_-1] += regularization_;
-      g[(r+1)*cols_ + cols_-1] -= regularization_;
+      g[ r   *cols_ + cols_-1] += regularization_ * termDerivative(x[r*cols_ + cols_-1] - x[(r+1)*cols_ + cols_-1]);
+      g[(r+1)*cols_ + cols_-1] -= regularization_ * termDerivative(x[r*cols_ + cols_-1] - x[(r+1)*cols_ + cols_-1]);
     }
     else if (x[r*cols_ + cols_-1] < x[(r+1)*cols_ + cols_-1]) {
-      g[ r   *cols_ + cols_-1] -= regularization_;
-      g[(r+1)*cols_ + cols_-1] += regularization_;
+      g[ r   *cols_ + cols_-1] -= regularization_ * termDerivative(x[(r+1)*cols_ + cols_-1] - x[r*cols_ + cols_-1]);
+      g[(r+1)*cols_ + cols_-1] += regularization_ * termDerivative(x[(r+1)*cols_ + cols_-1] - x[r*cols_ + cols_-1]);
     }
   }
   for (int c = 0; c < cols_ - 1; c++) {
     if (x[(rows_-1)*cols_ + c+1] > x[(rows_-1)*cols_ + c]) {
-      g[(rows_-1)*cols_ + c+1] += regularization_;
-      g[(rows_-1)*cols_ + c  ] -= regularization_;
+      g[(rows_-1)*cols_ + c+1] += regularization_ * termDerivative(x[(rows_-1)*cols_ + c+1] - x[(rows_-1)*cols_ + c]);
+      g[(rows_-1)*cols_ + c  ] -= regularization_ * termDerivative(x[(rows_-1)*cols_ + c+1] - x[(rows_-1)*cols_ + c]);
     }
     else if (x[(rows_-1)*cols_ + c+1] < x[(rows_-1)*cols_ + c]) {
-      g[(rows_-1)*cols_ + c+1] -= regularization_;
-      g[(rows_-1)*cols_ + c  ] += regularization_;
+      g[(rows_-1)*cols_ + c+1] -= regularization_ * termDerivative(x[(rows_-1)*cols_ + c] - x[(rows_-1)*cols_ + c+1]);
+      g[(rows_-1)*cols_ + c  ] += regularization_ * termDerivative(x[(rows_-1)*cols_ + c] - x[(rows_-1)*cols_ + c+1]);
     }
   }
 
@@ -233,4 +235,57 @@ bool ImageDenoising::finalizeSolution(int n,
                                       const double* g)
 {
   return true;
-}
+} // end finalizeSolution
+
+// Term function
+double ImageDenoising::termFunction(const double t)
+{
+
+  // Switch on regularizer
+  switch(regularizer_) {
+    case 0:
+      return smoothing_ * fabs(t);
+      break;
+    case 1:
+      return smoothing_ * log(1.0 + smoothing_ * fabs(t));
+      break;
+    case 2:
+      return smoothing_ * fabs(t) / (1.0 + smoothing_ * fabs(t));
+      break;
+    case 3:
+      return 0.5 * (smoothing_ - pow(fmax(0.0, smoothing_ - fabs(t)), 2.0) / smoothing_);
+      break;
+    default:
+      return fabs(t);
+  } // end switch
+
+} // end termFunction
+
+// Term derivative
+double ImageDenoising::termDerivative(const double t)
+{
+
+  // Switch on regularizer (t presumed to be nonnegative)
+  switch(regularizer_) {
+    case 0:
+      return smoothing_;
+      break;
+    case 1:
+      return pow(smoothing_, 2.0) / (1.0 + smoothing_ * t);
+      break;
+    case 2:
+      return smoothing_ / pow(1.0 + smoothing_ * t, 2.0);
+      break;
+    case 3:
+      if (t >= smoothing_) {
+        return 0.0;
+      }
+      else {
+        return (smoothing_ - t) / smoothing_;
+      }
+      break;
+    default:
+      return 1.0;
+  } // end switch
+
+} // end termFunction

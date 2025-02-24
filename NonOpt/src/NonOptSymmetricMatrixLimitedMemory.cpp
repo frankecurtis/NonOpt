@@ -47,7 +47,7 @@ void SymmetricMatrixLimitedMemory::addOptions(Options* options)
                             0,
                             NONOPT_INT_INFINITY,
                             "Limited-memory history length.\n"
-                            "Default     : 20.");
+                            "Default     : 20");
 
 } // end addOptions
 

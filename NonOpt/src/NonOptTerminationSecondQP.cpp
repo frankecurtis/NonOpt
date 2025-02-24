@@ -27,14 +27,14 @@ void TerminationSecondQP::addOptions(Options* options)
                            "              counter is increased.  If the counter exceeds\n"
                            "              objective_similarity_limit, then the stationarity radius\n"
                            "              is decreased or the algorithm terminates.\n"
-                           "Default     : 1e-05.");
+                           "Default     : 1e-05");
   options->addDoubleOption("TS_objective_tolerance",
                            -NONOPT_DOUBLE_INFINITY,
                            -NONOPT_DOUBLE_INFINITY,
                            NONOPT_DOUBLE_INFINITY,
                            "Tolerance for objective function value.  Algorithm terminates\n"
                            "              if unscaled objective falls below this tolerance.\n"
-                           "Default     : -Infinity.");
+                           "Default     : -Infinity");
   options->addDoubleOption("TS_stationarity_tolerance_factor",
                            1e+00,
                            0.0,
@@ -42,7 +42,7 @@ void TerminationSecondQP::addOptions(Options* options)
                            "Factor for checking termination with respect to stationarity.\n"
                            "              For further explanation, see description for the parameter\n"
                            "              stationarity_tolerance.\n"
-                           "Default     : 1e+00.");
+                           "Default     : 1e+00");
 
   // Add integer options
   options->addIntegerOption("TS_objective_similarity_limit",
@@ -55,13 +55,13 @@ void TerminationSecondQP::addOptions(Options* options)
                             "              then a counter is increased.  If the counter exceeds\n"
                             "              objective_similarity_limit, then the stationarity\n"
                             "              radius is decreased or the algorithm terminates.\n"
-                            "Default     : 10.");
+                            "Default     : 10");
   options->addIntegerOption("TS_solve_QP_every",
                             10,
                             1,
                             NONOPT_INT_INFINITY,
                             "Dictates that QP should be solved every how many iterations.\n"
-                            "Default     : 10.");
+                            "Default     : 10");
 
 } // end addOptions
 

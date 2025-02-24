@@ -1,0 +1,5 @@
+print_level 2
+symmetric_matrix LimitedMemory
+function_evaluation_limit 1e+20
+gradient_evaluation_limit 1e+20
+iteration_limit 2000

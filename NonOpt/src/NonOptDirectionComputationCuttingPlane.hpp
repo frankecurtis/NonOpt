@@ -124,6 +124,7 @@ private:
   double shortened_stepsize_;
   double step_acceptance_tolerance_;
   int inner_iteration_limit_;
+  int qp_small_limit_;
   //@}
 
   /** @name Private methods */

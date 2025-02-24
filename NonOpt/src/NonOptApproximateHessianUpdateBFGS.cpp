@@ -22,17 +22,17 @@ void ApproximateHessianUpdateBFGS::addOptions(Options* options)
   options->addBoolOption("BFGS_fail_on_tolerance_violation",
                          false,
                          "Indicator for whether to indicate failure on violated tolerance.\n"
-                         "Default     : false.");
+                         "Default     : false");
 
   // Add double options
   options->addDoubleOption("BFGS_correction_threshold_1",
-                           1e-20,
+                           1e-08,
                            0.0,
                            1.0,
                            "BFGS correction threshold.  If BFGS update is corrected, then\n"
                            "              gradient displacement v is set so that inner product with step,\n"
                            "              call it s, is such that <s,v>/<s,s> is at least this threshold.\n"
-                           "Default     : 1e-20.");
+                           "Default     : 1e-08");
   options->addDoubleOption("BFGS_correction_threshold_2",
                            1e+08,
                            1.0,
@@ -40,16 +40,16 @@ void ApproximateHessianUpdateBFGS::addOptions(Options* options)
                            "BFGS correction threshold.  If BFGS update is corrected, then\n"
                            "              gradient displacement v is set so that inner product with step,\n"
                            "              call it s, is such that <v,v>/<s,v> is at most this threshold.\n"
-                           "Default     : 1e+02.");
+                           "Default     : 1e+08");
   options->addDoubleOption("BFGS_norm_tolerance",
-                           1e-20,
+                           1e-08,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Tolerance for allowing a BFGS update to occur.  If the norm\n"
                            "              of the iterate displacement or the gradient displacement is\n"
                            "              greater than this tolerance, then the BFGS update may occur;\n"
                            "              else, it is skipped.\n"
-                           "Default     : 1e-20.");
+                           "Default     : 1e-08");
   options->addDoubleOption("BFGS_product_tolerance",
                            1e-20,
                            0.0,
@@ -58,7 +58,7 @@ void ApproximateHessianUpdateBFGS::addOptions(Options* options)
                            "              product between the iterate and gradient displacements is at\n"
                            "              least this tolerance times the product of the 2-norms of the\n"
                            "              displacements, then a BFGS update occurs; else, it is skipped.\n"
-                           "Default     : 1e-20.");
+                           "Default     : 1e-20");
 
 } // end addOptions
 

@@ -22,7 +22,7 @@ void LineSearchWeakWolfe::addOptions(Options* options)
   options->addBoolOption("LSWW_fail_on_small_interval",
                          false,
                          "Indicator for whether to indicate failure on small interval.\n"
-                         "Default     : false.");
+                         "Default     : false");
 
   // Add double options
   options->addDoubleOption("LSWW_stepsize_initial",
@@ -33,7 +33,7 @@ void LineSearchWeakWolfe::addOptions(Options* options)
                            "              the initial stepsize used in the line search in subsequent\n"
                            "              iterations is set the minimum of this value and a factor times\n"
                            "              the stepsize accepted in the previous iteration.\n"
-                           "Default     : 1.0.");
+                           "Default     : 1.0");
   options->addDoubleOption("LSWW_stepsize_minimum",
                            1e-20,
                            0.0,
@@ -41,49 +41,49 @@ void LineSearchWeakWolfe::addOptions(Options* options)
                            "Tolerance for determining an insufficient stepsize.  If the\n"
                            "              line search yields a stepsize below this tolerance, then the\n"
                            "              algorithm may terminate with a message of a small stepsize.\n"
-                           "Default     : 1e-20.");
+                           "Default     : 1e-20");
   options->addDoubleOption("LSWW_stepsize_maximum",
                            1e+02,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Maximum stepsize allowed by the line search.\n"
-                           "Default     : 1e+02.");
+                           "Default     : 1e+02");
   options->addDoubleOption("LSWW_stepsize_sufficient_decrease_threshold",
                            1e-10,
                            0.0,
                            1.0,
                            "Sufficient decrease constant for the weak Wolfe line search.\n"
-                           "Default     : 1e-10.");
+                           "Default     : 1e-10");
   options->addDoubleOption("LSWW_stepsize_sufficient_decrease_fudge_factor",
                            1e-10,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Sufficient decrease fudge factor.\n"
-                           "Default     : 1e-10.");
+                           "Default     : 1e-10");
   options->addDoubleOption("LSWW_stepsize_curvature_threshold",
                            9e-01,
                            0.0,
                            1.0,
                            "Curvature condition constant for the weak Wolfe line search.\n"
-                           "Default     : 9e-01.");
+                           "Default     : 9e-01");
   options->addDoubleOption("LSWW_stepsize_curvature_fudge_factor",
                            1e-10,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Curvature condition fudge factor.\n"
-                           "Default     : 1e-10.");
+                           "Default     : 1e-10");
   options->addDoubleOption("LSWW_stepsize_decrease_factor",
                            5e-01,
                            0.0,
                            1.0,
                            "Factor for updating the stepsize during the line search.\n"
-                           "Default     : 5e-01.");
+                           "Default     : 5e-01");
   options->addDoubleOption("LSWW_stepsize_increase_factor",
                            1e+01,
                            1.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Factor for updating the stepsize before the line search.\n"
-                           "Default     : 1e+01.");
+                           "Default     : 1e+01");
   options->addDoubleOption("LSWW_stepsize_bound_tolerance",
                            1e-20,
                            0.0,
@@ -91,7 +91,7 @@ void LineSearchWeakWolfe::addOptions(Options* options)
                            "Tolerance for terminating line search.  If the stepsize is\n"
                            "              greater than the maximum stepsize minus this tolerance,\n"
                            "              then the line search terminates.\n"
-                           "Default     : 1e-20.");
+                           "Default     : 1e-20");
 
 } // end addOptions
 

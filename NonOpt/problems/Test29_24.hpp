@@ -11,7 +11,6 @@
 //               with initial point
 //                 x_i = 1.0 for all i = 1..n
 // Notes       : THIS PROBLEM IS NONCONVEX
-//               Optimal value: 0.0
 
 #ifndef __TEST29_24_HPP__
 #define __TEST29_24_HPP__

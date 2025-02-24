@@ -159,14 +159,14 @@ void Quantities::addOptions(Options* options)
                            "              terminates with a message of stationarity.\n"
                            "Default     : 1e-04");
   options->addDoubleOption("trust_region_radius_initialization_factor",
-                           1e+04,
+                           1e+10,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Factor for initializing the trust region radius.  The initial\n"
                            "              trust region radius is the maximum of this value times the\n"
                            "              inf-norm of the gradient at the initial point and\n"
                            "              trust_region_radius_initialization_minimum.\n"
-                           "Default     : 1e+04");
+                           "Default     : 1e+10");
   options->addDoubleOption("trust_region_radius_initialization_minimum",
                            1e-01,
                            0.0,
@@ -184,24 +184,24 @@ void Quantities::addOptions(Options* options)
 
   // Add integer options
   options->addIntegerOption("function_evaluation_limit",
-                            1e+05,
+                            NONOPT_INT_INFINITY,
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of function evaluations performed.\n"
-                            "Default     : 1e+05");
+                            "Default     : Infinity");
   options->addIntegerOption("gradient_evaluation_limit",
-                            1e+05,
+                            NONOPT_INT_INFINITY,
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of gradient evaluations performed.\n"
-                            "Default     : 1e+05");
+                            "Default     : Infinity");
   options->addIntegerOption("iteration_limit",
-                            1e+04,
+                            1e+06,
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of iterations that will be performed.\n"
                             "              Note that each iteration might involve inner iterations.\n"
-                            "Default     : 1e+04");
+                            "Default     : 1e+06");
 
 } // end addOptions
 

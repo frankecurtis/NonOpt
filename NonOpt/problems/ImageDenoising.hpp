@@ -26,6 +26,7 @@ public:
   ImageDenoising(int rows,
                  int cols,
                  double* image,
+                 int regularizer,
                  double regularization,
                  double smoothing);
   //@}
@@ -128,9 +129,16 @@ private:
   int number_of_variables_; /**< Number of variables */
   int rows_;                /**< Number of rows in image */
   int cols_;                /**< Number of cols in image */
+  int regularizer_;         /**< Regularizer option */
   double* image_;           /**< Image array in grayscale */
   double regularization_;   /**< Regularization parameter */
   double smoothing_;        /**< Smoothing parameter */
+  //@}
+
+  /** @name Private methods */
+  //@{
+  double termFunction(const double t);
+  double termDerivative(const double t);
   //@}
 
 }; // end ImageDenoising

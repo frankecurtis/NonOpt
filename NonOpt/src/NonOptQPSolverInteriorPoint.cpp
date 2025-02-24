@@ -37,87 +37,89 @@ void QPSolverInteriorPoint::addOptions(Options* options)
 
   // Add bool options
   options->addBoolOption("QPIPM_allow_inexact_termination",
-                         false,
+                         true,
                          "Indicator for whether to allow early termination.\n"
-                         "Default     : false.");
+                         "Default     : true");
+
   // Add double options
   options->addDoubleOption("QPIPM_barrier_parameter_factor",
                            1.00,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Factor for setting barrier parameter in predictor-corrector method.\n"
-                           "Default     : 1.00.");
+                           "Default     : 1.00");
   options->addDoubleOption("QPIPM_barrier_parameter_initial",
                            5e-01,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Initial barrier parameter.\n"
-                           "Default     : 5e-01.");
+                           "Default     : 5e-01");
   options->addDoubleOption("QPIPM_barrier_parameter_maximum",
                            1e+04,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Maximum barrier parameter.\n"
-                           "Default     : 1e+02.");
+                           "Default     : 1e+04");
   options->addDoubleOption("QPIPM_barrier_parameter_minimum",
                            1e-12,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Minimum barrier parameter.\n"
-                           "Default     : 1e-10.");
+                           "Default     : 1e-12");
   options->addDoubleOption("QPIPM_fraction_to_boundary_tolerance",
                            1e-03,
                            0.0,
                            1.0,
                            "Fraction-to-boundary parameter for line searches.\n"
-                           "Default     : 1e-03.");
+                           "Default     : 1e-03");
   options->addDoubleOption("QPIPM_kkt_tolerance",
-                           1e-08,
+                           1e-07,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Tolerance for determining optimality.  If the KKT error\n"
                            "              computed by the algorithm falls below this tolerance, then\n"
                            "              the algorithm terminates with a message of success.\n"
-                           "Default     : 1e-08.");
+                           "Default     : 1e-07");
   options->addDoubleOption("QPIPM_inexact_termination_descent_tolerance",
                            1e-04,
                            0.0,
                            1.0,
                            "Descent direction tolerance for inexactness conditions.\n"
-                           "Default     : 1e-04.");
+                           "Default     : 1e-04");
   options->addDoubleOption("QPIPM_inexact_termination_initialization_factor",
-                           0.0,
+                           2.5e-01,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Determines number of iterations (fraction of gradient list size)\n"
                            "              to perform before inexact termination conditions are checked.\n"
-                           "Default     : 2.5e-01.");
+                           "Default     : 2.5e-01");
   options->addDoubleOption("QPIPM_inexact_termination_ratio_minimum",
                            1e-02,
                            0.0,
                            1.0,
                            "Minimum value for ratio used in inexact termination condition.\n"
-                           "Default     : 1e-02.");
+                           "Default     : 1e-02");
   options->addDoubleOption("QPIPM_solution_initialization_factor",
                            1e-01,
                            0.0,
                            NONOPT_DOUBLE_INFINITY,
                            "Factor for initializing interior solution vectors.\n"
-                           "Default     : 1e-01.");
+                           "Default     : 1e-01");
+
   // Add integer options
   options->addIntegerOption("QPIPM_inexact_termination_check_interval",
-                            4,
+                            5,
                             1,
                             NONOPT_INT_INFINITY,
                             "Number of iterations to perform between checks of inexact\n"
                             "              termination conditions.\n"
-                            "Default     : 4.");
+                            "Default     : 5");
   options->addIntegerOption("QPIPM_iteration_limit",
                             2e+02,
-                            0.0,
+                            0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of iterations.\n"
-                            "Default     : 1e+03.");
+                            "Default     : 2e+02");
 
 } // end addOptions
 
@@ -127,6 +129,7 @@ void QPSolverInteriorPoint::setOptions(Options* options)
 
   // Read bool options
   options->valueAsBool("QPIPM_allow_inexact_termination", allow_inexact_termination_);
+
   // Read double options
   options->valueAsDouble("QPIPM_barrier_parameter_factor", barrier_parameter_factor_);
   options->valueAsDouble("QPIPM_barrier_parameter_initial", barrier_parameter_initial_);
@@ -138,6 +141,7 @@ void QPSolverInteriorPoint::setOptions(Options* options)
   options->valueAsDouble("QPIPM_inexact_termination_initialization_factor", inexact_termination_initialization_factor_);
   options->valueAsDouble("QPIPM_inexact_termination_ratio_minimum", inexact_termination_ratio_minimum_);
   options->valueAsDouble("QPIPM_solution_initialization_factor", solution_initialization_factor_);
+
   // Read integer options
   options->valueAsInteger("QPIPM_inexact_termination_check_interval", inexact_termination_check_interval_);
   options->valueAsInteger("QPIPM_iteration_limit", iteration_limit_);
