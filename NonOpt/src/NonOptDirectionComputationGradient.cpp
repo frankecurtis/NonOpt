@@ -43,13 +43,13 @@ void DirectionComputationGradient::initialize(const Options* options,
 // Iteration header
 std::string DirectionComputationGradient::iterationHeader()
 {
-  return "In. Its.  QP Pts.  QP Its. QP   QP KKT    |Step|   |Step|_H";
+  return "In Its QP Pts QP Its S?   QP KKT    |Step|   |Step|_H";
 }
 
 // Iteration null values string
 std::string DirectionComputationGradient::iterationNullValues()
 {
-  return "-------- -------- -------- -- --------- --------- ---------";
+  return "------ ------ ------ -- --------- --------- ---------";
 }
 
 // Compute direction
@@ -147,7 +147,7 @@ void DirectionComputationGradient::computeDirection(const Options* options,
   }
 
   // Print iteration information
-  reporter->printf(R_NL, R_PER_ITERATION, " %8d %8d %8d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), strategies->qpSolver(quantities->qpIsSmall())->vectorListLength(), quantities->qpIterationCounter(), strategies->qpSolver(quantities->qpIsSmall())->status(), strategies->qpSolver(quantities->qpIsSmall())->KKTErrorDual(), strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNormInf(), strategies->qpSolver(quantities->qpIsSmall())->dualObjectiveQuadraticValue());
+  reporter->printf(R_NL, R_PER_ITERATION, " %6d %6d %6d %2d %+.2e %+.2e %+.2e", quantities->innerIterationCounter(), strategies->qpSolver(quantities->qpIsSmall())->vectorListLength(), quantities->qpIterationCounter(), strategies->qpSolver(quantities->qpIsSmall())->status(), strategies->qpSolver(quantities->qpIsSmall())->KKTErrorDual(), strategies->qpSolver(quantities->qpIsSmall())->primalSolutionNormInf(), strategies->qpSolver(quantities->qpIsSmall())->dualObjectiveQuadraticValue());
 
   // Update QP is small indicator (for next solve)
   //printf("\n%d %d\n",quantities->qpIterationCounter(),quantities->numberOfVariables());

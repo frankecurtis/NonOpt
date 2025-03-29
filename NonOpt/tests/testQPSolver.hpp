@@ -73,6 +73,8 @@ int testQPSolverImplementation(int option)
   options.modifyBoolValue("QPIPM_allow_inexact_termination", false);
   options.modifyDoubleValue("QPDAS_kkt_tolerance", 1e-06);
   options.modifyDoubleValue("QPIPM_kkt_tolerance", 1e-06);
+  options.modifyIntegerValue("QPDAS_iteration_limit", 1e+03);
+  options.modifyIntegerValue("QPIPM_iteration_limit", 1e+03);
 
   // Set options
   qDAS.setOptions(&options);

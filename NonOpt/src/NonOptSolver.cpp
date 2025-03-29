@@ -469,7 +469,7 @@ void NonOptSolver::printHeader()
   reporter_.printf(R_NL, R_BASIC, "+--------------------------------------------------------------+\n"
                                   "|       NonOpt = Nonlinear/Nonconvex/Nonsmooth Optimizer       |\n"
                                   "| NonOpt is released as open source code under the MIT License |\n"
-                                  "| Please visit http://coral.ise.lehigh.edu/frankecurtis/nonopt |\n"
+                                  "|     Please visit: https://github.com/frankecurtis/NonOpt     |\n"
                                   "+--------------------------------------------------------------+\n"
                                   "\n"
                                   "This is NonOpt version %s\n"

@@ -1,0 +1,257 @@
+\documentclass{article}
+
+%**********
+% Packages
+%**********
+\usepackage{amsfonts,amsmath,fullpage,hyperref}
+\hypersetup{colorlinks}
+
+%*************
+% Title, etc.
+%*************
+\title{NonOpt Manual}
+\author{Frank E. Curtis}
+\date{\today}
+
+%**********
+% Document
+%**********
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+%*********
+% Section
+%*********
+\section{Introduction}
+
+NonOpt (Nonconvex, Nonsmooth Optimizer) is an open-source C++ software package for solving unconstrained minimization problems.  It is designed to locate a minimizer, or at least a (nearly) stationary point, of an objective function $f : \mathbb{R}^n \to \mathbb{R}{}$, which is assumed to be locally Lipschitz.  That is, given such an objective function $f$, the software contains algorithms that are designed to solve problems of the form
+\begin{equation*}
+  \min_{x \in \mathbb{R}^n}\ f(x).
+\end{equation*}
+The objective function $f$ can be nonlinear, nonconvex, and/or nonsmooth.  For further information, see \cite{CurtZebi2025}.
+
+%************
+% Subsection
+%************
+\subsection{Algorithm Overview}
+
+NonOpt contains implementations of a collection of algorithms, including gradient-sampling and proximal-bundle methods, each equipped with quasi-Newton techniques for improving practical performance.  You can choose between different strategies for the search direction computation, approximate Hessian approximation update, line search, point-set update, symmetric matrix storage, and termination.  For more information on the implemented algorithms, see \cite{CurtZebi2025}, which in turn references the algorithms developed in \cite{CurtLi22,CurtQue13,CurtQue15,CurtRobiZhou20}.
+
+%************
+% Subsection
+%************
+\subsection{Availability}
+
+NonOpt is written in C++ and is available on GitHub \href{https://github.com/frankecurtis/NonOpt}{here}---see also the NonOpt homepage \href{https://sufficientdescent.github.io/nonopt}{here}---under the MIT open source license. This puts very few restrictions on the use and reuse of the software. This license has been selected since the goal of open-source software is continuous development and improvement.  It is only asked that if you use the software in work that leads to a publication, then you cite the article \cite{CurtZebi2025}, and potentially (a subset of) the articles \cite{CurtLi22,CurtQue13,CurtQue15,CurtRobiZhou20}, when applicable.  Writing effective and computationally efficient software requires a lot of time and effort, so citations are appreciated!
+
+%*********
+% Section
+%*********
+\section{Installation}
+
+NonOpt has been written with the intention of having it be Unix-based platform and compiler independent, but there are no guarantees.  Comments and/or questions can be sent to \href{mailto:frank.e.curtis@gmail.com}{Frank E. Curtis}, although there are no guarantees that all issues will be resolvable. (Please do not e-mail with any inquiries pertaining to installing NonOpt on Microsoft Windows! You are on your own for that. Sorry!)
+
+%************
+% Subsection
+%************
+\subsection{Obtaining NonOpt}
+
+NonOpt is available on GitHub \href{https://github.com/frankecurtis/NonOpt}{here}; see also the NonOpt homepage \href{https://sufficientdescent.github.io/nonopt}{here}.
+
+%************
+% Subsection
+%************
+\subsection{Compiling NonOpt}
+
+A C++ compiler is required to compile the NonOpt library. Building NonOpt also requires:
+
+\begin{itemize}
+  \item BLAS (Basic Linear Algebra Subroutines). Many operating systems provide precompiled and optimized
+libraries for these subroutines.  One could also obtain the source code from \href{www.netlib.org}{www.netlib.org}.  However, it is recommended to use an optimized BLAS implementation.
+  \item LAPACK (Linear Algebra PACKage).  As with BLAS, many operating systems provide precompiled and optimized libraries, but the source code can also be obtained from \href{www.netlib.org}{www.netlib.org}.
+\end{itemize}
+
+After obtaining NonOpt, an environment variable needs to be set:
+\begin{itemize}
+  \item \texttt{\$NONOPTDIR} should point to the NonOpt root directory of the distribution that you obtained. This root directory is the one containing the \texttt{README} file for the distribution.
+\end{itemize}
+
+After these environment variables have been set, the NonOpt library can be built by issuing the commands below.  Here, and throughout this document, ``\texttt{>}'' indicates your terminal prompt.
+
+\begin{verbatim}
+> cd $NONOPTDIR/NonOpt
+> make
+\end{verbatim}
+
+This should make the libraries in each of the \texttt{src}, \texttt{problems}, and \texttt{tests} subdirectories.  It should also
+make two executables, \texttt{runExperiment} and \texttt{solveProblem}, in the \texttt{exes} subdirectory, as well as a few executables in the \texttt{mpc} subdirectory, which are provided to reproduce the numerical results for the experiments in \cite{CurtZebi2025}.
+
+%************
+% Subsection
+%************
+\subsection{Testing the Installation}
+
+If the compilation has been successful, then a few unit tests and a minimization test can be run by issuing:
+
+\begin{verbatim}
+> cd $NONOPTDIR/NonOpt/tests
+> ./testAll
+\end{verbatim}
+
+Standard output will reveal the results of the unit tests. If all unit tests are successful, then the script will continue to run a minimization test for a test problem that is implemented in \texttt{\$NONOPTDIR/NonOpt/problems}.  If a unit test fails, then the minimization test is not run.  In this case, it is possible (although not necessarily the case) that NonOpt will not run properly, or at least the performance that you will obtain by using NonOpt will not be as good as expected.  More detailed output from each unit test can be obtained by running each unit test separately. For example, the symmetric matrix class can be tested by issuing:
+
+\begin{verbatim}
+> cd $NONOPTDIR/NonOpt/tests
+> ./testSymmetricMatrix
+\end{verbatim}
+
+The last line of the detailed output indicates whether or not the test was successful.
+
+%*********
+% Section
+%*********
+\section{Interfacing to NonOpt}
+
+NonOpt comes with a set of test problems in the \texttt{\$NONOPTDIR/NonOpt/problems} directory.  The easiest way to interface your problem to NonOpt is to follow one of these as an example.
+
+%************
+% Subsection
+%************
+\subsection{Implementing a Problem}
+
+For example, consider \texttt{MaxQ} implemented in \texttt{MaxQ.hpp} and \texttt{MaxQ.cpp} in \texttt{\$NONOPTDIR/NonOpt/problems}.  This problem is scalable, with the input \texttt{n} to the constructor dictating the dimension of the problem to be solved.  If your problem is not scalable, then the value of \texttt{number\_of\_variables} can be hard-coded. The remainder of an implementation of a problem can be understood in this example.  Overall, the functions that need to be implemented are those dictated in the header file \texttt{\$NONOPTDIR/NonOpt/src/NonOptProblem.hpp}.
+
+\texttt{Note:} It is extremely easy to set up NonOpt for failure if you have bugs in your objective and/or
+derivative implementations.  NonOpt comes equipped with a derivative checker that you can use to test your
+implementation of your \texttt{evaluateGradient} function with respect to your \texttt{evaluateObjective} function.  See~\S\ref{sec.options} for instructions on turning on the derivative checker when your problem is being solved.
+
+%************
+% Subsection
+%************
+\subsection{Solving a Problem}
+
+Suppose your problem is implemented in \texttt{YourProblem.hpp} and \texttt{YourProblem.cpp}.  If these files are located in \texttt{\$NONOPTDIR/NonOpt/problems}, then running \texttt{make} in this directory will add \texttt{YourProblem} to the \texttt{libNonOptProblems.a} library that is built in this directory.  Your problem can then be solved by adding it to the list of problems in \texttt{solveProblem.cpp} in \texttt{\$NONOPTDIR/NonOpt/exes}, then issuing:
+
+\begin{verbatim}
+> cd $NONOPTDIR/NonOpt/exes
+> ./solveProblem YourProblem
+\end{verbatim}
+
+You might also implement your own executable to set up and solve your problem.
+
+%************
+% Subsection
+%************
+\subsection{Changing Options}\label{sec.options}
+
+NonOpt is designed to be flexible, offering various options, each of which can be changed from its default value, if desired.  For a list of options, along with their types and default values, please see the \texttt{\$NONOPTDIR/NonOpt-Manual/options.txt} file.  Some safeguards have been added so that you cannot set an option to an illegal value, although it is possible that you could set an option to a value that will cause the optimizer to behave in strange ways.  If you provide a legal value (and the \texttt{Reporter} is issuing output to a report at a sufficient level), then a note will be printed (to a report) that the value for an option has been changed.  If you attempt to set an option to an illegal value, then similarly a note will be printed saying that a change was attempted, but the attempt was not successful (due to the provided value being illegal).  Options should be set with caution, or at least with sufficient knowledge of the underlying algorithms.
+
+The value for an option can be changed in one of two ways:
+
+\begin{itemize}
+  \item In an executable.  After a \texttt{NonOptSolver} object has been declared (via \texttt{NonOptSolver nonopt;}), one can modify the value of an option via a statement such as:
+  \begin{verbatim}
+  nonopt.options()->modifyDoubleValue(nonopt.reporter(), "cpu_time_limit", 600.0);
+  \end{verbatim}
+  The functions \texttt{modifyBoolValue}, \texttt{modifyDoubleValue}, \texttt{modifyIntegerValue}, and \texttt{modifyStringValue} all have the same form, with the last two arguments indicating the name of the option and the value to which you would like to set it, respectively.
+  \item In an options file. After a \texttt{NonOptSolver} object has been declared, one can modify the value of \emph{multiple} options via a statement such as:
+  \begin{verbatim}
+  nonopt.options()->modifyOptionsFromFile(nonopt.reporter(), "nonopt.opt");
+  \end{verbatim}
+  Here, \texttt{nonopt.opt} represents the name of a file containing a list of options and the values to which you would like to set them.  For example, the contents of the file might be:
+  \begin{verbatim}
+  cpu_time_limit 600.0
+  iteration_limit 1e+4
+  \end{verbatim}
+  Each line should contain only the name of an option followed by the desired value.
+\end{itemize}
+
+As previously mentioned, a useful option is to turn on the derivative checker, which is off by default. The derivative checker can be turned on by the statement:
+\begin{verbatim}
+nonopt.options()->modifyBoolValue(nonopt.reporter(), "check_derivatives", true);
+\end{verbatim}
+or within an options file by including the line:
+\begin{verbatim}
+check_derivatives true
+\end{verbatim}
+The derivative checker can be computationally expensive, so it is not recommended to run the derivative checker when performing timed experiments. But it is the best first step for debugging!
+
+%*********
+% Section
+%*********
+\section{NonOpt Reporter Output}
+
+The option \texttt{print\_level} determines the level of output to be printed to standard output.  Setting this level to \texttt{0} means that no information will be printed.  Setting this level to \texttt{1} means that a basic amount of information will be printed, such as in the example below.  The information at this level is self-explanatory.
+
+\begin{verbatim}
+  +--------------------------------------------------------------+
+  |       NonOpt = Nonlinear/Nonconvex/Nonsmooth Optimizer       |
+  | NonOpt is released as open source code under the MIT License |
+  |     Please visit: https://github.com/frankecurtis/NonOpt     |
+  +--------------------------------------------------------------+
+  
+  This is NonOpt version 2.0
+  
+  Number of variables.................. : 1000
+  Initial objective.................... : 6.908755e+00
+  Initial objective (unscaled)......... : 6.908755e+00
+  
+  Approximate Hessian update strategy.. : BFGS
+  Derivative checker strategy.......... : FiniteDifference
+  Direction computation strategy....... : CuttingPlane
+  Line search strategy................. : WeakWolfe
+  Point set update strategy............ : Proximity
+  QP solver (small scale) strategy..... : DualActiveSet
+  QP solver (large scale) strategy..... : InteriorPoint
+  Symmetric matrix strategy............ : Dense
+  Termination strategy................. : Basic
+  
+  EXIT: Stationary point found.
+  
+  Objective............................ : 3.008077e-09
+  Objective (unscaled)................. : 3.008077e-09
+  
+  Number of iterations................. : 22
+  Number of inner iterations........... : 25
+  Number of QP iterations.............. : 29
+  Number of function evaluations....... : 414
+  Number of gradient evaluations....... : 347
+  
+  CPU seconds.......................... : 0.108261
+  CPU seconds in evaluations........... : 0.006546
+  CPU seconds in direction computations : 0.065522
+  CPU seconds in line searches......... : 0.008766
+\end{verbatim}
+
+Setting \texttt{print\_level} to \texttt{2} means that per-iteration output will be printed in addition to the basic output shown above.  A header line is printed periodically to indicate the meaning of the values in each column of the per-iteration output.  Further information about these quantities is provided in the list below.  The per-iteration output when the \texttt{direction\_computation} option is set to either \texttt{CuttingPlane} or \texttt{GradientCombination} is exactly the same, whereas when this option is set to \texttt{Gradient} the column \texttt{L?} is omitted since the small-scale QP subproblem solver is always employed for this strategy.
+
+\begin{itemize}
+  \item \texttt{Iter.}: iteration index
+  \item \texttt{Objective}: objective function value
+  \item \texttt{St. Rad.}: stationarity radius
+  \item \texttt{Tr. Rad.}: trust region radius
+  \item \texttt{|Pts|}: cardinality of point set
+  \item \texttt{In Its}: inner iteration index in direction computation method
+  \item \texttt{QP Pts}: cardinality of points used to build QP subproblem
+  \item \texttt{L?}: indicator that QP is large scale (\texttt{1}) or not (\texttt{0})
+  \item \texttt{QP Its}: iterations required to solve QP subproblem
+  \item \texttt{S?}: termination status of QP subproblem solver (\texttt{0} indicates success)
+  \item \texttt{QP KKT}: QP subproblem solution KKT error
+  \item \texttt{|Step|}: norm of search direction
+  \item \texttt{|Step|\_H}: norm of search direction, with norm defined by approximate Hessian
+  \item \texttt{|Grad.|}: norm of objective gradient
+  \item \texttt{|G. Cmb.|}: norm of combination of gradients corresponding to QP subproblem solution
+  \item \texttt{Stepsize}: step size from line search
+  \item \texttt{Up. Fact.}: approximate Hessian update factor
+  \item \texttt{U?}: indicator that approximate Hessian update is being updated (\texttt{1}) or not (\texttt{0})
+\end{itemize}
+
+%**************
+% Bibliography
+%**************
+\bibliographystyle{plain}
+\bibliography{NonOpt}
+
+\end{document}

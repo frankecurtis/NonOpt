@@ -78,7 +78,7 @@ int testQuantitiesImplementation(int option)
   if (quantities.stationarityRadius() < 1e+01 - 1e-12 || quantities.stationarityRadius() > 1e+01 + 1e-12) {
     result = 1;
   }
-  if (quantities.trustRegionRadius() < 1e+06 - 1e-12 || quantities.trustRegionRadius() > 1e+06 + 1e-12) {
+  if (quantities.trustRegionRadius() < 1e+12 - 1e-12 || quantities.trustRegionRadius() > 1e+12 + 1e-12) {
     result = 1;
   }
 
@@ -122,7 +122,7 @@ int testQuantitiesImplementation(int option)
   if (quantities.stationarityRadius() < 1e+00 - 1e-12 || quantities.stationarityRadius() > 1e+00 + 1e-12) {
     result = 1;
   }
-  if (quantities.trustRegionRadius() < 1e+05 - 1e-12 || quantities.trustRegionRadius() > 1e+05 + 1e-12) {
+  if (quantities.trustRegionRadius() < 1e+11 - 1e-12 || quantities.trustRegionRadius() > 1e+11 + 1e-12) {
     result = 1;
   }
 
@@ -157,7 +157,7 @@ int testQuantitiesImplementation(int option)
   if (quantities.stationarityRadius() < 1e+01 - 1e-12 || quantities.stationarityRadius() > 1e+01 + 1e-12) {
     result = 1;
   }
-  if (quantities.trustRegionRadius() < 1e+06 - 1e-12 || quantities.trustRegionRadius() > 1e+06 + 1e-12) {
+  if (quantities.trustRegionRadius() < 1e+12 - 1e-12 || quantities.trustRegionRadius() > 1e+12 + 1e-12) {
     result = 1;
   }
 
