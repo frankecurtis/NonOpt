@@ -26,10 +26,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="static/css/index.css">
 
-  <!--
+  <!-- Scripts -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>  
-  -->
 </head>
 <body>
 
@@ -48,7 +47,7 @@
 </section>
 <!-- end Title -->
 
-<!-- Abstract -->
+<!-- About -->
 <section class="section hero is-light">
   <div class="container is-max-desktop">
     <div class="columns is-centered">
@@ -57,18 +56,129 @@
         <div class="content has-text-justified">
           <p>
             NonOpt is an open-source C++ software package for solving unconstrained optimization problems of the form
+            \[
+              \min_{x \in \mathbb{R}^n} f(x)
+            \]
+            where \(f : \mathbb{R}^n \to \mathbb{R}\) is locally Lipschitz.  The objective function \(f\) may be nonconvex and/or nonsmooth.
           </p>
           <p>
-          \[
-            \min_{x \in \mathbb{R}^n} f(x)
-          \]
+            NonOpt can be obtained on GitHub <a href="https://github.com/frankecurtis/NonOpt"><strong>here (link)</strong></a>.  A direct link to its user manual is <a href="https://github.com/frankecurtis/NonOpt/blob/main/NonOpt-Manual/NonOpt.pdf"><strong>here (link)</strong></a>.
           </p>
         </div>
       </div>
     </div>
   </div>
 </section>
-<!-- end Abstract -->
+<!-- end About -->
+
+<!-- Developers -->
+<section class="section hero">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column has-text-centered">
+        <h2 class="title is-4">Developers</h2>
+        <div class="content has-text-justified">
+          <p>
+            developers
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- end Developers -->
+
+<!-- Further details -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column has-text-centered">
+        <h2 class="title is-4">Further details</h2>
+        <div class="content has-text-justified">
+          <p>
+            <img src="static/images/gradient_sampling.png" alt="Gradient Sampling Image" class="center" width="400"/>
+          </p>
+          <p>
+            <img src="static/images/proximal_bundle.png" alt="Proximal Bundle Image" class="center" width="400"/>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- end Further details -->
+
+<!--BibTex citation -->
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column has-text-centered">
+        <h2 class="title is-4">Citations</h2>
+        <p>The main citation for NonOpt is the following.  If you use NonOpt in your research, then please cite it.  We appreciate it!</p>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="container is-max-desktop content">
+    <pre><code>
+      @article{CurtZebi2025,
+      title={NonOpt: Nonconvex, Nonsmooth Optimizer},
+      author={Frank E. Curtis and Lara Zebiane},
+      journal={arXiv preprint arXiv:????},
+      year={2025}
+      }
+    </code></pre>
+  </div>
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column has-text-centered">
+        <p>NonOpt is also based on the following papers.  We hope you find them useful, and, if so, cite them as well.</p>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="container is-max-desktop content">
+    <pre><code>
+      @article{CurtQue2013,
+        author = {Frank E. Curtis and Xiaocun Que},
+        title = {{An Adaptive Gradient Sampling Algorithm for Nonsmooth Optimization}},
+        journal = {{Optimization Methods and Software}},
+        volume = {28},
+        number = {6},
+        pages = {1302--1324},
+        year = {2013}
+      }
+      @article{CurtQue2015,
+        author = {Frank E. Curtis and Xiaocun Que},
+        title = {{A Quasi-Newton Algorithm for Nonconvex, Nonsmooth Optimization with Global Convergence Guarantees}},
+        journal = {{Mathematical Programming Computation}},
+        volume = {7},
+        number = {4},
+        pages = {399--428},
+        year = {2015}
+      }
+      @article{CurtRobiZhou2020,
+        author = {Frank E. Curtis and Daniel P. Robinson and Baoyu Zhou},
+        title = {{A Self-Correcting Variable-Metric Algorithm Framework for Nonsmooth Optimization}},
+        journal = {{IMA Journal of Numerical Analysis}},
+        volume = {40},
+        number = {2},
+        pages = {1154--1187},
+        year = {2020}
+      }
+      @article{CurtLi22,
+        author = {Frank E. Curtis and Minhan Li},
+        title = {{Gradient Sampling Methods with Inexact Subproblem Solutions and Gradient Aggregation}},
+        journal = {{INFORMS Journal on Optimization}},
+        volume = {4},
+        number = {4},
+        pages = {347--445},
+        year = {2022}
+      }
+    </code></pre>
+  </div>
+</section>
+<!--End BibTex citation -->
 
 <!-- footer -->
 <footer class="footer">
