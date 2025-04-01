@@ -1,7 +1,9 @@
 NonOpt
 ======
 
-This is a version 2.0 of NonOpt.  Please see below for basic information about the software.  For more information, please see the user manual:
+This is a version 2.0 of NonOpt.  Please see below for basic information about the software.
+
+For more information, please see the user manual:
 
 [NonOpt User Manual](NonOpt-Manual/NonOpt.pdf)
 
@@ -21,7 +23,7 @@ min     f(x)
 x ∈ Rⁿ
 ```
 
-where ```f : Rⁿ -> R``` is locally Lipschitz over ```Rⁿ```.  The function ```f``` can be nonlinear, nonconvex, and/or nonsmooth.
+where ```f : Rⁿ -> R``` is locally Lipschitz over ```Rⁿ```.  The function ```f``` can be nonconvex and/or nonsmooth.
 
 NonOpt is written in C++ and is released under the MIT License.  The main author is [Frank E. Curtis](http://coral.ise.lehigh.edu/frankecurtis/).  For a list of all contributors, please see the [AUTHORS file](NonOpt/AUTHORS).
 
