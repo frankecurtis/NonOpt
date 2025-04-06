@@ -4,9 +4,9 @@
   <meta charset="utf-8">
 
   <!-- Meta tags -->
-  <meta name="description" content="NonOpt">
-  <meta property="og:title" content="NonOpt"/>
-  <meta property="og:description" content="NonOpt"/>
+  <meta name="description" content="NonOpt: Nonconvex, Nonsmooth Optimizer">
+  <meta property="og:title" content="NonOpt: Nonconvex, Nonsmooth Optimizer"/>
+  <meta property="og:description" content="NonOpt: Nonconvex, Nonsmooth Optimizer"/>
   <meta property="og:url" content="https://frankecurtis.github.io/NonOpt/"/>
 
   <!-- Keywords -->
@@ -77,10 +77,17 @@
     <div class="columns is-centered">
       <div class="column has-text-centered">
         <h2 class="title is-4">Developers</h2>
-        <div class="content has-text-justified">
-          <p>
-            developers
-          </p>
+        <div class="content has-text-centered">
+          <div class="columns">
+            <div class="column">
+              <img src="static/images/fec.jpg" alt="Frank E. Curtis" class="blend-img-background center-image" style="max-width: 60%; height: auto;" />
+              <p><em><strong>Frank E. Curtis</strong></em></p>
+            </div>
+            <div class="column">
+              <img src="static/images/lara.png" alt="Lara Zebiane" class="blend-img-background center-image" style="max-width: 60%; height: auto;" />
+              <p><em><strong>Lara Zebiane</strong></em></p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -96,10 +103,46 @@
         <h2 class="title is-4">Further details</h2>
         <div class="content has-text-justified">
           <p>
-            <img src="static/images/gradient_sampling.png" alt="Gradient Sampling Image" class="center" width="400"/>
+            NonOpt contains a suite of algorithms for solving locally Lipschitz (potentially nonconvex and/or nonsmooth) minimization problems.  It is not guaranteed to find a global minimizer of the objective function.  Rather, it employs local-search techniques based on (generalized) derivative computations in order to improve as best as it can upon an initial solution estimate.
           </p>
           <p>
-            <img src="static/images/proximal_bundle.png" alt="Proximal Bundle Image" class="center" width="400"/>
+            To use NonOpt, a user only needs to provide a method for evaluating an objective function and a (generalized) gradient for it at any given solution estimate.  (Various examples are provided that a user can follow to implement their own problem.)  NonOpt's default parameters have been chosen as those that often allow the software to find a good solution estimate relatively quickly.  A user can adjust these parameters through options in the software in order to push the solver to try to find solutions of higher accuracy.  For further information about how to adjust input parameters, please see the User's Manual <a href="https://github.com/frankecurtis/NonOpt/blob/main/NonOpt-Manual/NonOpt.pdf"><strong>here (link)</strong></a>.
+          </p>
+          <p>
+            The algorithms implemented in NonOpt are based on three main methodologies, namely, the quasi-Newton, proximal-bundle, and gradient-sampling methodologies.  For further information about each of these methodologies, please see the (forthcoming) book ``Practical Nonconvex Nonsmooth Optimization'' <a href="https://sufficientdescent.github.io/practicalnonconvexnonsmooth"><strong>here (link)</strong></a>.  Here we provide only brief descriptions.
+          </p>
+          <p>
+            Quasi-Newton techniques were first designed for the setting of minimizing smooth functions.  They involve using first-order derivatives in order to approximate second-order derivatives through iterative updates.  In particular, given first-order derivatives at solution estimates indexed by \(k\) and \(k+1\), call these estimates \(x_k\) and \(x_{k+1}\), the foundational idea of any quasi-Newton method is to approximate the second-order derivative (i.e., Hessian matrix) of the objective function at \(x_{k+1}\), call it \(H_{k+1}\), in such a way that the resulting second-order approximation of the objective at \(x_{k+1}\) has a derivative that matches the derivative of the original objective at \(x_k\).  This is known as the secant equation; see the figure below, where by satisfying the secant equation the resulting second-order approximation of the objective at \(x_{k+1}\) (purple curve) has a derivative that matches the derivative of the objective function (blue curve) at \(x_k\).  Despite the fact that this foundational idea was first developed for the setting of smooth optimization, quasi-Newton techniques turn out to be extremely powerful when solving nonsmooth minimization problems as well.  All algorithms in NonOpt use quasi-Newton techniques.
+          </p>
+        </div>
+        <div class="content has-text-centered">
+          <p>
+            <img src="static/images/quasi_newton.png" alt="Quasi-Newton Image" class="center" width="300"/>
+          </p>
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            The default algorithm that NonOpt employs is based on the proximal-bundle methodology (equipped with a quasi-Newton technique) for computing search directions.  Proximal-bundle methods build on the classic cutting-plane methodology for approximating a function through point-wise maxima over sets of affine approximations.  For convex functions, these cutting planes underestimate the objective function at every point in the domain.  Combined with the proximal-point methodology, the resulting piecewise-quadratic approximations no longer underestimate the objective function, but they approximate it sufficiently well for the purpose of computing search directions.  See the figure below, where on the left the quadratic approximation of the objective, namely, \(q_{\cal{B}_{k,j}}\), is constructed using only one cutting plane, whereas on the right the piecewise quadratic approximation is constructed with two cutting planes.  Convergence guarantees for the algorithm are based on tying the resulting approximations to a function known as the Moreau envelope, which is shown as \(\tilde{f}\) in the illustrations below.
+          </p>
+        </div>
+        <div class="content has-text-centered">
+          <p>
+            <img src="static/images/proximal_bundle.png" alt="Proximal Bundle Image" class="center" width="600"/>
+          </p>
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            The other main algorithm available in NonOpt is based on the gradient-sampling methodology.  The fundamental idea of the gradient-sampling methodology is to approximate, at each solution estimate, a steepest-descent direction through the random sampling of points and computation of gradients of the objective function at those points.  The computed search direction is then the minimum-norm element of the convex hull of these available gradients from nearby points.  If the points that are sampled surround a minimizer, such as on the left in the figure below, then the search direction may be zero, in which case the algorithm adaptively decreases the radius over which the points are sampled.  This can lead to a situation such as that illustrated on the right below, where a nonzero search direction can equivalently be described as being computed by minimizing a piecewise-quadratic approximation of the objective function at the solution estimate \(x_{k+1}\).
+          </p>
+        </div>
+        <div class="content has-text-centered">
+          <p>
+            <img src="static/images/gradient_sampling.png" alt="Gradient Sampling Image" class="center" width="600"/>
+          </p>
+        </div>
+        <div class="content has-text-justified">
+          <p>
+            These are only very brief descriptions of the algorithmic methodologies underlying NonOpt.  We encourage any user that is interested to check out the (forthcoming) book ``Practical Nonconvex Nonsmooth Optimization'' <a href="https://sufficientdescent.github.io/practicalnonconvexnonsmooth"><strong>here (link)</strong></a> for much more in-depth discussions about these methodologies and their use for locally Lipschitz minimization.
           </p>
         </div>
       </div>
