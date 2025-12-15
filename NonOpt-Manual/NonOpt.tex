@@ -168,13 +168,13 @@ The value for an option can be changed in one of two ways:
   Each line should contain only the name of an option followed by the desired value.
 \end{itemize}
 
-As previously mentioned, a useful option is to turn on the derivative checker, which is off by default. The derivative checker can be turned on by the statement:
+As previously mentioned, a useful option is to turn on the derivative checker, which is off by default. The default derivative checker option is \texttt{FiniteDifference}. Assuming this is the derivative checker that has been chosen, the derivative checker can be turned on by the statement:
 \begin{verbatim}
-nonopt.options()->modifyBoolValue(nonopt.reporter(), "check_derivatives", true);
+nonopt.options()->modifyBoolValue(nonopt.reporter(), "DEFD_check_derivatives", true);
 \end{verbatim}
 or within an options file by including the line:
 \begin{verbatim}
-check_derivatives true
+DEFD_check_derivatives true
 \end{verbatim}
 The derivative checker can be computationally expensive, so it is not recommended to run the derivative checker when performing timed experiments. But it is the best first step for debugging!
 
@@ -183,7 +183,7 @@ The derivative checker can be computationally expensive, so it is not recommende
 %*********
 \section{NonOpt Reporter Output}
 
-The option \texttt{print\_level} determines the level of output to be printed to standard output.  Setting this level to \texttt{0} means that no information will be printed.  Setting this level to \texttt{1} means that a basic amount of information will be printed, such as in the example below.  The information at this level is self-explanatory.
+The option \texttt{print\_level} determines the level of output to be printed to standard output.  Setting this level to \texttt{0} means that no information will be printed.  Setting this level to \texttt{1} means that a basic amount of information will be printed, such as in the example below.  The information at this level is self-explanatory, perhaps except for the EXIT messages, which are summarized after the example.
 
 \begin{verbatim}
   +--------------------------------------------------------------+
@@ -224,6 +224,28 @@ The option \texttt{print\_level} determines the level of output to be printed to
   CPU seconds in direction computations : 0.065522
   CPU seconds in line searches......... : 0.008766
 \end{verbatim}
+
+There are various EXIT messages that may be printed, which indicate the reason that the \texttt{NonOptSolver} terminated.  Some messages end with the phrase ``\texttt{This wasn't supposed to happen!}''  If any of those are printed, then we ask the user to contact \href{mailto:frank.e.curtis@gmail.com}{Frank E. Curtis}, since that was not supposed to happen!  With respect to the EXIT messages that are intended to be printed, their meanings are the following.
+
+\begin{itemize}
+  \item \texttt{Stationary point found}: A point has been found satisfying the stationarity conditions; see, e.g., \cite{CurtRobiZhou20}.
+  \item \texttt{Objective not improving sufficiently}: The objective has not improved sufficiently in recent iterations, indicating that the algorithm is not likely to make substantial further progress.
+  \item \texttt{Objective tolerance reached}: A point has been found whose objective value is below a tolerance that has been provided by the user.
+  \item \texttt{CPU time limit reached}: The CPU time limit has been reached.
+  \item \texttt{Iterates seem to be diverging}: A point has been found whose norm is above a tolerance.
+  \item \texttt{Iteration limit reached}: The iteration limit has been reached.
+  \item \texttt{Function evaluation limit reached}: The function evaluation limit has been reached.
+  \item \texttt{Gradient evaluation limit reached}:  The gradient evaluation limit has been reached.
+  \item \texttt{Approximate Hessian update failure}: A failure occurred, due to a numerical tolerance being violated, in the update of the approximate Hessian matrix.  By default, the code would not terminate based on such a tolerance, so this would only occur if a user turns this feature on as a termination condition.
+  \item \texttt{Derivative checker failure}: A failure occurred, due to a numerical tolerance being violated, in the derivative checker.  By default, the code would not terminate based on such a tolerance, so this would only occur if a user turns this feature on as a termination condition.
+  \item \texttt{Direction computation failure}: A failure occurred, due to a numerical tolerance being violated, in the direction computation.  By default, the code would not terminate based on such a tolerance, so this would only occur if a user turns this feature on as a termination condition.
+  \item \texttt{Function evaluation failure! Check definition of problem}: An error occurred in the function evaluation code provided by the user.
+  \item \texttt{Gradient evaluation failure! Check definition of problem}: An error occurred in the gradient evaluation code provided by the user.
+  \item \texttt{Line search failure}: A failure occurred, due to a numerical tolerance being violated, in the line search.  By default, the code would not terminate based on such a tolerance, so this would only occur if a user turns this feature on as a termination condition.
+  \item \texttt{Point set update failure}: A failure occurred, due to a numerical tolerance being violated, in the point set update.  By default, the code would not terminate based on such a tolerance, so this would only occur if a user turns this feature on as a termination condition.
+  \item \texttt{Problem data read failure!  Check definition of problem}: An error occurred in the code provided by the user.
+  \item \texttt{Termination check failure}: A failure occurred, due to a numerical tolerance being violated, in the termination checker.  By default, the code would not terminate based on such a tolerance, so this would only occur if a user turns this feature on as a termination condition.
+\end{itemize}
 
 Setting \texttt{print\_level} to \texttt{2} means that per-iteration output will be printed in addition to the basic output shown above.  A header line is printed periodically to indicate the meaning of the values in each column of the per-iteration output.  Further information about these quantities is provided in the list below.  The per-iteration output when the \texttt{direction\_computation} option is set to either \texttt{CuttingPlane} or \texttt{GradientCombination} is exactly the same, whereas when this option is set to \texttt{Gradient} the column \texttt{L?} is omitted since the small-scale QP subproblem solver is always employed for this strategy.
 

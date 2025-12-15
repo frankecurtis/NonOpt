@@ -25,6 +25,9 @@ imwrite(I,"croissant.png");
 % Write as matrix to text file
 writematrix(I,'croissant_original_matrix.txt','Delimiter','tab');
 
+% Set random number generator seed
+rng(19970830);
+
 % Add noise
 %J = imnoise(I,'gaussian',0.0,0.02);
 J = imnoise(I,'salt & pepper');
