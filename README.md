@@ -1,7 +1,7 @@
 NonOpt
 ======
 
-This is a version 2.0 of NonOpt.  Please see below for basic information about the software.
+This is a version 2.1 of NonOpt.  Please see below for basic information about the software.
 
 For more information, please see the user manual:
 
