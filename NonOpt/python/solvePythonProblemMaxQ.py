@@ -11,7 +11,7 @@ class MaxQ(nonopt.Problem):
 
   def numberOfVariables(self):
     return 1000
-    
+
   def initialPoint(self, n, x):
     # set initial point
     for i in range(n//2):

@@ -46,7 +46,7 @@ void LineSearchBacktracking::addOptions(Options* options)
                            1e-10,
                            0.0,
                            1.0,
-                           "Sufficient decrease constant for the weak Wolfe line search.\n"
+                           "Sufficient decrease constant for the line search.\n"
                            "Default     : 1e-10");
   options->addDoubleOption("LSB_stepsize_sufficient_decrease_fudge_factor",
                            1e-10,

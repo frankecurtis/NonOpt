@@ -2,7 +2,7 @@ Set value for option 'direction_computation' as CuttingPlane.
 +--------------------------------------------------------------+
 |       NonOpt = Nonlinear/Nonconvex/Nonsmooth Optimizer       |
 | NonOpt is released as open source code under the MIT License |
-| Please visit http://coral.ise.lehigh.edu/frankecurtis/nonopt |
+|     Please visit: https://github.com/frankecurtis/NonOpt     |
 +--------------------------------------------------------------+
 
 This is NonOpt version 2.0
@@ -141,7 +141,7 @@ Number of QP iterations.............. : 191
 Number of function evaluations....... : 487
 Number of gradient evaluations....... : 120
 
-CPU seconds.......................... : 0.554696
-CPU seconds in evaluations........... : 0.032352
-CPU seconds in direction computations : 0.385578
-CPU seconds in line searches......... : 0.026533
+CPU seconds.......................... : 0.556556
+CPU seconds in evaluations........... : 0.031121
+CPU seconds in direction computations : 0.390008
+CPU seconds in line searches......... : 0.025719
