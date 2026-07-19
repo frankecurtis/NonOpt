@@ -109,7 +109,14 @@ public:
   int dualSolutionOmegaLength() { return (int)vector_.size(); };
   /**
    * Get KKT error
-   * \return solver's KKT error
+   * \return solver's KKT error.  This is a *signed* residual: the value of
+   * the most-violated stationarity/complementarity component found during
+   * the active-set search, not a nonnegative norm.  It is negative (below
+   * -kkt_tolerance_) while the solve is still in progress, and the solve
+   * declares success once it rises to >= -kkt_tolerance_.  If the solver
+   * exits without success (e.g. status() == QP_ITERATION_LIMIT), this value
+   * is the last computed (and by construction still negative) residual, not
+   * an indication of a corrupted solve.
    */
   double KKTError() { return kkt_error_; };
   /**

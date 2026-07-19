@@ -93,7 +93,7 @@ solutions divide by `Q1_22`, `Q2_11`, `Q2_22`, and Schur complements like
 `NaN`. Add small-denominator guards with a fallback step and a clear status,
 plus a debug assert.
 
-## 6. Investigate QP test problem #9 (INVESTIGATE)
+## 6. Investigate QP test problem #9 (INVESTIGATE) — RESOLVED, see findings below
 On Linux/aarch64 with reference netlib BLAS/LAPACK, `testQPSolver` problem #9
 fails in BOTH solvers: DAS returns status 2 with a **negative** KKT error
 (-2.86e+00 — a residual should be >= 0), IPM hits its 1000-iteration limit.
@@ -101,6 +101,35 @@ Reproduce on your toolchain/BLAS. Determine (a) whether it fails with your BLAS
 or only reference BLAS, and (b) whether the negative DAS KKT value is a
 reporting/label bug or a real corrupted solve. The instance is defined in
 `NonOpt/tests/testQPSolver.{hpp,cpp}`.
+
+**Findings (macOS/arm64, clang):**
+- (a) With Apple's Accelerate/vecLib (vendor BLAS/LAPACK), the full
+  `testQPSolver` suite passes, including problem #9. Linked instead against
+  Homebrew's `lapack` formula (netlib reference BLAS/LAPACK, i.e. the same
+  unoptimized reference implementation as the Linux report) on this same
+  machine, a matching failure mode reproduces: DAS status 2 (iteration
+  limit), negative KKT error — but on problem **#11**, not #9. So the failure
+  is tied to the reference BLAS/LAPACK implementation's numerics (rounding/
+  pivoting differ from vendor-tuned libraries), not to Linux/aarch64
+  specifically; which exact instance trips it is sensitive to
+  toolchain/platform floating-point details on top of that.
+- (b) Not a labeling bug. `KKTError()` (see the doc comment now on it in
+  `NonOptQPSolverDualActiveSet.hpp`) is a *signed* residual — the value of
+  the most-violated stationarity/complementarity component — which is
+  negative by construction until it rises to >= `-kkt_tolerance_` (the
+  success condition). A non-success exit (e.g. `QP_ITERATION_LIMIT`) simply
+  reports the last such value, which is still negative because that's why
+  the loop hadn't stopped. In the reproduced #11 failure, `KKTErrorDual()`
+  (an independent, non-negative full dual KKT measure) was also large
+  (+5.48e+01), confirming the solve had genuinely not converged at the
+  iteration limit — a real (BLAS-dependent) convergence difficulty for that
+  instance, not a display artifact.
+- No code fix applied beyond documenting `KKTError()`'s sign convention
+  (see task 8-adjacent header change). Making DAS converge on every instance
+  under every BLAS backend would need further numerical work (tolerance
+  scaling, iteration-limit formula, or restart-from-scratch-Cholesky
+  triggers) validated against a reference-BLAS CI leg; the CMake/CI added in
+  task 9 gives a place to catch regressions/improvements here going forward.
 
 ## 7. Reduce duplication between the two QP solvers (MEDIUM, maintainability)
 ~24 methods are near-identical across `QPSolverDualActiveSet` and
