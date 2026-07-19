@@ -229,7 +229,6 @@ private:
   double primal_objective_reference_;
   double primal_objective_simple_;
   double primal_quadratic_feasible_best_;
-  double primal_solution_feasible_best_norm_inf_;
   /**
    * Algorithm quantities
    */
