@@ -58,7 +58,7 @@ bool MaxQ::evaluateObjective(int n,
   }
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -88,7 +88,7 @@ bool MaxQ::evaluateObjectiveAndGradient(int n,
   g[index] = 2 * x[index];
 
   // Return
-  return !isnan(f) && !isnan(g[index]);
+  return !std::isnan(f) && !std::isnan(g[index]);
 
 } // end evaluateObjectiveAndGradient
 
@@ -115,7 +115,7 @@ bool MaxQ::evaluateGradient(int n,
   g[index] = 2 * x[index];
 
   // Return
-  return !isnan(g[index]);
+  return !std::isnan(g[index]);
 
 } // end evaluateGradient
 

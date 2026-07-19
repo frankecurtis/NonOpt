@@ -57,7 +57,7 @@ bool ChainedCB3_1::evaluateObjective(int n,
   } // end for
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -93,13 +93,13 @@ bool ChainedCB3_1::evaluateObjectiveAndGradient(int n,
       g[i] += -2.0 * exp(-x[i] + x[i + 1]);
       g[i + 1] += 2.0 * exp(-x[i] + x[i + 1]);
     } // end else
-    if (isnan(g[i]) || isnan(g[i + 1])) {
+    if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
       success = false;
     }
   } // end for
 
   // Return
-  return !isnan(f) && success;
+  return !std::isnan(f) && success;
 
 } // end evaluateObjectiveAndGradient
 
@@ -132,7 +132,7 @@ bool ChainedCB3_1::evaluateGradient(int n,
       g[i] += -2.0 * exp(-x[i] + x[i + 1]);
       g[i + 1] += 2.0 * exp(-x[i] + x[i + 1]);
     } // end else
-    if (isnan(g[i]) || isnan(g[i + 1])) {
+    if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
       success = false;
     }
   } // end for

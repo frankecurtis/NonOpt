@@ -1,0 +1,14 @@
+*.a
+*.aux
+/build/
+*.bbl
+*.bib
+*.blg
+*.DS_Store
+*.fdb_latexmk
+*.fls
+*.log
+*.o
+*.out
+*.synctex.gz
+*.toc

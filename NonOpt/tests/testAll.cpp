@@ -92,13 +92,19 @@ int main()
   // Test algorithm if results are good
   if (result == 0) {
     printf("testing NonOpt..................... ");
-    testNonOptImplementation();
+    if (!testNonOptImplementation()) {
+      printf("success.\n");
+    }
+    else {
+      result = 1;
+      printf("failure! (run testNonOpt for details)\n");
+    }
   }
   else {
     printf("testing NonOpt..................... skipped (due to failure above).\n");
   }
 
   // Return
-  return 0;
+  return result;
 
 } // end main

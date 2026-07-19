@@ -55,7 +55,7 @@ bool BrownFunction_2::evaluateObjective(int n,
   }
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -91,13 +91,13 @@ bool BrownFunction_2::evaluateObjectiveAndGradient(int n,
       g[i] += -(pow(x[i + 1], 2) + 1.0) * pow(-x[i], pow(x[i + 1], 2)) + 2.0 * x[i] * log(-x[i + 1]) * pow(-x[i + 1], pow(x[i], 2) + 1.0);
       g[i + 1] += 2.0 * x[i + 1] * log(-x[i]) * pow(-x[i], pow(x[i + 1], 2) + 1.0) - (pow(x[i], 2) + 1.0) * pow(-x[i + 1], pow(x[i], 2));
     } // end else
-    if (isnan(g[i]) || isnan(g[i + 1])) {
+    if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
       success = false;
     }
   } // end for
 
   // Return
-  return !isnan(f) && success;
+  return !std::isnan(f) && success;
 
 } // end evaluateObjectiveAndGradient
 
@@ -130,7 +130,7 @@ bool BrownFunction_2::evaluateGradient(int n,
       g[i] += -(pow(x[i + 1], 2) + 1.0) * pow(-x[i], pow(x[i + 1], 2)) + 2.0 * x[i] * log(-x[i + 1]) * pow(-x[i + 1], pow(x[i], 2) + 1.0);
       g[i + 1] += 2.0 * x[i + 1] * log(-x[i]) * pow(-x[i], pow(x[i + 1], 2) + 1.0) - (pow(x[i], 2) + 1.0) * pow(-x[i + 1], pow(x[i], 2));
     } // end else
-    if (isnan(g[i]) || isnan(g[i + 1])) {
+    if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
       success = false;
     }
   } // end for

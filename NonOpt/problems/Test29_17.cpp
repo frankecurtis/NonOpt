@@ -56,7 +56,7 @@ bool Test29_17::evaluateObjective(int n,
   } // end for
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -93,7 +93,7 @@ bool Test29_17::evaluateObjectiveAndGradient(int n,
   g[5 * j + 4] += sign * sin(x[5 * j + 4]);
 
   // Return
-  return !isnan(g[index]) && !isnan(g[5 * j]) && !isnan(g[5 * j + 1]) && !isnan(g[5 * j + 2]) && !isnan(g[5 * j + 3]) && !isnan(g[5 * j + 4]);
+  return !std::isnan(g[index]) && !std::isnan(g[5 * j]) && !std::isnan(g[5 * j + 1]) && !std::isnan(g[5 * j + 2]) && !std::isnan(g[5 * j + 3]) && !std::isnan(g[5 * j + 4]);
 
 } // end evaluateObjectiveAndGradient
 
@@ -129,7 +129,7 @@ bool Test29_17::evaluateGradient(int n,
   g[5 * j + 4] += sign * sin(x[5 * j + 4]);
 
   // Return
-  return !isnan(g[index]) && !isnan(g[5 * j]) && !isnan(g[5 * j + 1]) && !isnan(g[5 * j + 2]) && !isnan(g[5 * j + 3]) && !isnan(g[5 * j + 4]);
+  return !std::isnan(g[index]) && !std::isnan(g[5 * j]) && !std::isnan(g[5 * j + 1]) && !std::isnan(g[5 * j + 2]) && !std::isnan(g[5 * j + 3]) && !std::isnan(g[5 * j + 4]);
 
 } // end evaluateGradient
 

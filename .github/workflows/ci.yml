@@ -1,0 +1,92 @@
+# NonOpt continuous integration.
+#
+# Place this file at: .github/workflows/ci.yml (repository root).
+#
+# It builds NonOpt across Linux + macOS and gcc + clang, then runs the test
+# suite via CTest. A separate job also exercises the classic hand-written
+# Makefiles so that build path stays healthy.
+
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  cmake:
+    name: cmake / ${{ matrix.os }} / ${{ matrix.cxx }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            cxx: g++
+            cc: gcc
+          - os: ubuntu-latest
+            cxx: clang++
+            cc: clang
+          - os: macos-latest
+            cxx: clang++
+            cc: clang
+    env:
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install BLAS/LAPACK (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libblas-dev liblapack-dev
+
+      - name: Install BLAS/LAPACK (macOS)
+        if: runner.os == 'macOS'
+        run: brew install openblas lapack
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build -j
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  # Keep the original Makefile build path working as well.
+  makefiles:
+    name: makefiles / ubuntu-latest / g++
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install BLAS/LAPACK
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libblas-dev liblapack-dev
+
+      - name: Build libraries and tests
+        env:
+          NONOPTDIR: ${{ github.workspace }}
+        run: |
+          make -C NonOpt/src
+          make -C NonOpt/problems
+          make -C NonOpt/tests
+
+      - name: Run tests
+        env:
+          NONOPTDIR: ${{ github.workspace }}
+        working-directory: NonOpt/tests
+        run: |
+          # Every test binary (including testAll) returns a meaningful exit code.
+          status=0
+          for t in testVector testSymmetricMatrix testReporter testQuantities \
+                   testOptions testPoint testProblem testQPSolver testAll; do
+            echo "== $t =="
+            ./$t || { echo "$t FAILED"; status=1; }
+          done
+          exit $status

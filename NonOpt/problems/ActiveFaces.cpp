@@ -58,7 +58,7 @@ bool ActiveFaces::evaluateObjective(int n,
   f = fmax(f, log(fabs(sum) + 1.0));
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -90,7 +90,7 @@ bool ActiveFaces::evaluateObjectiveAndGradient(int n,
   } // end if
 
   // Declare success
-  bool success = !isnan(f);
+  bool success = !std::isnan(f);
 
   // Evaluate gradient
   if (index >= 0) {
@@ -100,20 +100,20 @@ bool ActiveFaces::evaluateObjectiveAndGradient(int n,
     else {
       g[index] = -1 / (-x[index] + 1);
     }
-    success = !isnan(g[index]);
+    success = !std::isnan(g[index]);
   } // end if
   else {
     if (-sum >= 0) {
       for (int i = 0; i < n; i++) {
         g[i] = -1 / (-sum + 1);
       }
-      success = !isnan(-1 / (-sum + 1));
+      success = !std::isnan(-1 / (-sum + 1));
     }
     else {
       for (int i = 0; i < n; i++) {
         g[i] = 1 / (sum + 1);
       }
-      success = !isnan(1 / (sum + 1));
+      success = !std::isnan(1 / (sum + 1));
     }
   } // end else
 
@@ -159,20 +159,20 @@ bool ActiveFaces::evaluateGradient(int n,
     else {
       g[index] = -1 / (-x[index] + 1);
     }
-    success = !isnan(g[index]);
+    success = !std::isnan(g[index]);
   } // end if
   else {
     if (-sum >= 0) {
       for (int i = 0; i < n; i++) {
         g[i] = -1 / (-sum + 1);
       }
-      success = !isnan(-1 / (-sum + 1));
+      success = !std::isnan(-1 / (-sum + 1));
     }
     else {
       for (int i = 0; i < n; i++) {
         g[i] = 1 / (sum + 1);
       }
-      success = !isnan(1 / (sum + 1));
+      success = !std::isnan(1 / (sum + 1));
     }
   } // end else
 

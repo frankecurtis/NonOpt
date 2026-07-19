@@ -55,7 +55,7 @@ bool ChainedMifflin_2::evaluateObjective(int n,
   }
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -83,13 +83,13 @@ bool ChainedMifflin_2::evaluateObjectiveAndGradient(int n,
       g[i] += -1.0 + 0.5 * x[i];
       g[i + 1] += 0.5 * x[i + 1];
     } // end else
-    if (isnan(g[i]) || isnan(g[i + 1])) {
+    if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
       success = false;
     }
   } // end for
 
   // Return
-  return !isnan(f) && success;
+  return !std::isnan(f) && success;
 
 } // end evaluateObjectiveAndGradient
 
@@ -114,7 +114,7 @@ bool ChainedMifflin_2::evaluateGradient(int n,
       g[i] += -1.0 + 0.5 * x[i];
       g[i + 1] += 0.5 * x[i + 1];
     } // end else
-    if (isnan(g[i]) || isnan(g[i + 1])) {
+    if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
       success = false;
     }
   } // end for

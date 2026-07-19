@@ -62,7 +62,7 @@ bool ChainedCB3_2::evaluateObjective(int n,
   f = fmax(sum1, fmax(sum2, sum3));
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -108,7 +108,7 @@ bool ChainedCB3_2::evaluateObjectiveAndGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += 4.0 * pow(x[i], 3);
       g[i + 1] += 2.0 * x[i + 1];
-      if (isnan(g[i]) || isnan(g[i + 1])) {
+      if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
         success = false;
       }
     } // end for
@@ -117,7 +117,7 @@ bool ChainedCB3_2::evaluateObjectiveAndGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += -2.0 * (2.0 - x[i]);
       g[i + 1] += -2.0 * (2.0 - x[i + 1]);
-      if (isnan(g[i]) || isnan(g[i + 1])) {
+      if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
         success = false;
       }
     } // end for
@@ -126,14 +126,14 @@ bool ChainedCB3_2::evaluateObjectiveAndGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += -2.0 * exp(-x[i] + x[i + 1]);
       g[i + 1] += 2.0 * exp(-x[i] + x[i + 1]);
-      if (isnan(g[i]) || isnan(g[i + 1])) {
+      if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
         success = false;
       }
     } // end for
   }   // end else
 
   // Return
-  return !isnan(f) && success;
+  return !std::isnan(f) && success;
 
 } // end evaluateObjectiveAndGradient
 
@@ -175,7 +175,7 @@ bool ChainedCB3_2::evaluateGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += 4.0 * pow(x[i], 3);
       g[i + 1] += 2.0 * x[i + 1];
-      if (isnan(g[i]) || isnan(g[i + 1])) {
+      if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
         success = false;
       }
     } // end for
@@ -184,7 +184,7 @@ bool ChainedCB3_2::evaluateGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += -2.0 * (2.0 - x[i]);
       g[i + 1] += -2.0 * (2.0 - x[i + 1]);
-      if (isnan(g[i]) || isnan(g[i + 1])) {
+      if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
         success = false;
       }
     } // end for
@@ -193,7 +193,7 @@ bool ChainedCB3_2::evaluateGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += -2.0 * exp(-x[i] + x[i + 1]);
       g[i + 1] += 2.0 * exp(-x[i] + x[i + 1]);
-      if (isnan(g[i]) || isnan(g[i + 1])) {
+      if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
         success = false;
       }
     } // end for

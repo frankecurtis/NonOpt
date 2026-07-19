@@ -65,7 +65,7 @@ bool ChainedCrescent_1::evaluateObjective(int n,
   f = fmax(sum1, sum2);
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -97,7 +97,7 @@ bool ChainedCrescent_1::evaluateObjectiveAndGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += 2.0 * x[i];
       g[i + 1] += 2.0 * (x[i + 1] - 1.0) + 1.0;
-      if (isnan(g[i]) || isnan(g[i + 1])) {
+      if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
         success = false;
       }
     } // end for
@@ -106,14 +106,14 @@ bool ChainedCrescent_1::evaluateObjectiveAndGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += -2.0 * x[i];
       g[i + 1] += -2.0 * (x[i + 1] - 1.0) + 1.0;
-      if (isnan(g[i]) || isnan(g[i + 1])) {
+      if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
         success = false;
       }
     } // end for
   }   // end else
 
   // Return
-  return !isnan(f) && success;
+  return !std::isnan(f) && success;
 
 } // end evaluateObjectiveAndGradient
 
@@ -141,7 +141,7 @@ bool ChainedCrescent_1::evaluateGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += 2.0 * x[i];
       g[i + 1] += 2.0 * (x[i + 1] - 1.0) + 1.0;
-      if (isnan(g[i]) || isnan(g[i + 1])) {
+      if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
         success = false;
       }
     } // end for
@@ -150,7 +150,7 @@ bool ChainedCrescent_1::evaluateGradient(int n,
     for (int i = 0; i < n - 1; i++) {
       g[i] += -2.0 * x[i];
       g[i + 1] += -2.0 * (x[i + 1] - 1.0) + 1.0;
-      if (isnan(g[i]) || isnan(g[i + 1])) {
+      if (std::isnan(g[i]) || std::isnan(g[i + 1])) {
         success = false;
       }
     } // end for

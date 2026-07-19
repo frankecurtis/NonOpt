@@ -217,7 +217,7 @@ bool QuadPoly::evaluateObjective(int n,
   }
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -246,7 +246,7 @@ bool QuadPoly::evaluateObjectiveAndGradient(int n,
       f += 0.5 * symmetric_matrix_[i * number_of_variables_ + j] * x[i] * x[j];
       g[i] += symmetric_matrix_[i * number_of_variables_ + j] * x[j];
     }
-    if (isnan(g[i])) {
+    if (std::isnan(g[i])) {
       success = false;
     }
   } // end for
@@ -271,14 +271,14 @@ bool QuadPoly::evaluateObjectiveAndGradient(int n,
     f += affine_max;
     for (int i = 0; i < number_of_variables_; i++) {
       g[i] += matrix_[affine_ind * number_of_variables_ + i];
-      if (isnan(g[i])) {
+      if (std::isnan(g[i])) {
         success = false;
       }
     }
   } // end if
 
   // Return
-  return !isnan(f) && success;
+  return !std::isnan(f) && success;
 
 } // end evaluateObjectiveAndGradient
 
@@ -301,7 +301,7 @@ bool QuadPoly::evaluateGradient(int n,
     for (int j = 0; j < number_of_variables_; j++) {
       g[i] += symmetric_matrix_[i * number_of_variables_ + j] * x[j];
     }
-    if (isnan(g[i])) {
+    if (std::isnan(g[i])) {
       success = false;
     }
   } // end for
@@ -325,7 +325,7 @@ bool QuadPoly::evaluateGradient(int n,
   if (number_of_affine_ > 0) {
     for (int i = 0; i < number_of_variables_; i++) {
       g[i] += matrix_[affine_ind * number_of_variables_ + i];
-      if (isnan(g[i])) {
+      if (std::isnan(g[i])) {
         success = false;
       }
     }

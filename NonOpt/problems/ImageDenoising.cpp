@@ -100,7 +100,7 @@ bool ImageDenoising::evaluateObjective(int n,
   }
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 

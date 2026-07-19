@@ -56,7 +56,7 @@ bool Test29_19::evaluateObjective(int n,
   f = fmax(f, pow((3.0 - 2.0 * x[n - 1]) * x[n - 1] - x[n - 2] + 1.0, 2.0));
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -99,24 +99,24 @@ bool Test29_19::evaluateObjectiveAndGradient(int n,
   // Check index of maximum value
   double sign = ((f >= 0.0) ? 1.0 : -1.0);
   g[index] = sign * (2.0 * maximum * (3.0 - 4.0 * x[index]));
-  if (isnan(g[index])) {
+  if (std::isnan(g[index])) {
     success = false;
   }
   if (index > 0) {
     g[index - 1] = sign * (2.0 * maximum * (-1.0));
-    if (isnan(g[index - 1])) {
+    if (std::isnan(g[index - 1])) {
       success = false;
     }
   }
   if (index < n - 1) {
     g[index + 1] = sign * (2.0 * maximum * (-2.0));
-    if (isnan(g[index + 1])) {
+    if (std::isnan(g[index + 1])) {
       success = false;
     }
   }
 
   // Return
-  return !isnan(f) && success;
+  return !std::isnan(f) && success;
 
 } // end evaluateObjective
 
@@ -158,18 +158,18 @@ bool Test29_19::evaluateGradient(int n,
   // Check index of maximum value
   double sign = ((f >= 0.0) ? 1.0 : -1.0);
   g[index] = sign * (2.0 * maximum * (3.0 - 4.0 * x[index]));
-  if (isnan(g[index])) {
+  if (std::isnan(g[index])) {
     success = false;
   }
   if (index > 0) {
     g[index - 1] = sign * (2.0 * maximum * (-1.0));
-    if (isnan(g[index - 1])) {
+    if (std::isnan(g[index - 1])) {
       success = false;
     }
   }
   if (index < n - 1) {
     g[index + 1] = sign * (2.0 * maximum * (-2.0));
-    if (isnan(g[index + 1])) {
+    if (std::isnan(g[index + 1])) {
       success = false;
     }
   }

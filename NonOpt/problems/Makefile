@@ -7,8 +7,12 @@
 # C++ compiler
 CXX = g++
 
-# C++ compiler flags
-CXXFLAGS = -g -Wall -std=c++11
+# C++ compiler flags (optimized release build by default)
+CXXFLAGS = -Wall -std=c++11 -O3 -DNDEBUG
+
+# Debug build flags (unoptimized, with symbols; ASSERT_EXCEPTION is unaffected
+# by -DNDEBUG either way since it is a custom macro, not <cassert>)
+DEBUG_CXXFLAGS = -Wall -std=c++11 -g -O0
 
 # Library utility command
 AR = ar rv
@@ -24,6 +28,10 @@ LIB = libNonOptProblems.a
 
 # Rule for all
 all: $(LIB)
+
+# Debug build (use: make debug)
+debug: CXXFLAGS := $(DEBUG_CXXFLAGS)
+debug: $(LIB)
 
 # Create library
 $(LIB): $(objects)

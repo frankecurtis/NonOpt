@@ -59,7 +59,7 @@ bool Test29_5::evaluateObjective(int n,
   } // end for
 
   // Return
-  return !isnan(f);
+  return !std::isnan(f);
 
 } // end evaluateObjective
 
@@ -87,14 +87,14 @@ bool Test29_5::evaluateObjectiveAndGradient(int n,
     double sign = ((term > 0.0) ? 1.0 : ((term < 0.0) ? -1.0 : 0.0));
     for (int j = 0; j < n; j++) {
       g[j] += sign / double(i + j + 1);
-      if (isnan(g[j])) {
+      if (std::isnan(g[j])) {
         success = false;
       }
     } // end for
   }   // end for
 
   // Return
-  return !isnan(f) && success;
+  return !std::isnan(f) && success;
 
 } // end evaluateObjectiveAndGradient
 
@@ -119,7 +119,7 @@ bool Test29_5::evaluateGradient(int n,
     double sign = ((term > 0.0) ? 1.0 : ((term < 0.0) ? -1.0 : 0.0));
     for (int j = 0; j < n; j++) {
       g[j] += sign / double(i + j + 1);
-      if (isnan(g[j])) {
+      if (std::isnan(g[j])) {
         success = false;
       }
     }
