@@ -749,7 +749,7 @@ void QPSolverInteriorPoint::solveQP(const Options* options,
         Gomega.scale(0.0);
         for (int i = 0; i < gamma_length_; i++) {
           for (int j = 0; j < omega_length; j++) {
-            Gomega.set(i, Gomega.values()[i] += theta_.values()[j] * vector_list_[j]->values()[i]);
+            Gomega.valuesModifiable()[i] += theta_.values()[j] * vector_list_[j]->values()[i];
           }
         }
 

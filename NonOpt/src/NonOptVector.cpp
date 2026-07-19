@@ -23,8 +23,11 @@ Vector::Vector(int length)
     normInf_computed_(false)
 {
 
-  // Allocate array
-  values_ = new double[length];
+  // Assert
+  ASSERT_EXCEPTION(length >= 0, NONOPT_VECTOR_ASSERT_EXCEPTION, "Vector assert failed.  Length is negative.");
+
+  // Allocate array, zero-initialized
+  values_ = new double[length]();
 
 } // end constructor
 
@@ -40,6 +43,9 @@ Vector::Vector(int length,
     max_value_(value),
     min_value_(value)
 {
+
+  // Assert
+  ASSERT_EXCEPTION(length >= 0, NONOPT_VECTOR_ASSERT_EXCEPTION, "Vector assert failed.  Length is negative.");
 
   // Allocate array
   values_ = new double[length];
@@ -118,6 +124,9 @@ std::shared_ptr<Vector> Vector::makeNewLinearCombination(double scalar1,
 void Vector::setLength(int length)
 {
 
+  // Assert
+  ASSERT_EXCEPTION(length >= 0, NONOPT_VECTOR_ASSERT_EXCEPTION, "Vector assert failed.  Length is negative.");
+
   // Store length
   length_ = length;
 
@@ -127,8 +136,8 @@ void Vector::setLength(int length)
     values_ = nullptr;
   } // end if
 
-  // Allocate array
-  values_ = new double[length];
+  // Allocate array, zero-initialized
+  values_ = new double[length]();
 
   // Reset scalar value bools
   max_computed_ = false;

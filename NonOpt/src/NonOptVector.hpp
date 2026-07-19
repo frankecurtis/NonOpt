@@ -101,7 +101,13 @@ public:
   inline int length() const { return length_; };
   /**
    * Get values (const)
-   * \return is pointer to array of Vector values
+   * \return is pointer to array of Vector values.  This returns a raw
+   * (non-const) double* rather than const double*, purely so it can be
+   * passed directly to the non-const-correct BLAS/LAPACK C prototypes in
+   * NonOptBLASLAPACK.hpp (Fortran has no notion of const); it must NOT be
+   * used to modify elements, since doing so bypasses the cached-norm
+   * invalidation that valuesModifiable() performs.  Use valuesModifiable()
+   * for any write access.
    */
   inline double* values() const { return values_; };
   /**

@@ -43,7 +43,7 @@ int testVectorImplementation(int option)
 
   // Set values to 0.0
   for (int i = 0; i < 5; i++) {
-    u.values()[i] = 0.0;
+    u.valuesModifiable()[i] = 0.0;
   }
 
   // Check values

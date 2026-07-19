@@ -442,7 +442,7 @@ double QPSolverDualActiveSet::KKTErrorDual()
   Vector Gtd;
   Gtd.setLength((int)vector_.size());
   for (int i = 0; i < (int)vector_list_.size(); i++) {
-    Gtd.values()[i] = vector_list_[i]->innerProduct(d);
+    Gtd.valuesModifiable()[i] = vector_list_[i]->innerProduct(d);
   }
 
   // Evaluate dual scalar
