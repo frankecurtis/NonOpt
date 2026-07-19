@@ -1660,13 +1660,15 @@ bool QPSolverDualActiveSet::choleskyAugment(double system_vector[],
     temporary_scalar = temporary_scalar + factor_[i * system_solution_length_ + index] * factor_[i * system_solution_length_ + index];
   }
 
-  // Check diagonal element tolerances
+  // Check diagonal element tolerances.  cholesky_tolerance_ is a floor on the
+  // factor diagonal d (not d^2), matching choleskyFromScratch's convention;
+  // compare against its square so no sqrt of a negative value is taken.
   double diagonal_squared = system_vector[index] - temporary_scalar;
-  if (diagonal_squared >= cholesky_tolerance_) {
+  if (diagonal_squared >= cholesky_tolerance_ * cholesky_tolerance_) {
     factor_[index * system_solution_length_ + index] = sqrt(diagonal_squared);
   }
   else {
-    factor_[index * system_solution_length_ + index] = sqrt(cholesky_tolerance_);
+    factor_[index * system_solution_length_ + index] = cholesky_tolerance_;
     success_without_factorization_error = false;
   } // end else
 
@@ -1708,12 +1710,13 @@ bool QPSolverDualActiveSet::choleskyAugment(double system_vector[],
     double t_squared = factor_[i * system_solution_length_ + i] * factor_[i * system_solution_length_ + i] - temporary_vector[i - index - 1] * temporary_vector[i - index - 1];
     double t = 0.0;
 
-    // Check diagonal element tolerances
-    if (t_squared >= cholesky_tolerance_) {
+    // Check diagonal element tolerances.  cholesky_tolerance_ is a floor on
+    // the rotated diagonal t (not t^2); see choleskyAugment's pivot check above.
+    if (t_squared >= cholesky_tolerance_ * cholesky_tolerance_) {
       t = sqrt(t_squared);
     }
     else {
-      t = sqrt(cholesky_tolerance_);
+      t = cholesky_tolerance_;
       success_without_factorization_error = false;
     }
 
@@ -1887,7 +1890,8 @@ void QPSolverDualActiveSet::choleskyFromScratch(const Reporter* reporter)
   // Compute factorization
   dpotf2_(&upper_lower, &size, matrix, &size, &flag);
 
-  // Check tolerance on diagonal
+  // Check tolerance on diagonal.  cholesky_tolerance_ floors the factor
+  // diagonal d directly (matches choleskyAugment's convention above).
   for (int i = 0; i < size; i++) {
     if (matrix[i * size + i] < cholesky_tolerance_) {
       reporter->printf(R_QP, R_PER_INNER_ITERATION, "ARGH! Replacing Cholesky diagonal of %+23.16e with %+23.16e.\n", matrix[i * size + i], cholesky_tolerance_);

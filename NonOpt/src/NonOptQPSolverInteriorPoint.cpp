@@ -5,6 +5,7 @@
 // Author(s) : Frank E. Curtis, Lara Zebiane
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <cstdio>
 #include <iterator>
@@ -1257,6 +1258,16 @@ void QPSolverInteriorPoint::computeStepSizes(const Vector& dtheta,
   }
   double bar_alpha = fmin(bar_atheta, bar_av);
 
+  // Tolerance below which a 2d sub-QP's Hessian entry or Schur complement is
+  // treated as singular (e.g., a null direction like du == 0 makes o == 0,
+  // hence Q1_22 == 0 -- this is a routine occurrence during IPM iterations,
+  // not a sign of a bug).  Dividing by such a denominator would produce
+  // Inf/NaN, and IEEE fmin/fmax can silently propagate a NaN operand through;
+  // instead fall back to a zero-contribution step for the affected sub-QP so
+  // the merit-function comparison below always has finite candidates to
+  // choose from.
+  const double denominator_tolerance = 1e-12;
+
   // Solve preliminary 2d QP
   Vector s_plus_p(total_length + 1, 0.0);
   s_plus_p.linearCombination(1.0, s, 1.0, p);
@@ -1265,12 +1276,22 @@ void QPSolverInteriorPoint::computeStepSizes(const Vector& dtheta,
   double Q1_22 = o.innerProduct(o);
   double c1_1 = r.innerProduct(s_plus_p) + 0.5 * (dtheta.innerProduct(v_) + theta_.innerProduct(dv));
   double c1_2 = r.innerProduct(o);
-  double atheta1 = fmax(0.0, fmin((c1_2 * Q1_12 / Q1_22 - c1_1) / (Q1_11 - Q1_12 * Q1_12 / Q1_22), bar_alpha));
-  double au1 = (-c1_2 - atheta1 * Q1_12) / Q1_22;
-  double av1 = atheta1;
+  double atheta1 = 0.0, au1 = 0.0, av1 = 0.0;
+  if (fabs(Q1_22) >= denominator_tolerance) {
+    double schur1 = Q1_11 - Q1_12 * Q1_12 / Q1_22;
+    if (fabs(schur1) >= denominator_tolerance) {
+      atheta1 = fmax(0.0, fmin((c1_2 * Q1_12 / Q1_22 - c1_1) / schur1, bar_alpha));
+      au1 = (-c1_2 - atheta1 * Q1_12) / Q1_22;
+      av1 = atheta1;
+    }
+  }
+  // Sanity check (debug builds only): the guards above should always keep
+  // this step finite, regardless of how degenerate Q1_22/schur1 were.
+  assert(std::isfinite(atheta1) && std::isfinite(au1) && std::isfinite(av1) &&
+         "computeStepSizes: preliminary 2d QP produced a non-finite step");
 
   // Solve secondary 2d QP
-  double atheta2, au2, av2;
+  double atheta2 = 0.0, au2 = 0.0, av2 = 0.0;
   if (bar_atheta <= bar_av) {
     double Q2_11 = o.innerProduct(o);
     double Q2_12 = o.innerProduct(p);
@@ -1278,8 +1299,14 @@ void QPSolverInteriorPoint::computeStepSizes(const Vector& dtheta,
     double c2_1 = r.innerProduct(o) + bar_atheta * s.innerProduct(o);
     double c2_2 = r.innerProduct(p) + 0.5 * theta_.innerProduct(dv) + bar_atheta * (s.innerProduct(p) + 0.5 * dtheta.innerProduct(dv));
     atheta2 = bar_atheta;
-    av2 = fmax(bar_alpha, fmin((c2_1 * Q2_12 / Q2_11 - c2_2) / (Q2_22 - Q2_12 * Q2_12 / Q2_11), bar_av));
-    au2 = (-c2_1 - av2 * Q2_12) / Q2_11;
+    av2 = bar_alpha;
+    if (fabs(Q2_11) >= denominator_tolerance) {
+      double schur2 = Q2_22 - Q2_12 * Q2_12 / Q2_11;
+      if (fabs(schur2) >= denominator_tolerance) {
+        av2 = fmax(bar_alpha, fmin((c2_1 * Q2_12 / Q2_11 - c2_2) / schur2, bar_av));
+        au2 = (-c2_1 - av2 * Q2_12) / Q2_11;
+      }
+    }
   }
   else {
     double Q2_11 = s.innerProduct(s);
@@ -1287,10 +1314,19 @@ void QPSolverInteriorPoint::computeStepSizes(const Vector& dtheta,
     double Q2_22 = o.innerProduct(o);
     double c2_1 = r.innerProduct(s) + 0.5 * dtheta.innerProduct(v_) + bar_av * (s.innerProduct(p) + 0.5 * dtheta.innerProduct(dv));
     double c2_2 = r.innerProduct(o) + bar_av * o.innerProduct(p);
-    atheta2 = fmax(bar_alpha, fmin((c2_2 * Q2_12 / Q2_22 - c2_1) / (Q2_11 - Q2_12 * Q2_12 / Q2_22), bar_atheta));
-    au2 = (-c2_2 - atheta2 * Q2_12) / Q2_22;
+    atheta2 = bar_alpha;
     av2 = bar_av;
+    if (fabs(Q2_22) >= denominator_tolerance) {
+      double schur2 = Q2_11 - Q2_12 * Q2_12 / Q2_22;
+      if (fabs(schur2) >= denominator_tolerance) {
+        atheta2 = fmax(bar_alpha, fmin((c2_2 * Q2_12 / Q2_22 - c2_1) / schur2, bar_atheta));
+        au2 = (-c2_2 - atheta2 * Q2_12) / Q2_22;
+      }
+    }
   }
+  // Sanity check (debug builds only): same invariant for the secondary QP.
+  assert(std::isfinite(atheta2) && std::isfinite(au2) && std::isfinite(av2) &&
+         "computeStepSizes: secondary 2d QP produced a non-finite step");
 
   // Compute trial points
   Vector theta1(total_length, 0.0);
