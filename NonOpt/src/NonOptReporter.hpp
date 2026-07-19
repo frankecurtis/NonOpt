@@ -118,11 +118,11 @@ private:
   /**
    * Copy constructor
    */
-  Reporter(const Reporter&);
+  Reporter(const Reporter&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const Reporter&);
+  void operator=(const Reporter&) = delete;
   //@}
 
   /** @name Private members */
@@ -257,11 +257,11 @@ private:
   /**
    * Copy constructor
    */
-  Report(const Report&);
+  Report(const Report&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const Report&);
+  void operator=(const Report&) = delete;
   //@}
 
   /**
@@ -358,11 +358,11 @@ private:
   /**
    * Copy constructor
    */
-  FileReport(const FileReport&);
+  FileReport(const FileReport&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const FileReport&);
+  void operator=(const FileReport&) = delete;
   //@}
 
   /**
@@ -456,11 +456,11 @@ private:
   /**
    * Copy constructor
    */
-  StreamReport(const StreamReport&);
+  StreamReport(const StreamReport&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const StreamReport&);
+  void operator=(const StreamReport&) = delete;
   //@}
 
   /**

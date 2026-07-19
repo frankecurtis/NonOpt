@@ -61,11 +61,11 @@ private:
   /**
    * Copy constructor
    */
-  RandomNumberGenerator(const RandomNumberGenerator&);
+  RandomNumberGenerator(const RandomNumberGenerator&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const RandomNumberGenerator&);
+  void operator=(const RandomNumberGenerator&) = delete;
   //@}
 
   /** @name * Private members */

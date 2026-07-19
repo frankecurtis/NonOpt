@@ -108,7 +108,7 @@ private:
   /**
    * Overloaded equals operator
    */
-  void operator=(const Exception&);
+  void operator=(const Exception&) = delete;
   //@}
 
   /** @name Private members */
@@ -142,7 +142,7 @@ private:
                                                                                \
   private:                                                                     \
     __except_type();                                                           \
-    void operator=(const __except_type&);                                      \
+    void operator=(const __except_type&) = delete;                                      \
   }
 
 } // namespace NonOpt

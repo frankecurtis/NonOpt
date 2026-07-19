@@ -117,11 +117,11 @@ private:
   /**
    * Copy constructor
    */
-  TerminationBasic(const TerminationBasic&);
+  TerminationBasic(const TerminationBasic&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const TerminationBasic&);
+  void operator=(const TerminationBasic&) = delete;
   //@}
 
   /** @name Private members */

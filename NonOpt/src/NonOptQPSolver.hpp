@@ -255,11 +255,11 @@ private:
   /**
    * Copy constructor
    */
-  QPSolver(const QPSolver&);
+  QPSolver(const QPSolver&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const QPSolver&);
+  void operator=(const QPSolver&) = delete;
   //@}
 
   /** @name Private members */

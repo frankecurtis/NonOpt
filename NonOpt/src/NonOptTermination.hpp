@@ -179,11 +179,11 @@ private:
   /**
    * Copy constructor
    */
-  Termination(const Termination&);
+  Termination(const Termination&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const Termination&);
+  void operator=(const Termination&) = delete;
   //@}
 
   /** @name Private members */

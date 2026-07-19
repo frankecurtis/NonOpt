@@ -118,11 +118,11 @@ private:
   /**
    * Copy constructor
    */
-  DerivativeChecker(const DerivativeChecker&);
+  DerivativeChecker(const DerivativeChecker&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const DerivativeChecker&);
+  void operator=(const DerivativeChecker&) = delete;
   //@}
 
   /** @name Private members */

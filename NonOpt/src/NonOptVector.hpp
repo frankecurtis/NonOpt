@@ -211,11 +211,11 @@ private:
   /**
    * Copy constructor
    */
-  Vector(const Vector&);
+  Vector(const Vector&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const Vector&);
+  void operator=(const Vector&) = delete;
   //@}
 
   /** @name Private members */

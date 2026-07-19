@@ -188,11 +188,11 @@ private:
   /**
    * Copy constructor
    */
-  Options(const Options&);
+  Options(const Options&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const Options&);
+  void operator=(const Options&) = delete;
   //@}
 
   /** @name Private members */
@@ -393,11 +393,11 @@ private:
   /**
    * Copy constructor
    */
-  Option(const Option&);
+  Option(const Option&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const Option&);
+  void operator=(const Option&) = delete;
   //@}
 
   /**

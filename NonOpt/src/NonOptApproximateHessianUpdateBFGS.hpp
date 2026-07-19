@@ -103,11 +103,11 @@ private:
   /**
    * Copy constructor
    */
-  ApproximateHessianUpdateBFGS(const ApproximateHessianUpdateBFGS&);
+  ApproximateHessianUpdateBFGS(const ApproximateHessianUpdateBFGS&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const ApproximateHessianUpdateBFGS&);
+  void operator=(const ApproximateHessianUpdateBFGS&) = delete;
   //@}
 
   /** @name Private members */

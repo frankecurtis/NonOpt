@@ -201,11 +201,11 @@ private:
   /**
    * Copy constructor
    */
-  SymmetricMatrixDense(const SymmetricMatrixDense&);
+  SymmetricMatrixDense(const SymmetricMatrixDense&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const SymmetricMatrixDense&);
+  void operator=(const SymmetricMatrixDense&) = delete;
   //@}
 
   /** @name Private members */

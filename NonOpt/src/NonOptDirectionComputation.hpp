@@ -134,11 +134,11 @@ private:
   /**
    * Copy constructor
    */
-  DirectionComputation(const DirectionComputation&);
+  DirectionComputation(const DirectionComputation&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const DirectionComputation&);
+  void operator=(const DirectionComputation&) = delete;
   //@}
 
   /** @name Private members */

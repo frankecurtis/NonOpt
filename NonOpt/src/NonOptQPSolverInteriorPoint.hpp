@@ -248,11 +248,11 @@ private:
   /**
    * Copy constructor
    */
-  QPSolverInteriorPoint(const QPSolverInteriorPoint&);
+  QPSolverInteriorPoint(const QPSolverInteriorPoint&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const QPSolverInteriorPoint&);
+  void operator=(const QPSolverInteriorPoint&) = delete;
   //@}
 
   /** @name Private members */

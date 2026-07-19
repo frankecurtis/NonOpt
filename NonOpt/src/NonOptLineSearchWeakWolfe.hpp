@@ -103,11 +103,11 @@ private:
   /**
    * Copy constructor
    */
-  LineSearchWeakWolfe(const LineSearchWeakWolfe&);
+  LineSearchWeakWolfe(const LineSearchWeakWolfe&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const LineSearchWeakWolfe&);
+  void operator=(const LineSearchWeakWolfe&) = delete;
   //@}
 
   /** @name Private members */

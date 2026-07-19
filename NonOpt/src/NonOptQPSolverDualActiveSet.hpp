@@ -254,11 +254,11 @@ private:
   /**
    * Copy constructor
    */
-  QPSolverDualActiveSet(const QPSolverDualActiveSet&);
+  QPSolverDualActiveSet(const QPSolverDualActiveSet&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const QPSolverDualActiveSet&);
+  void operator=(const QPSolverDualActiveSet&) = delete;
   //@}
 
   /** @name Private members */

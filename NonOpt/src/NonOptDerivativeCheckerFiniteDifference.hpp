@@ -92,11 +92,11 @@ private:
   /**
    * Copy constructor
    */
-  DerivativeCheckerFiniteDifference(const DerivativeCheckerFiniteDifference&);
+  DerivativeCheckerFiniteDifference(const DerivativeCheckerFiniteDifference&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const DerivativeCheckerFiniteDifference&);
+  void operator=(const DerivativeCheckerFiniteDifference&) = delete;
   //@}
 
   /** @name Private members */

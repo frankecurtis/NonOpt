@@ -103,11 +103,11 @@ private:
   /**
    * Copy constructor
    */
-  ApproximateHessianUpdateDFP(const ApproximateHessianUpdateDFP&);
+  ApproximateHessianUpdateDFP(const ApproximateHessianUpdateDFP&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const ApproximateHessianUpdateDFP&);
+  void operator=(const ApproximateHessianUpdateDFP&) = delete;
   //@}
 
   /** @name Private members */

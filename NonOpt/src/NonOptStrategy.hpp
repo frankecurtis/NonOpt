@@ -89,11 +89,11 @@ private:
   /**
    * Copy constructor
    */
-  Strategy(const Strategy&);
+  Strategy(const Strategy&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const Strategy&);
+  void operator=(const Strategy&) = delete;
   //@}
 
 }; // end Strategy

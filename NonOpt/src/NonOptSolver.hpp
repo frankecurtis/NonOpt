@@ -156,11 +156,11 @@ private:
   /**
    * Copy constructor
    */
-  NonOptSolver(const NonOptSolver&);
+  NonOptSolver(const NonOptSolver&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const NonOptSolver&);
+  void operator=(const NonOptSolver&) = delete;
   //@}
 
   /** @name Private members */

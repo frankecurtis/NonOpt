@@ -134,11 +134,11 @@ private:
   /**
    * Copy constructor
    */
-  LineSearch(const LineSearch&);
+  LineSearch(const LineSearch&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const LineSearch&);
+  void operator=(const LineSearch&) = delete;
   //@}
 
   /** @name Private members */

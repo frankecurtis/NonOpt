@@ -120,11 +120,11 @@ private:
   /**
    * Copy constructor
    */
-  Problem(const Problem&);
+  Problem(const Problem&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const Problem&);
+  void operator=(const Problem&) = delete;
   //@}
 
 }; // end Problem

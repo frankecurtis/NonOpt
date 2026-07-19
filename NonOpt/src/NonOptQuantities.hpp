@@ -398,11 +398,11 @@ private:
   /**
    * Copy constructor
    */
-  Quantities(const Quantities&);
+  Quantities(const Quantities&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const Quantities&);
+  void operator=(const Quantities&) = delete;
   //@}
 
   /** @name Private members */

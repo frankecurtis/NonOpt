@@ -173,11 +173,11 @@ private:
   /**
    * Copy constructor
    */
-  Strategies(const Strategies&);
+  Strategies(const Strategies&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const Strategies&);
+  void operator=(const Strategies&) = delete;
   //@}
 
   /** @name * Private members */

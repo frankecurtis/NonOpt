@@ -118,11 +118,11 @@ private:
   /**
    * Copy constructor
    */
-  TerminationSecondQP(const TerminationSecondQP&);
+  TerminationSecondQP(const TerminationSecondQP&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const TerminationSecondQP&);
+  void operator=(const TerminationSecondQP&) = delete;
   //@}
 
   /** @name Private members */

@@ -109,11 +109,11 @@ private:
   /**
    * Copy constructor
    */
-  DirectionComputationGradientCombination(const DirectionComputationGradientCombination&);
+  DirectionComputationGradientCombination(const DirectionComputationGradientCombination&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const DirectionComputationGradientCombination&);
+  void operator=(const DirectionComputationGradientCombination&) = delete;
   //@}
 
   /** @name Private members */

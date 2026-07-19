@@ -103,11 +103,11 @@ private:
   /**
    * Copy constructor
    */
-  LineSearchBacktracking(const LineSearchBacktracking&);
+  LineSearchBacktracking(const LineSearchBacktracking&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const LineSearchBacktracking&);
+  void operator=(const LineSearchBacktracking&) = delete;
   //@}
 
   /** @name Private members */

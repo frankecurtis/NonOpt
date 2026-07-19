@@ -103,11 +103,11 @@ private:
   /**
    * Copy constructor
    */
-  PointSetUpdateProximity(const PointSetUpdateProximity&);
+  PointSetUpdateProximity(const PointSetUpdateProximity&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const PointSetUpdateProximity&);
+  void operator=(const PointSetUpdateProximity&) = delete;
   //@}
 
   /** @name Private members */

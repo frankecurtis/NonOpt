@@ -139,11 +139,11 @@ private:
   /**
    * Copy constructor
    */
-  ApproximateHessianUpdate(const ApproximateHessianUpdate&);
+  ApproximateHessianUpdate(const ApproximateHessianUpdate&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const ApproximateHessianUpdate&);
+  void operator=(const ApproximateHessianUpdate&) = delete;
   //@}
 
   /** @name Private members */

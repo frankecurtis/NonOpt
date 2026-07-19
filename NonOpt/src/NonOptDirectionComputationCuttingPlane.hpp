@@ -103,11 +103,11 @@ private:
   /**
    * Copy constructor
    */
-  DirectionComputationCuttingPlane(const DirectionComputationCuttingPlane&);
+  DirectionComputationCuttingPlane(const DirectionComputationCuttingPlane&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const DirectionComputationCuttingPlane&);
+  void operator=(const DirectionComputationCuttingPlane&) = delete;
   //@}
 
   /** @name Private members */

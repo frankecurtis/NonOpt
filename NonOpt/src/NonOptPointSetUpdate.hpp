@@ -134,11 +134,11 @@ private:
   /**
    * Copy constructor
    */
-  PointSetUpdate(const PointSetUpdate&);
+  PointSetUpdate(const PointSetUpdate&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const PointSetUpdate&);
+  void operator=(const PointSetUpdate&) = delete;
   //@}
 
   /** @name Private members */

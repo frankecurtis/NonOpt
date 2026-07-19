@@ -203,11 +203,11 @@ private:
   /**
    * Copy constructor
    */
-  SymmetricMatrix(const SymmetricMatrix&);
+  SymmetricMatrix(const SymmetricMatrix&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const SymmetricMatrix&);
+  void operator=(const SymmetricMatrix&) = delete;
   //@}
 
   /** @name Private members */

@@ -186,11 +186,11 @@ private:
   /**
    * Copy constructor
    */
-  SymmetricMatrixLimitedMemory(const SymmetricMatrixLimitedMemory&);
+  SymmetricMatrixLimitedMemory(const SymmetricMatrixLimitedMemory&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const SymmetricMatrixLimitedMemory&);
+  void operator=(const SymmetricMatrixLimitedMemory&) = delete;
   //@}
 
   /** @name Private members */

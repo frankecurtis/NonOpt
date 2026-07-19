@@ -188,11 +188,11 @@ private:
   /**
    * Copy constructor
    */
-  Point(const Point&);
+  Point(const Point&) = delete;
   /**
    * Overloaded equals operator
    */
-  void operator=(const Point&);
+  void operator=(const Point&) = delete;
   //@}
 
   /** @name Private members */
