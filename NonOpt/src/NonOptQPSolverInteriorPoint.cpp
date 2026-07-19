@@ -937,31 +937,63 @@ void QPSolverInteriorPoint::computeStepSizes(const Vector& dtheta,
   // Set total length
   int total_length = theta_.length();
 
+  // (Re-)size preallocated working vectors only when the system size
+  // changes, instead of constructing fresh Vectors (with a fresh heap
+  // allocation each) on every call
+  if (step_r_.length() != total_length + 1) {
+    step_r_.setLength(total_length + 1);
+    step_s_.setLength(total_length + 1);
+    step_o_.setLength(total_length + 1);
+    step_p_.setLength(total_length + 1);
+    step_s_plus_p_.setLength(total_length + 1);
+  }
+  if (step_Qdtheta_.length() != total_length) {
+    step_Qdtheta_.setLength(total_length);
+    step_theta1_.setLength(total_length);
+    step_theta2_.setLength(total_length);
+    step_v1_.setLength(total_length);
+    step_v2_.setLength(total_length);
+    step_r_dual1_.setLength(total_length);
+    step_r_dual2_.setLength(total_length);
+  }
+  Vector& r = step_r_;
+  Vector& s = step_s_;
+  Vector& Qdtheta = step_Qdtheta_;
+  Vector& o = step_o_;
+  Vector& p = step_p_;
+  Vector& s_plus_p = step_s_plus_p_;
+  Vector& theta1 = step_theta1_;
+  Vector& theta2 = step_theta2_;
+  Vector& v1 = step_v1_;
+  Vector& v2 = step_v2_;
+  Vector& r_dual1 = step_r_dual1_;
+  Vector& r_dual2 = step_r_dual2_;
+
   // Compute r
-  Vector r(total_length + 1, 0.0);
   r.set(0, r_prim_);
   for (int i = 1; i < total_length + 1; i++) {
     r.set(i, r_dual_.values()[i - 1]);
   }
 
   // Compute s
-  Vector s(total_length + 1, 0.0);
   s.set(0, -At_.innerProduct(dtheta));
-  Vector Qdtheta(total_length, 0.0);
   Q_.matrixVectorProduct(dtheta, Qdtheta);
   for (int i = 1; i < total_length + 1; i++) {
     s.set(i, Qdtheta.values()[i - 1]);
   }
 
-  // Compute o
-  Vector o(total_length + 1, 0.0);
+  // Compute o.  Index 0 is never written by the loop below (unlike r/s,
+  // which do set index 0 above), so it must be reset explicitly now that o
+  // is a persistent, reused buffer instead of a fresh zero-initialized
+  // Vector each call.
+  o.set(0, 0.0);
   for (int i = 1; i < total_length + 1; i++) {
     o.set(i, -At_.values()[i-1]);
   }
   o.scale(du);
 
-  // Compute p
-  Vector p(total_length + 1, 0.0);
+  // Compute p.  Same index-0 caveat as o above.
+  p.set(0, 0.0);
   for (int i = 1; i < total_length + 1; i++) {
     p.set(i, -dv.values()[i - 1]);
   }
@@ -990,7 +1022,6 @@ void QPSolverInteriorPoint::computeStepSizes(const Vector& dtheta,
   const double denominator_tolerance = 1e-12;
 
   // Solve preliminary 2d QP
-  Vector s_plus_p(total_length + 1, 0.0);
   s_plus_p.linearCombination(1.0, s, 1.0, p);
   double Q1_11 = s_plus_p.innerProduct(s_plus_p) + dtheta.innerProduct(dv);
   double Q1_12 = s_plus_p.innerProduct(o);
@@ -1050,25 +1081,19 @@ void QPSolverInteriorPoint::computeStepSizes(const Vector& dtheta,
          "computeStepSizes: secondary 2d QP produced a non-finite step");
 
   // Compute trial points
-  Vector theta1(total_length, 0.0);
   theta1.linearCombination(1.0, theta_, atheta1, dtheta);
-  Vector theta2(total_length, 0.0);
   theta2.linearCombination(1.0, theta_, atheta2, dtheta);
   double u1 = u_ + au1 * du;
   double u2 = u_ + au2 * du;
-  Vector v1(total_length, 0.0);
   v1.linearCombination(1.0, v_, av1, dv);
-  Vector v2(total_length, 0.0);
   v2.linearCombination(1.0, v_, av2, dv);
 
   // Evaluate merit function values
-  Vector r_dual1(total_length, 0.0);
   Q_.matrixVectorProduct(theta1, r_dual1);
   r_dual1.addScaledVector(1.0, c_);
   r_dual1.addScaledVector(-u1, At_);
   r_dual1.addScaledVector(-1.0, v1);
   double r_prim1 = At_.innerProduct(theta1) - b_;
-  Vector r_dual2(total_length, 0.0);
   Q_.matrixVectorProduct(theta2, r_dual2);
   r_dual2.addScaledVector(1.0, c_);
   r_dual2.addScaledVector(-u2, At_);

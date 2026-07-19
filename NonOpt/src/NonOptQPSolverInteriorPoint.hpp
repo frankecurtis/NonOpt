@@ -234,6 +234,23 @@ private:
   int linear_system_workspace_size_;
 
   /**
+   * Preallocated working vectors for computeStepSizes, resized only when
+   * the system size changes instead of on every call
+   */
+  Vector step_r_;
+  Vector step_s_;
+  Vector step_Qdtheta_;
+  Vector step_o_;
+  Vector step_p_;
+  Vector step_s_plus_p_;
+  Vector step_theta1_;
+  Vector step_theta2_;
+  Vector step_v1_;
+  Vector step_v2_;
+  Vector step_r_dual1_;
+  Vector step_r_dual2_;
+
+  /**
    * Algorithm parameters
    */
   bool predict_boundary_;
