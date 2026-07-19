@@ -72,42 +72,6 @@ public:
   /** @name Get methods */
   //@{
   /**
-   * Get combination of vectors' infinity norm
-   * \return "||G*omega||_inf"
-   */
-  double combinationNormInf();
-  /**
-   * Get translated combination of vectors' infinity norm
-   * \return "||G*omega + gamma||_inf"
-   */
-  double combinationTranslatedNormInf();
-  /**
-   * Get translated combination of vectors' infinity norm
-   * \return "||G*omega + gamma||_2^2"
-   */
-  double combinationTranslatedNorm2Squared();
-  /**
-   * Get dual objective quadratic value
-   * \return "(G*omega + gamma)'*W*(G*omega + gamma)"
-   */
-  double dualObjectiveQuadraticValue();
-  /**
-   * Get dual solution
-   * \param[out] omega is dual solution, omega part
-   * \param[out] gamma is dual solution, gamma part
-   */
-  void dualSolution(double omega[], double gamma[]);
-  /**
-   * Get dual solution, omega part
-   * \param[out] omega is dual solution, omega part
-   */
-  void dualSolutionOmega(double omega[]);
-  /**
-   * Get dual solution, omega part, length
-   * \return dual solution, omega part, length
-   */
-  int dualSolutionOmegaLength() { return (int)vector_.size(); };
-  /**
    * Get KKT error
    * \return solver's KKT error.  This is a *signed* residual: the value of
    * the most-violated stationarity/complementarity component found during
@@ -130,39 +94,10 @@ public:
    */
   int numberOfIterations() { return iteration_count_; };
   /**
-   * Get primal solution
-   * \param[out] "d" (equal to "-W*(G*omega + gamma)" if solution is exact)
-   */
-  void primalSolution(double d[]);
-  /**
-   * Get primal solution that is feasible
-   * \param[out] feasible primal solution
-   */
-  void primalSolutionFeasible(double d_feasible[]);
-  /**
-   * Get primal solution infinity norm
-   * \return "||d||_inf"
-   */
-  double primalSolutionNormInf();
-  /**
-   * Get primal solution 2-norm square
-   * \return "||d||_2^2"
-   */
-  double primalSolutionNorm2Squared();
-  /**
-   * Get feasible primal solution infinity norm
-   * \return inf-norm of feasible primal solution
-   */
-  double primalSolutionFeasibleNormInf();
-  /**
    * Get name of strategy
    * \return string with name of strategy
    */
   std::string name() { return "DualActiveSet"; };
-  /**
-   * Vector list length
-   */
-  inline int const vectorListLength() const { return (int)vector_list_.size(); };
   //@}
 
   /** @name Set methods */
@@ -267,7 +202,6 @@ private:
    * Length parameters
    */
   int factor_length_;
-  int gamma_length_;
   int system_solution_length_;
   /**
    * Input parameters
@@ -284,13 +218,6 @@ private:
   int inexact_termination_check_interval_;
   int iteration_limit_minimum_;
   int iteration_limit_maximum_;
-  /**
-   * QP data quantities
-   */
-  double scalar_;                                    /**< "r" */
-  std::shared_ptr<SymmetricMatrix> matrix_;          /**< "W" */
-  std::vector<std::shared_ptr<Vector>> vector_list_; /**< "G" */
-  std::vector<double> vector_;                       /**< "b" */
   /**
    * Algorithm parameters
    */
@@ -327,27 +254,12 @@ private:
    * Solution quantities
    */
   double multiplier_;
-  double primal_solution_projection_scalar_;
-  Vector combination_;
-  Vector combination_translated_;
-  Vector gamma_;
-  Vector omega_;
-  Vector primal_solution_;
-  Vector primal_solution_feasible_;
   Vector primal_solution_feasible_best_;
   Vector primal_solution_simple_;
   //@}
 
   /** @name Private methods */
   //@{
-  /**
-   * Sanity check
-   */
-  bool checkQuantityCompatibility();
-  /**
-   * Dual objective quadratic value, scaled to correspond to feasible "d"
-   */
-  double dualObjectiveQuadraticValueScaled();
   /**
    * Update best solution
    */

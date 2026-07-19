@@ -101,38 +101,38 @@ public:
    * Get combination of vectors' infinity norm
    * \return "||G*omega||_inf"
    */
-  virtual double combinationNormInf() = 0;
+  virtual double combinationNormInf();
   /**
    * Get translated combination of vectors' infinity norm
    * \return "||G*omega + gamma||_inf"
    */
-  virtual double combinationTranslatedNormInf() = 0;
+  virtual double combinationTranslatedNormInf();
   /**
    * Get translated combination of vectors' infinity norm
    * \return "||G*omega + gamma||_2^2"
    */
-  virtual double combinationTranslatedNorm2Squared() = 0;
+  virtual double combinationTranslatedNorm2Squared();
   /**
    * Get dual objective quadratic value
    * \return "(G*omega + gamma)'*W*(G*omega + gamma)"
    */
-  virtual double dualObjectiveQuadraticValue() = 0;
+  virtual double dualObjectiveQuadraticValue();
   /**
    * Get dual solution
    * \param[out] omega is dual solution, omega part
    * \param[out] gamma is dual solution, gamma part
    */
-  virtual void dualSolution(double omega[], double gamma[]) = 0;
+  virtual void dualSolution(double omega[], double gamma[]);
   /**
    * Get dual solution, omega part
    * \param[out] omega is dual solution, omega part
    */
-  virtual void dualSolutionOmega(double omega[]) = 0;
+  virtual void dualSolutionOmega(double omega[]);
   /**
    * Get dual solution, omega part, length
    * \return dual solution, omega part, length
    */
-  virtual int dualSolutionOmegaLength() = 0;
+  inline int dualSolutionOmegaLength() { return (int)vector_.size(); };
   /**
    * Get KKT error
    * \return solver's KKT error
@@ -152,17 +152,27 @@ public:
    * Get primal solution
    * \param[out] "d" (equal to "-W*(G*omega + gamma)" if solution is exact)
    */
-  virtual void primalSolution(double d[]) = 0;
+  virtual void primalSolution(double d[]);
+  /**
+   * Get primal solution that is feasible
+   * \param[out] feasible primal solution
+   */
+  virtual void primalSolutionFeasible(double d_feasible[]);
   /**
    * Get primal solution infinity norm
    * \return "||d||_inf"
    */
-  virtual double primalSolutionNormInf() = 0;
+  virtual double primalSolutionNormInf();
   /**
    * Get primal solution 2-norm square
    * \return "||d||_2^2"
    */
-  virtual double primalSolutionNorm2Squared() = 0;
+  virtual double primalSolutionNorm2Squared();
+  /**
+   * Get feasible primal solution infinity norm
+   * \return inf-norm of feasible primal solution
+   */
+  virtual double primalSolutionFeasibleNormInf();
   /**
    * Get name of strategy
    * \return string with name of strategy
@@ -176,7 +186,7 @@ public:
   /**
    * Vector list length
    */
-  virtual int const vectorListLength() const = 0;
+  inline int const vectorListLength() const { return (int)vector_list_.size(); };
   //@}
 
   /** @name Set method */
@@ -245,6 +255,45 @@ public:
   virtual void solveQPHot(const Options* options,
                           const Reporter* reporter,
                           Quantities* quantities) = 0;
+  //@}
+
+protected:
+  /** @name Protected members
+   * (Shared QP data/solution quantities common to all QPSolver implementations.)
+   */
+  //@{
+  /**
+   * QP data quantities
+   */
+  double scalar_;                                    /**< "r" */
+  std::shared_ptr<SymmetricMatrix> matrix_;          /**< "W"/"H", matrix (or its inverse) defining the quadratic term */
+  std::vector<std::shared_ptr<Vector>> vector_list_; /**< "G" */
+  std::vector<double> vector_;                       /**< "b" */
+  int gamma_length_;
+  /**
+   * Solution quantities
+   */
+  double primal_solution_projection_scalar_;
+  Vector combination_;
+  Vector combination_translated_;
+  Vector gamma_;
+  Vector omega_;
+  Vector primal_solution_;
+  Vector primal_solution_feasible_;
+  //@}
+
+  /** @name Protected methods
+   * (Internal helpers shared by all QPSolver implementations.)
+   */
+  //@{
+  /**
+   * Sanity check
+   */
+  virtual bool checkQuantityCompatibility();
+  /**
+   * Dual objective quadratic value, scaled to correspond to feasible "d"
+   */
+  virtual double dualObjectiveQuadraticValueScaled();
   //@}
 
 private:
