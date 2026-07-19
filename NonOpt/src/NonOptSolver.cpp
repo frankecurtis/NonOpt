@@ -170,6 +170,15 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
   // (Re)set options
   setOptions();
 
+  // Termination is driven by throwing one of the NONOPT_*_EXCEPTION types
+  // (caught below, each mapped to a status via setStatus), rather than an
+  // explicit status/break out of the loop. This is deliberate: termination
+  // conditions are detected not just in the loop body below but arbitrarily
+  // deep inside strategy calls (direction computation, line search, point
+  // set update, etc.), and exceptions unwind straight to the single
+  // dispatch point here instead of requiring every intermediate call in
+  // those strategies to check and propagate a status/break signal back up
+  // manually.
   // try to run algorithm, terminate on any exception
   try {
 
@@ -198,6 +207,16 @@ void NonOptSolver::optimize(const std::shared_ptr<Problem> problem)
       if (quantities_.iterationCounter() >= quantities_.iterationLimit()) {
         THROW_EXCEPTION(NONOPT_ITERATION_LIMIT_EXCEPTION, "Iteration limit has been reached.");
       }
+      // NOTE: clock() intentionally measures process CPU time (matching the
+      // "CPU seconds" reporting and the cpu_time_limit option name), not wall
+      // time. Known caveats: on some platforms clock_t is a 32-bit tick count
+      // that wraps after ~72 minutes of CPU time, and a threaded BLAS/LAPACK
+      // backend inflates this beyond single-thread wall time (all threads'
+      // CPU time is summed). Switching to std::chrono::steady_clock would
+      // fix both, but would change these semantics to wall-clock time and
+      // affect the meaning of every reported timing field and the
+      // cpu_time_limit option itself -- a deliberate design choice to make
+      // separately, not a drop-in fix.
       if ((clock() - quantities_.startTime()) / (double)CLOCKS_PER_SEC >= quantities_.cpuTimeLimit()) {
         THROW_EXCEPTION(NONOPT_CPU_TIME_LIMIT_EXCEPTION, "CPU time limit has been reached.");
       }
