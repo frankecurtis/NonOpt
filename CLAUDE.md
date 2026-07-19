@@ -184,17 +184,18 @@ NonOpt/tests/CMakeLists.txt         # per-test CTest registration
 Then: `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j && ctest --test-dir build --output-on-failure`.
 CI (and the CMake build) will fail on Linux until task 1 is done — expected.
 
-## 10. Lower-risk polish (LOW) — DONE except one deliberately-deferred item
+## 10. Lower-risk polish (LOW) — DONE
 - [x] Replace `pow(x, 2.0)` with `x*x` (~30 sites across `src/`, incl. `computeStepSizes`
   and the `Vector` 2-arg constructor) — faster and more accurate.
 - [x] `NonOptQPSolverInteriorPoint::solveLinearSystem`: don't allocate `ipiv_local`
   and copy; factor into the caller's `ipiv`. Cache the LAPACK workspace instead
   of re-querying (`lwork=-1`) + `new` on every solve.
-- [ ] `computeStepSizes`: preallocate the ~12 temporary `Vector`s as members.
-  **Deliberately deferred** — not done in this pass. Pure performance
-  micro-optimization (no correctness issue), and this function already had
-  two rounds of careful changes (task 5's guards); didn't want to add a third
-  without a fresh pair of eyes re-verifying the whole function again.
+- [x] `computeStepSizes`: preallocate the ~12 temporary `Vector`s as members
+  (`step_*_`), resized only when the system dimension changes. Two of them
+  (`o`, `p`) relied on index 0 staying zero via construction since their fill
+  loops only touch indices 1..total_length; made that explicit now that
+  they're persistent, reused buffers. Verified byte-for-byte identical
+  `testQPSolver` output before/after.
 - [x] Remove the leftover `"ARGH! Replacing Cholesky diagonal..."` message in
   `choleskyFromScratch`; use a neutral warning string.
 - [x] `addIntegerOption("QPIPM_iteration_limit", 2e+02, ...)`: pass `200`, not a
