@@ -22,13 +22,20 @@ namespace NonOpt
 // Constructor
 QPSolverInteriorPoint::QPSolverInteriorPoint()
   : inexact_solution_tolerance_(0.0),
-    scalar_(0.0) {}
+    scalar_(0.0),
+    linear_system_workspace_(nullptr),
+    linear_system_lwork_(0),
+    linear_system_workspace_size_(-1) {}
 
 // Destructor
 QPSolverInteriorPoint::~QPSolverInteriorPoint()
 {
 
   // Delete arrays
+  if (linear_system_workspace_ != nullptr) {
+    delete[] linear_system_workspace_;
+    linear_system_workspace_ = nullptr;
+  } // end if
 
 } // end destructor
 
@@ -1153,32 +1160,28 @@ void QPSolverInteriorPoint::solveLinearSystem(int size,
   int n = size;
   int nrhs = 1;
   int info;
-  int* ipiv_local = new int[size];
-    
-  // Query for optimal workspace
-  double work_query;
-  int lwork = -1;
-  dsysv_(&upper_lower, &n, &nrhs, matrix, &n, ipiv_local, solution, &n, &work_query, &lwork, &info);
-    
-  // Allocate optimal workspace
-  lwork = static_cast<int>(work_query);
-  double* work = new double[lwork];
+
+  // (Re-)query and allocate optimal workspace only when the system size
+  // changes, instead of on every solve
+  if (n != linear_system_workspace_size_) {
+    if (linear_system_workspace_ != nullptr) {
+      delete[] linear_system_workspace_;
+      linear_system_workspace_ = nullptr;
+    } // end if
+    double work_query;
+    int lwork_query = -1;
+    dsysv_(&upper_lower, &n, &nrhs, matrix, &n, ipiv, solution, &n, &work_query, &lwork_query, &info);
+    linear_system_lwork_ = static_cast<int>(work_query);
+    linear_system_workspace_ = new double[linear_system_lwork_];
+    linear_system_workspace_size_ = n;
+  } // end if
 
   // Copy right_hand_side to solution
   int increment1 = 1;
   dcopy_(&n, right_hand_side, &increment1, solution, &increment1);
 
-  // Solve system
-  dsysv_(&upper_lower, &n, &nrhs, matrix, &n, ipiv_local, solution, &n, work, &lwork, &info);
-
-  // Copy ipiv_local to ipiv
-  for (int i = 0; i < n; i++) {
-    ipiv[i] = ipiv_local[i];
-  }
-
-  // Delete arrays
-  delete[] ipiv_local;
-  delete[] work;
+  // Solve system, factoring directly into the caller's ipiv
+  dsysv_(&upper_lower, &n, &nrhs, matrix, &n, ipiv, solution, &n, linear_system_workspace_, &linear_system_lwork_, &info);
 
 } // end solveLinearSystem
 

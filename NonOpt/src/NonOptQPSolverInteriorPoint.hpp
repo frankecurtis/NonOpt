@@ -303,6 +303,14 @@ private:
   double mu_;
 
   /**
+   * Cached LAPACK workspace for solveLinearSystem, re-queried/reallocated
+   * only when the system size changes instead of on every solve
+   */
+  double* linear_system_workspace_;
+  int linear_system_lwork_;
+  int linear_system_workspace_size_;
+
+  /**
    * Algorithm parameters
    */
   bool predict_boundary_;
