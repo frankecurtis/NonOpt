@@ -12,8 +12,8 @@
 //                 x_i = -1.0 for all i = 1..n
 // Notes       : THIS PROBLEM IS NONCONVEX
 
-#ifndef __TEST29_20_HPP__
-#define __TEST29_20_HPP__
+#ifndef TEST29_20_HPP_
+#define TEST29_20_HPP_
 
 #include "NonOptProblem.hpp"
 

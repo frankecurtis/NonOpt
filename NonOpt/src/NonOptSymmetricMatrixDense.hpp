@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTSYMMETRICMATRIXDENSE_HPP__
-#define __NONOPTSYMMETRICMATRIXDENSE_HPP__
+#ifndef NONOPTSYMMETRICMATRIXDENSE_HPP_
+#define NONOPTSYMMETRICMATRIXDENSE_HPP_
 
 #include "NonOptSymmetricMatrix.hpp"
 
@@ -244,4 +244,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTSYMMETRICMATRIXDENSE_HPP__ */
+#endif /* NONOPTSYMMETRICMATRIXDENSE_HPP_ */

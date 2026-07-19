@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __TESTPROBLEM_HPP__
-#define __TESTPROBLEM_HPP__
+#ifndef TESTPROBLEM_HPP_
+#define TESTPROBLEM_HPP_
 
 #include <iostream>
 
@@ -129,4 +129,4 @@ int testProblemImplementation(int option)
 
 } // end testProblemImplementation
 
-#endif /* __TESTPROBLEM_HPP__ */
+#endif /* TESTPROBLEM_HPP_ */

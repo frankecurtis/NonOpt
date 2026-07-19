@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTBLASLAPACK_HPP__
-#define __NONOPTBLASLAPACK_HPP__
+#ifndef NONOPTBLASLAPACK_HPP_
+#define NONOPTBLASLAPACK_HPP_
 
 extern "C"
 {
@@ -32,4 +32,4 @@ extern "C"
 
 } // end extern "C"
 
-#endif /* __NONOPTBLASLAPACK_HPP__ */
+#endif /* NONOPTBLASLAPACK_HPP_ */

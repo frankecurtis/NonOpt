@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTDECLARATIONS_HPP__
-#define __NONOPTDECLARATIONS_HPP__
+#ifndef NONOPTDECLARATIONS_HPP_
+#define NONOPTDECLARATIONS_HPP_
 
 #include "NonOptException.hpp"
 
@@ -94,4 +94,4 @@ DECLARE_EXCEPTION(TE_EVALUATION_FAILURE_EXCEPTION);
 
 } // namespace NonOpt
 
-#endif /* __NONOPTDECLARATIONS_HPP__ */
+#endif /* NONOPTDECLARATIONS_HPP_ */

@@ -377,7 +377,7 @@ double QPSolverDualActiveSet::dualObjectiveQuadraticValueScaled()
   double dual_objective_quadratic_value_scaled = -ddot_(&length, primal_solution_.values(), &increment, combination_translated_.values(), &increment);
 
   // Scale so value corresponds to feasible dual step
-  dual_objective_quadratic_value_scaled *= pow(primal_solution_projection_scalar_, 2.0);
+  dual_objective_quadratic_value_scaled *= primal_solution_projection_scalar_ * primal_solution_projection_scalar_;
 
   // Set maximum
   if (std::isnan(dual_objective_quadratic_value_scaled) || dual_objective_quadratic_value_scaled > NONOPT_DOUBLE_INFINITY) {
@@ -780,7 +780,7 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Quantities* quanti
   }
 
   // Set inexact termination ratio value
-  double inexact_termination_ratio = 1.0 - (pow(quantities->inexactTerminationFactor(), 2.0) + 2 * quantities->inexactTerminationFactor()) / (objective_ratio - 1.0);
+  double inexact_termination_ratio = 1.0 - (quantities->inexactTerminationFactor() * quantities->inexactTerminationFactor() + 2 * quantities->inexactTerminationFactor()) / (objective_ratio - 1.0);
 
   // Initialize return value
   bool condition_bool = false;
@@ -793,7 +793,7 @@ bool QPSolverDualActiveSet::inexactTerminationCondition(const Quantities* quanti
   }
   // Check first "nonzero d" condition
   else if (vector_list_[0]->innerProduct(primal_solution_feasible_) <= -inexact_termination_descent_tolerance_ * dualObjectiveQuadraticValue()) {
-    if ((pow(quantities->inexactTerminationFactor(), 2.0) + 2 * quantities->inexactTerminationFactor()) * (primal_objective_reference_ - primal_objective_feasible_best_) >=
+    if ((quantities->inexactTerminationFactor() * quantities->inexactTerminationFactor() + 2 * quantities->inexactTerminationFactor()) * (primal_objective_reference_ - primal_objective_feasible_best_) >=
         primal_objective_feasible_best_ - dual_objective) {
       primal_solution_.copy(primal_solution_feasible_best_);
       condition_bool = true;
@@ -862,7 +862,7 @@ void QPSolverDualActiveSet::solveQP(const Options* options,
     factor_[0] = sqrt(1.0 + matrix_->innerProductOfInverse(*vector_list_[index]));
 
     // Set dual multiplier b_i-g_i^T*W*g_i
-    multiplier_ = 1.0 + vector_[index] - pow(factor_[0], 2);
+    multiplier_ = 1.0 + vector_[index] - factor_[0] * factor_[0];
 
     // Set system solution
     system_solution_[0] = 1.0;
@@ -1894,7 +1894,7 @@ void QPSolverDualActiveSet::choleskyFromScratch(const Reporter* reporter)
   // diagonal d directly (matches choleskyAugment's convention above).
   for (int i = 0; i < size; i++) {
     if (matrix[i * size + i] < cholesky_tolerance_) {
-      reporter->printf(R_QP, R_PER_INNER_ITERATION, "ARGH! Replacing Cholesky diagonal of %+23.16e with %+23.16e.\n", matrix[i * size + i], cholesky_tolerance_);
+      reporter->printf(R_QP, R_PER_INNER_ITERATION, "Warning: replacing Cholesky diagonal of %+23.16e with %+23.16e.\n", matrix[i * size + i], cholesky_tolerance_);
       matrix[i * size + i] = cholesky_tolerance_;
     } // end if
   }   // end for

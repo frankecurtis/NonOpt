@@ -284,7 +284,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
           // Evaluate linearization and downshifting values
           double linearization_value = (*quantities->pointSet())[point_count]->objective() + (*quantities->pointSet())[point_count]->gradient()->innerProduct(*quantities->currentIterate()->vector()) - (*quantities->pointSet())[point_count]->gradient()->innerProduct(*((*quantities->pointSet())[point_count])->vector());
-          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * pow(difference->norm2(), 2.0);
+          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * difference->norm2() * difference->norm2();
 
           // Add linear term value based on cutting plane
           QP_vector.push_back(fmin(linearization_value, downshifting_value));
@@ -464,7 +464,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
             // Evaluate linearization and downshifting values
             double linearization_value = quantities->trialIterate()->objective() + quantities->trialIterate()->gradient()->innerProduct(*quantities->currentIterate()->vector()) - quantities->trialIterate()->gradient()->innerProduct(*quantities->trialIterate()->vector());
-            double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * pow(difference->norm2(), 2.0);
+            double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * difference->norm2() * difference->norm2();
 
             // Add linear term value based on cutting plane
             QP_vector_new.push_back(fmin(linearization_value, downshifting_value));
@@ -532,7 +532,7 @@ void DirectionComputationCuttingPlane::computeDirection(const Options* options,
 
             // Evaluate linearization and downshifting values
             double linearization_value = quantities->trialIterate()->objective() + quantities->trialIterate()->gradient()->innerProduct(*quantities->currentIterate()->vector()) - quantities->trialIterate()->gradient()->innerProduct(*quantities->trialIterate()->vector());
-            double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * pow(difference->norm2(), 2.0);
+            double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * difference->norm2() * difference->norm2();
 
             // Add linear term value based on cutting plane
             QP_vector_new.push_back(fmin(linearization_value, downshifting_value));

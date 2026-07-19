@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __TESTREPORTER_HPP__
-#define __TESTREPORTER_HPP__
+#ifndef TESTREPORTER_HPP_
+#define TESTREPORTER_HPP_
 
 #include <fstream>
 #include <iostream>
@@ -173,4 +173,4 @@ int testReporterImplementation(int option)
 
 } // end testReporterImplementation
 
-#endif /* __TESTREPORTER_HPP__ */
+#endif /* TESTREPORTER_HPP_ */

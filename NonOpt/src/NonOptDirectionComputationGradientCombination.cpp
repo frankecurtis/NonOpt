@@ -290,7 +290,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
           QP_gradient_list.push_back((*quantities->pointSet())[point_count]->gradient());
 
           // Evaluate downshifting value
-          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * pow(difference->norm2(), 2.0);
+          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * difference->norm2() * difference->norm2();
 
           // Add linear term value
           QP_vector.push_back(downshifting_value);
@@ -466,7 +466,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
           std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *quantities->trialIterate()->vector());
 
           // Evaluate downshifting value
-          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * pow(difference->norm2(), 2.0);
+          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * difference->norm2() * difference->norm2();
 
           // Add linear term value
           QP_vector_new.push_back(downshifting_value);
@@ -528,7 +528,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
           std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *quantities->trialIterate()->vector());
 
           // Evaluate downshifting value
-          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * pow(difference->norm2(), 2.0);
+          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * difference->norm2() * difference->norm2();
 
           // Add linear term value
           QP_vector_new.push_back(downshifting_value);
@@ -581,7 +581,7 @@ void DirectionComputationGradientCombination::computeDirection(const Options* op
           std::shared_ptr<Vector> difference = quantities->currentIterate()->vector()->makeNewLinearCombination(1.0, -1.0, *random_point->vector());
 
           // Evaluate downshifting value
-          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * pow(difference->norm2(), 2.0);
+          double downshifting_value = quantities->currentIterate()->objective() - downshift_constant_ * difference->norm2() * difference->norm2();
 
           // Add linear term value (simply current objective value)
           QP_vector_new.push_back(downshifting_value);

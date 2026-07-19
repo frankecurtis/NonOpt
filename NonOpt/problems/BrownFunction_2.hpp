@@ -13,8 +13,8 @@
 // Notes       : THIS PROBLEM IS NONCONVEX
 //               Optimal value: 0.0
 
-#ifndef __BROWNFUNCTION_2_HPP__
-#define __BROWNFUNCTION_2_HPP__
+#ifndef BROWNFUNCTION_2_HPP_
+#define BROWNFUNCTION_2_HPP_
 
 #include "NonOptProblem.hpp"
 
@@ -135,4 +135,4 @@ private:
 
 }; // end BrownFunction_2
 
-#endif /* __BROWNFUNCTION_2_HPP__ */
+#endif /* BROWNFUNCTION_2_HPP_ */

@@ -12,8 +12,8 @@
 // Notes       : THIS PROBLEM IS CONVEX
 //               Optimal value: 0.0
 
-#ifndef __MXHILB_HPP__
-#define __MXHILB_HPP__
+#ifndef MXHILB_HPP_
+#define MXHILB_HPP_
 
 #include "NonOptProblem.hpp"
 
@@ -135,4 +135,4 @@ private:
 
 }; // end MxHilb
 
-#endif /* __MXHILB_HPP__ */
+#endif /* MXHILB_HPP_ */

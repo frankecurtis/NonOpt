@@ -12,8 +12,8 @@
 // Notes       : THIS PROBLEM IS NONCONVEX
 //               Optimal value: varies (for n=50, approx. -35.0)
 
-#ifndef __CHAINEDMIFFLIN_2_HPP__
-#define __CHAINEDMIFFLIN_2_HPP__
+#ifndef CHAINEDMIFFLIN_2_HPP_
+#define CHAINEDMIFFLIN_2_HPP_
 
 #include "NonOptProblem.hpp"
 
@@ -134,4 +134,4 @@ private:
 
 }; // end ChainedMifflin_2
 
-#endif /* __CHAINEDMIFFLIN_2_HPP__ */
+#endif /* CHAINEDMIFFLIN_2_HPP_ */

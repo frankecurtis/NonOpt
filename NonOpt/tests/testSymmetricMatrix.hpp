@@ -4,8 +4,8 @@
 //
 // Authors : Frank E. Curtis
 
-#ifndef __TESTSYMMETRICMATRIX_HPP__
-#define __TESTSYMMETRICMATRIX_HPP__
+#ifndef TESTSYMMETRICMATRIX_HPP_
+#define TESTSYMMETRICMATRIX_HPP_
 
 #include <iostream>
 
@@ -1269,4 +1269,4 @@ int testSymmetricMatrixImplementation(int option)
 
 } // end testSymmetricMatrixImplementation
 
-#endif /* __TESTSYMMETRICMATRIX_HPP__ */
+#endif /* TESTSYMMETRICMATRIX_HPP_ */

@@ -171,7 +171,7 @@ void ApproximateHessianUpdateBFGS::updateApproximateHessian(const Options* optio
 
     // Check for initial scaling
     if (!initial_update_performed_ && quantities->approximateHessianInitialScaling()) {
-      strategies->symmetricMatrix()->setAsDiagonal(quantities->numberOfVariables(), iterate_displacement.innerProduct(gradient_displacement) / pow(gradient_displacement.norm2(), 2.0));
+      strategies->symmetricMatrix()->setAsDiagonal(quantities->numberOfVariables(), iterate_displacement.innerProduct(gradient_displacement) / gradient_displacement.norm2() * gradient_displacement.norm2());
       initial_update_performed_ = true;
     } // end if
 
@@ -217,9 +217,9 @@ void ApproximateHessianUpdateBFGS::evaluateSelfCorrectingScalar(Vector& s,
 {
 
   // Compute products
-  double u = pow(s.norm2(), 2.0);
+  double u = s.norm2() * s.norm2();
   double v = s.innerProduct(y);
-  double w = pow(y.norm2(), 2.0);
+  double w = y.norm2() * y.norm2();
 
   // Set scalar for lower bound
   double scalar1 = 0.0;
@@ -237,7 +237,7 @@ void ApproximateHessianUpdateBFGS::evaluateSelfCorrectingScalar(Vector& s,
       }
     }
     if (scalar1 > 0.0 &&
-        pow(scalar1, 2.0) * u + scalar1 * (1.0 - scalar1) * v + pow(1.0 - scalar1, 2.0) * w > correction_threshold_1_ * (scalar1 * u + (1 - scalar1) * v)) {
+        scalar1 * scalar1 * u + scalar1 * (1.0 - scalar1) * v + (1.0 - scalar1) * (1.0 - scalar1) * w > correction_threshold_1_ * (scalar1 * u + (1 - scalar1) * v)) {
       scalar1 = 1.0;
     }
   } // end else
@@ -252,8 +252,8 @@ void ApproximateHessianUpdateBFGS::evaluateSelfCorrectingScalar(Vector& s,
     double temporary2 = 2.0 * (v - w) - correction_threshold_2_ * (u - v);
     double temporary3 = w - correction_threshold_2_ * v;
     if (temporary3 > 0.0 &&
-        -temporary2 + sqrt(pow(temporary2, 2.0) - 4.0 * temporary1 * temporary3) > 0.0) {
-      scalar2 = 2.0 * temporary3 / (-temporary2 + sqrt(pow(temporary2, 2.0) - 4.0 * temporary1 * temporary3));
+        -temporary2 + sqrt(temporary2 * temporary2 - 4.0 * temporary1 * temporary3) > 0.0) {
+      scalar2 = 2.0 * temporary3 / (-temporary2 + sqrt(temporary2 * temporary2 - 4.0 * temporary1 * temporary3));
     }
     else {
       scalar2 = 1.0;

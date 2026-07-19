@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTTERMINATION_HPP__
-#define __NONOPTTERMINATION_HPP__
+#ifndef NONOPTTERMINATION_HPP_
+#define NONOPTTERMINATION_HPP_
 
 #include "NonOptOptions.hpp"
 #include "NonOptQuantities.hpp"
@@ -195,4 +195,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTTERMINATION_HPP__ */
+#endif /* NONOPTTERMINATION_HPP_ */

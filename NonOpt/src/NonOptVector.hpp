@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTVECTOR_HPP__
-#define __NONOPTVECTOR_HPP__
+#ifndef NONOPTVECTOR_HPP_
+#define NONOPTVECTOR_HPP_
 
 #include <memory>
 #include <string>
@@ -242,4 +242,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __VECTOR_HPP__ */
+#endif /* NONOPTVECTOR_HPP_ */

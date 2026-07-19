@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __TESTNONOPT_HPP__
-#define __TESTNONOPT_HPP__
+#ifndef TESTNONOPT_HPP_
+#define TESTNONOPT_HPP_
 
 #include "NonOptProblem.hpp"
 #include "NonOptReporter.hpp"
@@ -40,4 +40,4 @@ int testNonOptImplementation()
 
 } // end testNonOptImplementation
 
-#endif /* __TESTNONOPT_HPP__ */
+#endif /* TESTNONOPT_HPP_ */

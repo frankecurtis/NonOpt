@@ -13,8 +13,8 @@
 // Notes       : THIS PROBLEM IS CONVEX
 //               Optimal value: 2*(n-1)
 
-#ifndef __CHAINEDCB3_2_HPP__
-#define __CHAINEDCB3_2_HPP__
+#ifndef CHAINEDCB3_2_HPP_
+#define CHAINEDCB3_2_HPP_
 
 #include "NonOptProblem.hpp"
 
@@ -135,4 +135,4 @@ private:
 
 }; // end ChainedCB3_2
 
-#endif /* __CHAINEDCB3_2_HPP__ */
+#endif /* CHAINEDCB3_2_HPP_ */

@@ -12,8 +12,8 @@
 // Notes       : THIS PROBLEM IS CONVEX
 //               Optimal value: 0.0
 
-#ifndef __TEST29_5_HPP__
-#define __TEST29_5_HPP__
+#ifndef TEST29_5_HPP_
+#define TEST29_5_HPP_
 
 #include "NonOptProblem.hpp"
 

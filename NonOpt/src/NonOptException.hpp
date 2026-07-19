@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTEXCEPTION_HPP__
-#define __NONOPTEXCEPTION_HPP__
+#ifndef NONOPTEXCEPTION_HPP_
+#define NONOPTEXCEPTION_HPP_
 
 #include <string>
 
@@ -147,4 +147,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTEXCEPTION_HPP__ */
+#endif /* NONOPTEXCEPTION_HPP_ */

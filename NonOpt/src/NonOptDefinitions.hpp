@@ -4,12 +4,12 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTDEFINITIONS_HPP__
-#define __NONOPTDEFINITIONS_HPP__
+#ifndef NONOPTDEFINITIONS_HPP_
+#define NONOPTDEFINITIONS_HPP_
 
 #include <limits>
 
 #define NONOPT_DOUBLE_INFINITY 1e+50
 #define NONOPT_INT_INFINITY std::numeric_limits<int>::max()
 
-#endif /* __NONOPTDEFINITIONS_HPP__ */
+#endif /* NONOPTDEFINITIONS_HPP_ */

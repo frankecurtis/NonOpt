@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTENUMERATIONS_HPP__
-#define __NONOPTENUMERATIONS_HPP__
+#ifndef NONOPTENUMERATIONS_HPP_
+#define NONOPTENUMERATIONS_HPP_
 
 namespace NonOpt
 {
@@ -146,4 +146,4 @@ enum TE_Status
 
 } // namespace NonOpt
 
-#endif /* __NONOPTENUMERATIONS_HPP__ */
+#endif /* NONOPTENUMERATIONS_HPP_ */

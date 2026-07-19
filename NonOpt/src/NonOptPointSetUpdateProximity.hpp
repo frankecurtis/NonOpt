@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTPOINTSETUPDATEPROXIMITY_HPP__
-#define __NONOPTPOINTSETUPDATEPROXIMITY_HPP__
+#ifndef NONOPTPOINTSETUPDATEPROXIMITY_HPP_
+#define NONOPTPOINTSETUPDATEPROXIMITY_HPP_
 
 #include "NonOptPointSetUpdate.hpp"
 
@@ -121,4 +121,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTPOINTSETUPDATEPROXIMITY_HPP__ */
+#endif /* NONOPTPOINTSETUPDATEPROXIMITY_HPP_ */

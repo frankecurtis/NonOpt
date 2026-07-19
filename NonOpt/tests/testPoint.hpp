@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __TESTPOINT_HPP__
-#define __TESTPOINT_HPP__
+#ifndef TESTPOINT_HPP_
+#define TESTPOINT_HPP_
 
 #include <iostream>
 
@@ -255,4 +255,4 @@ int testPointImplementation(int option)
 
 } // end testPointImplementation
 
-#endif /* __TESTPOINT_HPP__ */
+#endif /* TESTPOINT_HPP_ */

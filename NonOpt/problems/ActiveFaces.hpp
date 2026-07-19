@@ -13,8 +13,8 @@
 // Notes       : THIS PROBLEM IS NONCONVEX
 //               Optimal value: 0.0
 
-#ifndef __ACTIVEFACES_HPP__
-#define __ACTIVEFACES_HPP__
+#ifndef ACTIVEFACES_HPP_
+#define ACTIVEFACES_HPP_
 
 #include "NonOptProblem.hpp"
 
@@ -135,4 +135,4 @@ private:
 
 }; // end ActiveFaces
 
-#endif /* __ACTIVEFACES_HPP__ */
+#endif /* ACTIVEFACES_HPP_ */

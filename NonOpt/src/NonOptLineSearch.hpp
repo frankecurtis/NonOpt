@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTLINESEARCH_HPP__
-#define __NONOPTLINESEARCH_HPP__
+#ifndef NONOPTLINESEARCH_HPP_
+#define NONOPTLINESEARCH_HPP_
 
 #include <memory>
 #include <string>
@@ -150,4 +150,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTLINESEARCH_HPP__ */
+#endif /* NONOPTLINESEARCH_HPP_ */

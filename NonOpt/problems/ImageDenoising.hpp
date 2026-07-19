@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __IMAGEDENOISING_HPP__
-#define __IMAGEDENOISING_HPP__
+#ifndef IMAGEDENOISING_HPP_
+#define IMAGEDENOISING_HPP_
 
 #include "NonOptProblem.hpp"
 
@@ -143,4 +143,4 @@ private:
 
 }; // end ImageDenoising
 
-#endif /* __IMAGEDENOISING_HPP__ */
+#endif /* IMAGEDENOISING_HPP_ */

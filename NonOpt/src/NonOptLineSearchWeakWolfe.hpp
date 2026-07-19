@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTLINESEARCHWEAKWOLFE_HPP__
-#define __NONOPTLINESEARCHWEAKWOLFE_HPP__
+#ifndef NONOPTLINESEARCHWEAKWOLFE_HPP_
+#define NONOPTLINESEARCHWEAKWOLFE_HPP_
 
 #include "NonOptLineSearch.hpp"
 
@@ -129,4 +129,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTLINESEARCHWEAKWOLFE_HPP__ */
+#endif /* NONOPTLINESEARCHWEAKWOLFE_HPP_ */

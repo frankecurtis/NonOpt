@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTPOINT_HPP__
-#define __NONOPTPOINT_HPP__
+#ifndef NONOPTPOINT_HPP_
+#define NONOPTPOINT_HPP_
 
 #include <memory>
 #include <string>
@@ -210,4 +210,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTPOINT_HPP__ */
+#endif /* NONOPTPOINT_HPP_ */

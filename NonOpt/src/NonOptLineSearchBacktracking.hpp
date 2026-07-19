@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTLINESEARCHBACKTRACKING_HPP__
-#define __NONOPTLINESEARCHBACKTRACKING_HPP__
+#ifndef NONOPTLINESEARCHBACKTRACKING_HPP_
+#define NONOPTLINESEARCHBACKTRACKING_HPP_
 
 #include "NonOptLineSearch.hpp"
 
@@ -125,4 +125,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTLINESEARCHBACKTRACKING_HPP__ */
+#endif /* NONOPTLINESEARCHBACKTRACKING_HPP_ */

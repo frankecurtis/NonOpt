@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis, Baoyu Zhou, Minhan Li
 
-#ifndef __NONOPTQPSOLVERDUALACTIVESET_HPP__
-#define __NONOPTQPSOLVERDUALACTIVESET_HPP__
+#ifndef NONOPTQPSOLVERDUALACTIVESET_HPP_
+#define NONOPTQPSOLVERDUALACTIVESET_HPP_
 
 #include <deque>
 
@@ -400,4 +400,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTQPSOLVERDUALACTIVESET_HPP__ */
+#endif /* NONOPTQPSOLVERDUALACTIVESET_HPP_ */

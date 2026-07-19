@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTRANDOMNUMBERGENERATOR_HPP__
-#define __NONOPTRANDOMNUMBERGENERATOR_HPP__
+#ifndef NONOPTRANDOMNUMBERGENERATOR_HPP_
+#define NONOPTRANDOMNUMBERGENERATOR_HPP_
 
 #include <random>
 
@@ -77,4 +77,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTRANDOMNUMBERGENERATOR_HPP__ */
+#endif /* NONOPTRANDOMNUMBERGENERATOR_HPP_ */

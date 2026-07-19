@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis, Baoyu Zhou
 
-#ifndef __TESTQPSOLVER_HPP__
-#define __TESTQPSOLVER_HPP__
+#ifndef TESTQPSOLVER_HPP_
+#define TESTQPSOLVER_HPP_
 
 #include <iostream>
 
@@ -414,4 +414,4 @@ int testQPSolverImplementation(int option)
 
 } // end testQPSolverImplementation
 
-#endif /* __TESTQPSOLVER_HPP__ */
+#endif /* TESTQPSOLVER_HPP_ */

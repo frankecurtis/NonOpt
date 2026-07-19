@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTREPORTER_HPP__
-#define __NONOPTREPORTER_HPP__
+#ifndef NONOPTREPORTER_HPP_
+#define NONOPTREPORTER_HPP_
 
 #include <cstdarg>
 #include <memory>
@@ -475,4 +475,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTREPORTER_HPP__ */
+#endif /* NONOPTREPORTER_HPP_ */

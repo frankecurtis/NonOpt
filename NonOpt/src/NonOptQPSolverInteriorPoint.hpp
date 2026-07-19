@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis, Lara Zebiane
 
-#ifndef __NONOPTQPSOLVERINTERIORPOINT_HPP__
-#define __NONOPTQPSOLVERINTERIORPOINT_HPP__
+#ifndef NONOPTQPSOLVERINTERIORPOINT_HPP_
+#define NONOPTQPSOLVERINTERIORPOINT_HPP_
 
 #include <deque>
 
@@ -382,4 +382,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTQPSOLVERINTERIORPOINT_HPP__ */
+#endif /* NONOPTQPSOLVERINTERIORPOINT_HPP_ */

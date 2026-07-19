@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __TESTVECTOR_HPP__
-#define __TESTVECTOR_HPP__
+#ifndef TESTVECTOR_HPP_
+#define TESTVECTOR_HPP_
 
 #include <iostream>
 
@@ -279,4 +279,4 @@ int testVectorImplementation(int option)
 
 } // end testVectorImplementation
 
-#endif /* __TESTVECTOR_HPP__ */
+#endif /* TESTVECTOR_HPP_ */

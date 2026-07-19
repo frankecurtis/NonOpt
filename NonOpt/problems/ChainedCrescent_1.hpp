@@ -13,8 +13,8 @@
 // Notes       : THIS PROBLEM IS NONCONVEX
 //               Optimal value: 0.0
 
-#ifndef __CHAINEDCRESCENT_1_HPP__
-#define __CHAINEDCRESCENT_1_HPP__
+#ifndef CHAINEDCRESCENT_1_HPP_
+#define CHAINEDCRESCENT_1_HPP_
 
 #include "NonOptProblem.hpp"
 
@@ -135,4 +135,4 @@ private:
 
 }; // end ChainedCrescent_1
 
-#endif /* __CHAINEDCRESCENT_1_HPP__ */
+#endif /* CHAINEDCRESCENT_1_HPP_ */

@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTDIRECTIONCOMPUTATION_HPP__
-#define __NONOPTDIRECTIONCOMPUTATION_HPP__
+#ifndef NONOPTDIRECTIONCOMPUTATION_HPP_
+#define NONOPTDIRECTIONCOMPUTATION_HPP_
 
 #include <memory>
 #include <string>
@@ -150,4 +150,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTDIRECTIONCOMPUTATION_HPP__ */
+#endif /* NONOPTDIRECTIONCOMPUTATION_HPP_ */

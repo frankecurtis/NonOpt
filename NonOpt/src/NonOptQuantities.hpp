@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTITERATIONQUANTITIES_HPP__
-#define __NONOPTITERATIONQUANTITIES_HPP__
+#ifndef NONOPTITERATIONQUANTITIES_HPP_
+#define NONOPTITERATIONQUANTITIES_HPP_
 
 #include <ctime>
 #include <memory>
@@ -459,4 +459,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTITERATIONQUANTITIES_HPP__ */
+#endif /* NONOPTITERATIONQUANTITIES_HPP_ */

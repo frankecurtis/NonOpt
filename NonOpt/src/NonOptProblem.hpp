@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTPROBLEM_HPP__
-#define __NONOPTPROBLEM_HPP__
+#ifndef NONOPTPROBLEM_HPP_
+#define NONOPTPROBLEM_HPP_
 
 #include <iostream>
 
@@ -131,4 +131,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTPROBLEM_HPP__ */
+#endif /* NONOPTPROBLEM_HPP_ */

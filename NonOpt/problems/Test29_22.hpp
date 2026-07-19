@@ -12,8 +12,8 @@
 //                 x_i = (i/(n+1.0))*((i/(n+1.0)) - 1.0) for all i = 1..n
 // Notes       : THIS PROBLEM IS NONCONVEX
 
-#ifndef __TEST29_22_HPP__
-#define __TEST29_22_HPP__
+#ifndef TEST29_22_HPP_
+#define TEST29_22_HPP_
 
 #include "NonOptProblem.hpp"
 

@@ -116,11 +116,11 @@ void QPSolverInteriorPoint::addOptions(Options* options)
                             "              termination conditions.\n"
                             "Default     : 5");
   options->addIntegerOption("QPIPM_iteration_limit",
-                            2e+02,
+                            200,
                             0,
                             NONOPT_INT_INFINITY,
                             "Limit on the number of iterations.\n"
-                            "Default     : 2e+02");
+                            "Default     : 200");
 
 } // end addOptions
 
@@ -282,7 +282,7 @@ double QPSolverInteriorPoint::dualObjectiveQuadraticValueScaled()
   double dual_objective_quadratic_value_scaled = -ddot_(&length, primal_solution_.values(), &increment, combination_translated_.values(), &increment);
 
   // Scale so value corresponds to feasible dual step
-  dual_objective_quadratic_value_scaled *= pow(primal_solution_projection_scalar_, 2.0);
+  dual_objective_quadratic_value_scaled *= primal_solution_projection_scalar_ * primal_solution_projection_scalar_;
 
   // Set maximum
   if (std::isnan(dual_objective_quadratic_value_scaled) || dual_objective_quadratic_value_scaled > NONOPT_DOUBLE_INFINITY) {
@@ -587,7 +587,7 @@ bool QPSolverInteriorPoint::inexactTerminationCondition(const Quantities* quanti
   }
 
   // Set inexact termination ratio value
-  double inexact_termination_ratio = 1.0 - (pow(quantities->inexactTerminationFactor(), 2.0) + 2 * quantities->inexactTerminationFactor()) / (objective_ratio - 1.0);
+  double inexact_termination_ratio = 1.0 - (quantities->inexactTerminationFactor() * quantities->inexactTerminationFactor() + 2 * quantities->inexactTerminationFactor()) / (objective_ratio - 1.0);
 
   // Initialize return value
   bool condition_bool = false;
@@ -600,7 +600,7 @@ bool QPSolverInteriorPoint::inexactTerminationCondition(const Quantities* quanti
   }
   // Check first "nonzero d" condition
   else if (vector_list_[0]->innerProduct(primal_solution_feasible_) <= -inexact_termination_descent_tolerance_ * dualObjectiveQuadraticValue()) {
-    if ((pow(quantities->inexactTerminationFactor(), 2.0) + 2 * quantities->inexactTerminationFactor()) * (primal_objective_reference_ - primal_objective_feasible_best_) >=
+    if ((quantities->inexactTerminationFactor() * quantities->inexactTerminationFactor() + 2 * quantities->inexactTerminationFactor()) * (primal_objective_reference_ - primal_objective_feasible_best_) >=
         primal_objective_feasible_best_ - dual_objective) {
       primal_solution_.copy(primal_solution_feasible_best_);
       condition_bool = true;
@@ -1355,8 +1355,8 @@ void QPSolverInteriorPoint::computeStepSizes(const Vector& dtheta,
   double r_prim2 = At_.innerProduct(theta2) - b_;
 
   // Choose best step sizes
-  if (pow(r_prim1, 2.0) + pow(r_dual1.norm2(), 2.0) + theta1.innerProduct(v1)
-    < pow(r_prim2, 2.0) + pow(r_dual2.norm2(), 2.0) + theta2.innerProduct(v2)) {
+  if (r_prim1 * r_prim1 + r_dual1.norm2() * r_dual1.norm2() + theta1.innerProduct(v1)
+    < r_prim2 * r_prim2 + r_dual2.norm2() * r_dual2.norm2() + theta2.innerProduct(v2)) {
     atheta = atheta1;
     au = au1;
     av = av1;

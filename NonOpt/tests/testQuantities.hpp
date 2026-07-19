@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __TESTITERATIONQUANTITIES_HPP__
-#define __TESTITERATIONQUANTITIES_HPP__
+#ifndef TESTITERATIONQUANTITIES_HPP_
+#define TESTITERATIONQUANTITIES_HPP_
 
 #include <iostream>
 
@@ -182,4 +182,4 @@ int testQuantitiesImplementation(int option)
 
 } // end testQuantitiesImplementation
 
-#endif /* __TESTITERATIONQUANTITIES_HPP__ */
+#endif /* TESTITERATIONQUANTITIES_HPP_ */

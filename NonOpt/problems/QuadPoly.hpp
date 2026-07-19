@@ -10,8 +10,8 @@
 // Notes       : THIS PROBLEM IS CONVEX
 //               Optimal value: 0.0
 
-#ifndef __QUADPOLY_HPP__
-#define __QUADPOLY_HPP__
+#ifndef QUADPOLY_HPP_
+#define QUADPOLY_HPP_
 
 #include "NonOptProblem.hpp"
 
@@ -151,4 +151,4 @@ private:
 
 }; // end QuadPoly
 
-#endif /* __QUADPOLY_HPP__ */
+#endif /* QUADPOLY_HPP_ */

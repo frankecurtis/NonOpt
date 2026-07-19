@@ -12,8 +12,8 @@
 // Notes       : THIS PROBLEM IS CONVEX
 //               Optimal value: 0.0
 
-#ifndef __MAXQ_HPP__
-#define __MAXQ_HPP__
+#ifndef MAXQ_HPP_
+#define MAXQ_HPP_
 
 #include "NonOptProblem.hpp"
 
@@ -134,4 +134,4 @@ private:
 
 }; // end MaxQ
 
-#endif /* __MAXQ_HPP__ */
+#endif /* MAXQ_HPP_ */

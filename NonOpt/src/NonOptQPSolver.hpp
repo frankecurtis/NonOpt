@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef __NONOPTQPSOLVER_HPP__
-#define __NONOPTQPSOLVER_HPP__
+#ifndef NONOPTQPSOLVER_HPP_
+#define NONOPTQPSOLVER_HPP_
 
 #include <memory>
 #include <string>
@@ -271,4 +271,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTQPSOLVER_HPP__ */
+#endif /* NONOPTQPSOLVER_HPP_ */

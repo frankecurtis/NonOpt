@@ -18,8 +18,8 @@
 //                 x_i = -1.2 for mod(i,4) == 3
 // Notes       : THIS PROBLEM IS NONCONVEX
 
-#ifndef __TEST29_13_HPP__
-#define __TEST29_13_HPP__
+#ifndef TEST29_13_HPP_
+#define TEST29_13_HPP_
 
 #include "NonOptProblem.hpp"
 

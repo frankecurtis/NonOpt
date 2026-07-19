@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTSOLVER_HPP__
-#define __NONOPTSOLVER_HPP__
+#ifndef NONOPTSOLVER_HPP_
+#define NONOPTSOLVER_HPP_
 
 #include <ctime>
 #include <memory>
@@ -200,4 +200,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTSOLVER_HPP__ */
+#endif /* NONOPTSOLVER_HPP_ */

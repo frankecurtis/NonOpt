@@ -1,6 +1,7 @@
 *.a
 *.aux
 /build/
+/.claude/
 *.bbl
 *.bib
 *.blg

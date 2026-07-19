@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __TESTOPTIONS_HPP__
-#define __TESTOPTIONS_HPP__
+#ifndef TESTOPTIONS_HPP_
+#define TESTOPTIONS_HPP_
 
 #include <iostream>
 
@@ -353,4 +353,4 @@ int testOptionsImplementation(int option)
 
 } // end testOptionsImplementation
 
-#endif /* __TESTOPTIONS_HPP__ */
+#endif /* TESTOPTIONS_HPP_ */

@@ -4,9 +4,9 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTVERSION_HPP__
-#define __NONOPTVERSION_HPP__
+#ifndef NONOPTVERSION_HPP_
+#define NONOPTVERSION_HPP_
 
 #define NONOPT_VERSION "2.1"
 
-#endif /* __NONOPTVERSION_HPP__ */
+#endif /* NONOPTVERSION_HPP_ */

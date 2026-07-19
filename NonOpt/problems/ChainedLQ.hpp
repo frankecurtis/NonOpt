@@ -13,8 +13,8 @@
 // Notes       : THIS PROBLEM IS CONVEX
 //               Optimal value: -(n-1)*sqrt(2)
 
-#ifndef __CHAINEDLQ_HPP__
-#define __CHAINEDLQ_HPP__
+#ifndef CHAINEDLQ_HPP_
+#define CHAINEDLQ_HPP_
 
 #include "NonOptProblem.hpp"
 
@@ -135,4 +135,4 @@ private:
 
 }; // end ChainedLQ
 
-#endif /* __CHAINEDLQ_HPP__ */
+#endif /* CHAINEDLQ_HPP_ */

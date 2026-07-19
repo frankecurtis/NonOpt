@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTDERIVATIVECHECKER_HPP__
-#define __NONOPTDERIVATIVECHECKER_HPP__
+#ifndef NONOPTDERIVATIVECHECKER_HPP_
+#define NONOPTDERIVATIVECHECKER_HPP_
 
 #include "NonOptEnumerations.hpp"
 #include "NonOptOptions.hpp"
@@ -134,4 +134,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTDERIVATIVECHECKER_HPP__ */
+#endif /* NONOPTDERIVATIVECHECKER_HPP_ */

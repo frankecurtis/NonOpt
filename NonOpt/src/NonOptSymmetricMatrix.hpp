@@ -4,8 +4,8 @@
 //
 // Author(s) : Frank E. Curtis
 
-#ifndef __NONOPTSYMMETRICMATRIX_HPP__
-#define __NONOPTSYMMETRICMATRIX_HPP__
+#ifndef NONOPTSYMMETRICMATRIX_HPP_
+#define NONOPTSYMMETRICMATRIX_HPP_
 
 #include <memory>
 #include <string>
@@ -219,4 +219,4 @@ private:
 
 } // namespace NonOpt
 
-#endif /* __NONOPTSYMMETRICMATRIX_HPP__ */
+#endif /* NONOPTSYMMETRICMATRIX_HPP_ */
