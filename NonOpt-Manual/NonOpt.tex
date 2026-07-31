@@ -6,10 +6,15 @@
 \usepackage{amsfonts,amsmath,fullpage,hyperref,url}
 \hypersetup{colorlinks}
 
+%**********
+% Macros
+%**********
+\newcommand{\nonoptversion}{2.2}
+
 %*************
 % Title, etc.
 %*************
-\title{NonOpt Manual}
+\title{NonOpt Manual \\ \large Version \nonoptversion}
 \author{Frank E. Curtis}
 \date{\today}
 
@@ -32,6 +37,8 @@ NonOpt (Nonconvex, Nonsmooth Optimizer) is an open-source C++ software package f
 \end{equation*}
 The objective function $f$ can be nonlinear, nonconvex, and/or nonsmooth.  For further information, see \cite{CurtZebi2025}.
 
+This manual documents NonOpt version \nonoptversion.
+
 %************
 % Subsection
 %************
@@ -45,6 +52,8 @@ NonOpt contains implementations of a collection of algorithms, including gradien
 \subsection{Availability}
 
 NonOpt is written in C++ and is available on GitHub \href{https://github.com/frankecurtis/NonOpt}{here}---see also the NonOpt homepage \href{https://sufficientdescent.github.io/nonopt}{here}---under the MIT open source license. This puts very few restrictions on the use and reuse of the software. This license has been selected since the goal of open-source software is continuous development and improvement.  It is only asked that if you use the software in work that leads to a publication, then you cite the article \cite{CurtZebi2025}, and potentially (a subset of) the articles \cite{CurtLi22,CurtQue13,CurtQue15,CurtRobiZhou20}, when applicable.  Writing effective and computationally efficient software requires a lot of time and effort, so citations are appreciated!
+
+NonOpt can be used from C++ directly, from Python via the \texttt{nonoptpy} module, or from AMPL via a solver executable.  These three interfaces are described in \S\ref{sec.interfaces}.
 
 %*********
 % Section
@@ -63,7 +72,7 @@ NonOpt is available on GitHub \href{https://github.com/frankecurtis/NonOpt}{here
 %************
 % Subsection
 %************
-\subsection{Compiling NonOpt}
+\subsection{Compiling NonOpt}\label{sec.compiling}
 
 A C++ compiler is required to compile the NonOpt library. Building NonOpt also requires:
 
@@ -75,10 +84,10 @@ libraries for these subroutines.  One could also obtain the source code from \hr
 
 After obtaining NonOpt, an environment variable needs to be set:
 \begin{itemize}
-  \item \texttt{\$NONOPTDIR} should point to the NonOpt root directory of the distribution that you obtained. This root directory is the one containing the \texttt{README} file for the distribution.
+  \item \texttt{\$NONOPTDIR} should point to the NonOpt root directory of the distribution that you obtained. This root directory is the one containing the \texttt{README.md} file for the distribution.
 \end{itemize}
 
-After these environment variables have been set, the NonOpt library can be built by issuing the commands below.  Here, and throughout this document, ``\texttt{>}'' indicates your terminal prompt.
+After this environment variable has been set, the NonOpt library can be built by issuing the commands below.  Here, and throughout this document, ``\texttt{>}'' indicates your terminal prompt.
 
 \begin{verbatim}
 > cd $NONOPTDIR/NonOpt
@@ -87,6 +96,28 @@ After these environment variables have been set, the NonOpt library can be built
 
 This should make the libraries in each of the \texttt{src}, \texttt{problems}, and \texttt{tests} subdirectories.  It should also
 make two executables, \texttt{runExperiment} and \texttt{solveProblem}, in the \texttt{exes} subdirectory, as well as a few executables in the \texttt{mpc} subdirectory, which are provided to reproduce the numerical results for the experiments in \cite{CurtZebi2025}.
+
+The Makefiles build with optimizations enabled (\texttt{-O3 -DNDEBUG}) by default.  An unoptimized build with debugging symbols can be obtained in any of these directories by issuing \texttt{make debug} instead of \texttt{make}.
+
+The Python and AMPL interfaces are built separately; see \S\ref{sec.python} and \S\ref{sec.ampl}, respectively.
+
+%************
+% Subsection
+%************
+\subsection{Compiling NonOpt with CMake}\label{sec.cmake}
+
+As an alternative to the Makefiles described in \S\ref{sec.compiling}, NonOpt can be built with CMake (version 3.15 or later).  The two build systems coexist; neither interferes with the other.  From the NonOpt root directory, issue:
+
+\begin{verbatim}
+> cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+> cmake --build build -j
+\end{verbatim}
+
+CMake locates BLAS and LAPACK automatically.  To request a specific implementation, configure with, e.g., \texttt{-DBLA\_VENDOR=OpenBLAS}.  Libraries are placed in \texttt{build/lib} and executables in \texttt{build/bin}.  The build defaults to \texttt{Release} if no build type is specified.  NonOpt can also be installed, and then located by other CMake projects via \texttt{find\_package(NonOpt)}, by issuing:
+
+\begin{verbatim}
+> cmake --install build --prefix /your/install/prefix
+\end{verbatim}
 
 %************
 % Subsection
@@ -107,19 +138,49 @@ Standard output will reveal the results of the unit tests. If all unit tests are
 > ./testSymmetricMatrix
 \end{verbatim}
 
-The last line of the detailed output indicates whether or not the test was successful.
+The last line of the detailed output indicates whether or not the test was successful.  Each test executable, including \texttt{testAll}, also returns a process exit code of zero on success and nonzero on failure, so the tests can be run from a script.
 
-%*********
-% Section
-%*********
-\section{Interfacing to NonOpt}
+If NonOpt was built with CMake as in \S\ref{sec.cmake}, then the same tests are registered with CTest and can all be run by issuing:
 
-NonOpt comes with a set of test problems in the \texttt{\$NONOPTDIR/NonOpt/problems} directory.  The easiest way to interface your problem to NonOpt is to follow one of these as an example.
+\begin{verbatim}
+> ctest --test-dir build --output-on-failure
+\end{verbatim}
 
 %************
 % Subsection
 %************
-\subsection{Implementing a Problem}
+\subsection{Quick Start}
+
+For the impatient, the following builds NonOpt and solves one of the provided test problems:
+
+\begin{verbatim}
+> export NONOPTDIR=/path/to/NonOpt
+> cd $NONOPTDIR/NonOpt
+> make
+> cd $NONOPTDIR/NonOpt/exes
+> ./solveProblem MaxQ
+\end{verbatim}
+
+The output that this produces is described in \S\ref{sec.output}.  To solve your own problem instead, see \S\ref{sec.interfaces}.
+
+%*********
+% Section
+%*********
+\section{Interfaces}\label{sec.interfaces}
+
+NonOpt can be used from C++ (\S\ref{sec.cpp}), from Python (\S\ref{sec.python}), or from AMPL (\S\ref{sec.ampl}).  In all cases, the algorithmic behavior is controlled by the same set of options, which are described in \S\ref{sec.options}.
+
+%************
+% Subsection
+%************
+\subsection{C++ Interface}\label{sec.cpp}
+
+NonOpt comes with a set of test problems in the \texttt{\$NONOPTDIR/NonOpt/problems} directory.  The easiest way to interface your problem to NonOpt is to follow one of these as an example.
+
+%***************
+% Subsubsection
+%***************
+\subsubsection{Implementing a Problem}
 
 For example, consider \texttt{MaxQ} implemented in \texttt{MaxQ.hpp} and \texttt{MaxQ.cpp} in \texttt{\$NONOPTDIR/NonOpt/problems}.  This problem is scalable, with the input \texttt{n} to the constructor dictating the dimension of the problem to be solved.  If your problem is not scalable, then the value of \texttt{number\_of\_variables} can be hard-coded. The remainder of an implementation of a problem can be understood in this example.  Overall, the functions that need to be implemented are those dictated in the header file \texttt{\$NONOPTDIR/NonOpt/src/NonOptProblem.hpp}.
 
@@ -127,10 +188,10 @@ For example, consider \texttt{MaxQ} implemented in \texttt{MaxQ.hpp} and \texttt
 derivative implementations.  NonOpt comes equipped with a derivative checker that you can use to test your
 implementation of your \texttt{evaluateGradient} function with respect to your \texttt{evaluateObjective} function.  See~\S\ref{sec.options} for instructions on turning on the derivative checker when your problem is being solved.
 
-%************
-% Subsection
-%************
-\subsection{Solving a Problem}
+%***************
+% Subsubsection
+%***************
+\subsubsection{Solving a Problem}
 
 Suppose your problem is implemented in \texttt{YourProblem.hpp} and \texttt{YourProblem.cpp}.  If these files are located in \texttt{\$NONOPTDIR/NonOpt/problems}, then running \texttt{make} in this directory will add \texttt{YourProblem} to the \texttt{libNonOptProblems.a} library that is built in this directory.  Your problem can then be solved by adding it to the list of problems in \texttt{solveProblem.cpp} in \texttt{\$NONOPTDIR/NonOpt/exes}, then issuing:
 
@@ -144,21 +205,221 @@ You might also implement your own executable to set up and solve your problem.
 %************
 % Subsection
 %************
+\subsection{Python Interface}\label{sec.python}
+
+NonOpt provides a Python interface, built with \href{https://github.com/pybind/pybind11}{pybind11}, that exposes the solver as a module named \texttt{nonoptpy}.  A problem is defined in Python by subclassing \texttt{nonoptpy.Problem}, so no C++ needs to be written.  Objective and gradient values are exchanged as NumPy arrays.
+
+%***************
+% Subsubsection
+%***************
+\subsubsection{Building the Python Module}
+
+In addition to \texttt{\$NONOPTDIR}, building the Python module requires that pybind11 and NumPy be installed, and that an environment variable point to the pybind11 headers:
+
+\begin{itemize}
+  \item \texttt{\$PYBINDDIR} should point to the pybind11 include directory, as reported by
+        \texttt{python3 -m pybind11 --includes}.
+\end{itemize}
+
+The module can then be built by issuing:
+
+\begin{verbatim}
+> pip install pybind11 numpy
+> cd $NONOPTDIR/NonOpt/python
+> make
+\end{verbatim}
+
+This produces a shared object named \texttt{nonoptpy} followed by the extension suffix for your Python installation, e.g., \texttt{nonoptpy.cpython-311-darwin.so}.  The module is importable from any directory on your Python path; the simplest approach is to run your scripts from \texttt{\$NONOPTDIR/NonOpt/python}.
+
+%***************
+% Subsubsection
+%***************
+\subsubsection{Implementing a Problem in Python}
+
+A problem is implemented by subclassing \texttt{nonoptpy.Problem} and defining the methods in Table~\ref{tab.python}.  Note that the Python signatures are not identical to their C++ counterparts: values that are returned through output arguments in C++ are, in several cases, returned directly in Python or written in place into a NumPy array.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|p{8.2cm}|}
+\hline
+\textbf{Method} & \textbf{Description} \\
+\hline
+\texttt{numberOfVariables(self)} & Returns the number of variables $n$ directly, as an integer. \\
+\hline
+\texttt{initialPoint(self, n, x)} & Writes the initial point in place into the NumPy array \texttt{x}.  Returns \texttt{True} on success. \\
+\hline
+\texttt{evaluateObjective(self, x)} & Returns $f(x)$ directly, as a float.  Note that this method takes only \texttt{x}; it does \emph{not} take \texttt{n}. \\
+\hline
+\texttt{evaluateGradient(self, n, x, g)} & Writes the gradient in place into the NumPy array \texttt{g}.  Returns \texttt{True} on success. \\
+\hline
+\texttt{evaluateObjectiveAndGradient(self, n, x, f, g)} & Writes the objective value into \texttt{f[0]}, where \texttt{f} is a \emph{list}, and the gradient in place into \texttt{g}.  Returns \texttt{True} on success.  Used only when the option \texttt{evaluate\_function\_with\_gradient} is \texttt{true}. \\
+\hline
+\texttt{finalizeSolution(self, n, x, f, g)} & Called once with the final point, objective value, and gradient.  Returns \texttt{True} on success.  This method is required: it must be defined even if it does nothing but \texttt{return True}. \\
+\hline
+\end{tabular}
+\caption{Methods of a \texttt{nonoptpy.Problem} subclass.}\label{tab.python}
+\end{table}
+
+Arrays that are written in place (\texttt{x} in \texttt{initialPoint}, \texttt{g} in the gradient methods) are views onto NonOpt's own memory.  They should be filled element-wise or with in-place NumPy operations such as \texttt{g.fill(0)}; rebinding the name, as in \texttt{g = np.zeros(n)}, will \emph{not} communicate any values back to the solver.
+
+%***************
+% Subsubsection
+%***************
+\subsubsection{Solving a Problem in Python}
+
+The following complete example implements and solves the \texttt{MaxQ} problem.  It is available, along with a Rosenbrock example, in \texttt{\$NONOPTDIR/NonOpt/python}.
+
+\begin{verbatim}
+import nonoptpy as nonopt
+import numpy as np
+
+class MaxQ(nonopt.Problem):
+
+  def numberOfVariables(self):
+    return 1000
+
+  def initialPoint(self, n, x):
+    for i in range(n//2):
+      x[i] = i + 1
+    for i in range(n//2,n):
+      x[i] = -i - 1
+    return True
+
+  def evaluateObjective(self, x):
+    return np.max(np.abs(x))**2
+
+  def evaluateGradient(self, n, x, g):
+    index = np.argmax(np.abs(x))
+    g.fill(0)
+    g[index] = 2 * x[index]
+    return True
+
+  def evaluateObjectiveAndGradient(self, n, x, f, g):
+    f[0] = np.max(np.abs(x))**2
+    index = np.argmax(np.abs(x))
+    g.fill(0)
+    g[index] = 2 * x[index]
+    return True
+
+  def finalizeSolution(self, n, x, f, g):
+    return True
+
+# Declare solver
+solver = nonopt.Solver()
+
+# Modify options from file
+solver.options().modifyOptionsFromFile("nonoptpy.opt")
+
+# Add file report
+solver.reporter().addFileReport("report", "nonoptpy.out",
+                                nonopt.ReportType.R_NL,
+                                nonopt.ReportLevel.R_PER_ITERATION)
+
+# Optimize
+solver.optimize(MaxQ())
+
+# Print a few statistics
+print(f"Final objective ..... : {solver.objective()}")
+print(f"Iterations .......... : {solver.iterations()}")
+print(f"CPU seconds ......... : {solver.time()}")
+print(f"Solver status ....... : {solver.status()}")
+
+# Retrieve the solution
+x = np.zeros(solver.numberOfVariables())
+solver.solution(x)
+\end{verbatim}
+
+The \texttt{nonoptpy.Solver} object exposes the following methods.  The statistics correspond to the quantities reported at the end of a run; see \S\ref{sec.output}.
+
+\begin{itemize}
+  \item \texttt{optimize(problem)}: solves the given \texttt{Problem} instance.
+  \item \texttt{solution(x)}: writes the final iterate into the preallocated NumPy array \texttt{x}, which must have length \texttt{numberOfVariables()}.
+  \item \texttt{options()}: returns the \texttt{Options} object; see \S\ref{sec.options}.
+  \item \texttt{reporter()}: returns the \texttt{Reporter} object, whose \texttt{addFileReport(name, file, type, level)} method directs output to a file.  The arguments \texttt{type} and \texttt{level} are values of the enumerations \texttt{nonoptpy.ReportType} (\texttt{R\_NL} or \texttt{R\_QP}) and \texttt{nonoptpy.ReportLevel} (\texttt{R\_NONE}, \texttt{R\_BASIC}, \texttt{R\_PER\_ITERATION}, or \texttt{R\_PER\_INNER\_ITERATION}).
+  \item \texttt{objective()}, \texttt{stationarityRadius()}, \texttt{numberOfVariables()}: solution quantities.
+  \item \texttt{iterations()}, \texttt{totalInnerIterations()}, \texttt{totalQPIterations()}, \texttt{functionEvaluations()}, \texttt{gradientEvaluations()}: iteration and evaluation counts.
+  \item \texttt{time()}, \texttt{timeEvaluations()}, \texttt{timeNonOpt()}: CPU seconds in total, in function and gradient evaluations, and in NonOpt itself.
+  \item \texttt{status()}: a value of the enumeration \texttt{nonoptpy.NonOpt\_Status}, e.g., \texttt{NONOPT\_SUCCESS}.  These correspond to the EXIT messages listed in \S\ref{sec.output}.
+\end{itemize}
+
+%************
+% Subsection
+%************
+\subsection{AMPL Interface}\label{sec.ampl}
+
+NonOpt can be used as a solver for problems modeled in \href{https://ampl.com}{AMPL} through the AMPL Solver Library (ASL).  In addition to \texttt{\$NONOPTDIR}, two further environment variables are required:
+
+\begin{itemize}
+  \item \texttt{\$AMPLDIR} should point to the directory containing the compiled ASL, i.e., the directory containing \texttt{amplsolver.a} and the ASL headers.
+  \item \texttt{\$LAPACKDIR} should point to the directory containing your BLAS and LAPACK libraries.
+\end{itemize}
+
+The interface is then built by issuing:
+
+\begin{verbatim}
+> cd $NONOPTDIR/NonOpt/ampl
+> make
+\end{verbatim}
+
+This produces the library \texttt{libAMPLProblem.a} and the executable \texttt{solveAMPLProblem}.  Given a problem written in AMPL and exported to a \texttt{.nl} file, say \texttt{YourProblem.nl}, the problem is solved by issuing:
+
+\begin{verbatim}
+> cd $NONOPTDIR/NonOpt/ampl
+> ./solveAMPLProblem YourProblem
+\end{verbatim}
+
+Note that the \texttt{.nl} suffix is appended automatically and should be omitted from the argument.
+
+%************
+% Subsection
+%************
 \subsection{Changing Options}\label{sec.options}
 
-NonOpt is designed to be flexible, offering various options, each of which can be changed from its default value, if desired.  For a list of options, along with their types and default values, please see the \texttt{\$NONOPTDIR/NonOpt-Manual/options.txt} file.  Some safeguards have been added so that you cannot set an option to an illegal value, although it is possible that you could set an option to a value that will cause the optimizer to behave in strange ways.  If you provide a legal value (and the \texttt{Reporter} is issuing output to a report at a sufficient level), then a note will be printed (to a report) that the value for an option has been changed.  If you attempt to set an option to an illegal value, then similarly a note will be printed saying that a change was attempted, but the attempt was not successful (due to the provided value being illegal).  Options should be set with caution, or at least with sufficient knowledge of the underlying algorithms.
+NonOpt is designed to be flexible, offering various options, each of which can be changed from its default value, if desired.  For a complete list of options, along with their types, bounds, and default values, please see the \texttt{\$NONOPTDIR/NonOpt-Manual/options.txt} file.  A selection of the most commonly used options is given in Table~\ref{tab.options}.  Some safeguards have been added so that you cannot set an option to an illegal value, although it is possible that you could set an option to a value that will cause the optimizer to behave in strange ways.  If you provide a legal value (and the \texttt{Reporter} is issuing output to a report at a sufficient level), then a note will be printed (to a report) that the value for an option has been changed.  If you attempt to set an option to an illegal value, then similarly a note will be printed saying that a change was attempted, but the attempt was not successful (due to the provided value being illegal).  Options should be set with caution, or at least with sufficient knowledge of the underlying algorithms.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Option} & \textbf{Type} & \textbf{Default} \\
+\hline
+\texttt{print\_level}                & integer & \texttt{1} \\
+\texttt{print\_level\_file}          & integer & \texttt{0} \\
+\texttt{print\_file\_name}           & string  & \texttt{nonopt.out} \\
+\hline
+\texttt{cpu\_time\_limit}            & double  & \texttt{1e+04} \\
+\texttt{iteration\_limit}            & integer & \texttt{1e+06} \\
+\texttt{function\_evaluation\_limit} & integer & Infinity \\
+\texttt{gradient\_evaluation\_limit} & integer & Infinity \\
+\texttt{stationarity\_tolerance}     & double  & \texttt{1e-04} \\
+\hline
+\texttt{direction\_computation}      & string  & \texttt{CuttingPlane} \\
+\texttt{approximate\_hessian\_update}& string  & \texttt{BFGS} \\
+\texttt{line\_search}                & string  & \texttt{WeakWolfe} \\
+\texttt{point\_set\_update}          & string  & \texttt{Proximity} \\
+\texttt{qp\_solver\_small\_scale}    & string  & \texttt{DualActiveSet} \\
+\texttt{qp\_solver\_large\_scale}    & string  & \texttt{InteriorPoint} \\
+\texttt{symmetric\_matrix}           & string  & \texttt{Dense} \\
+\texttt{termination}                 & string  & \texttt{Basic} \\
+\hline
+\texttt{derivative\_checker}         & string  & \texttt{FiniteDifference} \\
+\texttt{DEFD\_check\_derivatives}    & bool    & \texttt{false} \\
+\hline
+\end{tabular}
+\caption{Commonly used options.  See \texttt{options.txt} for the complete list.}\label{tab.options}
+\end{table}
 
 The value for an option can be changed in one of two ways:
 
 \begin{itemize}
   \item In an executable.  After a \texttt{NonOptSolver} object has been declared (via \texttt{NonOptSolver nonopt;}), one can modify the value of an option via a statement such as:
   \begin{verbatim}
-  nonopt.options()->modifyDoubleValue(nonopt.reporter(), "cpu_time_limit", 600.0);
+  nonopt.options()->modifyDoubleValue("cpu_time_limit", 600.0);
   \end{verbatim}
-  The functions \texttt{modifyBoolValue}, \texttt{modifyDoubleValue}, \texttt{modifyIntegerValue}, and \texttt{modifyStringValue} all have the same form, with the last two arguments indicating the name of the option and the value to which you would like to set it, respectively.
+  The functions \texttt{modifyBoolValue}, \texttt{modifyDoubleValue}, \texttt{modifyIntegerValue}, and \texttt{modifyStringValue} all have the same form, with the two arguments indicating the name of the option and the value to which you would like to set it, respectively.
   \item In an options file. After a \texttt{NonOptSolver} object has been declared, one can modify the value of \emph{multiple} options via a statement such as:
   \begin{verbatim}
-  nonopt.options()->modifyOptionsFromFile(nonopt.reporter(), "nonopt.opt");
+  nonopt.options()->modifyOptionsFromFile("nonopt.opt");
   \end{verbatim}
   Here, \texttt{nonopt.opt} represents the name of a file containing a list of options and the values to which you would like to set them.  For example, the contents of the file might be:
   \begin{verbatim}
@@ -168,9 +429,15 @@ The value for an option can be changed in one of two ways:
   Each line should contain only the name of an option followed by the desired value.
 \end{itemize}
 
+The same methods are available from Python on the object returned by \texttt{solver.options()}, with identical names and arguments, e.g.:
+\begin{verbatim}
+solver.options().modifyDoubleValue("cpu_time_limit", 600.0)
+solver.options().modifyOptionsFromFile("nonoptpy.opt")
+\end{verbatim}
+
 As previously mentioned, a useful option is to turn on the derivative checker, which is off by default. The default derivative checker option is \texttt{FiniteDifference}. Assuming this is the derivative checker that has been chosen, the derivative checker can be turned on by the statement:
 \begin{verbatim}
-nonopt.options()->modifyBoolValue(nonopt.reporter(), "DEFD_check_derivatives", true);
+nonopt.options()->modifyBoolValue("DEFD_check_derivatives", true);
 \end{verbatim}
 or within an options file by including the line:
 \begin{verbatim}
@@ -181,7 +448,7 @@ The derivative checker can be computationally expensive, so it is not recommende
 %*********
 % Section
 %*********
-\section{NonOpt Reporter Output}
+\section{NonOpt Reporter Output}\label{sec.output}
 
 The option \texttt{print\_level} determines the level of output to be printed to standard output.  Setting this level to \texttt{0} means that no information will be printed.  Setting this level to \texttt{1} means that a basic amount of information will be printed, such as in the example below.  The information at this level is self-explanatory, perhaps except for the EXIT messages, which are summarized after the example.
 
@@ -191,13 +458,13 @@ The option \texttt{print\_level} determines the level of output to be printed to
   | NonOpt is released as open source code under the MIT License |
   |     Please visit: https://github.com/frankecurtis/NonOpt     |
   +--------------------------------------------------------------+
-  
-  This is NonOpt version 2.0
-  
+
+  This is NonOpt version 2.2
+
   Number of variables.................. : 1000
   Initial objective.................... : 6.908755e+00
   Initial objective (unscaled)......... : 6.908755e+00
-  
+
   Approximate Hessian update strategy.. : BFGS
   Derivative checker strategy.......... : FiniteDifference
   Direction computation strategy....... : CuttingPlane
@@ -207,18 +474,18 @@ The option \texttt{print\_level} determines the level of output to be printed to
   QP solver (large scale) strategy..... : InteriorPoint
   Symmetric matrix strategy............ : Dense
   Termination strategy................. : Basic
-  
+
   EXIT: Stationary point found.
-  
+
   Objective............................ : 3.008077e-09
   Objective (unscaled)................. : 3.008077e-09
-  
+
   Number of iterations................. : 22
   Number of inner iterations........... : 25
   Number of QP iterations.............. : 29
   Number of function evaluations....... : 414
   Number of gradient evaluations....... : 347
-  
+
   CPU seconds.......................... : 0.108261
   CPU seconds in evaluations........... : 0.006546
   CPU seconds in direction computations : 0.065522
@@ -246,6 +513,8 @@ There are various EXIT messages that may be printed, which indicate the reason t
   \item \texttt{Problem data read failure!  Check definition of problem}: An error occurred in the code provided by the user.
   \item \texttt{Termination check failure}: A failure occurred, due to a numerical tolerance being violated, in the termination checker.  By default, the code would not terminate based on such a tolerance, so this would only occur if a user turns this feature on as a termination condition.
 \end{itemize}
+
+When NonOpt is used from Python, the same information is available programmatically through \texttt{solver.status()}, which returns a value of the \texttt{nonoptpy.NonOpt\_Status} enumeration corresponding to the EXIT message; see \S\ref{sec.python}.
 
 Setting \texttt{print\_level} to \texttt{2} means that per-iteration output will be printed in addition to the basic output shown above.  A header line is printed periodically to indicate the meaning of the values in each column of the per-iteration output.  Further information about these quantities is provided in the list below.  The per-iteration output when the \texttt{direction\_computation} option is set to either \texttt{CuttingPlane} or \texttt{GradientCombination} is exactly the same, whereas when this option is set to \texttt{Gradient} the column \texttt{L?} is omitted since the small-scale QP subproblem solver is always employed for this strategy.
 
