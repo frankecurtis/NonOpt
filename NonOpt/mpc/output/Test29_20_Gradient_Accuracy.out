@@ -5,7 +5,7 @@ Set value for option 'direction_computation' as Gradient.
 |     Please visit: https://github.com/frankecurtis/NonOpt     |
 +--------------------------------------------------------------+
 
-This is NonOpt version 2.0
+This is NonOpt version 2.1
 
 Number of variables.................. : 1000
 Initial objective.................... : 1.500000e+00
@@ -363,7 +363,7 @@ Number of QP iterations.............. : 285
 Number of function evaluations....... : 1742
 Number of gradient evaluations....... : 524
 
-CPU seconds.......................... : 0.845733
-CPU seconds in evaluations........... : 0.009532
-CPU seconds in direction computations : 0.458719
-CPU seconds in line searches......... : 0.018946
+CPU seconds.......................... : 0.340567
+CPU seconds in evaluations........... : 0.002427
+CPU seconds in direction computations : 0.150317
+CPU seconds in line searches......... : 0.009593

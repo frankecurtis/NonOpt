@@ -5,7 +5,7 @@ Set value for option 'direction_computation' as Gradient.
 |     Please visit: https://github.com/frankecurtis/NonOpt     |
 +--------------------------------------------------------------+
 
-This is NonOpt version 2.0
+This is NonOpt version 2.1
 
 Number of variables.................. : 1000
 Initial objective.................... : 9.000000e+00
@@ -223,7 +223,7 @@ Termination strategy................. : Basic
     172 +1.0000e+00 +4.20e-03 +4.20e+08     50      1      1      1  0 +0.00e+00 +2.13e+01 +2.95e+02 +1.40e+01 +1.40e+01 +1.82e-12 +0.00e+00  0
     173 +1.0000e+00 +4.20e-04 +4.20e+07     50      1      1      1  0 +0.00e+00 +3.15e+01 +2.52e+02 +1.40e+01 +1.40e+01 +2.27e-12 +0.00e+00  0
     174 +1.0000e+00 +4.20e-04 +4.20e+07     50      1      1      1  0 +0.00e+00 +2.13e+01 +2.95e+02 +1.40e+01 +1.40e+01 +2.84e-12 +0.00e+00  0
-    175 +1.0000e+00 +4.20e-04 +4.20e+07     50      1      1      1  0 +2.84e-14 +3.15e+01 +2.52e+02 +1.40e+01 +1.40e+01 +3.55e-12 +0.00e+00  0
+    175 +1.0000e+00 +4.20e-04 +4.20e+07     50      1      1      1  0 +0.00e+00 +3.15e+01 +2.52e+02 +1.40e+01 +1.40e+01 +3.55e-12 +0.00e+00  0
     176 +1.0000e+00 +4.20e-04 +4.20e+07     50      1      1      1  0 +0.00e+00 +2.13e+01 +2.95e+02 +1.40e+01 +1.40e+01 +2.22e-12 +0.00e+00  0
     177 +1.0000e+00 +4.20e-04 +4.20e+07     50      1      1      1  0 +0.00e+00 +3.15e+01 +2.52e+02 +1.40e+01 +1.40e+01 +2.78e-12 +0.00e+00  0
     178 +1.0000e+00 +4.20e-04 +4.20e+07     50      1      1      1  0 +0.00e+00 +2.13e+01 +2.95e+02 +1.40e+01 +1.40e+01 +3.47e-12 +0.00e+00  0
@@ -281,7 +281,7 @@ Number of QP iterations.............. : 215
 Number of function evaluations....... : 1077
 Number of gradient evaluations....... : 216
 
-CPU seconds.......................... : 0.591731
-CPU seconds in evaluations........... : 0.009584
-CPU seconds in direction computations : 0.345868
-CPU seconds in line searches......... : 0.015548
+CPU seconds.......................... : 0.233481
+CPU seconds in evaluations........... : 0.001329
+CPU seconds in direction computations : 0.113953
+CPU seconds in line searches......... : 0.005821

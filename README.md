@@ -1,7 +1,7 @@
 NonOpt
 ======
 
-This is a version 2.1 of NonOpt.  Please see below for basic information about the software.
+This is a version 2.2 of NonOpt.  Please see below for basic information about the software.
 
 For more information, please see the user manual:
 
@@ -34,7 +34,7 @@ Citing NonOpt
 
 NonOpt is provided free of charge so that it might be useful to others.  Please send e-mail to [Frank E. Curtis](mailto:frank.e.curtis@gmail.com) with success stories or other feedback.  If you use NonOpt in your research, then please at least cite the following paper:
 
-- Frank E. Curtis and Lara Zebiane. "NonOpt: Nonconvex, Nonsmooth Optimizer." [https://arxiv.org/abs/2503.22826](https://arxiv.org/abs/2503.22826), 2025.
+- Frank E. Curtis and Lara Zebiane. "NonOpt: Nonconvex, Nonsmooth Optimizer." Mathematical Programming Computation, [https://doi.org/10.1007/s12532-026-00322-5](https://doi.org/10.1007/s12532-026-00322-5), 2026.
 
 Depending on the algorithms and/or features of the NonOpt software that you use, please also consider citing all or some of the following papers as well:
 

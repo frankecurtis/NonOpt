@@ -35,8 +35,7 @@ NonOpt (Nonconvex, Nonsmooth Optimizer) is an open-source C++ software package f
 \begin{equation*}
   \min_{x \in \mathbb{R}^n}\ f(x).
 \end{equation*}
-The objective function $f$ can be nonlinear, nonconvex, and/or nonsmooth.  For further information, see \cite{CurtZebi2025}.
-
+The objective function $f$ can be nonlinear, nonconvex, and/or nonsmooth.  For further information, see \cite{CurtZebi2026}. .3.
 This manual documents NonOpt version \nonoptversion.
 
 %************
@@ -44,16 +43,14 @@ This manual documents NonOpt version \nonoptversion.
 %************
 \subsection{Algorithm Overview}
 
-NonOpt contains implementations of a collection of algorithms, including gradient-sampling and proximal-bundle methods, each equipped with quasi-Newton techniques for improving practical performance.  You can choose between different strategies for the search direction computation, approximate Hessian approximation update, line search, point-set update, symmetric matrix storage, and termination.  For more information on the implemented algorithms, see \cite{CurtZebi2025}, which in turn references the algorithms developed in \cite{CurtLi22,CurtQue13,CurtQue15,CurtRobiZhou20}.
+NonOpt contains implementations of a collection of algorithms, including gradient-sampling and proximal-bundle methods, each equipped with quasi-Newton techniques for improving practical performance.  You can choose between different strategies for the search direction computation, approximate Hessian approximation update, line search, point-set update, symmetric matrix storage, and termination.  For more information on the implemented algorithms, see \cite{CurtZebi2026}, which in turn references the algorithms developed in \cite{CurtLi22,CurtQue13,CurtQue15,CurtRobiZhou20}.
 
 %************
 % Subsection
 %************
 \subsection{Availability}
 
-NonOpt is written in C++ and is available on GitHub \href{https://github.com/frankecurtis/NonOpt}{here}---see also the NonOpt homepage \href{https://sufficientdescent.github.io/nonopt}{here}---under the MIT open source license. This puts very few restrictions on the use and reuse of the software. This license has been selected since the goal of open-source software is continuous development and improvement.  It is only asked that if you use the software in work that leads to a publication, then you cite the article \cite{CurtZebi2025}, and potentially (a subset of) the articles \cite{CurtLi22,CurtQue13,CurtQue15,CurtRobiZhou20}, when applicable.  Writing effective and computationally efficient software requires a lot of time and effort, so citations are appreciated!
-
-NonOpt can be used from C++ directly, from Python via the \texttt{nonoptpy} module, or from AMPL via a solver executable.  These three interfaces are described in \S\ref{sec.interfaces}.
+NonOpt is written in C++ and is available on GitHub \href{https://github.com/frankecurtis/NonOpt}{here}---see also the NonOpt homepage \href{https://frankecurtis.github.io/NonOpt/}{here}---under the MIT open source license. This puts very few restrictions on the use and reuse of the software. This license has been selected since the goal of open-source software is continuous development and improvement.  It is only asked that if you use the software in work that leads to a publication, then you cite the article \cite{CurtZebi2026}, and potentially (a subset of) the articles \cite{CurtLi22,CurtQue13,CurtQue15,CurtRobiZhou20}, when applicable.  Writing effective and computationally efficient software requires a lot of time and effort, so citations are appreciated!
 
 %*********
 % Section
@@ -67,7 +64,7 @@ NonOpt has been written with the intention of having it be Unix-based platform a
 %************
 \subsection{Obtaining NonOpt}
 
-NonOpt is available on GitHub \href{https://github.com/frankecurtis/NonOpt}{here}; see also the NonOpt homepage \href{https://sufficientdescent.github.io/nonopt}{here}.
+NonOpt is available on GitHub \href{https://github.com/frankecurtis/NonOpt}{here}; see also the NonOpt homepage \href{https://frankecurtis.github.io/NonOpt/}{here}.
 
 %************
 % Subsection
@@ -95,7 +92,7 @@ After this environment variable has been set, the NonOpt library can be built by
 \end{verbatim}
 
 This should make the libraries in each of the \texttt{src}, \texttt{problems}, and \texttt{tests} subdirectories.  It should also
-make two executables, \texttt{runExperiment} and \texttt{solveProblem}, in the \texttt{exes} subdirectory, as well as a few executables in the \texttt{mpc} subdirectory, which are provided to reproduce the numerical results for the experiments in \cite{CurtZebi2025}.
+make two executables, \texttt{runExperiment} and \texttt{solveProblem}, in the \texttt{exes} subdirectory, as well as a few executables in the \texttt{mpc} subdirectory, which are provided to reproduce the numerical results for the experiments in \cite{CurtZebi2026}.
 
 The Makefiles build with optimizations enabled (\texttt{-O3 -DNDEBUG}) by default.  An unoptimized build with debugging symbols can be obtained in any of these directories by issuing \texttt{make debug} instead of \texttt{make}.
 
@@ -106,7 +103,7 @@ The Python and AMPL interfaces are built separately; see \S\ref{sec.python} and 
 %************
 \subsection{Compiling NonOpt with CMake}\label{sec.cmake}
 
-As an alternative to the Makefiles described in \S\ref{sec.compiling}, NonOpt can be built with CMake (version 3.15 or later).  The two build systems coexist; neither interferes with the other.  From the NonOpt root directory, issue:
+As an alternative to the Makefiles described in \S\ref{sec.compiling}, NonOpt can be built with CMake (version 3.15 or later).  The two build systems coexist; neither interferes with the other.  From the NonOpt root directory, run:
 
 \begin{verbatim}
 > cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -236,7 +233,7 @@ This produces a shared object named \texttt{nonoptpy} followed by the extension 
 %***************
 \subsubsection{Implementing a Problem in Python}
 
-A problem is implemented by subclassing \texttt{nonoptpy.Problem} and defining the methods in Table~\ref{tab.python}.  Note that the Python signatures are not identical to their C++ counterparts: values that are returned through output arguments in C++ are, in several cases, returned directly in Python or written in place into a NumPy array.
+A problem is implemented by subclassing \texttt{nonoptpy.Problem} and defining the methods in Table~\ref{tab.python}.  The Python signatures are not identical to their C++ counterparts: values that are returned through output arguments in C++ are, in several cases, returned directly in Python or written in place into a NumPy array.
 
 \begin{table}[ht]
 \centering
@@ -244,23 +241,23 @@ A problem is implemented by subclassing \texttt{nonoptpy.Problem} and defining t
 \hline
 \textbf{Method} & \textbf{Description} \\
 \hline
-\texttt{numberOfVariables(self)} & Returns the number of variables $n$ directly, as an integer. \\
+\texttt{numberOfVariables(self)} & Returns the number of variables $n$ as an integer. \\
 \hline
-\texttt{initialPoint(self, n, x)} & Writes the initial point in place into the NumPy array \texttt{x}.  Returns \texttt{True} on success. \\
+\texttt{initialPoint(self,n,x)} & Writes the initial point in place into NumPy array \texttt{x}.  Returns \texttt{True} on success. \\
 \hline
-\texttt{evaluateObjective(self, x)} & Returns $f(x)$ directly, as a float.  Note that this method takes only \texttt{x}; it does \emph{not} take \texttt{n}. \\
+\texttt{evaluateObjective(self,x)} & Returns $f(x)$ directly, as a float.  Note that this method takes only \texttt{x}; it does \emph{not} take \texttt{n}. \\
 \hline
-\texttt{evaluateGradient(self, n, x, g)} & Writes the gradient in place into the NumPy array \texttt{g}.  Returns \texttt{True} on success. \\
+\texttt{evaluateGradient(self,n,x,g)} & Writes the gradient in place into the NumPy array \texttt{g}.  Returns \texttt{True} on success. \\
 \hline
-\texttt{evaluateObjectiveAndGradient(self, n, x, f, g)} & Writes the objective value into \texttt{f[0]}, where \texttt{f} is a \emph{list}, and the gradient in place into \texttt{g}.  Returns \texttt{True} on success.  Used only when the option \texttt{evaluate\_function\_with\_gradient} is \texttt{true}. \\
+\texttt{evaluateObjectiveAndGradient(self,n,x,f,g)} & Writes the objective value into \texttt{f[0]}, where \texttt{f} is a \emph{list}, and the gradient in place into \texttt{g}.  Returns \texttt{True} on success.  Used only when the option \texttt{evaluate\_function\_with\_gradient} is \texttt{true}. \\
 \hline
-\texttt{finalizeSolution(self, n, x, f, g)} & Called once with the final point, objective value, and gradient.  Returns \texttt{True} on success.  This method is required: it must be defined even if it does nothing but \texttt{return True}. \\
+\texttt{finalizeSolution(self,n,x,f,g)} & Called once with the final point, objective value, and gradient.  Returns \texttt{True} on success.  This method is required: it must be defined even if it does nothing but \texttt{return True}. \\
 \hline
 \end{tabular}
 \caption{Methods of a \texttt{nonoptpy.Problem} subclass.}\label{tab.python}
 \end{table}
 
-Arrays that are written in place (\texttt{x} in \texttt{initialPoint}, \texttt{g} in the gradient methods) are views onto NonOpt's own memory.  They should be filled element-wise or with in-place NumPy operations such as \texttt{g.fill(0)}; rebinding the name, as in \texttt{g = np.zeros(n)}, will \emph{not} communicate any values back to the solver.
+Arrays that are written in place (i.e., \texttt{x} in \texttt{initialPoint} and \texttt{g} in the gradient methods) are views onto NonOpt's own memory.  They should be filled element-wise or with in-place NumPy operations such as \texttt{g.fill(0)}. Rebinding the name, as in \texttt{g = np.zeros(n)}, will \emph{not} communicate values back to the solver.
 
 %***************
 % Subsubsection
@@ -335,9 +332,9 @@ The \texttt{nonoptpy.Solver} object exposes the following methods.  The statisti
   \item \texttt{optimize(problem)}: solves the given \texttt{Problem} instance.
   \item \texttt{solution(x)}: writes the final iterate into the preallocated NumPy array \texttt{x}, which must have length \texttt{numberOfVariables()}.
   \item \texttt{options()}: returns the \texttt{Options} object; see \S\ref{sec.options}.
-  \item \texttt{reporter()}: returns the \texttt{Reporter} object, whose \texttt{addFileReport(name, file, type, level)} method directs output to a file.  The arguments \texttt{type} and \texttt{level} are values of the enumerations \texttt{nonoptpy.ReportType} (\texttt{R\_NL} or \texttt{R\_QP}) and \texttt{nonoptpy.ReportLevel} (\texttt{R\_NONE}, \texttt{R\_BASIC}, \texttt{R\_PER\_ITERATION}, or \texttt{R\_PER\_INNER\_ITERATION}).
+  \item \texttt{reporter()}: returns the \texttt{Reporter} object, whose \texttt{addFileReport(name,file,type,level)} method directs output to a file.  The arguments \texttt{type} and \texttt{level} are values of the enumerations \texttt{nonoptpy.ReportType} (\texttt{R\_NL} or \texttt{R\_QP}) and \texttt{nonoptpy.ReportLevel} (\texttt{R\_NONE}, \texttt{R\_BASIC}, \texttt{R\_PER\_ITERATION}, or \texttt{R\_PER\_INNER\_ITERATION}).
   \item \texttt{objective()}, \texttt{stationarityRadius()}, \texttt{numberOfVariables()}: solution quantities.
-  \item \texttt{iterations()}, \texttt{totalInnerIterations()}, \texttt{totalQPIterations()}, \texttt{functionEvaluations()}, \texttt{gradientEvaluations()}: iteration and evaluation counts.
+  \item \texttt{iterations()}, \texttt{totalInnerIterations()}, \texttt{totalQPIterations()}, \texttt{functionEvaluations()}, \\ \texttt{gradientEvaluations()}: iteration and evaluation counts.
   \item \texttt{time()}, \texttt{timeEvaluations()}, \texttt{timeNonOpt()}: CPU seconds in total, in function and gradient evaluations, and in NonOpt itself.
   \item \texttt{status()}: a value of the enumeration \texttt{nonoptpy.NonOpt\_Status}, e.g., \texttt{NONOPT\_SUCCESS}.  These correspond to the EXIT messages listed in \S\ref{sec.output}.
 \end{itemize}
@@ -514,7 +511,7 @@ There are various EXIT messages that may be printed, which indicate the reason t
   \item \texttt{Termination check failure}: A failure occurred, due to a numerical tolerance being violated, in the termination checker.  By default, the code would not terminate based on such a tolerance, so this would only occur if a user turns this feature on as a termination condition.
 \end{itemize}
 
-When NonOpt is used from Python, the same information is available programmatically through \texttt{solver.status()}, which returns a value of the \texttt{nonoptpy.NonOpt\_Status} enumeration corresponding to the EXIT message; see \S\ref{sec.python}.
+When NonOpt is used from Python, the same information is available through \texttt{solver.status()}, which returns a value of the \texttt{nonoptpy.NonOpt\_Status} enumeration corresponding to the EXIT message; see \S\ref{sec.python}.
 
 Setting \texttt{print\_level} to \texttt{2} means that per-iteration output will be printed in addition to the basic output shown above.  A header line is printed periodically to indicate the meaning of the values in each column of the per-iteration output.  Further information about these quantities is provided in the list below.  The per-iteration output when the \texttt{direction\_computation} option is set to either \texttt{CuttingPlane} or \texttt{GradientCombination} is exactly the same, whereas when this option is set to \texttt{Gradient} the column \texttt{L?} is omitted since the small-scale QP subproblem solver is always employed for this strategy.
 
